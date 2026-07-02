@@ -1,6 +1,6 @@
 ---
 name: houdini-procedural-generation
-description: Create procedural geometry workflows using SOPs including scattering, copying, instancing, and parametric modeling. Use for procedural modeling workflows. Triggers: procedural generation, scatter, copy to points, procedural modeling, sops
+description: "Create procedural geometry workflows using SOPs including scattering, copying, instancing, and parametric modeling. Use for procedural modeling workflows. Triggers: procedural generation, scatter, copy to points, procedural modeling, sops"
 allowed-tools: Read,Write,Bash
 ---
 

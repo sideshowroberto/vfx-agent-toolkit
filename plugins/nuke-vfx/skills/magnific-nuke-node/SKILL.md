@@ -1,6 +1,6 @@
 ---
 name: magnific-nuke-node
-description: MagnificAI Nuke Group node — complete reference for building, modifying, debugging, or extending the MagnificAI.nk ToolSet. Node sends prompts and Nuke input images to Magnific AI and returns results as a Read node inside the group. Uses Chrome browser cookies (no API key). Installed at ~/.nuke/ToolSets/MagnificAI.nk. Use when asked about: MagnificAI node, Magnific inside Nuke, ExportWrite, GeneratedResult, postage stamp refresh, cookie extraction, Windows DPAPI, install_deps, refresh_cookies, Magnific API flow, WebP conversion, resolution knob, model list, cancel pattern, or thumbnail arrows.
+description: "MagnificAI Nuke Group node — complete reference for building, modifying, debugging, or extending the MagnificAI.nk ToolSet. Node sends prompts and Nuke input images to Magnific AI and returns results as a Read node inside the group. Uses Chrome browser cookies (no API key). Installed at ~/.nuke/ToolSets/MagnificAI.nk. Use when asked about: MagnificAI node, Magnific inside Nuke, ExportWrite, GeneratedResult, postage stamp refresh, cookie extraction, Windows DPAPI, install_deps, refresh_cookies, Magnific API flow, WebP conversion, resolution knob, model list, cancel pattern, or thumbnail arrows."
 allowed-tools: Read,Write,Edit,Bash
 ---
 

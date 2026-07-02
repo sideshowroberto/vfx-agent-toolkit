@@ -1,6 +1,6 @@
 ---
 name: houdini-vex-programming
-description: Write VEX code for Houdini including wrangles, custom operations, attribute manipulation, and performance optimization. Use when writing VEX scripts or custom operations. Triggers: vex, wrangle, vex code, attribute wrangle, point wrangle
+description: "Write VEX code for Houdini including wrangles, custom operations, attribute manipulation, and performance optimization. Use when writing VEX scripts or custom operations. Triggers: vex, wrangle, vex code, attribute wrangle, point wrangle"
 allowed-tools: Read,Write,Bash
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: magnific-video-gen
-description: Magnific MCP video generation skill. Use when generating video via Magnific, selecting video models, animating stills, using start/end keyframes, camera motion, audio/lipsync, multishot, or video upscale. Triggers on: "generate video with magnific", "magnific video", "animate this image", "magnific camera motion", "seedance", "kling video", "veo video", "video from still".
+description: "Magnific MCP video generation skill. Use when generating video via Magnific, selecting video models, animating stills, using start/end keyframes, camera motion, audio/lipsync, multishot, or video upscale. Triggers on: \"generate video with magnific\", \"magnific video\", \"animate this image\", \"magnific camera motion\", \"seedance\", \"kling video\", \"veo video\", \"video from still\"."
 allowed-tools: mcp__magnific__video_plan,mcp__magnific__video_generate,mcp__magnific__video_models_list,mcp__magnific__video_models_show,mcp__magnific__video_concatenate,mcp__magnific__video_upscale,mcp__magnific__creations_wait,mcp__magnific__creations_show,mcp__magnific__creations_get,mcp__magnific__folders_list,mcp__magnific__folders_create,mcp__magnific__account_balance
 ---
 

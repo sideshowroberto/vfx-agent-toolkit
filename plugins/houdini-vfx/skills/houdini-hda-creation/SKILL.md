@@ -1,6 +1,6 @@
 ---
 name: houdini-hda-creation
-description: Create and manage Houdini Digital Assets (HDAs) including parameter interfaces, compilation, versioning, and asset organization. Use when authoring reusable Houdini tools. Triggers: hda creation, digital asset, hda compile, hda parameters, create hda
+description: "Create and manage Houdini Digital Assets (HDAs) including parameter interfaces, compilation, versioning, and asset organization. Use when authoring reusable Houdini tools. Triggers: hda creation, digital asset, hda compile, hda parameters, create hda"
 allowed-tools: Read,Write,Bash
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: houdini-solaris-usd
-description: Work with USD (Universal Scene Description) in Houdini Solaris including stage creation, layer composition, variants, and USD export workflows. Use for USD workflows and Solaris. Triggers: solaris, usd, stage, layer, variant, usd export
+description: "Work with USD (Universal Scene Description) in Houdini Solaris including stage creation, layer composition, variants, and USD export workflows. Use for USD workflows and Solaris. Triggers: solaris, usd, stage, layer, variant, usd export"
 allowed-tools: Read,Write,Bash
 ---
 

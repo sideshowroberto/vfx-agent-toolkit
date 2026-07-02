@@ -1,6 +1,6 @@
 ---
 name: brave-search
-description: VFX-focused web research using Brave Search API. Two modes: MCP web_search for filtered URL results, LLM Context script for deep research with actual extracted page content. Use when searching for tutorials, documentation, errors, plugins, software updates, or any VFX research task.
+description: "VFX-focused web research using Brave Search API. Two modes: MCP web_search for filtered URL results, LLM Context script for deep research with actual extracted page content. Use when searching for tutorials, documentation, errors, plugins, software updates, or any VFX research task."
 allowed-tools: Read,Bash
 ---
 

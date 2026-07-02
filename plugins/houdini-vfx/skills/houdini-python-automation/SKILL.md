@@ -1,6 +1,6 @@
 ---
 name: houdini-python-automation
-description: Automate Houdini workflows using Python (HOM - Houdini Object Model) including node creation, parameter manipulation, scene management, and batch processing. Use when scripting Houdini workflows. Triggers: houdini python, hom, python script, automate houdini, batch process
+description: "Automate Houdini workflows using Python (HOM - Houdini Object Model) including node creation, parameter manipulation, scene management, and batch processing. Use when scripting Houdini workflows. Triggers: houdini python, hom, python script, automate houdini, batch process"
 allowed-tools: Read,Write,Bash
 ---
 
