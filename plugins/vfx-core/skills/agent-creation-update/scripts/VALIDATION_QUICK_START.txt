@@ -1,0 +1,185 @@
+================================================================================
+AGENT VALIDATION QUICK START
+================================================================================
+
+PURPOSE: Validate agent files against VFX_SKILL_CONSTITUTION.md Article IX
+
+LOCATION:
+.claude/skills/agent-creation-update/scripts/validate_agent.py
+
+--------------------------------------------------------------------------------
+BASIC USAGE
+--------------------------------------------------------------------------------
+
+# Validate agent in default location (.claude/agents)
+python validate_agent.py documentation-specialist
+
+# Validate agent in custom location
+python validate_agent.py my-agent --agents-dir path/to/agents
+
+--------------------------------------------------------------------------------
+WHAT IT CHECKS (6 VALIDATIONS)
+--------------------------------------------------------------------------------
+
+1. Filename Format
+   ✅ PASS: documentation-specialist.md
+   ❌ FAIL: documentation-specialist-v2.md (version suffix)
+   ❌ FAIL: DocumentationSpecialist.md (CamelCase)
+   ❌ FAIL: documentation_specialist.md (snake_case)
+
+2. Metadata Present
+   Required fields in YAML frontmatter:
+   - name: agent-name
+   - description: What + When + Triggers
+   - version: X.Y.Z
+   - last_updated: YYYY-MM-DD
+   - status: active | deprecated | experimental
+
+3. Name Matches Filename
+   File: documentation-specialist.md
+   Metadata: name: documentation-specialist
+   ✅ Must match exactly
+
+4. Version Format
+   ✅ PASS: 1.0.0, 2.1.3, 10.20.30
+   ❌ FAIL: v1.0.0, 1.0, 1.0.0-beta, 1.0.0.0
+
+5. Changelog Exists
+   - Version 1.0.0: Optional
+   - Version > 1.0.0: Required "## Version History" section
+   - Must document at least 2 versions (current + previous)
+
+6. Description Quality
+   - Length: 10-300 characters
+   - No vague language: "helps with", "does stuff", "manages things"
+   - Must have triggers: "use when", "for", "when"
+   - Formula: What + When + Triggers
+
+--------------------------------------------------------------------------------
+OUTPUT FORMAT
+--------------------------------------------------------------------------------
+
+Validating: documentation-specialist
+Path: C:\Users\...\documentation-specialist.md
+
+✅ Filename Format: No version suffix found, follows naming conventions
+✅ Metadata Present: All required fields found
+✅ Name Matches Filename: documentation-specialist == documentation-specialist
+✅ Version Format: 2.0.0 is valid semantic version
+✅ Changelog Exists: Version history section found (v2.0.0, v1.0.0)
+✅ Description Quality: Clear description with triggers
+
+RESULT: PASS (6/6 checks)
+
+--------------------------------------------------------------------------------
+EXIT CODES
+--------------------------------------------------------------------------------
+
+0 - All checks passed
+1 - One or more checks failed
+2 - File not found or error
+
+--------------------------------------------------------------------------------
+EXAMPLE VALID AGENT
+--------------------------------------------------------------------------------
+
+---
+name: my-agent
+description: Index-driven updates for VFX projects. Use when updating docs.
+version: 2.0.0
+last_updated: 2025-10-25
+status: active
+---
+
+# My Agent
+
+Documentation here.
+
+## Version History
+
+**v2.0.0** (2025-10-25) - Major Update
+- New features
+
+**v1.0.0** (2025-10-24) - Initial Release
+- Basic functionality
+
+--------------------------------------------------------------------------------
+TESTING
+--------------------------------------------------------------------------------
+
+# Run test suite
+cd .claude/skills/agent-creation-update/scripts
+python test_validation.py
+
+# Test with valid agent
+python validate_agent.py test-agent-valid
+
+# Test with invalid agent (version suffix)
+python validate_agent.py test-agent-invalid-v2
+
+--------------------------------------------------------------------------------
+INTEGRATION WITH WORKFLOW
+--------------------------------------------------------------------------------
+
+# Step 1: Create agent
+python create_agent.py my-new-agent
+
+# Step 2: Validate
+python validate_agent.py my-new-agent
+
+# Step 3: Fix issues (if any)
+# Edit: .claude/agents/my-new-agent.md
+
+# Step 4: Re-validate
+python validate_agent.py my-new-agent
+
+# Step 5: Commit when all checks pass
+
+--------------------------------------------------------------------------------
+COMMON ISSUES & FIXES
+--------------------------------------------------------------------------------
+
+Issue: "Missing required fields: version, last_updated, status"
+Fix: Add missing fields to YAML frontmatter
+
+Issue: "Filename contains version suffix"
+Fix: Rename file to remove -vX suffix (use metadata version instead)
+
+Issue: "Description contains vague language: helps with"
+Fix: Rewrite description with specific What + When + Triggers
+
+Issue: "Version X.Y.Z requires '## Version History' section"
+Fix: Add version history section with at least 2 versions
+
+Issue: "Mismatch: filename=agent-a, metadata=agent-b"
+Fix: Ensure filename and metadata name field match exactly
+
+Issue: "Version 'v1.0.0' must match X.Y.Z format"
+Fix: Remove 'v' prefix from version (1.0.0 not v1.0.0)
+
+--------------------------------------------------------------------------------
+CONSTITUTIONAL REFERENCE
+--------------------------------------------------------------------------------
+
+Article IX: Agent Versioning and Naming Conventions
+- Section 9.1: Static Agent Names
+- Section 9.3: Agent Header Metadata
+- Section 9.4: Version Numbering (Semantic Versioning)
+- Section 9.5: Changelog Requirements
+
+Article VIII: Documentation Standards
+- Section 8.2: Description Writing Guidelines
+
+Full document:
+ClaudeCode/development/VFX_SKILL_CONSTITUTION.md
+
+--------------------------------------------------------------------------------
+HELP
+--------------------------------------------------------------------------------
+
+python validate_agent.py --help
+
+For detailed implementation notes:
+.claude/skills/agent-creation-update/scripts/VALIDATION_IMPLEMENTATION_SUMMARY.md
+
+================================================================================

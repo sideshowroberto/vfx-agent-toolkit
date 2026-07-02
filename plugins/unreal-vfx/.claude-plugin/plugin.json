@@ -1,0 +1,8 @@
+{
+  "name": "unreal-vfx",
+  "description": "Unreal Engine 5.5 VFX pipeline: Blueprint automation, PCG, actor operations, Sequencer, Python scripting.",
+  "version": "1.0.1",
+  "author": {
+    "name": "Rob Williams"
+  }
+}

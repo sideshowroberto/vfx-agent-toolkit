@@ -1,0 +1,381 @@
+ARCHIVE_AGENT.PY WORKFLOW DIAGRAM
+=================================
+
+COMMAND LINE INVOCATION
+------------------------
+$ python archive_agent.py documentation-specialist --force --agents-dir .claude/agents
+                          │                        │        │
+                          │                        │        └─> Optional: Custom directory
+                          │                        └─> Optional: Force overwrite
+                          └─> Required: Agent name (without .md)
+
+
+MAIN WORKFLOW (10 STEPS)
+-------------------------
+
+  ┌──────────────────────────────────────────────────────────────────┐
+  │ Step 1: Resolve Agents Directory Path                           │
+  │ Input:  agents_dir = ".claude/agents" (or custom)               │
+  │ Output: agents_path = Path(agents_dir).resolve()                │
+  │ Action: Convert to absolute path                                │
+  └──────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │ Step 2: Build Agent File Path                                   │
+  │ Input:  agent_name = "documentation-specialist"                 │
+  │ Output: agent_file = agents_path / "documentation-specialist.md"│
+  │ Format: {agents_dir}/{agent_name}.md                            │
+  └──────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │ Step 3: Check Agent File Exists                                 │
+  │ Check:  agent_file.exists()                                     │
+  │ ✅ Yes → Continue                                                │
+  │ ❌ No  → Error: "Agent file not found"                          │
+  └──────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │ Step 4: Read Agent File                                         │
+  │ Action: content = agent_file.read_text(encoding='utf-8')       │
+  │ Error:  Catch exceptions → "Failed to read agent file"         │
+  └──────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │ Step 5: Parse YAML Frontmatter                                  │
+  │ Function: parse_yaml_frontmatter(content)                       │
+  │ Regex:    r'^---\n(.*?)\n---'                                   │
+  │ Output:   metadata = {'name': '...', 'version': '2.0.0', ...}  │
+  └──────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │ Step 6: Extract and Validate Version                            │
+  │ Extract: version = metadata.get('version', '').strip()          │
+  │ Check 1: version != '' → ❌ Error: "No version found"           │
+  │ Check 2: validate_version_format(version)                       │
+  │          Pattern: r'^\d+\.\d+\.\d+$'                            │
+  │          ✅ Valid (e.g., 2.0.0) → Continue                       │
+  │          ❌ Invalid (e.g., 1.0) → Error: "Invalid version"      │
+  └──────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │ Step 7: Create Archive Directory                                │
+  │ Path:   archive_dir = agents_path / "archive"                   │
+  │ Action: archive_dir.mkdir(exist_ok=True)                        │
+  │ Result: Creates directory if doesn't exist                      │
+  │ Error:  Catch exceptions → "Failed to create archive directory" │
+  └──────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │ Step 8: Build Archive Filename                                  │
+  │ Format: "{agent_name}-v{version}.md"                            │
+  │ Example: "documentation-specialist-v2.0.0.md"                   │
+  │ Path:   archive_path = archive_dir / archive_filename           │
+  └──────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │ Step 9: Check Archive Exists                                    │
+  │ Check: archive_path.exists() and not force                      │
+  │ ✅ Exists + force=True  → Continue (overwrite)                  │
+  │ ❌ Exists + force=False → Error: "Archive already exists..."    │
+  │ ✅ Not exists           → Continue                               │
+  └──────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │ Step 10: Copy File to Archive                                   │
+  │ Action: shutil.copy2(agent_file, archive_path)                  │
+  │ Note:   copy2() preserves metadata (timestamps, permissions)    │
+  │ Verify: archive_path.exists()                                   │
+  │ Error:  Catch exceptions → "Failed to copy file"               │
+  └──────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │ SUCCESS                                                          │
+  │ Return: {                                                        │
+  │   "success": True,                                               │
+  │   "archive_path": "C:\...\archive\doc-specialist-v2.0.0.md",    │
+  │   "version": "2.0.0",                                            │
+  │   "message": "Successfully archived..."                          │
+  │ }                                                                │
+  └──────────────────────────────────────────────────────────────────┘
+
+
+ERROR PATHS
+-----------
+
+Error at Step 3 (File Not Found):
+  ┌──────────────────────────────────────┐
+  │ agent_file.exists() == False         │
+  ├──────────────────────────────────────┤
+  │ Return: {                            │
+  │   "success": False,                  │
+  │   "message": "Agent file not found"  │
+  │ }                                    │
+  └──────────────────────────────────────┘
+
+Error at Step 6 (No Version):
+  ┌──────────────────────────────────────┐
+  │ version == '' or None                │
+  ├──────────────────────────────────────┤
+  │ Return: {                            │
+  │   "success": False,                  │
+  │   "message": "No version found..."   │
+  │ }                                    │
+  └──────────────────────────────────────┘
+
+Error at Step 6 (Invalid Version):
+  ┌──────────────────────────────────────────┐
+  │ validate_version_format() == False       │
+  ├──────────────────────────────────────────┤
+  │ Return: {                                │
+  │   "success": False,                      │
+  │   "message": "Invalid version format..." │
+  │ }                                        │
+  └──────────────────────────────────────────┘
+
+Error at Step 9 (Archive Exists):
+  ┌──────────────────────────────────────────┐
+  │ archive_path.exists() and not force      │
+  ├──────────────────────────────────────────┤
+  │ Return: {                                │
+  │   "success": False,                      │
+  │   "message": "Archive already exists..." │
+  │ }                                        │
+  └──────────────────────────────────────────┘
+
+
+YAML PARSING DETAIL
+--------------------
+
+Input File Content:
+  ┌──────────────────────────────┐
+  │ ---                          │ ← Frontmatter start
+  │ name: my-agent               │ ← Parse: key: value
+  │ description: Test agent      │ ← Parse: key: value
+  │ version: 2.0.0               │ ← Parse: key: value (CRITICAL)
+  │ tools: Read, Write           │ ← Parse: key: value
+  │ ---                          │ ← Frontmatter end
+  │                              │
+  │ Agent content here...        │ ← Ignored (not in frontmatter)
+  └──────────────────────────────┘
+
+Parsing Logic:
+  1. Regex: r'^---\n(.*?)\n---' → Extract frontmatter block
+  2. Split by '\n' → Get lines
+  3. For each line with ':' → Split into key:value
+  4. Strip whitespace → Store in metadata dict
+
+Output:
+  metadata = {
+    'name': 'my-agent',
+    'description': 'Test agent',
+    'version': '2.0.0',
+    'tools': 'Read, Write'
+  }
+
+
+VERSION VALIDATION DETAIL
+--------------------------
+
+Valid Versions (Pattern: ^\d+\.\d+\.\d+$):
+  ✅ 1.0.0     → Matches: 1 . 0 . 0
+  ✅ 2.0.0     → Matches: 2 . 0 . 0
+  ✅ 10.20.30  → Matches: 10 . 20 . 30
+
+Invalid Versions:
+  ❌ 1.0       → Missing patch number
+  ❌ v1.0.0    → Prefix 'v' not allowed
+  ❌ 1.0.0-beta → Pre-release tag not allowed
+  ❌ 1.0.x     → Non-numeric component
+
+
+DIRECTORY STRUCTURE
+-------------------
+
+Before Archiving:
+  .claude/agents/
+  ├── documentation-specialist.md  (version: 2.0.0)
+  ├── blender-specialist.md
+  └── unreal-specialist.md
+
+After Archiving:
+  .claude/agents/
+  ├── documentation-specialist.md  (version: 2.0.0, unchanged)
+  ├── blender-specialist.md
+  ├── unreal-specialist.md
+  └── archive/                     (created automatically)
+      └── documentation-specialist-v2.0.0.md  (copy of original)
+
+
+MULTIPLE VERSIONS
+-----------------
+
+Scenario: Archive v1.0.0, update agent to v2.0.0, archive v2.0.0
+
+Step 1: Archive v1.0.0
+  $ python archive_agent.py my-agent
+  Result: archive/my-agent-v1.0.0.md
+
+Step 2: Update agent file (manually edit)
+  Change: version: 1.0.0 → version: 2.0.0
+
+Step 3: Archive v2.0.0
+  $ python archive_agent.py my-agent
+  Result: archive/my-agent-v2.0.0.md
+
+Final Structure:
+  .claude/agents/
+  ├── my-agent.md (version: 2.0.0)
+  └── archive/
+      ├── my-agent-v1.0.0.md
+      └── my-agent-v2.0.0.md
+
+
+FORCE OVERWRITE
+---------------
+
+Without Force (Error):
+  $ python archive_agent.py my-agent
+  ❌ Error: Archive already exists: C:\...\archive\my-agent-v1.0.0.md
+     Use --force to overwrite.
+
+With Force (Success):
+  $ python archive_agent.py my-agent --force
+  ✅ Archived: C:\...\archive\my-agent-v1.0.0.md
+  Version: 1.0.0
+
+
+INTEGRATION EXAMPLE: BLENDER CONSOLIDATION
+-------------------------------------------
+
+Use Case: Archive 10 specialist agents before consolidation
+
+Commands:
+  $ python archive_agent.py blender-geometry-nodes
+  $ python archive_agent.py blender-materials-shaders
+  $ python archive_agent.py blender-animation
+  $ python archive_agent.py blender-sculpting
+  $ python archive_agent.py blender-rendering
+  $ python archive_agent.py blender-physics-simulation
+  $ python archive_agent.py blender-compositing
+  $ python archive_agent.py blender-grease-pencil
+  $ python archive_agent.py blender-addon-development
+  $ python archive_agent.py blender-api-compatibility
+
+Result:
+  .claude/agents/archive/
+  ├── blender-geometry-nodes-v1.0.0.md
+  ├── blender-materials-shaders-v1.0.0.md
+  ├── blender-animation-v1.0.0.md
+  ├── blender-sculpting-v1.0.0.md
+  ├── blender-rendering-v1.0.0.md
+  ├── blender-physics-simulation-v1.0.0.md
+  ├── blender-compositing-v1.0.0.md
+  ├── blender-grease-pencil-v1.0.0.md
+  ├── blender-addon-development-v1.0.0.md
+  └── blender-api-compatibility-v1.0.0.md
+
+Benefit: Preserve original agents before consolidation, allowing rollback
+
+
+TESTING WORKFLOW
+----------------
+
+Step 1: Manual Integration Test
+  $ cd tests/
+  $ python manual_test_archive.py
+  Output: Formatted test report with ✅/❌ indicators
+
+Step 2: Unit Tests
+  $ cd tests/
+  $ pytest test_archive.py -v
+  Output: 28+ tests, all passing
+
+Step 3: Real Agent Test
+  $ cd scripts/
+  $ python archive_agent.py test-agent-valid --agents-dir ../../..
+  Result: test-agent-valid-v2.0.0.md created in archive/
+
+Step 4: Verify Archive
+  $ ls .claude/agents/archive/
+  Output: test-agent-valid-v2.0.0.md
+
+
+PERFORMANCE CHARACTERISTICS
+----------------------------
+
+Time Complexity:
+  - File read:       O(n) where n = file size
+  - YAML parse:      O(m) where m = frontmatter lines
+  - File write:      O(n) where n = file size
+  - Overall:         O(n) linear with file size
+
+Space Complexity:
+  - Memory:          O(n) to hold file content
+  - Disk:            O(n) for archive copy
+  - Overall:         O(n) linear with file size
+
+Execution Time:
+  - Small files (<10 KB):   < 0.1s
+  - Medium files (100 KB):  < 0.5s
+  - Large files (1 MB):     < 1.0s
+
+Memory Usage:
+  - Minimal (file content only)
+  - No large buffers
+  - Efficient pathlib operations
+
+
+EXIT CODES
+----------
+
+  0  → Success
+       Archive created successfully
+
+  1  → Error
+       - Agent file not found
+       - No version in frontmatter
+       - Invalid version format
+       - Archive already exists (without --force)
+       - Failed to create archive directory
+       - Failed to copy file
+
+
+TROUBLESHOOTING GUIDE
+---------------------
+
+Problem: "Agent file not found"
+  → Check: Agent name correct? (without .md)
+  → Check: Agents directory path correct?
+  → Solution: Verify path and retry
+
+Problem: "No version found"
+  → Check: Agent has YAML frontmatter?
+  → Check: Frontmatter includes 'version: X.Y.Z'?
+  → Solution: Add version field to agent
+
+Problem: "Invalid version format"
+  → Check: Version follows X.Y.Z format?
+  → Solution: Update to semantic version (e.g., 2.0.0)
+
+Problem: "Archive already exists"
+  → Check: Archive file exists in archive/?
+  → Solution: Use --force or update version
+
+Problem: Script not found
+  → Check: Running from correct directory?
+  → Solution: Use absolute path or cd to scripts/
+
+
+---
+Last Updated: 2025-10-25
+Version: 1.0.0

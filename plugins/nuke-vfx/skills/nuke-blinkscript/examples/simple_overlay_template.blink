@@ -1,0 +1,85 @@
+// Simple Overlay Template - BlinkScript Starting Point
+// Use this as a foundation for custom overlays and effects
+//
+// Key Concepts:
+// - ePixelWise: Process entire pixel at once
+// - float4: Creates color picker in Nuke UI
+// - init(): Runs once (expensive calculations)
+// - process(): Runs per pixel (fast operations only)
+
+kernel SimpleOverlay : ImageComputationKernel<ePixelWise>
+{
+  // Input/Output Images
+  Image<eRead, eAccessPoint, eEdgeClamped> src;  // Input
+  Image<eWrite, eAccessPoint> dst;                // Output
+
+  // User Parameters (exposed in Nuke UI)
+  param:
+    // Enable/disable effect
+    bool enable;
+
+    // Line appearance
+    float4 lineColor;    // CRITICAL: float4 creates color picker!
+    float thickness;
+
+    // Position (normalized 0-1)
+    float positionX;     // 0 = left, 0.5 = center, 1 = right
+    float positionY;     // 0 = top, 0.5 = center, 1 = bottom
+
+    void define() {
+      defineParam(enable, "Enable", true);
+      defineParam(lineColor, "Line Colour", float4(1.0f, 0.0f, 0.0f, 1.0f)); // Red
+      defineParam(thickness, "Thickness", 2.0f);
+      defineParam(positionX, "Position X (0-1)", 0.5f);
+      defineParam(positionY, "Position Y (0-1)", 0.5f);
+    }
+
+  // Local Variables (precomputed in init())
+  local:
+    int imgWidth;
+    int imgHeight;
+    float lineX;  // Actual pixel position
+    float lineY;
+
+    void init() {
+      // Get image dimensions
+      imgWidth = dst.bounds.width();
+      imgHeight = dst.bounds.height();
+
+      // Convert normalized position (0-1) to pixel coordinates
+      lineX = imgWidth * positionX;
+      lineY = imgHeight * positionY;
+    }
+
+  // Process Function (runs for every pixel)
+  void process(int2 pos) {
+    // Read input pixel
+    float4 input = src();
+    float4 output = input;  // Start with input
+
+    // Only process if enabled
+    if (enable) {
+      float x = (float)pos.x;
+      float y = (float)pos.y;
+
+      // Check if pixel is on vertical line
+      bool onVerticalLine = fabs(x - lineX) < thickness;
+
+      // Check if pixel is on horizontal line
+      bool onHorizontalLine = fabs(y - lineY) < thickness;
+
+      // Draw lines if pixel is on them
+      if (onVerticalLine || onHorizontalLine) {
+        // Alpha blend line color over input
+        float alpha = lineColor.w;  // Alpha from 4th component
+        output.x = input.x * (1.0f - alpha) + lineColor.x * alpha;  // R
+        output.y = input.y * (1.0f - alpha) + lineColor.y * alpha;  // G
+        output.z = input.z * (1.0f - alpha) + lineColor.z * alpha;  // B
+        output.w = 1.0f;  // Full alpha
+      }
+    }
+
+    // Write to output
+    dst() = output;
+  }
+};

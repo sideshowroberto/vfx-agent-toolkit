@@ -1,0 +1,97 @@
+ARCHIVE_AGENT.PY QUICK REFERENCE
+================================
+
+BASIC USAGE
+-----------
+python archive_agent.py <agent_name>
+
+Examples:
+  python archive_agent.py documentation-specialist
+  python archive_agent.py blender-specialist
+
+
+COMMON OPTIONS
+--------------
+--force           Overwrite existing archive file
+--agents-dir      Custom agents directory path (default: .claude/agents)
+
+
+TYPICAL WORKFLOWS
+-----------------
+
+1. Archive before major update:
+   python archive_agent.py documentation-specialist
+   (manually update documentation-specialist.md version to 3.0.0)
+   python archive_agent.py documentation-specialist --force
+
+2. Archive all agents before consolidation:
+   python archive_agent.py blender-geometry-nodes
+   python archive_agent.py blender-materials-shaders
+   python archive_agent.py blender-animation
+   (repeat for all agents)
+
+3. Archive with custom directory:
+   python archive_agent.py my-agent --agents-dir C:\custom\path\.claude\agents
+
+
+OUTPUT
+------
+Success:
+  ✅ Archived: C:\...\archive\documentation-specialist-v2.0.0.md
+  Version: 2.0.0
+
+Error:
+  ❌ Error: Agent file not found: C:\...\nonexistent-agent.md
+
+
+REQUIREMENTS
+------------
+- Agent file must exist: .claude/agents/<agent_name>.md
+- Agent must have YAML frontmatter with:
+  ---
+  version: X.Y.Z
+  ---
+- Version format: Semantic versioning (e.g., 1.0.0, 2.1.3)
+
+
+ERROR HANDLING
+--------------
+Agent not found:
+  → Check agent name (without .md extension)
+  → Verify agents directory path
+
+No version found:
+  → Add 'version: X.Y.Z' to YAML frontmatter
+
+Invalid version:
+  → Use semantic version format (X.Y.Z)
+  → Examples: 1.0.0, 2.1.0, 10.20.30
+
+Archive exists:
+  → Use --force to overwrite
+  → Or update version in agent file first
+
+
+DIRECTORY STRUCTURE
+-------------------
+.claude/agents/
+├── documentation-specialist.md           (active)
+└── archive/                              (created automatically)
+    └── documentation-specialist-v2.0.0.md  (archived)
+
+
+TESTING
+-------
+Unit tests:
+  cd tests/
+  pytest test_archive.py -v
+
+Manual tests:
+  cd tests/
+  python manual_test_archive.py
+
+
+MORE INFO
+---------
+Full documentation: README_ARCHIVE.md
+GitHub issues: (your repo URL)

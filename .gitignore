@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+
+# Secrets - never commit
+.env
+*.pem
+*credentials*.json
+settings.local.json
+
+# Local scratch
+tmp/
+*.log

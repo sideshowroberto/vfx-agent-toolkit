@@ -1,0 +1,8 @@
+{
+  "name": "comfyui-node-dev",
+  "description": "ComfyUI custom node development: V3 API node structure, schemas, datatypes, inputs/outputs, execution lifecycle, frontend extensions, V1-to-V3 migration, and packaging/publishing.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Rob Williams"
+  }
+}

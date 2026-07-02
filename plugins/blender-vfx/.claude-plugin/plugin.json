@@ -1,0 +1,8 @@
+{
+  "name": "blender-vfx",
+  "description": "Blender VFX pipeline via the official Blender MCP (blender.org): modeling, animation, materials, geometry nodes, physics, rendering, sculpting, grease pencil, and ControlNet pass rendering for AI generation.",
+  "version": "2.0.0",
+  "author": {
+    "name": "Rob Williams"
+  }
+}

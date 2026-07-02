@@ -1,0 +1,15 @@
+[project]
+name = "maya-mcp"
+version = "0.1.0"
+description = "Maya MCP bridge — connects Claude Code to a live Maya session via commandPort"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "houdini": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "run",
+        "python",
+        "${HOUDINI_MCP_SERVER_PATH}"
+      ],
+      "env": {}
+    }
+  }
+}

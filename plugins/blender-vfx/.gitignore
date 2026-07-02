@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+uv.lock
+
+# Secrets
+.env
+*.env
+secrets.*
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db

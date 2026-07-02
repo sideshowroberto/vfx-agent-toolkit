@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "unreal-mcp": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "cd /d ${UNREAL_MCP_SERVER_PATH} && uv run unreal_mcp_server.py"
+      ],
+      "env": {}
+    }
+  }
+}
