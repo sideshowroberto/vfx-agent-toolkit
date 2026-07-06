@@ -1,12 +1,12 @@
 # unreal-vfx Plugin
 
-Connects Claude Code to Unreal Engine 5.5 via MCP. Enables Blueprint creation, PCG automation, actor operations, Sequencer workflows, and Python scripting — all from Claude Code.
+Connects Claude Code to Unreal Engine 5.8 via MCP. Enables Blueprint creation, PCG automation, actor operations, Sequencer workflows, and Python scripting — all from Claude Code.
 
 ---
 
 ## Before You Install — What Kind of UE Project Do You Need?
 
-The MCP connection works with **any running UE 5.5 Editor instance** with the plugin enabled. The question is what kind of project to run it against. This depends on your role:
+The MCP connection works with **any running UE 5.8 Editor instance** with the plugin enabled. The question is what kind of project to run it against. This depends on your role:
 
 ---
 
@@ -48,7 +48,7 @@ The MCP connection works with **any running UE 5.5 Editor instance** with the pl
 
 ### Developer / Pipeline Engineer
 
-**You need:** A C++ UE 5.5 install as your primary sandbox
+**You need:** A C++ UE 5.8 install as your primary sandbox
 
 **What this gives you:**
 - Full engine access — extend anything
@@ -67,7 +67,7 @@ C++ UE project (your sandbox)
 
 **What you need installed:**
 - Visual Studio 2022 (Community or higher) with "Game development with C++" workload
-- UE 5.5 source build or the standard UE5.5 install (either works — C++ game projects don't require a source build)
+- UE 5.8 source build or the standard UE5.5 install (either works — C++ game projects don't require a source build)
 
 ---
 
@@ -75,19 +75,18 @@ C++ UE project (your sandbox)
 
 ```
 Claude Code
-    MCP server (Python, runs in background)
-    -> TCP port 55557
-    -> UnrealMCP plugin (running inside UE Editor)
-    -> UE Python API / Blueprint API
+    -> HTTP (http://127.0.0.1:8000/mcp)
+    -> ModelContextProtocol plugin (native, runs inside the UE 5.8 Editor)
+    -> UE Python API / VibeUE toolset services
 ```
 
-The MCP server connects to **whatever UE project is currently open**. You can switch projects — just reopen UE with a different project and the connection follows. There is no lock to a specific project path.
+The MCP server runs INSIDE the editor - it serves whatever UE project is currently open. Switch projects by reopening UE; the connection follows. No external server process is needed.
 
 ---
 
 ## Prerequisites
 
-- Unreal Engine 5.5 (any project type — see above)
+- Unreal Engine 5.8 (any project type — see above)
 - `uv` Python package manager (installed by vfx-base)
 - The `unreal-mcp-main` Python server (see install notes below)
 
@@ -112,10 +111,10 @@ If the server can't be auto-detected, you'll be prompted for the path to the `un
 
 ## After Installation
 
-1. Open UE 5.5 with your project
-2. Enable the **UnrealMCP** plugin: Edit > Plugins > search "UnrealMCP" > Enable > Restart
-3. The plugin starts the TCP listener automatically on port 55557
-4. Open Claude Code and run `/mcp` — `unreal-mcp` should show as connected
+1. Open UE 5.8 with your project
+2. Enable the **ModelContextProtocol** plugin: Edit > Plugins > search "Model Context Protocol" > Enable > Restart (recommended: also install **VibeUE** from the Fab marketplace)
+3. Set auto-start in Config/DefaultEditorPerProjectUser.ini: bAutoStartServer=True, Port=8000, URLPath=/mcp (see connectors/unreal/register.ps1 header)
+4. Open Claude Code and run `/mcp` — `ue58-mcp` should show as connected
 5. Test: ask Claude "List all actors in the current level"
 
 ---
