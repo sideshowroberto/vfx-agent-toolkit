@@ -6,7 +6,7 @@ This is a Claude Code project pre-loaded with VFX pipeline skills and agents.
 
 ## Tools
 
-- **Unreal Engine 5.5** — cinematics, PCG, Sequencer
+- **Unreal Engine 5.8** — cinematics, PCG, Sequencer
 - **Nuke** — compositing
 - **Blender** — 3D modeling, animation, simulation
 - **Houdini** — procedural generation, FX
@@ -55,12 +55,11 @@ MCP servers connect Claude directly to VFX applications. Run `/mcp` to see activ
 - `context7` — library documentation lookup
 - `desktop-commander` — file and process operations
 
-**App servers** (installed via `claude-plugins-marketplace`):
+**App servers** (registered via `connectors/<app>` in vfx-agent-toolkit):
 - `nuke` — Nuke compositing control (port 8765)
 - `houdini` — Houdini scene control (port 9876)
 - `ue58-mcp` — Unreal Engine 5.8 control (native MCP, HTTP port 8000)
 - `comfyui` — AI image generation
-- `affine` — project management and knowledge base
 
 **Note on Blender:** Uses the official Blender MCP (blender.org). Enable the MCP add-on in Blender preferences and register via `connectorslender
 egister.ps1`.
@@ -84,8 +83,9 @@ Run `/skills` to see all available skills. Core skills pre-loaded in this projec
 | `agent-creation-update` | Create and update VFX agents |
 | `skill-creation-update` | Create and update VFX skills |
 | `development-management` | Spec-driven development workflows |
+| `wrap-session` | End-of-session wrap-up: save memories, session log, handoff plan |
 
-App-specific skills (Nuke, Houdini, Unreal, Blender, etc.) are installed via `claude-plugins-marketplace`.
+App-specific skills (Nuke, Houdini, Unreal, Blender, etc.) are installed via the vfx-agent-toolkit marketplace: `/plugin install <app>-vfx@vfx-agent-toolkit`.
 
 ---
 
