@@ -1,11 +1,14 @@
 # Silent Execution Pattern for Blueprint Automation
 
-**Version:** 1.0.0
+**Version:** 2.0.0
 **Created:** 2025-10-26
+**Last Updated:** 2026-07-06 (UE 5.8 native MCP migration)
+
+All Python in this document runs inside the Unreal Editor via `mcp__ue58-mcp__execute_python_code(code=...)`.
 
 ## The Problem
 
-Blueprint compilation in Unreal Engine 5.5 triggers **async validation** that locks the Blueprint asset. Any Python code that attempts to access the Blueprint during validation causes crashes or hangs.
+Blueprint compilation in Unreal Engine 5.8 triggers **async validation** that locks the Blueprint asset. Any Python code that attempts to access the Blueprint during validation causes crashes or hangs.
 
 This is the same root cause discovered during PCG automation (Session_2025-10-26_PCG_LandscapeDeformation.md).
 
@@ -45,7 +48,7 @@ unreal.KismetSystemLibrary.compile_blueprint(bp)
 
 Operations that trigger compilation:
 - `unreal.KismetSystemLibrary.compile_blueprint()`
-- `compile_blueprint` MCP tool
+- VibeUE `compile_blueprint` tool (via `mcp__ue58-mcp__call_tool`)
 - Component modifications that auto-compile
 - Property changes that trigger recompilation
 
@@ -60,9 +63,11 @@ bp = unreal.AssetToolsHelpers.get_asset_tools().create_asset(...)
 # Script ends
 
 # Phase 2: Add Components (separate script)
-from unreal_mcp_server import get_unreal_connection
-unreal_conn = get_unreal_connection()
-unreal_conn.send_command("add_component_to_blueprint", {...})
+import unreal
+bp = unreal.load_asset('/Game/Blueprints/BP_MyActor')
+scs = bp.simple_construction_script
+mesh_node = scs.create_node(unreal.StaticMeshComponent)
+scs.add_node(mesh_node)
 # Script ends
 
 # Phase 3: Compile (separate script)
@@ -72,7 +77,7 @@ unreal.KismetSystemLibrary.compile_blueprint(bp)
 # NO CODE AFTER - Silent Execution
 ```
 
-**Key:** Each phase is a separate MCP command execution. Python exits completely between phases.
+**Key:** Each phase is a separate `execute_python_code` call. Python exits completely between phases.
 
 ## Why This Works
 
@@ -106,7 +111,7 @@ if result.compiled:  # Access locked Blueprint
 **DO:**
 ```
 Check Unreal Output Log:
-<UNREAL_MCP_DIR>\MCPGameProject\Saved\Logs\MCPGameProject.log
+<YOUR_UE_PROJECT>\Saved\Logs\<ProjectName>.log
 
 Search for:
 LogBlueprint: [BP_MyActor] compiled successfully
@@ -169,13 +174,14 @@ After running compilation phase:
 
 ```python
 # Phase 2: Add Multiple Components (SAFE)
-from unreal_mcp_server import get_unreal_connection
-unreal_conn = get_unreal_connection()
+import unreal
+bp = unreal.load_asset('/Game/Blueprints/BP_MyActor')
+scs = bp.simple_construction_script
 
 # All these can be batched - no compilation triggered
-unreal_conn.send_command("add_component_to_blueprint", {...})
-unreal_conn.send_command("add_component_to_blueprint", {...})
-unreal_conn.send_command("add_component_to_blueprint", {...})
+scs.add_node(scs.create_node(unreal.StaticMeshComponent))
+scs.add_node(scs.create_node(unreal.PointLightComponent))
+scs.add_node(scs.create_node(unreal.BoxComponent))
 # Script ends
 ```
 
@@ -183,8 +189,9 @@ unreal_conn.send_command("add_component_to_blueprint", {...})
 
 ```python
 # DON'T BATCH COMPILATION
-unreal_conn.send_command("compile_blueprint", {"blueprint_name": "BP_A"})
-unreal_conn.send_command("compile_blueprint", {"blueprint_name": "BP_B"})  # CRASH
+import unreal
+unreal.KismetSystemLibrary.compile_blueprint(unreal.load_asset('/Game/Blueprints/BP_A'))
+unreal.KismetSystemLibrary.compile_blueprint(unreal.load_asset('/Game/Blueprints/BP_B'))  # CRASH
 ```
 
 **Reason:** First compilation locks resources, second call deadlocks.
@@ -197,7 +204,7 @@ unreal_conn.send_command("compile_blueprint", {"blueprint_name": "BP_B"})  # CRA
 1. ✅ Is compilation the last operation in script?
 2. ✅ Are you using separate phases (not one big script)?
 3. ✅ Did you remove all print/debug statements after compilation?
-4. ✅ Are you running via MCP (not direct Python console)?
+4. ✅ Are you running via `execute_python_code` (not an interactive Python console)?
 
 ### "Script runs but Blueprint not compiled"
 
@@ -233,5 +240,6 @@ unreal_conn.send_command("compile_blueprint", {"blueprint_name": "BP_B"})  # CRA
 **Blueprint API:**
 - `<workspace>\UnrealEngine\guides\blueprints`
 
-**Unreal MCP:**
-- `UnrealEngine/unreal-mcp-main/MCP_Capabilities_UE55.md`
+**UE 5.8 Native MCP:**
+- `mcp__ue58-mcp__execute_python_code` for editor Python
+- `mcp__ue58-mcp__discover_python_class(class_name=...)` for API discovery

@@ -1,15 +1,23 @@
 ---
 name: unreal-python-scripting
-description: Python API patterns for Unreal Engine 5.5 including Blueprint spawning, material workflows, component manipulation, and API limitations workarounds. Use when scripting Unreal, creating Python tools, encountering API limitations, or when user mentions unreal python, blueprint spawning, material instance, component properties, python api limitations, ue python.
-allowed-tools: Read, Write, Grep
+description: Python API patterns for Unreal Engine 5.8 including Blueprint spawning, material workflows, component manipulation, and API limitations workarounds. Use when scripting Unreal, creating Python tools, encountering API limitations, or when user mentions unreal python, blueprint spawning, material instance, component properties, python api limitations, ue python.
+allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool,Read,Write,Grep
 ---
 
 # Unreal Python Scripting
 
-**Version:** 1.0.0
-**Last Updated:** 2025-10-25
-**Target:** Unreal Engine 5.5+
-**Dependencies:** unreal Python module (built-in)
+**Version:** 2.0.0
+**Last Updated:** 2026-07-06
+**Target:** Unreal Engine 5.8+
+**Dependencies:** unreal Python module (built-in), UE 5.8 native MCP (HTTP, port 8000)
+
+---
+
+## MCP Execution
+
+All Python code runs via `mcp__ue58-mcp__execute_python_code(code=...)` which executes directly in the UE editor process. VibeUE toolsets are also available via `mcp__ue58-mcp__call_tool(toolset_name=..., tool_name=..., arguments={...})`.
+
+Use `mcp__ue58-mcp__discover_python_module(module_name="unreal")` to introspect available Python API.
 
 ---
 
@@ -156,22 +164,15 @@ for actor in actors:
 
 ### Workflow 5: Work Around API Limitations
 
-**Problem:** `register_component()` not available in Python (UE 5.5)
-
-**Symptom:** Component created but not visible in editor
+**Problem:** Some component registration methods not available in Python
 
 **Workaround:**
 - Use Blueprint actor with pre-configured components
-- Cannot dynamically add components fully in Python
 - Component hierarchy must be defined in Blueprint
 
 **Example:**
 ```python
-# ❌ DOESN'T WORK: Dynamic component creation
-component = unreal.ImagePlateComponent()
-actor.add_component(component)  # Component exists but not registered
-
-# ✅ WORKS: Blueprint-based approach
+# Use Blueprint-based approach
 bp = unreal.load_class(None, "/Game/BP_CameraWithPlate.BP_CameraWithPlate_C")
 actor = unreal.EditorLevelLibrary.spawn_actor_from_class(bp, ...)
 # Components already configured in Blueprint
@@ -189,7 +190,7 @@ actor = unreal.EditorLevelLibrary.spawn_actor_from_class(bp, ...)
 
 **Fix:**
 - Add `_C` suffix: `/Game/BP_Actor.BP_Actor_C`
-- Copy reference from Content Browser (right-click → Copy Reference)
+- Copy reference from Content Browser (right-click -> Copy Reference)
 - Use forward slashes `/` not backslashes `\`
 
 ---
@@ -201,7 +202,7 @@ actor = unreal.EditorLevelLibrary.spawn_actor_from_class(bp, ...)
 **Fix:**
 - Check property name (case-sensitive)
 - Use `dir(component)` to list available properties
-- Some properties are C++ only (see api_limitations_ue55.md)
+- Some properties are C++ only
 
 ---
 
@@ -211,10 +212,10 @@ actor = unreal.EditorLevelLibrary.spawn_actor_from_class(bp, ...)
 
 **Fix:**
 ```python
-# ❌ WRONG
+# WRONG
 instance.set_editor_property('BaseColor', texture)
 
-# ✅ CORRECT
+# CORRECT
 unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(
     instance, 'BaseColor', texture
 )
@@ -224,45 +225,13 @@ unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(
 
 ---
 
-### Issue 4: "Component Not Registered"
-
-**Symptom:** Component created but invisible in editor
-
-**Cause:** `register_component()` not available in Python (UE 5.5 limitation)
-
-**Fix:**
-- Use Blueprint actor with pre-configured components
-- Cannot add components dynamically in Python
-- See Workflow 5 for Blueprint workaround
-
----
-
-## API Limitations (UE 5.5)
-
-**Methods NOT Available in Python:**
-- `register_component()` - Component registration
-- `setup_attachment()` - Component attachment
-- `attach_to_component()` - Component parenting
-- Complex material graph construction
-- Custom component initialization
-
-**Workarounds:**
-- Blueprint-based actors for component hierarchies
-- Material instances instead of material construction
-- AssetTools for asset creation
-- EditorLevelLibrary for level operations
-
-**Complete list:** See `reference/api_limitations_ue55.md`
-
----
-
 ## Key Patterns
 
 ### Blueprint Loading
 ```python
 # Pattern: _C suffix required
 bp = unreal.load_class(None, "/Game/Path/BP_Name.BP_Name_C")
-                                    #         ↑ Repeat name with _C
+#                                       ^ Repeat name with _C
 ```
 
 ### Type Coercion
@@ -292,77 +261,34 @@ asset = tools.create_asset(
 
 ## Reference Documentation
 
-**api_limitations_ue55.md** - Complete list of Python API limitations
-- Methods not exposed (with workarounds)
-- C++-only patterns
-- Status for each limitation
-
-**blueprint_patterns.md** - Blueprint loading and spawning
-- `_C` suffix deep dive
-- Blueprint path resolution
-- Component access patterns
-
-**material_patterns.md** - Material workflows
-- Master material + instance pattern
-- Parameter types (Texture, Scalar, Vector)
-- MaterialEditingLibrary usage
-
-**component_patterns.md** - Component manipulation
-- Finding components by class
-- Property setting patterns
-- Attachment limitations
+**api_limitations_ue55.md** - Python API limitations and workarounds
+**blueprint_patterns.md** - Blueprint loading and spawning (`_C` suffix)
+**material_patterns.md** - Material workflows (MaterialEditingLibrary)
+**component_patterns.md** - Component manipulation patterns
 
 ---
 
 ## Constitutional Compliance
 
-### Article I: General Purpose Scripts ✅
-- Patterns apply to ALL projects (no hard-coded paths)
-- Examples use generic `/Game/...` paths
-- Tested with 3+ Blueprint types
+### Article I: General Purpose Scripts
+- All patterns apply to ALL projects (no hard-coded paths)
 
-### Article III: Progressive Disclosure ✅
-- SKILL.md: 463 lines (<500 limit ✅)
-- Margin: 37 lines (7% buffer)
-- Reference docs: 1,900 lines (on-demand)
+### Article III: Progressive Disclosure
+- SKILL.md under 500 lines, reference docs on-demand
 
-### Article IV: Test Independently ✅
-- All examples tested in UE 5.5 Python console
-- Verified with 3+ Blueprint types
-- Session: Session_2025-10-25_ImagePlate.md
-
-### Article V: Follow Official Patterns ✅
-- UE Python API documentation
-- MaterialEditingLibrary (Epic module)
-- AssetTools (official API)
-
-### Article VI: Context Efficiency ✅
-**Metrics:**
-```
-Before: UE Python guide (2,500 lines)
-After: SKILL.md (463) + Reference (400 avg) = 863 lines
-Savings: 64% reduction ✅
-```
-
-### Article VII: Cross-App Integration ⊘
-Not applicable (Unreal-specific)
-
-### Article VIII: Documentation Standards ✅
-- All required sections present
-- Description: What + When + Triggers
-- Semantic versioning (1.0.0)
+### Article V: Follow Official Patterns
+- UE Python API, MaterialEditingLibrary, AssetTools
 
 ---
 
 ## Version History
 
+**v2.0.0** (2026-07-06) - UE 5.8 Migration
+- Migrated from UE 5.5 to UE 5.8
+- Updated MCP calling pattern: `mcp__ue58-mcp__execute_python_code`
+- Added VibeUE toolset and Python introspection references
+- Added MCP Execution section
+
 **v1.0.0** (2025-10-25) - Initial Release
-- Blueprint spawning patterns (load_class with _C suffix)
-- Material instance creation (MaterialEditingLibrary)
-- Component property setting (set_editor_property)
-- API limitations database (UE 5.5 specific)
-- 5 standard workflows
-- 4 troubleshooting issues
-- Tested in Unreal Engine 5.5.0
-- Learnings from ImagePlate session
-- 64% context reduction vs monolithic guide
+- Blueprint spawning, material instances, component properties
+- API limitations database, 5 workflows, 4 troubleshooting issues

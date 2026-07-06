@@ -352,8 +352,9 @@ hython --version
 ### Basic Foreground Plate Setup
 
 ```python
-# Via Unreal MCP
-mcp__unreal-mcp__create_foreground_plate(
+# Via UE 5.8 native MCP: mcp__ue58-mcp__execute_python_code
+from ForegroundPlateSetup import create_foreground_plate
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG"
 )

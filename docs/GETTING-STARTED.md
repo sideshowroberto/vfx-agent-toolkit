@@ -13,7 +13,7 @@ Install these before anything else:
 | Claude Code | Runs everything | https://claude.com/claude-code |
 | Node.js 18+ | Nuke MCP server, npx-based connectors | https://nodejs.org (LTS) |
 | Python 3.12+ | Bridge scripts, ComfyUI tooling | https://python.org (check "Add to PATH") |
-| uv | Python-based MCP servers (Houdini, Unreal) | https://docs.astral.sh/uv/getting-started/installation/ |
+| uv | Python-based MCP servers (Houdini, Blender) | https://docs.astral.sh/uv/getting-started/installation/ |
 | Git | Cloning this repo for connector setup | https://git-scm.com |
 
 Verify from PowerShell:
@@ -123,10 +123,10 @@ with the bridge active, then Claude Code.
 ### Unreal Engine
 
 ```powershell
-connectors\unreal\install.ps1
+connectors\unreal\register.ps1
 ```
 
-Installs the bridge into your Unreal project and registers the Unreal MCP.
+Registers the UE 5.8 NATIVE MCP (no bridge needed). One-time editor setup first: enable the ModelContextProtocol plugin (Edit > Plugins), optionally install VibeUE from the Fab marketplace for 25+ extra toolsets, and set bAutoStartServer=True / Port=8000 / URLPath=/mcp in Config\DefaultEditorPerProjectUser.ini. The server runs inside the editor - tools connect while the editor is open. Full steps are in the register.ps1 header.
 Built against UE 5.5.
 
 ### Maya

@@ -1,18 +1,18 @@
 ---
 name: unreal-pcg-specialist
 description: Expert in Unreal Engine PCG system for procedural terrain, vegetation, and asset placement with Python automation
-version: 1.0.0
-last_updated: 2025-10-26
+version: 2.0.0
+last_updated: 2026-07-06
 status: active
 model: sonnet
-tools: Read,Write,Grep,Bash,mcp__unreal-mcp__*
+tools: Read,Write,Grep,Bash,mcp__ue58-mcp__*
 ---
 
 # Unreal PCG Specialist
 
-**Version:** 1.0.0
-**Last Updated:** 2025-10-26
-**Specialization:** Procedural Content Generation (PCG) workflows in Unreal Engine 5.5+
+**Version:** 2.0.0
+**Last Updated:** 2026-07-06
+**Specialization:** Procedural Content Generation (PCG) workflows in Unreal Engine 5.8+
 
 ---
 
@@ -71,8 +71,7 @@ Expert in Unreal Engine PCG system for procedural terrain, vegetation, and asset
 ### Supporting Skills
 
 **unreal-python-scripting:** Unreal Python API patterns, MCP integration
-**vfx-automation:** Pipeline integration, batch processing
-**unreal-mcp-development:** MCP tool creation for PCG operations
+**unreal-vfx-automation:** Pipeline integration, batch processing
 
 ---
 
@@ -230,17 +229,22 @@ Get Spline Data → Spline Sampler → Projection ← Get Landscape Data
 
 ### Available MCP Tools
 
-**execute_python:** Primary tool for PCG automation
+**mcp__ue58-mcp__execute_python_code(code=...):** Primary tool for PCG automation
+- Runs Python directly inside the editor's interpreter (UE 5.8 native MCP, HTTP port 8000)
 - Use for all graph operations
 - Respects Silent Execution pattern
 - Returns success/error status
 
+**Discovery helpers:**
+- `mcp__ue58-mcp__discover_python_class(class_name="PCGGraph")` - Find available methods/properties
+- `mcp__ue58-mcp__list_toolsets()` / `mcp__ue58-mcp__describe_toolset(...)` - Check for VibeUE toolset services
+
 **Limitations:**
-- No dedicated PCG MCP tools yet
-- All operations via execute_python
+- No dedicated PCG toolset yet
+- All operations via execute_python_code
 - Must use phased approach (separate scripts)
 
-**Best Practice:** Break complex graphs into multiple execute_python calls:
+**Best Practice:** Break complex graphs into multiple execute_python_code calls:
 1. Node creation
 2. Settings configuration
 3. Pin query (optional)
@@ -340,6 +344,12 @@ Always provide:
 ---
 
 ## Version History
+
+**v2.0.0** (2026-07-06) - UE 5.8 Migration
+- Migrated from community MCP (stdio, TCP 55557) to UE 5.8 native MCP (`ue58-mcp`, HTTP port 8000)
+- All PCG automation now via `mcp__ue58-mcp__execute_python_code`
+- Updated tools list and UE version references (5.5 to 5.8)
+- Removed reference to archived unreal-mcp-development skill
 
 **v1.0.0** (2025-10-26) - Initial Release
 - Discovered unreal.Name() requirement

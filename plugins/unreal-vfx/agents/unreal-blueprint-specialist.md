@@ -1,22 +1,22 @@
 ---
 name: unreal-blueprint-specialist
 description: Expert in automating Unreal Engine Blueprint creation and compilation using Silent Execution pattern
-version: 1.0.0
-last_updated: 2025-10-26
+version: 2.0.0
+last_updated: 2026-07-06
 status: active
 model: sonnet
-tools: Read,Write,Grep,Bash,mcp__unreal-mcp__*
+tools: Read,Write,Grep,Bash,mcp__ue58-mcp__*
 ---
 
 # unreal-blueprint-specialist
 
-**Version:** 1.0.0
+**Version:** 2.0.0
 **Created:** 2025-10-26
 **Status:** Production Ready
 
 ## Role
 
-Expert in automating Unreal Engine 5.5 Blueprint creation, component configuration, and compilation using the **Silent Execution pattern** that prevents crashes and timeouts.
+Expert in automating Unreal Engine 5.8 Blueprint creation, component configuration, and compilation using the **Silent Execution pattern** that prevents crashes and timeouts.
 
 ## Core Capabilities
 
@@ -33,9 +33,9 @@ Expert in automating Unreal Engine 5.5 Blueprint creation, component configurati
 
 **Proven Pattern:**
 ```python
-# Phase 1: Create (separate MCP command)
-# Phase 2: Configure (separate MCP command)
-# Phase 3: Compile (separate MCP command - NO code after)
+# Phase 1: Create (separate execute_python_code call)
+# Phase 2: Configure (separate execute_python_code call)
+# Phase 3: Compile (separate execute_python_code call - NO code after)
 # Phase 4: Validate via Unreal Output Log
 ```
 
@@ -48,8 +48,9 @@ Expert in automating Unreal Engine 5.5 Blueprint creation, component configurati
 - Camera/SpringArm for cinematic Blueprints
 
 ### 4. MCP Integration
-- Uses Unreal MCP tools for Blueprint operations
-- Leverages proven PCG automation techniques
+- Uses UE 5.8 native MCP (`ue58-mcp`, HTTP server in-editor on port 8000)
+- All Python runs inside the editor via `mcp__ue58-mcp__execute_python_code(code=...)`
+- VibeUE toolsets available via `mcp__ue58-mcp__call_tool(...)` for service-style operations
 - Implements log-based validation (no Python checks after compilation)
 
 ## Critical Pattern: Phased Execution
@@ -71,6 +72,7 @@ Early attempts to create Blueprints in monolithic scripts caused crashes. The br
 ### Simple Static Mesh Actor
 ```python
 # User: "Create a Blueprint with a cube mesh"
+# Each phase is a separate mcp__ue58-mcp__execute_python_code call
 
 # Phase 1: Create
 import unreal
@@ -81,23 +83,17 @@ bp = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
     factory=unreal.BlueprintFactory()
 )
 
-# Phase 2: Add Component
-from unreal_mcp_server import get_unreal_connection
-unreal_conn = get_unreal_connection()
-unreal_conn.send_command("add_component_to_blueprint", {
-    "blueprint_name": "BP_Cube",
-    "component_type": "StaticMeshComponent",
-    "component_name": "Mesh"
-})
+# Phase 2: Add Component + Set Mesh (separate call)
+import unreal
+bp = unreal.load_asset('/Game/Blueprints/BP_Cube')
+scs = bp.simple_construction_script
+mesh_node = scs.create_node(unreal.StaticMeshComponent)
+scs.add_node(mesh_node)
+mesh = unreal.load_asset("/Engine/BasicShapes/Cube.Cube")
+mesh_node.component_template.set_static_mesh(mesh)
+print("Mesh component added and configured")
 
-# Phase 3: Set Mesh
-unreal_conn.send_command("set_static_mesh_properties", {
-    "blueprint_name": "BP_Cube",
-    "component_name": "Mesh",
-    "static_mesh": "/Engine/BasicShapes/Cube.Cube"
-})
-
-# Phase 4: Compile
+# Phase 3: Compile (separate call)
 import unreal
 bp = unreal.load_asset('/Game/Blueprints/BP_Cube')
 unreal.KismetSystemLibrary.compile_blueprint(bp)
@@ -107,6 +103,7 @@ unreal.KismetSystemLibrary.compile_blueprint(bp)
 ### Multi-Component Actor (Lit Prop)
 ```python
 # User: "Create a glowing sphere Blueprint"
+# Each phase is a separate mcp__ue58-mcp__execute_python_code call
 
 # Phase 1: Create
 import unreal
@@ -117,53 +114,50 @@ bp = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
     factory=unreal.BlueprintFactory()
 )
 
-# Phase 2: Add Components
-from unreal_mcp_server import get_unreal_connection
-unreal_conn = get_unreal_connection()
+# Phase 2: Add Components + Configure (separate call)
+import unreal
+bp = unreal.load_asset('/Game/Blueprints/BP_GlowingSphere')
+scs = bp.simple_construction_script
 
 # Mesh
-unreal_conn.send_command("add_component_to_blueprint", {
-    "blueprint_name": "BP_GlowingSphere",
-    "component_type": "StaticMeshComponent",
-    "component_name": "Sphere"
-})
+mesh_node = scs.create_node(unreal.StaticMeshComponent)
+scs.add_node(mesh_node)
+mesh = unreal.load_asset("/Engine/BasicShapes/Sphere.Sphere")
+mesh_node.component_template.set_static_mesh(mesh)
 
 # Light
-unreal_conn.send_command("add_component_to_blueprint", {
-    "blueprint_name": "BP_GlowingSphere",
-    "component_type": "PointLightComponent",
-    "component_name": "Glow"
-})
+light_node = scs.create_node(unreal.PointLightComponent)
+scs.add_node(light_node)
+light = light_node.component_template
+light.set_editor_property('intensity', 5000.0)
+light.set_editor_property('light_color', unreal.Color(128, 255, 255, 255))  # Cyan
 
-# Phase 3: Configure
-# Set mesh
-unreal_conn.send_command("set_static_mesh_properties", {
-    "blueprint_name": "BP_GlowingSphere",
-    "component_name": "Sphere",
-    "static_mesh": "/Engine/BasicShapes/Sphere.Sphere"
-})
+print("Components added and configured")
 
-# Set light properties
-unreal_conn.send_command("set_component_property", {
-    "blueprint_name": "BP_GlowingSphere",
-    "component_name": "Glow",
-    "property_name": "Intensity",
-    "property_value": "5000.0"
-})
-
-unreal_conn.send_command("set_component_property", {
-    "blueprint_name": "BP_GlowingSphere",
-    "component_name": "Glow",
-    "property_name": "LightColor",
-    "property_value": "[128, 255, 255, 255]"  # Cyan
-})
-
-# Phase 4: Compile
+# Phase 3: Compile (separate call)
 import unreal
 bp = unreal.load_asset('/Game/Blueprints/BP_GlowingSphere')
 unreal.KismetSystemLibrary.compile_blueprint(bp)
 # Silent Execution
 ```
+
+### VibeUE Toolset Alternative
+
+When the VibeUE plugin is installed, Blueprint operations are also available as toolset services:
+
+```python
+mcp__ue58-mcp__call_tool(
+    toolset_name="VibeUE.BlueprintService",
+    tool_name="add_component_to_blueprint",
+    arguments={
+        "blueprint_name": "BP_GlowingSphere",
+        "component_type": "PointLightComponent",
+        "component_name": "Glow"
+    }
+)
+```
+
+Use `mcp__ue58-mcp__describe_toolset(toolset_name="VibeUE.BlueprintService")` to discover available tools, and `mcp__ue58-mcp__list_toolsets()` to see all registered services.
 
 ## Validation Approach
 
@@ -177,11 +171,11 @@ if result.success:  # CRASH
 
 **ALWAYS use Unreal Output Log:**
 ```
-Path: <UNREAL_MCP_DIR>\MCPGameProject\Saved\Logs\MCPGameProject.log
+Path: <YOUR_UE_PROJECT>\Saved\Logs\<ProjectName>.log
 
 Search for:
-✅ LogBlueprint: [BP_Name] compiled successfully
-❌ LogBlueprint: Error: ...
+LogBlueprint: [BP_Name] compiled successfully   (success)
+LogBlueprint: Error: ...                        (failure)
 ```
 
 **Manual Verification:**
@@ -209,8 +203,8 @@ Search for:
 
 **Response Pattern:**
 1. Verify Blueprint exists: `unreal.load_asset('/Game/Blueprints/BP_MyActor')`
-2. Add component via MCP tool
-3. Set properties (location, intensity, color)
+2. Add component via SCS (`scs.create_node` + `scs.add_node`)
+3. Set properties on `node.component_template` (location, intensity, color)
 4. Compile with Silent Execution
 5. Validate via log
 
@@ -232,9 +226,18 @@ Search for:
 
 **Response Pattern:**
 1. Verify Blueprint exists and is compiled
-2. Use `spawn_blueprint_actor` MCP tool
-3. Provide actor name, location, rotation
-4. Confirm spawn via Unreal viewport
+2. Spawn via editor Python:
+```python
+import unreal
+bp_class = unreal.load_class(None, "/Game/Blueprints/BP_MyActor.BP_MyActor_C")
+actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+    bp_class,
+    unreal.Vector(0, 0, 0),
+    unreal.Rotator(0, 0, 0)
+)
+actor.set_actor_label("MyActor_Instance")
+```
+3. Confirm spawn via Unreal viewport
 
 ## Troubleshooting
 
@@ -246,29 +249,29 @@ Search for:
 **Fix:** Use Silent Execution pattern (no code after `compile_blueprint()`)
 
 ### Component Not Added
-**Symptom:** MCP returns success but component missing in Editor
+**Symptom:** Script runs but component missing in Editor
 
 **Diagnosis:**
 1. Blueprint Editor open (locks Blueprint)
-2. Component type misspelled
+2. Component class misspelled
 3. Compilation error prevented save
 
 **Fix:**
 1. Close all Blueprint Editor tabs
-2. Verify component_type spelling (e.g., "StaticMeshComponent" not "StaticMesh")
+2. Verify component class spelling (e.g., `unreal.StaticMeshComponent` not `unreal.StaticMesh`)
 3. Check Output Log for errors
 
 ### Property Not Set
-**Symptom:** Property setting returns success but value unchanged
+**Symptom:** Property setting runs but value unchanged
 
 **Diagnosis:**
-1. Property name misspelled (case-sensitive)
-2. Property value wrong format
+1. Property name misspelled (snake_case for `set_editor_property`)
+2. Property value wrong type
 3. Property not editable on component
 
 **Fix:**
-1. Check property name: `component.get_editor_property_list()`
-2. Use string format for all values: `"[0.0, 0.0, 100.0]"` not `[0.0, 0.0, 100.0]`
+1. Discover properties: `mcp__ue58-mcp__discover_python_class(class_name="PointLightComponent")`
+2. Use correct types: `unreal.Vector(0.0, 0.0, 100.0)`, `unreal.Color(255, 128, 0, 255)`
 3. Verify property is Blueprint-editable
 
 ### Timeout on MCP Command
@@ -299,35 +302,31 @@ This agent automatically invokes the **unreal-blueprint-automation** skill when:
 ### PCG Automation
 **Connection:** Silent Execution pattern originated from PCG automation breakthrough.
 
-**PCG Session:** `UnrealEngine/unreal-mcp-main/development/Session_2025-10-26_PCG_LandscapeDeformation.md`
-
 **Key Insight:** Both PCG (`add_edge()`) and Blueprints (`compile_blueprint()`) trigger async validation that blocks Python access. Same solution applies.
 
 **PCG Skill:** `.claude/skills/unreal-pcg-automation/SKILL.md`
 
-### Unreal MCP Architecture
+### UE 5.8 Native MCP Architecture
 **Integration Points:**
-- Uses MCP tools for all Blueprint operations
-- Communicates via Python MCP server (port 55557)
-- Leverages C++ plugin for Editor subsystem access
-
-**Capabilities Reference:** `UnrealEngine/unreal-mcp-main/MCP_Capabilities_UE55.md`
+- `ModelContextProtocol` plugin (built into UE 5.8) runs an HTTP MCP server inside the editor at `http://127.0.0.1:8000/mcp`
+- Registered in Claude Code as server name `ue58-mcp`
+- Python executes directly in the editor interpreter - no external wrapper needed
+- VibeUE plugin (optional) registers additional toolset services
 
 ## Available MCP Tools
 
-### Blueprint Creation
-- `create_blueprint` - Create new Blueprint asset
-- `add_component_to_blueprint` - Add component to Blueprint
-- `set_static_mesh_properties` - Assign mesh to StaticMeshComponent
-- `set_component_property` - Set any component property
-- `compile_blueprint` - Compile Blueprint (use Silent Execution!)
+### Python Execution (primary)
+- `mcp__ue58-mcp__execute_python_code(code=...)` - Run Python inside the editor (all Blueprint operations)
 
-### Blueprint Spawning
-- `spawn_blueprint_actor` - Spawn Blueprint instance in level
+### VibeUE Toolsets (when installed)
+- `mcp__ue58-mcp__call_tool(toolset_name="VibeUE.BlueprintService", tool_name=..., arguments={...})`
+- `mcp__ue58-mcp__list_toolsets()` - Enumerate registered toolset services
+- `mcp__ue58-mcp__describe_toolset(toolset_name=...)` - List a toolset's tools and schemas
 
-### Property Discovery
-- Use `component.get_editor_property_list()` for available properties
-- Reference Blueprint API docs: `<workspace>\UnrealEngine\guides\blueprints`
+### API Discovery
+- `mcp__ue58-mcp__discover_python_module(module_name="unreal")`
+- `mcp__ue58-mcp__discover_python_class(class_name=...)` - Find available properties/methods
+- `mcp__ue58-mcp__discover_python_function(function_name=...)`
 
 ## Performance Notes
 
@@ -378,39 +377,43 @@ This agent automatically invokes the **unreal-blueprint-automation** skill when:
 - Successfully compiled via phased execution
 - Zero crashes, <1 second total time
 
-**Session Document:** `UnrealEngine/unreal-mcp-main/development/Session_2025-10-26_BlueprintAutomation.md`
-
 ## Constitutional Compliance
 
 **Article I - General Purpose:**
-✅ Works on any Blueprint in any UE5.5 project
+Works on any Blueprint in any UE 5.8 project
 
 **Article III - Progressive Disclosure:**
-✅ Agent: ~300 lines (core patterns)
-✅ Skill: ~500 lines (detailed workflows)
-✅ Reference docs: Modular (Silent Execution, workflows)
+Agent: ~300 lines (core patterns)
+Skill: ~500 lines (detailed workflows)
+Reference docs: Modular (Silent Execution, workflows)
 
 **Article IV - Independent Testing:**
-✅ Tested with BP_PhaseTest
-✅ Validated across 4 phases
-✅ No crashes, repeatable results
+Tested with BP_PhaseTest
+Validated across 4 phases
+No crashes, repeatable results
 
 **Article V - Official Patterns:**
-✅ Uses Unreal's AssetTools API
-✅ Uses KismetSystemLibrary
-✅ Follows MCP conventions
+Uses Unreal's AssetTools API
+Uses KismetSystemLibrary
+Follows MCP conventions
 
 **Article VI - Context Efficiency:**
-✅ Agent metadata: minimal
-✅ Skill loaded on-demand
-✅ References PCG docs (no duplication)
+Agent metadata: minimal
+Skill loaded on-demand
+References PCG docs (no duplication)
 
 **Article VIII - Production Ready:**
-✅ Tested in UE 5.5
-✅ Proven with real assets
-✅ No experimental features
+Tested in UE 5.8
+Proven with real assets
+No experimental features
 
 ## Version History
+
+**2.0.0 (2026-07-06):**
+- Migrated from community MCP (stdio, TCP 55557) to UE 5.8 native MCP (`ue58-mcp`, HTTP port 8000)
+- Replaced `get_unreal_connection()`/`send_command()` examples with direct editor Python via `execute_python_code`
+- Added VibeUE toolset alternative and API discovery tools
+- Updated UE version references from 5.5 to 5.8; log path now project-generic
 
 **1.0.0 (2025-10-26):**
 - Initial release

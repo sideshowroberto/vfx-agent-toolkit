@@ -73,7 +73,7 @@ Install `vfx-core` first. Everything else is per-project, install what you use.
 | `vfx-core` | Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander). |
 | `nuke-vfx` | Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, batch shot setup, and Magnific-in-Nuke. |
 | `houdini-vfx` | Houdini VFX pipeline: procedural generation, USD/Solaris, VEX, Python automation, HDA creation. |
-| `unreal-vfx` | Unreal Engine 5.5 VFX pipeline: Blueprint automation, PCG, actor operations, Sequencer, Python scripting. |
+| `unreal-vfx` | Unreal Engine 5.8 VFX pipeline via the native UE MCP (ModelContextProtocol plugin + VibeUE toolsets): Blueprint automation, PCG, actor operations, Sequencer, Python scripting. |
 | `blender-vfx` | Blender VFX pipeline via the official Blender MCP (blender.org): modeling, animation, materials, geometry nodes, physics, rendering, sculpting, grease pencil, and ControlNet pass rendering for AI generation. |
 | `comfyui-vfx` | ComfyUI pipeline via the ComfyUI MCP and Comfy CLI: workflow analysis, node/model requirements mapping, and headless generation guidance. |
 | `comfyui-node-dev` | ComfyUI custom node development: V3 API node structure, schemas, datatypes, inputs/outputs, execution lifecycle, frontend extensions, V1-to-V3 migration, and packaging/publishing. |
@@ -90,7 +90,7 @@ Details and per-app notes: [connectors/README.md](connectors/README.md)
 |-----------|--------------|-------|
 | `connectors\nuke` | Installs bundled bridge files into `~\.nuke` and registers the Nuke MCP | Bridge code included in this repo |
 | `connectors\houdini` | Installs the Houdini bridge and registers the Houdini MCP | Bridge code included in this repo |
-| `connectors\unreal` | Installs the Unreal bridge and registers the Unreal MCP | Bridge code included in this repo |
+| `connectors\unreal` | Registers the UE 5.8 NATIVE MCP (ModelContextProtocol plugin, HTTP port 8000) | UE 5.8 with the plugin enabled; VibeUE from Fab recommended |
 | `connectors\maya` | Installs the Maya bridge and registers the Maya MCP | Bridge code included in this repo |
 | `connectors\blender` | Registers the official Blender MCP from blender.org | Add-on ships with Blender 4.5+; register.ps1 only |
 | `connectors\comfyui` | Registers the ComfyUI MCP (`npx comfyui-mcp`) | Comfy CLI (`pip install comfy-cli`) recommended for headless generation |
@@ -103,10 +103,10 @@ Details and per-app notes: [connectors/README.md](connectors/README.md)
 | [Claude Code](https://claude.com/claude-code) | Everything |
 | Node.js 18+ | Nuke MCP server, npx-based connectors |
 | Python 3.12+ | Bridge scripts, ComfyUI tooling |
-| [uv](https://docs.astral.sh/uv/) | Python-based MCP servers (Houdini, Unreal) |
+| [uv](https://docs.astral.sh/uv/) | Python-based MCP servers (Houdini, Blender) |
 | Windows + PowerShell | The installers (skills/agents work on any OS) |
 
-Per-application: Nuke 14+, Houdini 20+, Unreal Engine 5.5, Blender 4.5+
+Per-application: Nuke 14+, Houdini 20+, Unreal Engine 5.8, Blender 4.5+
 (for the bundled MCP add-on), Maya 2024+, a local ComfyUI install, and a
 Magnific account for the Magnific connector.
 

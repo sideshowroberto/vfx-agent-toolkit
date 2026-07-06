@@ -1,44 +1,69 @@
 # unreal/register.ps1
-# Registers the Unreal Engine MCP server with Claude Code.
-# Assumes UnrealMCP plugin is already enabled in your UE project.
+# Registers the UE 5.8 NATIVE MCP server with Claude Code.
+#
+# Unreal Engine 5.8 ships its own MCP server: the "ModelContextProtocol"
+# editor plugin runs an HTTP MCP endpoint inside the editor. No bridge code
+# or external server process is needed anymore.
+#
+# One-time setup inside your UE project (before running this script):
+#   1. Enable the "ModelContextProtocol" plugin (built into UE 5.8):
+#      Edit > Plugins > search "Model Context Protocol" > enable > restart editor.
+#   2. RECOMMENDED: install the free "VibeUE" plugin from the Fab marketplace.
+#      It extends the native MCP with 25+ toolset services (Blueprints, assets,
+#      materials, etc.) exposed via the call_tool interface.
+#   3. Configure auto-start in <YourProject>\Config\DefaultEditorPerProjectUser.ini:
+#        [/Script/ModelContextProtocol.MCPServerSettings]
+#        bAutoStartServer=True
+#        Port=8000
+#        URLPath=/mcp
+#   4. If installing plugins by name in your .uproject, the correct names are
+#      "ModelContextProtocol" and "ToolsetRegistry" (NOT "UnrealMCP").
+#
+# The server only runs while the editor is open. Claude Code connects over HTTP,
+# so registration works even when the editor is closed - tools appear once the
+# editor (and MCP server) is running.
 
-param([string]$ServerPath = "")
+param(
+    [int]$Port = 8000,
+    [string]$UrlPath = "/mcp",
+    [string]$Scope = "project"
+)
 
-Write-Host "=== Unreal MCP — Register ===" -ForegroundColor Cyan
+Write-Host "=== Unreal Engine 5.8 Native MCP - Register ===" -ForegroundColor Cyan
 
 function Test-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
-if (-not (Test-Command "uv")) { Write-Error "uv not found. Run: pip install uv"; exit 1 }
-
-if (-not $ServerPath) { $ServerPath = $env:UNREAL_MCP_SERVER_PATH }
-
-if (-not $ServerPath -or -not (Test-Path (Join-Path $ServerPath "unreal_mcp_server.py"))) {
-    $candidates = @(
-        # Bundled with this connector (vfx-agent-toolkit\connectors\unreal\bridge)
-        (Join-Path $PSScriptRoot "bridge"),
-        # Common standalone clone location
-        (Join-Path $env:USERPROFILE "Documents\unreal-mcp-main\Python")
-    )
-    $ServerPath = $candidates | Where-Object { Test-Path (Join-Path $_ "unreal_mcp_server.py") } | Select-Object -First 1
+if (-not (Test-Command "claude")) {
+    Write-Error "Claude Code not found. Install from https://claude.ai/code"
+    exit 1
 }
 
-if (-not $ServerPath) {
-    $ServerPath = Read-Host "Enter path to unreal-mcp-main/Python directory"
-    if (-not $ServerPath) { exit 1 }
-}
+$url = "http://127.0.0.1:$Port$UrlPath"
 
-$resolved = Resolve-Path $ServerPath -ErrorAction SilentlyContinue
-if ($resolved) { $ServerPath = $resolved.Path }
-
-Write-Host "  [OK] Server: $ServerPath" -ForegroundColor Green
-[System.Environment]::SetEnvironmentVariable("UNREAL_MCP_SERVER_PATH", $ServerPath, "User")
-
-Write-Host "Installing Python dependencies..."
-Push-Location $ServerPath
-uv sync
-Pop-Location
-
+# Remove any old registrations (community unreal-mcp is retired; re-register ue58-mcp cleanly)
 $existing = claude mcp list 2>&1
-if ($existing -match "unreal-mcp") { claude mcp remove unreal-mcp --scope user 2>&1 | Out-Null }
-claude mcp add --transport stdio unreal-mcp --scope user -- cmd /c "cd /d `"$ServerPath`" && uv run unreal_mcp_server.py"
-Write-Host "  [OK] unreal-mcp registered" -ForegroundColor Green
+if ($existing -match "unreal-mcp") {
+    Write-Host "  Removing retired community 'unreal-mcp' registration..." -ForegroundColor Yellow
+    claude mcp remove unreal-mcp 2>&1 | Out-Null
+}
+if ($existing -match "ue58-mcp") {
+    claude mcp remove ue58-mcp 2>&1 | Out-Null
+}
+
+claude mcp add --transport http ue58-mcp $url --scope $Scope
+Write-Host "  [OK] ue58-mcp registered ($url, scope: $Scope)" -ForegroundColor Green
+
+# Probe: is the editor running with the MCP server up?
+try {
+    $null = Invoke-WebRequest -Uri $url -Method Head -TimeoutSec 3 -UseBasicParsing -ErrorAction Stop
+    Write-Host "  [OK] MCP endpoint is responding - editor is running" -ForegroundColor Green
+} catch {
+    Write-Host "  [INFO] Endpoint not responding yet. Start the UE editor (with the" -ForegroundColor Yellow
+    Write-Host "         ModelContextProtocol plugin enabled) and tools will connect." -ForegroundColor Yellow
+}
+
+Write-Host ""
+Write-Host "Key tools once connected:" -ForegroundColor White
+Write-Host "  execute_python_code(code=...)   - run editor Python (import unreal directly)" -ForegroundColor Gray
+Write-Host "  list_toolsets() / call_tool(...) - VibeUE toolset services" -ForegroundColor Gray
+Write-Host "  discover_python_module/class/function - API discovery" -ForegroundColor Gray
 claude mcp list

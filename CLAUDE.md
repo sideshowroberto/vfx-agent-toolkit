@@ -21,7 +21,7 @@ plugins\<plugin>\                 One directory per plugin
   install.ps1                     Optional setup script (vfx-core has one)
 connectors\<app>\                 MCP bridge installers per application
   install.ps1 / register.ps1      Setup scripts
-  bridge\                         Bundled bridge code (nuke, houdini, unreal, maya)
+  bridge\                         Bundled bridge code (nuke, houdini, maya)
 docs\                             GETTING-STARTED.md, ARCHITECTURE.md
 ```
 

@@ -29,8 +29,8 @@
                     },
                     {
                         "name":  "unreal-vfx",
-                        "version":  "1.0.1",
-                        "description":  "Unreal Engine 5.5 VFX pipeline: Blueprint automation, PCG, actor operations, Sequencer, Python scripting.",
+                        "version":  "2.0.0",
+                        "description":  "Unreal Engine 5.8 VFX pipeline via the native UE MCP (ModelContextProtocol plugin + VibeUE toolsets): Blueprint automation, PCG, actor operations, Sequencer, Python scripting.",
                         "source":  "./plugins/unreal-vfx"
                     },
                     {
@@ -41,8 +41,8 @@
                     },
                     {
                         "name":  "comfyui-vfx",
-                        "version":  "2.0.0",
-                        "description":  "ComfyUI pipeline via the ComfyUI MCP and Comfy CLI: workflow analysis, node/model requirements mapping, and headless generation guidance.",
+                        "version":  "2.1.0",
+                        "description":  "ComfyUI pipeline via the ComfyUI MCP and Comfy CLI, with optional ComfyUI_FL-MCP for live canvas operations: workflow analysis, node/model requirements mapping, and headless generation guidance.",
                         "source":  "./plugins/comfyui-vfx"
                     },
                     {

@@ -64,43 +64,40 @@ tools:
 
 **Tool Count:** 6 tools
 
-**MCP Tools:** Would use `mcp__unreal-mcp__*` tools when available (spawn_actor, set_actor_transform, etc.)
+**MCP Tools:** Would use `mcp__ue58-mcp__*` tools when available (execute_python_code, call_tool, discover_python_class, etc.)
 
 ---
 
 ## 🔌 Unreal MCP Integration
 
 ### Connection Details
-**MCP Server:** Unreal MCP Server (FastMCP)
-**C++ Plugin:** UnrealMCP (TCP server on port 55557)
-**Location:** `UnrealEngine/unreal-mcp-main/`
+**MCP Server:** UE 5.8 native MCP (`ModelContextProtocol` plugin, HTTP server in-editor)
+**Endpoint:** `http://127.0.0.1:8000/mcp` (registered as server name `ue58-mcp`)
+**Toolsets:** VibeUE plugin (optional) adds Blueprint/asset services
 
 **Health Check:**
 ```bash
-# Verify Python MCP server
-ps aux | grep unreal_mcp_server.py
+# Verify in-editor MCP endpoint responds
+curl -s http://127.0.0.1:8000/mcp
 
 # Verify Unreal Editor running with plugin
 tasklist | findstr "UnrealEditor"
 ```
 
-### MCP Capabilities (as of 2025-10-24)
+### MCP Capabilities (UE 5.8 native MCP)
 
-**✅ Working:**
-- Actor spawning (`spawn_actor`, `spawn_static_mesh_actor`)
-- Transform operations (`set_actor_transform`)
-- Component property setting (`set_actor_component_property`)
+**✅ Working (via `execute_python_code` editor Python):**
+- Actor spawning and manipulation
+- Transform operations
+- Component property setting
 - Blueprint creation and compilation
 - ObjectProperty support (meshes, materials, textures)
+- PCG graph automation (phased execution)
 
-**❌ Not Yet Supported:**
-- PCG (Procedural Content Generation)
-- Spline editing (can create, cannot edit points)
-- Sequencer/animation
-- Blueprint visual scripting (untested)
-- UMG widgets (untested)
+**✅ Via VibeUE toolsets (`call_tool`):**
+- Blueprint services, asset operations (enumerate with `list_toolsets()`)
 
-**Reference:** `UnrealEngine/unreal-mcp-main/MCP_Capabilities_UE55.md`
+**Discovery:** `discover_python_class` / `discover_python_module` for API exploration
 
 ---
 

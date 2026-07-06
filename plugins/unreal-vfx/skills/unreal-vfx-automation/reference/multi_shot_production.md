@@ -4,6 +4,18 @@
 
 ---
 
+## Calling Convention (UE 5.8 Native MCP)
+
+All Python in this document runs **inside the Unreal Editor** via `mcp__ue58-mcp__execute_python_code(code=...)`. The `create_foreground_plate()` helper comes from `ForegroundPlateSetup.py` - copy it into your UE project's `Content/Python/` folder so it is importable from editor Python:
+
+```python
+from ForegroundPlateSetup import create_foreground_plate
+```
+
+Batch loops run in a single `execute_python_code` call (plate setup does not trigger Blueprint compilation, so batching is safe).
+
+---
+
 ## Overview
 
 **The Challenge:**
@@ -55,7 +67,7 @@ MI_Shot002_FG (Material Instance)
 **Step 1: Create Master Material (One Time)**
 ```python
 # First shot creates master material
-result = mcp__unreal-mcp__create_foreground_plate(
+result = create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG",
     master_material_path="/Game/Materials/M_ForegroundPlate_Master"
@@ -67,7 +79,7 @@ result = mcp__unreal-mcp__create_foreground_plate(
 ```python
 # Subsequent shots create instances only
 for shot_num in range(2, 51):  # Shots 2-50
-    result = mcp__unreal-mcp__create_foreground_plate(
+    result = create_foreground_plate(
         sequence_path=f"D:/Plates/Shot{shot_num:03d}/Shot{shot_num:03d}_0001.exr",
         plate_name=f"Shot{shot_num:03d}_FG",
         master_material_path="/Game/Materials/M_ForegroundPlate_Master"
@@ -116,7 +128,7 @@ M_Shot003_FG (Unique Material)
 ```python
 # Each shot creates unique material
 for shot_num in range(1, 5):
-    result = mcp__unreal-mcp__create_foreground_plate(
+    result = create_foreground_plate(
         sequence_path=f"D:/Plates/Shot{shot_num:03d}/Shot{shot_num:03d}_0001.exr",
         plate_name=f"Shot{shot_num:03d}_FG"
         # No master_material_path = unique material
@@ -179,7 +191,7 @@ for shot_folder in sorted(shot_folders):
 
     # Create foreground plate
     print(f"📦 Processing {shot_folder}...")
-    result = mcp__unreal-mcp__create_foreground_plate(
+    result = create_foreground_plate(
         sequence_path=sequence_path,
         plate_name=plate_name,
         master_material_path=master_material
@@ -232,7 +244,7 @@ with open("D:/VFX/shots.csv", "r") as f:
 for shot in shots:
     print(f"📦 Processing {shot['shot_name']}...")
 
-    result = mcp__unreal-mcp__create_foreground_plate(
+    result = create_foreground_plate(
         sequence_path=shot['sequence_path'],
         plate_name=shot['shot_name'],
         opacity_multiplier=float(shot['opacity']),
@@ -290,13 +302,13 @@ Shot002_0001.exr, Shot002_0002.exr, ...
 **Multiple Plates Per Shot:**
 ```python
 # Foreground plate
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/FG/Shot001_FG_0001.exr",
     plate_name="Shot001_FG"
 )
 
 # Background plate
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/BG/Shot001_BG_0001.exr",
     plate_name="Shot001_BG"
 )
@@ -305,13 +317,13 @@ mcp__unreal-mcp__create_foreground_plate(
 **Shot Variants:**
 ```python
 # Version A
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot003/v001/Shot003A_0001.exr",
     plate_name="Shot003A_FG"
 )
 
 # Version B
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot003/v002/Shot003B_0001.exr",
     plate_name="Shot003B_FG"
 )
@@ -397,7 +409,7 @@ D:/Plates/Shot001/
 ```python
 # Batch setup with proxy
 for shot_num in range(1, 51):
-    mcp__unreal-mcp__create_foreground_plate(
+    create_foreground_plate(
         sequence_path=f"D:/Plates/Shot{shot_num:03d}/Shot{shot_num:03d}_0001.exr",
         plate_name=f"Shot{shot_num:03d}_FG",
         proxy_path="lowres",  # Use lowres subfolder
@@ -637,7 +649,7 @@ Use proxy during development, full-res only for final render
 **1. Proxy Workflow:**
 ```python
 # Use 1080p proxy during preview
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     ...,
     proxy_path="lowres"
 )
@@ -706,7 +718,7 @@ Total: 6,000 frames, ~240GB
 **Day 1: Initial Setup (Proxy)**
 ```python
 # Create master material with Shot001
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG",
     proxy_path="lowres",
@@ -715,7 +727,7 @@ mcp__unreal-mcp__create_foreground_plate(
 
 # Batch remaining 49 shots (proxy)
 for shot_num in range(2, 51):
-    mcp__unreal-mcp__create_foreground_plate(
+    create_foreground_plate(
         sequence_path=f"D:/Plates/Shot{shot_num:03d}/Shot{shot_num:03d}_0001.exr",
         plate_name=f"Shot{shot_num:03d}_FG",
         proxy_path="lowres",
@@ -773,7 +785,7 @@ if parent.get_name() != "M_ForegroundPlate_Master":
 **Fix:**
 ```python
 # Re-create with master_material_path parameter
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     ...,
     master_material_path="/Game/Materials/M_ForegroundPlate_Master"
 )
@@ -815,7 +827,7 @@ Shots 17-50 not created ❌
 **Diagnosis:**
 ```python
 # Check error in result
-result = mcp__unreal-mcp__create_foreground_plate(...)
+result = create_foreground_plate(...)
 if not result["success"]:
     print(f"Error: {result['errors']}")
     # Common: "First frame not found"
@@ -826,7 +838,7 @@ if not result["success"]:
 # Add error handling to batch script
 for shot_num in range(1, 51):
     try:
-        result = mcp__unreal-mcp__create_foreground_plate(...)
+        result = create_foreground_plate(...)
         if result["success"]:
             print(f"✅ Shot{shot_num:03d}")
         else:
@@ -852,5 +864,5 @@ for shot_num in range(1, 51):
 - ForegroundPlateSetup.py (core automation)
 - Batch processing examples (this document)
 
-**Version:** 1.0.0
-**Last Updated:** 2025-10-25
+**Version:** 2.0.0
+**Last Updated:** 2026-07-06 (UE 5.8 native MCP migration - create_foreground_plate now called via editor Python through mcp__ue58-mcp__execute_python_code)

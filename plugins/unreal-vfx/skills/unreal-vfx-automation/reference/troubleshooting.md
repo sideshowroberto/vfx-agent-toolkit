@@ -1,7 +1,7 @@
 # Unreal VFX Automation - Troubleshooting Guide
 
-**Version:** 1.0.0
-**Last Updated:** 2025-10-25
+**Version:** 2.0.0
+**Last Updated:** 2026-07-06
 **Skill:** unreal-vfx-automation
 **Purpose:** Complete diagnostic guide for resolving foreground plate and image sequence issues
 
@@ -10,6 +10,12 @@
 ## Overview
 
 This guide provides detailed troubleshooting for the most common issues encountered when using the unreal-vfx-automation skill. Each issue includes symptoms, diagnosis steps, solutions, and validation procedures.
+
+**Calling convention (UE 5.8 native MCP):** All Python in this document runs inside the Unreal Editor via `mcp__ue58-mcp__execute_python_code(code=...)`. The `create_foreground_plate()` helper comes from `ForegroundPlateSetup.py` - copy it (and `InspectCameraComponents.py`) into your UE project's `Content/Python/` folder, then import directly:
+
+```python
+from ForegroundPlateSetup import create_foreground_plate
+```
 
 **Quick Navigation:**
 - [Issue 1: ImagePlate Not Visible](#issue-1-imageplate-not-visible)
@@ -68,8 +74,8 @@ print(f"Duration: {duration}")
 
 ```python
 # Run diagnostic script
-import sys
-sys.path.append("<UNREAL_MCP_DIR>/Python/editor_utilities")
+# InspectCameraComponents.py lives in your UE project's Content/Python/ folder
+# (auto-added to sys.path by the editor)
 from InspectCameraComponents import inspect_camera_components
 
 # Inspect all cameras
@@ -129,7 +135,7 @@ media_player = unreal.load_asset("/Game/Media/MP_Shot001_FG")
 media_player.play()
 
 # Or re-create with auto_play_media=True
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG",
     auto_play_media=True  # Ensure this is True
@@ -155,7 +161,7 @@ if blueprint is None:
     # See Issue 6 for Blueprint creation guide
 
 # 3. Re-run foreground plate creation (uses Blueprint)
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG"
 )
@@ -341,7 +347,7 @@ Checklist:
 unreal.EditorAssetLibrary.delete_asset("/Game/Materials/M_Shot001_FG")
 
 # Re-create with correct blend mode
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG",
     auto_play_media=True
@@ -481,21 +487,21 @@ unreal.EditorAssetLibrary.delete_directory("/Game/Materials/Shot002")
 unreal.EditorAssetLibrary.delete_directory("/Game/Materials/Shot003")
 
 # Recreate Shot 1 (creates master)
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG",
     master_material_path="/Game/Materials/M_ForegroundPlate_Master"
 )
 
 # Recreate Shot 2 (creates instance)
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot002/Shot002_0001.exr",
     plate_name="Shot002_FG",
     master_material_path="/Game/Materials/M_ForegroundPlate_Master"
 )
 
 # Recreate Shot 3 (creates instance)
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot003/Shot003_0001.exr",
     plate_name="Shot003_FG",
     master_material_path="/Game/Materials/M_ForegroundPlate_Master"
@@ -544,7 +550,7 @@ if master_material is None:
     print("ERROR: Master material not found!")
     print("Create master material first:")
     # Create first shot with master_material_path parameter
-    mcp__unreal-mcp__create_foreground_plate(
+    create_foreground_plate(
         sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
         plate_name="Shot001_FG",
         master_material_path=master_material_path  # Creates master
@@ -593,7 +599,7 @@ M_ForegroundPlate_Master (master material)
 ```python
 # Verify auto_play_media was set to True
 # Review command used:
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG",
     auto_play_media=True  # Should be True
@@ -671,7 +677,7 @@ if os.path.exists(sequence_dir):
 
 ```python
 # Re-run with auto_play_media=True
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG",
     auto_play_media=True  # Explicitly set to True
@@ -877,7 +883,7 @@ print(f"Read Speed: {speed_mbps:.2f} MB/s")
 #     └── Shot001_0001.exr (1080p - 2MB per frame)
 
 # Set up with proxy
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG",
     proxy_path="lowres"  # Uses lowres subfolder
@@ -1112,7 +1118,7 @@ print("IMPORTANT: Manually add ImagePlate component in Blueprint Editor")
 BLUEPRINT_PATH = "/Game/Blueprints/cam_example_Blueprint"
 
 # Or specify in create_foreground_plate call (if supported)
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG",
     camera_blueprint_path="/Game/Blueprints/cam_example_Blueprint"
@@ -1229,7 +1235,7 @@ except AttributeError:
 
 ```
 Plugin Location:
-C:\Program Files\Epic Games\UE_5.5\Engine\Plugins\Experimental\ImagePlate\
+C:\Program Files\Epic Games\UE_5.8\Engine\Plugins\Experimental\ImagePlate\
 
 Check:
 - [ ] Directory exists
@@ -1256,7 +1262,7 @@ Check:
 // Edit Project.uproject file
 {
     "FileVersion": 3,
-    "EngineAssociation": "5.5",
+    "EngineAssociation": "5.8",
     "Plugins": [
         {
             "Name": "ImagePlate",
@@ -1281,7 +1287,7 @@ If plugin enabled but still not working:
 
 1. Close Unreal Editor
 2. Navigate to:
-   C:\Program Files\Epic Games\UE_5.5\Engine\Plugins\Experimental\ImagePlate\Binaries\Win64\
+   C:\Program Files\Epic Games\UE_5.8\Engine\Plugins\Experimental\ImagePlate\Binaries\Win64\
 3. Check for:
    - UnrealEditor-ImagePlate.dll
    - UnrealEditor-ImagePlate.pdb
@@ -1430,7 +1436,7 @@ Red Flags:
 # Memory reduction: 75%
 
 # Set up with proxy
-mcp__unreal-mcp__create_foreground_plate(
+create_foreground_plate(
     sequence_path="D:/Plates/Shot001/Shot001_0001.exr",
     plate_name="Shot001_FG",
     proxy_path="lowres",  # Uses lowres subfolder
@@ -1765,7 +1771,7 @@ If issues persist after following this guide:
 
 ---
 
-**Document Version:** 1.0.0
-**Last Updated:** 2025-10-25
-**Skill Version:** 1.0.0
+**Document Version:** 2.0.0
+**Last Updated:** 2026-07-06 (UE 5.8 native MCP migration)
+**Skill Version:** 2.0.0
 **Status:** Production-ready

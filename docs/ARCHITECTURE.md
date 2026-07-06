@@ -106,7 +106,7 @@ Each connector is a directory under `connectors\<app>\`:
 - `install.ps1` - full setup: installs dependencies, copies bridge files
   into the application, then registers.
 - `bridge\` - bundled bridge code, where the app needs code installed
-  (nuke, houdini, unreal, maya). Blender and Magnific need no bridge:
+  (nuke, houdini, maya). Blender, Unreal (UE 5.8 native MCP), and Magnific need no bridge:
   Blender's MCP add-on is official and ships with Blender 4.5+, and
   Magnific's MCP is hosted.
 

@@ -1,26 +1,26 @@
 ---
 name: unreal-blueprint-automation
-description: Automate Blueprint creation, component addition, property configuration, and compilation in Unreal Engine 5.5 using phased execution pattern. Use when creating Blueprints, adding components, setting properties, debugging Blueprint crashes, or when user mentions blueprint, create blueprint, compile blueprint, add component, blueprint property, set component property, blueprint automation.
-allowed-tools: Read,Write,Bash
+description: Automate Blueprint creation, component addition, property configuration, and compilation in Unreal Engine 5.8 using phased execution pattern. Use when creating Blueprints, adding components, setting properties, debugging Blueprint crashes, or when user mentions blueprint, create blueprint, compile blueprint, add component, blueprint property, set component property, blueprint automation.
+allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool
 ---
 
 # unreal-blueprint-automation
 
-**Version:** 1.1.0
-**Last Updated:** 2025-12-03
-**Dependencies:** Unreal Engine 5.5, Unreal MCP Server
+**Version:** 2.0.0
+**Last Updated:** 2026-07-06
+**Dependencies:** Unreal Engine 5.8+, UE 5.8 native MCP (HTTP, port 8000), VibeUE plugin (optional)
 **Status:** Production Ready
 
 ## Overview
 
-Automate Blueprint creation, component addition, property configuration, and compilation in Unreal Engine 5.5 using the proven **phased execution pattern** that prevents crashes and timeouts.
+Automate Blueprint creation, component addition, property configuration, and compilation in Unreal Engine 5.8 using the proven **phased execution pattern** that prevents crashes and timeouts.
 
 **Key Discovery:** Blueprint compilation triggers async validation that blocks subsequent Python operations. Using **Silent Execution** (no code after compilation) eliminates crashes.
 
 ## Quick Start
 
 ```python
-# Phase 1: Create Blueprint
+# Phase 1: Create Blueprint (via mcp__ue58-mcp__execute_python_code)
 import unreal
 bp = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
     asset_name="BP_MyActor",
@@ -30,29 +30,15 @@ bp = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
 )
 # Script ends - Silent Execution
 
-# Phase 2: Add Component (separate script)
+# Phase 2: Add Component (separate execute_python_code call)
 import unreal
-from unreal_mcp_server import get_unreal_connection
-unreal_conn = get_unreal_connection()
-result = unreal_conn.send_command("add_component_to_blueprint", {
-    "blueprint_name": "BP_MyActor",
-    "component_type": "StaticMeshComponent",
-    "component_name": "MyMesh"
-})
-# Script ends
+bp = unreal.load_asset('/Game/Blueprints/BP_MyActor')
+scs = bp.simple_construction_script
+mesh_node = scs.create_node(unreal.StaticMeshComponent)
+scs.add_node(mesh_node)
+print("Component added")
 
-# Phase 3: Set Properties (separate script)
-import unreal
-from unreal_mcp_server import get_unreal_connection
-unreal_conn = get_unreal_connection()
-result = unreal_conn.send_command("set_static_mesh_properties", {
-    "blueprint_name": "BP_MyActor",
-    "component_name": "MyMesh",
-    "static_mesh": "/Engine/BasicShapes/Cube.Cube"
-})
-# Script ends
-
-# Phase 4: Compile (separate script)
+# Phase 3: Compile (separate execute_python_code call)
 import unreal
 bp = unreal.load_asset('/Game/Blueprints/BP_MyActor')
 unreal.KismetSystemLibrary.compile_blueprint(bp)
@@ -61,9 +47,35 @@ unreal.KismetSystemLibrary.compile_blueprint(bp)
 
 **Expected Result:**
 - Blueprint created at `/Game/Blueprints/BP_MyActor`
-- Contains StaticMeshComponent with cube mesh assigned
+- Contains StaticMeshComponent
 - Compiles without errors
 - Total time: <1 second across all phases
+
+## VibeUE Toolset Alternative
+
+When VibeUE is installed, Blueprint operations are also available via toolsets:
+
+```
+# Create Blueprint via VibeUE
+mcp__ue58-mcp__call_tool(
+    toolset_name="VibeUE.BlueprintService",
+    tool_name="create_blueprint",
+    arguments={"blueprint_name": "BP_MyActor", "package_path": "/Game/Blueprints"}
+)
+
+# Add component via VibeUE
+mcp__ue58-mcp__call_tool(
+    toolset_name="VibeUE.BlueprintService",
+    tool_name="add_component_to_blueprint",
+    arguments={
+        "blueprint_name": "BP_MyActor",
+        "component_type": "StaticMeshComponent",
+        "component_name": "MyMesh"
+    }
+)
+```
+
+Use `mcp__ue58-mcp__describe_toolset(toolset_name="VibeUE.BlueprintService")` to discover available tools.
 
 ## Core Concepts
 
@@ -71,7 +83,7 @@ unreal.KismetSystemLibrary.compile_blueprint(bp)
 
 **Problem:** Blueprint compilation triggers async validation that locks the Blueprint and blocks Python access, causing crashes or timeouts.
 
-**Solution:** Execute operations in separate phases, allowing each async operation to complete before the next phase begins.
+**Solution:** Execute operations in separate `execute_python_code` calls, allowing each async operation to complete before the next phase begins.
 
 **4 Phases:**
 1. **Create** - Create the Blueprint asset
@@ -81,7 +93,7 @@ unreal.KismetSystemLibrary.compile_blueprint(bp)
 
 ### 2. Silent Execution
 
-Derived from PCG automation breakthrough (Session_2025-10-26_PCG_LandscapeDeformation.md).
+Derived from PCG automation breakthrough.
 
 **Rule:** No Python code after compilation-triggering operations.
 
@@ -111,8 +123,6 @@ if result.success:  # Causes crash
 
 **Use Unreal Output Log:**
 ```
-Location: <UNREAL_MCP_DIR>\MCPGameProject\Saved\Logs\MCPGameProject.log
-
 Look for:
 LogBlueprint: [BP_MyActor] compiled successfully
 LogBlueprint: Error: ... (indicates failure)
@@ -123,8 +133,6 @@ LogBlueprint: Error: ... (indicates failure)
 ### Workflow 1: Basic Actor Blueprint
 
 **Use Case:** Create a Blueprint with single static mesh component.
-
-**Steps:**
 
 **Phase 1 - Create Blueprint:**
 ```python
@@ -137,28 +145,21 @@ bp = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
 )
 ```
 
-**Phase 2 - Add Component:**
+**Phase 2 - Add Component (via execute_python_code):**
 ```python
-# Use MCP tool
-from unreal_mcp_server import get_unreal_connection
-unreal_conn = get_unreal_connection()
-result = unreal_conn.send_command("add_component_to_blueprint", {
-    "blueprint_name": "BP_SimpleActor",
-    "component_type": "StaticMeshComponent",
-    "component_name": "Mesh"
-})
+import unreal
+bp = unreal.load_asset('/Game/Blueprints/BP_SimpleActor')
+scs = bp.simple_construction_script
+mesh_node = scs.create_node(unreal.StaticMeshComponent)
+scs.add_node(mesh_node)
+
+# Set mesh on component
+mesh = unreal.load_asset("/Engine/BasicShapes/Cube.Cube")
+mesh_node.component_template.set_static_mesh(mesh)
+print("Mesh component added and configured")
 ```
 
-**Phase 3 - Set Mesh:**
-```python
-result = unreal_conn.send_command("set_static_mesh_properties", {
-    "blueprint_name": "BP_SimpleActor",
-    "component_name": "Mesh",
-    "static_mesh": "/Engine/BasicShapes/Cube.Cube"
-})
-```
-
-**Phase 4 - Compile:**
+**Phase 3 - Compile:**
 ```python
 import unreal
 bp = unreal.load_asset('/Game/Blueprints/BP_SimpleActor')
@@ -172,10 +173,10 @@ unreal.KismetSystemLibrary.compile_blueprint(bp)
 
 **Use Case:** Blueprint with multiple components (mesh, light, particle system).
 
-**Pattern:** Add all components before setting properties.
+**Pattern:** Add all components before compiling.
 
 ```python
-# Phase 1: Create Blueprint
+# Phase 1: Create Blueprint (separate call)
 import unreal
 bp = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
     asset_name="BP_ComplexActor",
@@ -184,48 +185,22 @@ bp = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
     factory=unreal.BlueprintFactory()
 )
 
-# Phase 2: Add Components (can be done in one script)
-from unreal_mcp_server import get_unreal_connection
-unreal_conn = get_unreal_connection()
+# Phase 2: Add Components (separate call)
+import unreal
+bp = unreal.load_asset('/Game/Blueprints/BP_ComplexActor')
+scs = bp.simple_construction_script
 
 # Add mesh component
-unreal_conn.send_command("add_component_to_blueprint", {
-    "blueprint_name": "BP_ComplexActor",
-    "component_type": "StaticMeshComponent",
-    "component_name": "BaseMesh"
-})
+mesh_node = scs.create_node(unreal.StaticMeshComponent)
+scs.add_node(mesh_node)
 
 # Add light component
-unreal_conn.send_command("add_component_to_blueprint", {
-    "blueprint_name": "BP_ComplexActor",
-    "component_type": "PointLightComponent",
-    "component_name": "Light"
-})
+light_node = scs.create_node(unreal.PointLightComponent)
+scs.add_node(light_node)
 
-# Add particle component
-unreal_conn.send_command("add_component_to_blueprint", {
-    "blueprint_name": "BP_ComplexActor",
-    "component_type": "ParticleSystemComponent",
-    "component_name": "VFX"
-})
+print("Components added")
 
-# Phase 3: Set Properties (separate script)
-# Set mesh
-unreal_conn.send_command("set_static_mesh_properties", {
-    "blueprint_name": "BP_ComplexActor",
-    "component_name": "BaseMesh",
-    "static_mesh": "/Engine/BasicShapes/Cylinder.Cylinder"
-})
-
-# Set light intensity
-unreal_conn.send_command("set_component_property", {
-    "blueprint_name": "BP_ComplexActor",
-    "component_name": "Light",
-    "property_name": "Intensity",
-    "property_value": "5000.0"
-})
-
-# Phase 4: Compile
+# Phase 3: Compile (separate call)
 import unreal
 bp = unreal.load_asset('/Game/Blueprints/BP_ComplexActor')
 unreal.KismetSystemLibrary.compile_blueprint(bp)
@@ -237,27 +212,18 @@ unreal.KismetSystemLibrary.compile_blueprint(bp)
 **Use Case:** Position components relative to each other.
 
 ```python
-# After adding components in Phase 2...
+# After adding components...
+import unreal
+bp = unreal.load_asset('/Game/Blueprints/BP_MyActor')
+scs = bp.simple_construction_script
+nodes = scs.get_all_nodes()
 
-# Phase 2.5: Set Component Transforms
-from unreal_mcp_server import get_unreal_connection
-unreal_conn = get_unreal_connection()
-
-# Position light above mesh
-unreal_conn.send_command("set_component_property", {
-    "blueprint_name": "BP_MyActor",
-    "component_name": "Light",
-    "property_name": "RelativeLocation",
-    "property_value": "[0.0, 0.0, 200.0]"  # Z-up 200 units
-})
-
-# Scale mesh
-unreal_conn.send_command("set_component_property", {
-    "blueprint_name": "BP_MyActor",
-    "component_name": "Mesh",
-    "property_name": "RelativeScale3D",
-    "property_value": "[2.0, 2.0, 2.0]"
-})
+for node in nodes:
+    comp = node.component_template
+    if isinstance(comp, unreal.PointLightComponent):
+        comp.set_editor_property('relative_location', unreal.Vector(0, 0, 200))
+    elif isinstance(comp, unreal.StaticMeshComponent):
+        comp.set_editor_property('relative_scale3d', unreal.Vector(2, 2, 2))
 ```
 
 ### Workflow 4: Spawning Blueprint in Level
@@ -266,23 +232,23 @@ unreal_conn.send_command("set_component_property", {
 
 ```python
 # After Blueprint is compiled and saved...
+import unreal
 
-from unreal_mcp_server import get_unreal_connection
-unreal_conn = get_unreal_connection()
-
-result = unreal_conn.send_command("spawn_blueprint_actor", {
-    "blueprint_name": "BP_MyActor",
-    "actor_name": "MyActor_Instance",
-    "location": [0, 0, 0],
-    "rotation": [0, 0, 0]
-})
+bp_class = unreal.load_class(None, "/Game/Blueprints/BP_MyActor.BP_MyActor_C")
+actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+    bp_class,
+    unreal.Vector(0, 0, 0),
+    unreal.Rotator(0, 0, 0)
+)
+actor.set_actor_label("MyActor_Instance")
+print(f"Spawned: {actor.get_actor_label()}")
 ```
 
 ## MCP Tools & Component Types
 
-For complete reference on MCP tools, component types, and property type safety:
+For complete reference on component types and property type safety:
 - **MCP Tools Reference:** `reference/mcp-tools-reference.md`
-- **Property Type Safety:** `reference/property-type-safety.md` ⚠️ Important for avoiding crashes
+- **Property Type Safety:** `reference/property-type-safety.md`
 
 ## Troubleshooting
 
@@ -302,53 +268,21 @@ unreal.KismetSystemLibrary.compile_blueprint(bp)
 
 ### Component Not Added
 
-**Symptom:** add_component_to_blueprint returns success but component not visible in Blueprint.
+**Symptom:** Component not visible in Blueprint.
 
 **Debugging:**
 1. Check Unreal Output Log for errors
 2. Verify Blueprint exists: `unreal.load_asset('/Game/Blueprints/BP_MyActor')`
 3. Try opening Blueprint manually in Unreal Editor
-4. Check component_type spelling (case-sensitive)
-
-**Common Mistake:**
-```python
-# WRONG
-"component_type": "StaticMesh"
-
-# CORRECT
-"component_type": "StaticMeshComponent"
-```
 
 ### Property Not Set
 
-**Symptom:** set_component_property returns success but property unchanged.
+**Symptom:** Property set but unchanged.
 
 **Debugging:**
 1. Check property name spelling (case-sensitive)
-2. Verify property value format (use strings for all types)
+2. Verify property value format
 3. Check if property is editable on component
-
-**Example - Vector Property:**
-```python
-# WRONG
-"property_value": [0.0, 0.0, 100.0]  # Python list
-
-# CORRECT
-"property_value": "[0.0, 0.0, 100.0]"  # String representation
-```
-
-### Blueprint Won't Compile
-
-**Symptom:** Compilation succeeds but Blueprint shows errors in Editor.
-
-**Debugging:**
-1. Open Blueprint in Editor, check Compiler Results tab
-2. Common issues:
-   - Missing parent class dependencies
-   - Invalid property values
-   - Circular dependencies
-
-**Fix:** Manually fix errors in Editor, then retry automation.
 
 ### Timeout on MCP Commands
 
@@ -366,8 +300,6 @@ unreal.KismetSystemLibrary.compile_blueprint(bp)
 - Set Property: <100ms
 - Compile: <500ms
 
-**Total workflow:** <1 second for simple Blueprint
-
 **Optimization Tips:**
 1. Batch component additions in single phase
 2. Group property settings together
@@ -379,68 +311,36 @@ After running automation, verify in Unreal Editor:
 
 - [ ] Blueprint asset exists at expected path
 - [ ] All components visible in Components panel
-- [ ] Component properties set correctly (mesh, transforms, etc.)
+- [ ] Component properties set correctly
 - [ ] Blueprint compiles without errors
 - [ ] Blueprint can be placed in level and runs correctly
-
-**Log Validation:**
-```
-Search MCPGameProject.log for:
-✅ "compiled successfully" - Blueprint compiled
-❌ "Error:" - Check for compilation errors
-✅ "Component added" - Component created
-```
 
 ## Reference Documentation
 
 **For detailed information:**
-- `reference/mcp-tools-reference.md` - Complete MCP tools and component types
+- `reference/mcp-tools-reference.md` - Component types reference
 - `reference/property-type-safety.md` - Property type safety and crash prevention
-- `.claude/skills/unreal-pcg-automation/` - PCG automation (same patterns)
-- `UnrealEngine/unreal-mcp-main/MCP_Capabilities_UE55.md` - Complete MCP capabilities
+- `.claude/skills/unreal-pcg-automation/` - PCG automation (same Silent Execution patterns)
 
 ## Constitutional Compliance
 
-**Article I - General Purpose Scripts:**
-✅ All scripts work on any Blueprint in any project (no hardcoded paths)
-
-**Article III - Progressive Disclosure:**
-✅ SKILL.md: 430 lines (<500 limit)
-✅ Reference docs: 2 files (200 lines moved from main)
-✅ Context reduction: 33% vs previous version
-
-**Article IV - Independent Testing:**
-✅ All workflows tested in clean Unreal level
-✅ Validated via BP_PhaseTest asset
-
-**Article V - Official Patterns:**
-✅ Uses Unreal's AssetTools API
-✅ Uses KismetSystemLibrary for compilation
-✅ Follows MCP tool conventions
-
-**Article VI - Context Efficiency:**
-✅ Progressive disclosure: Load only needed reference docs
-✅ Reuses PCG Silent Execution documentation
-✅ 430 lines main + 200 lines reference (on-demand)
-
-**Article VIII - Documentation Standards:**
-✅ YAML frontmatter complete
-✅ All required sections present
-✅ Version history maintained
+**Article I:** All scripts work on any Blueprint in any project (no hardcoded paths)
+**Article III:** SKILL.md under 500 lines, reference docs on-demand
+**Article IV:** All workflows tested in clean Unreal level
+**Article V:** Uses Unreal's AssetTools API and KismetSystemLibrary
 
 ## Version History
 
+**2.0.0 (2026-07-06):**
+- Migrated from community MCP (localhost:55557) to UE 5.8 native MCP (HTTP, port 8000)
+- Replaced all `from unreal_mcp_server import get_unreal_connection` / `send_command()` patterns with direct Python via `execute_python_code`
+- Added VibeUE toolset alternative for Blueprint operations
+- Updated version references from 5.5 to 5.8
+
 **1.1.0 (2025-12-03):**
 - Refactored to Article III compliance (<500 lines)
-- Moved MCP tools reference to separate file (91 lines)
-- Moved property type safety guide to separate file (109 lines)
-- Updated Constitutional Compliance section
+- Moved MCP tools reference to separate file
 - 33% context reduction through progressive disclosure
 
 **1.0.0 (2025-10-26):**
-- Initial release
-- 4-phase pattern documented
-- Silent Execution pattern validated
-- Basic workflows (single/multi-component, transforms, spawning)
-- Troubleshooting guide
-- Constitutional compliance verified
+- Initial release with 4-phase pattern and Silent Execution

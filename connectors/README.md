@@ -15,7 +15,8 @@ the scripts in this directory.
 |-----|--------|---------------|---------------|
 | Nuke | `nuke\install.ps1` | Python bridge into `~\.nuke` + Node MCP server + registration | Nuke 14+, Node.js 18+ |
 | Houdini | `houdini\install.ps1` | Bridge files + MCP registration (uv-based server) | Houdini 20+, uv, Python 3.12+ |
-| Unreal | `unreal\install.ps1` | Bridge into the UE project + MCP registration | Unreal Engine 5.5, uv, Python 3.12+ |
+| Unreal | `unreal\register.ps1` | Registers the UE 5.8 native MCP (HTTP :8000/mcp) | UE 5.8 with ModelContextProtocol plugin enabled; VibeUE recommended |
+| ComfyUI FL (optional) | `comfyuiegister-fl.ps1` | Registers ComfyUI_FL-MCP - live canvas operations (100+ tools) | ComfyUI_FL-MCP custom node installed in ComfyUI |
 | Maya | `maya\install.ps1` | Bridge (commandPort) + MCP registration - see `maya\README.md` | Maya 2024+ |
 | Blender | `blender\register.ps1` | Registration only - uses the official Blender MCP from blender.org | Blender 4.5+ with the bundled MCP add-on enabled in Preferences |
 | ComfyUI | `comfyui\install.ps1` | Registers the ComfyUI MCP (`npx comfyui-mcp`) | Local ComfyUI install, Node.js 18+; `COMFYUI_URL` defaults to `http://localhost:8188`; Comfy CLI (`pip install comfy-cli`) recommended for headless generation |

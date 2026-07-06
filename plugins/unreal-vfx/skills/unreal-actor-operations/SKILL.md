@@ -1,42 +1,39 @@
 ---
 name: unreal-actor-operations
 description: Spawn, manipulate, and query actors in Unreal Engine via Python. Use when spawning actors, setting transforms, getting/setting properties, or when user mentions "actor", "spawn", "transform", "location", "rotation", "static mesh actor", "blueprint actor".
-allowed-tools: mcp__unreal-mcp__execute_python
+allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool
 ---
 
 # Unreal Actor Operations
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-17
-**Dependencies:** Unreal Engine 5.5+, Unreal MCP (execute_python on localhost:55557)
+**Version:** 2.0.0
+**Last Updated:** 2026-07-06
+**Dependencies:** Unreal Engine 5.8+, UE 5.8 native MCP (HTTP, port 8000), VibeUE plugin (optional)
 **Context7 Validation:** ACTOR_API_VALIDATION_REPORT.md (18/20 APIs validated)
 
-## 🚨 CRITICAL: MCP Connection Required
+## CRITICAL: MCP Connection Required
 
 **BEFORE any actor operations:**
-1. Verify Unreal MCP server running: `localhost:55557`
-2. Verify Unreal Editor is open with project loaded
+1. Verify UE editor is open with project loaded (MCP server runs inside the editor)
+2. Native MCP auto-starts on port 8000 when `bAutoStartServer=True` in project config
 3. All Python execution happens on game thread (synchronous)
 
 **Connection Test:**
 ```python
-script = """
+# Via mcp__ue58-mcp__execute_python_code
 import unreal
 print("Unreal Python API ready")
 print(f"Editor world: {unreal.EditorLevelLibrary.get_editor_world()}")
-"""
-# Execute via execute_python MCP tool
 ```
 
 ---
 
-## 📊 QUICK START: Spawn Static Mesh Actor
+## QUICK START: Spawn Static Mesh Actor
 
 **Most common use case - copy and execute:**
 
 ```python
-# Via MCP execute_python tool
-script = """
+# Via mcp__ue58-mcp__execute_python_code
 import unreal
 
 # Spawn actor at world location
@@ -65,10 +62,6 @@ else:
     )
 
     print(f"SUCCESS: Spawned {actor.get_actor_label()}")
-"""
-
-# Execute via MCP
-result = mcp__unreal-mcp__execute_python(script)
 ```
 
 **Expected Output:**
@@ -78,7 +71,7 @@ SUCCESS: Spawned MyCube
 
 ---
 
-## 📋 STANDARD WORKFLOWS
+## STANDARD WORKFLOWS
 
 **For detailed workflow code and step-by-step instructions, see:** `reference/detailed-workflows.md`
 
@@ -89,7 +82,25 @@ SUCCESS: Spawned MyCube
 3. **Component Operations** - Add/remove components, configure properties, material assignment
 4. **Blueprint Actor Workflows** - Spawn from Blueprint, set construction script parameters
 5. **Actor Query and Filtering** - Find by name, class, tags, location, complex queries
-## 🚨 TROUBLESHOOTING
+
+## VibeUE Toolset Alternative
+
+When VibeUE plugin is installed, actor operations are also available via toolsets:
+
+```
+mcp__ue58-mcp__call_tool(
+    toolset_name="VibeUE.ActorService",
+    tool_name="spawn_actor",
+    arguments={...}
+)
+```
+
+Use `mcp__ue58-mcp__list_toolsets()` to discover available services.
+Use `mcp__ue58-mcp__describe_toolset(toolset_name="VibeUE.ActorService")` for tool details.
+
+---
+
+## TROUBLESHOOTING
 
 ### Error: spawn_actor_from_class() returns None
 
@@ -167,25 +178,7 @@ else:
 
 ---
 
-### Error: Property set succeeds but value doesn't change
-
-**Cause:** Property cached or requires editor refresh.
-
-**Solution:**
-```python
-# Set property
-actor.set_editor_property('property_name', value)
-
-# Verify it took effect
-actual_value = actor.get_editor_property('property_name')
-if actual_value != value:
-    print(f"WARNING: Expected {value}, got {actual_value}")
-    # May need to save asset or refresh editor
-```
-
----
-
-## 📖 REFERENCE DOCUMENTATION
+## REFERENCE DOCUMENTATION
 
 For complete API details, see:
 - **[actor_api_reference.md](reference/actor_api_reference.md)** - Complete EditorLevelLibrary API
@@ -193,7 +186,7 @@ For complete API details, see:
 
 ---
 
-## ✅ VALIDATION CHECKLIST
+## VALIDATION CHECKLIST
 
 **After actor operations, verify:**
 - [ ] Actor spawned at correct location (check viewport)
@@ -220,65 +213,15 @@ assert actual_value == expected_value, f"Property mismatch: {actual_value}"
 
 ---
 
-## 🔄 VERSION HISTORY
+## VERSION HISTORY
+
+**v2.0.0** (2026-07-06) - UE 5.8 Migration
+- Migrated from community MCP (localhost:55557) to UE 5.8 native MCP (HTTP, port 8000)
+- Updated allowed-tools: mcp__ue58-mcp__execute_python_code + call_tool
+- Added VibeUE toolset alternative for actor operations
+- Removed all references to old unreal-mcp server and send_command() patterns
 
 **v1.0.0** (2025-11-17) - Initial Release
 - EditorLevelLibrary as primary interface (18/20 APIs validated via Context7)
-- Spawning patterns: by class, by asset
-- Transform patterns: location, rotation, scale, complete transform
-- Property access patterns: get/set editor properties
-- Query patterns: all actors, by class, selected actors
+- Spawning, transform, property, and query patterns
 - Troubleshooting: Silent failures, validation patterns
-- References: actor_api_reference.md, examples.md
-
-## Standard Workflows
-
-### Core Workflow Pattern
-
-```python
-# TODO: Add standard workflow example
-# This section documents the most common usage patterns
-```
-
-**When to Use:**
-- TODO: Document typical use cases
-
-**Best Practices:**
-- Follow Article I: Use general-purpose scripts (no hardcoded paths)
-- Use appropriate logging patterns (MCP logger if applicable)
-- Handle errors gracefully
-
-
-## Reference Documentation
-
-**Primary Sources:**
-- TODO: Link to official tool/engine documentation
-- TODO: Add relevant API references
-
-**Related Skills:**
-- TODO: List complementary skills
-
-**External Resources:**
-- TODO: Community tutorials, examples
-
-## Constitutional Compliance
-
-**Version:** VFX_SKILL_CONSTITUTION.md v2.0.0
-
-**Article I - General Purpose Scripts:**
-- ✅ All scripts are parameterized (no hardcoded paths)
-- Scripts work across multiple projects/assets
-
-**Article III - Progressive Disclosure:**
-- ✅ SKILL.md: TODO lines (target: <500)
-- Progressive disclosure through reference files
-
-**Article VI - Context Efficiency:**
-- Context reduction: TODO% (measure with token counter)
-- On-demand loading through progressive disclosure
-
-**Article VIII - Documentation Standards:**
-- ✅ Complete YAML frontmatter
-- ✅ All required sections present
-- Version history tracked
-
