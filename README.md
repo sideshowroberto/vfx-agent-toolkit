@@ -141,6 +141,36 @@ vfx-agent-toolkit\
 +-- LICENSE
 ```
 
+## Attribution and provenance
+
+This toolkit is a working collection: the majority of the skills, agents, and
+scripts are original creations, built and battle-tested in production. A
+handful are adapted from open source tools, community resources, and prompts
+we found useful along the way - some used as-is, some heavily modified. This
+collection grew organically inside a working pipeline, so the exact origin of
+every piece was not always tracked.
+
+No claim of original authorship is made over anything that came from someone
+else. If you recognize your work in here and want credit added, a license
+noted, or the content removed, please open an issue - it will be handled
+promptly and gladly.
+
+The MCP servers that the connectors register are separate projects by their
+own authors, not part of this toolkit:
+
+| Server | Author / Source |
+|--------|-----------------|
+| Blender MCP | Official Blender MCP (blender.org, ships with Blender 4.5+) |
+| UE 5.8 ModelContextProtocol | Epic Games (built into Unreal Engine 5.8) |
+| VibeUE | VibeUE (Fab marketplace) |
+| comfyui-mcp | npm package by its author |
+| ComfyUI_FL-MCP | filliptm (github.com/filliptm/ComfyUI_FL-MCP) |
+| Comfy CLI | Comfy Org |
+| Magnific MCP | Hosted by Magnific (mcp.magnific.com) |
+
+Third-party tools keep their own licenses; the MIT license in this repo covers
+the original content of the toolkit itself.
+
 ## Contributing
 
 PRs welcome. Skills follow the standard Claude Code SKILL.md format: a
