@@ -67,7 +67,7 @@ C++ UE project (your sandbox)
 
 **What you need installed:**
 - Visual Studio 2022 (Community or higher) with "Game development with C++" workload
-- UE 5.8 source build or the standard UE5.5 install (either works — C++ game projects don't require a source build)
+- UE 5.8 source build or the standard UE 5.8 install (either works — C++ game projects don't require a source build)
 
 ---
 
