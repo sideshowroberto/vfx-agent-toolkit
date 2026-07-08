@@ -6,7 +6,7 @@ allowed-tools: Read,Bash
 
 # Brave Search Skill — VFX Research Intelligence
 
-**Version:** 2.0.0 | **Updated:** 2026-03-11
+**Version:** 2.1.0 | **Updated:** 2026-07-08
 
 ---
 
@@ -68,16 +68,18 @@ $site=sidefx.com,boost=10\n$site=odforce.net,boost=8\n$site=cgwiki.com,boost=6\n
 
 Calls `/llm/context` directly via Python. Returns actual extracted page content — no scraping needed.
 
-**Requires:** `BRAVE_API_KEY` env var (set automatically by `vfx-base/install.bat`)
+**Script:** bundled with this skill at `scripts/brave_llm_context.py` — resolve the path against this skill's own directory. Output is forced to UTF-8, so extracted web content prints safely on Windows (cp1252) consoles.
+
+**Requires:** `BRAVE_API_KEY` environment variable (same key the brave-search MCP server uses).
 
 ### Basic usage
 ```bash
-python ClaudeCode/scripts/brave_llm_context.py "Houdini VEX point attributes tutorial"
+python <skill-dir>/scripts/brave_llm_context.py "Houdini VEX point attributes tutorial"
 ```
 
 ### With options
 ```bash
-python ClaudeCode/scripts/brave_llm_context.py "USD Solaris render settings" \
+python <skill-dir>/scripts/brave_llm_context.py "USD Solaris render settings" \
   --tokens 16384 \
   --freshness pm \
   --threshold strict
@@ -125,7 +127,7 @@ mcp__brave-search__brave_web_search(
 ### 3. Documentation Deep Dive
 ```bash
 # LLM Context — get actual doc content
-python ClaudeCode/scripts/brave_llm_context.py \
+python <skill-dir>/scripts/brave_llm_context.py \
   "Unreal Engine 5.5 PCG API documentation" \
   --tokens 16384 --threshold strict
 ```

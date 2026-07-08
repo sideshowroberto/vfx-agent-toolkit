@@ -1,7 +1,7 @@
 {
     "name":  "vfx-core",
     "description":  "Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).",
-    "version":  "2.0.0",
+    "version":  "2.1.0",
     "author":  {
                    "name":  "Rob Williams"
                }

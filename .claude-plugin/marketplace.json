@@ -5,13 +5,13 @@
               },
     "metadata":  {
                      "description":  "VFX pipeline plugins for Claude Code - Nuke, Houdini, Unreal, Blender, ComfyUI, Maya, Magnific, and Seedance. Skills, agents, and MCP connectors for AI-assisted VFX production.",
-                     "version":  "2.0.0",
+                     "version":  "2.0.1",
                      "pluginRoot":  "./plugins"
                  },
     "plugins":  [
                     {
                         "name":  "vfx-core",
-                        "version":  "2.0.0",
+                        "version":  "2.1.0",
                         "description":  "Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).",
                         "source":  "./plugins/vfx-core"
                     },
