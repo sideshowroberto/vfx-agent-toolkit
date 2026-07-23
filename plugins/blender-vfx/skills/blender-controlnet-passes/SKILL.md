@@ -103,6 +103,27 @@ does the full range.
    tracking curves; `taa_render_samples=1` kills jitter but looks aliased
    and was judged worse in production. Leave scene sampling alone unless
    testing deliberately (`--taa-samples`, `--motion-blur` exist for that).
+10. **Long MCP-driven render loops can hang Blender with runaway memory.**
+    A 118-frame grey render through the MCP crept from 4.5s to 58s/frame
+    and wedged Blender at 28 GB RAM on frame 116 (large arena crowd scene).
+    Mitigations: chunk `render_sequence` calls (20-40 frames per call via
+    `frame_start`/`frame_end` -- seq numbering is derived from the full
+    range so chunks stay consistent only if you pass the SAME full range
+    and use `skip_existing=True`), or recover after a crash by re-running
+    with `skip_existing=True` (renders only missing frames). Straight
+    beauty/pass renders with no subframe/speed tricks are safer via
+    Blender's native animation render (`INVOKE_DEFAULT`), which held
+    steady for 118-frame 4K renders in the same sessions.
+11. **Dark scenes render near-black clay.** The override preserves scene
+    lighting; a dark stage/arena scene gives an unreadable conditioning
+    frame. Temporarily set the world Background to flat grey
+    (color 0.5 / strength 1.0), render, restore. Flat even light is ideal
+    for geometry conditioning anyway (no baked-in light direction).
+12. **ffmpeg on Windows.** `encode_mp4` calls plain "ffmpeg"; if Blender's
+    environment lacks it the script warns and leaves PNGs. A working copy
+    often hides at `C:\Program Files\ImageMagick-*\ffmpeg.exe`. Also
+    ensure the `grey_mp4` directory exists before an external encode --
+    ffmpeg does not create missing output directories.
 
 ## References
 

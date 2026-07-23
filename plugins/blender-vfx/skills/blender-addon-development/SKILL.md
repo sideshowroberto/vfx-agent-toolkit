@@ -6,7 +6,7 @@ allowed-tools: Read,Write
 
 # Blender Addon Development Skill
 
-**Version:** 2.0.0
+**Version:** 2.1.0
 **Last Updated:** 2026-06-10
 **Dependencies:** Blender 5.1+, Python 3.11+
 
@@ -227,6 +227,53 @@ def create_procedural_material(name="Procedural"):
     return mat
 ```
 
+### Workflow: Async cloud/API calls without freezing the UI
+
+bpy is not thread-safe. The production pattern (from the `ai_tools` addon,
+live-verified 2026-07):
+
+```python
+import queue, threading
+import bpy
+
+_QUEUE = queue.Queue()
+
+def _worker(job):
+    # HTTP/urllib/SDK calls only - NEVER touch bpy from this thread
+    result_path = call_cloud_api(job)
+    _QUEUE.put(("done", result_path))
+
+def _drain():
+    # runs on the main thread via bpy.app.timers - safe to touch bpy
+    try:
+        while True:
+            kind, payload = _QUEUE.get_nowait()
+            if kind == "done":
+                bpy.data.images.load(payload)
+    except queue.Empty:
+        pass
+    return 0.4  # keep polling; return None to stop
+
+# In the operator: capture inputs synchronously (renders etc.), then:
+threading.Thread(target=_worker, args=(job,), daemon=True).start()
+bpy.app.timers.register(_drain, first_interval=0.4)
+```
+
+Full implementation: `Blender/ai_tools/ops.py` (status/progress/cancel/
+multi-result variants). Related patterns proven there:
+
+- **Drag-and-drop from Explorer** (4.1+): subclass `bpy.types.FileHandler`
+  with `bl_import_operator` + `bl_file_extensions`; `poll_drop` gates by
+  area type. See `AITOOLS_FH_drop` in `Blender/ai_tools/ops.py`.
+- **Third-party deps without touching Blender's python**: pip-install with
+  `--target` into a per-user dir (`%APPDATA%\<addon>\site-packages\pyXY`),
+  `sys.path.insert` at import time. Survives Blender upgrades, no admin.
+  See `Blender/ai_tools/deps_install.py`. Note: agent-shell pip runs get
+  sandbox-virtualized - run installs from inside Blender.
+- **Hot-reload discipline**: never `importlib.reload` individual submodules
+  (poisons the class registry). Full cycle only: disable addon -> purge
+  `sys.modules` entries -> enable. Details: compatibility DB change #15.
+
 ---
 
 ## TROUBLESHOOTING
@@ -323,6 +370,12 @@ class MY_OT_Operator(bpy.types.Operator):
 ---
 
 ## VERSION HISTORY
+
+**v2.1.0** (2026-07-10) - Cloud-API addon patterns
+- Added: async worker/queue/bpy.app.timers pattern for cloud API calls
+- Added: FileHandler drag-and-drop, per-user pip-target dependency install
+- Added: hot-reload discipline (full disable/purge/enable cycle)
+- Source: ai_tools addon development (see blender-ai-tools skill)
 
 **v2.0.0** (2026-06-10) - MCP migration
 - Removed HTTP Bridge as addon content (retired)
