@@ -41,7 +41,7 @@
                     },
                     {
                         "name":  "comfyui-vfx",
-                        "version":  "2.2.0",
+                        "version":  "2.2.1",
                         "description":  "ComfyUI pipeline via the ComfyUI MCP and Comfy CLI, with optional ComfyUI_FL-MCP for live canvas operations: workflow analysis, node/model requirements mapping, and headless generation guidance, plus the previs-to-photoreal anchor keyframe recipe for reference-guided video generation.",
                         "source":  "./plugins/comfyui-vfx"
                     },

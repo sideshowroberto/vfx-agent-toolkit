@@ -113,6 +113,27 @@ Watch for: entry timing vs the CG schedule, footfall/contact sync (retime
 tricks apply if the action floats), temporal stability of signage, popping
 at frame edges.
 
+## 7. Match the model's aspect ratio (applies to everything above)
+
+Generation models output standard aspects only — 1:1, 3:4, 4:3, 16:9, 9:16.
+If your plate/render aspect is non-standard (full-aperture formats often
+are, e.g. ~1.46), the model resamples the input to its grid and the whole
+background SHIFTS subtly in every output. It looks like model drift; it is
+resampling.
+
+- Pick the nearest standard aspect and reformat the INPUT to it before
+  generating, fitting by the dimension whose framing must stay locked
+  (usually width). In a 2D app, that means letterboxing and cropping the
+  bars off afterward. When rendering from a 3D scene, skip the letterbox:
+  enlarge the render canvas to the standard aspect with the camera set to
+  horizontal sensor fit — horizontal framing stays identical and the extra
+  rows are real scene content, which gives the model better context than
+  black bars.
+- Set the generation tool's aspect parameter to the SAME aspect so input
+  and output grids agree.
+- Record the crop-back fraction (extra rows / canvas height) at setup time;
+  it applies at any generation resolution.
+
 ---
 
 ## Pitfalls quick list
@@ -126,10 +147,15 @@ at frame edges.
 | Hard fake shadows | Generic sunny-day prompt language | Describe the plate's real light; ask for diffuse shadows |
 | Generic-looking subject | No/weak identity references | Keep character refs; run ref-free control only as a test |
 | Anchors disagree with each other | Independent generations drift | Expected; anchors guide subjects only |
+| Background shifts subtly in every output | Input aspect is non-standard | Reformat to the nearest standard aspect first (sec. 7) |
 
 ---
 
 ## Version History
+
+**v1.1.0** (2026-07-23)
+- Added aspect-ratio matching section (sec. 7) + pitfalls row: non-standard
+  input aspects cause background shift via resampling
 
 **v1.0.0** (2026-07-23)
 - Initial release: production-validated recipe (previs shading, anchor
