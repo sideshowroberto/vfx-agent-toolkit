@@ -151,10 +151,10 @@ def populate_template(template: str, metadata: Dict[str, Any]) -> str:
     Replace all placeholders in template.
 
     Placeholders:
-    - {{NAME}} → agent name (e.g., "unreal-blueprint-specialist")
-    - {{DESCRIPTION}} → agent description
-    - {{TOOLS}} → tools list as YAML array (e.g., "\n  - Read\n  - Write")
-    - {{DATE}} → today's date (YYYY-MM-DD)
+    - {{NAME}} -> agent name (e.g., "unreal-blueprint-specialist")
+    - {{DESCRIPTION}} -> agent description
+    - {{TOOLS}} -> tools list as YAML array (e.g., "\n  - Read\n  - Write")
+    - {{DATE}} -> today's date (YYYY-MM-DD)
 
     Args:
         template: Template file content with placeholders
@@ -167,7 +167,7 @@ def populate_template(template: str, metadata: Dict[str, Any]) -> str:
     today = date.today().strftime('%Y-%m-%d')
 
     # Format tools as YAML array (indented list format)
-    # Convert ['Read', 'Write'] → "\n  - Read\n  - Write"
+    # Convert ['Read', 'Write'] -> "\n  - Read\n  - Write"
     tools_list = metadata.get('tools', [])
     if tools_list:
         tools_yaml = '\n'.join(f'  - {tool}' for tool in tools_list)

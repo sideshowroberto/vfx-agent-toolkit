@@ -142,7 +142,7 @@
    else:
        obj.data.materials.append(mat)
 
-   # Enable smooth shading (HTTP Bridge safe)
+   # Enable smooth shading (direct API, no operator needed)
    mesh = obj.data
    for poly in mesh.polygons:
        poly.use_smooth = True

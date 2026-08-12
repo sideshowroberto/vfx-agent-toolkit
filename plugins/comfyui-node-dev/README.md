@@ -18,6 +18,6 @@ Claude Code plugin for ComfyUI custom node development, centered on the modern *
 
 ## Install
 
-Install `claude-vfx-base` first, then this plugin. Skills load on demand when you work on ComfyUI custom node code.
+Install `vfx-core` first, then this plugin. Skills load on demand when you work on ComfyUI custom node code.
 
 No MCP server or external tools required - these are pure knowledge skills.

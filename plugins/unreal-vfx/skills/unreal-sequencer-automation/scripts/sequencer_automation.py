@@ -40,9 +40,9 @@ def create_level_sequence(
     )
 
     if sequence:
-        print(f"  ✓ Created: {sequence.get_name()}")
+        print(f"  [OK] Created: {sequence.get_name()}")
     else:
-        print(f"  ✗ Failed to create sequence")
+        print(f"  [FAIL] Failed to create sequence")
 
     return sequence
 
@@ -73,7 +73,7 @@ def add_actor_to_sequence(
             break
 
     if not target_actor:
-        print(f"  ✗ Actor not found: {actor_name}")
+        print(f"  [FAIL] Actor not found: {actor_name}")
         return None
 
     # Add as possessable
@@ -83,9 +83,9 @@ def add_actor_to_sequence(
     )
 
     if binding:
-        print(f"  ✓ Added binding: {binding.get_display_name()}")
+        print(f"  [OK] Added binding: {binding.get_display_name()}")
     else:
-        print(f"  ✗ Failed to add binding")
+        print(f"  [FAIL] Failed to add binding")
 
     return binding
 
@@ -119,7 +119,7 @@ def add_property_track(
     except:
         pass  # Silent Execution - operation completes in background
 
-    print(f"  ✓ Track added (verify with separate call)")
+    print(f"  [OK] Track added (verify with separate call)")
 
     return track
 
@@ -143,7 +143,7 @@ def add_section_to_track(
     section = track.add_section()
     section.set_range(start_frame, end_frame)
 
-    print(f"  ✓ Section added: frames {start_frame}-{end_frame}")
+    print(f"  [OK] Section added: frames {start_frame}-{end_frame}")
 
     return section
 
@@ -172,7 +172,7 @@ def add_keyframes_to_channel(
         )
 
     num_keys = channel.get_num_keys()
-    print(f"  ✓ Added {len(keyframes)} keyframes (total: {num_keys})")
+    print(f"  [OK] Added {len(keyframes)} keyframes (total: {num_keys})")
 
     return num_keys
 
@@ -270,12 +270,12 @@ def create_animated_sequence(
     print("\nOpening in Sequencer...")
     try:
         unreal.LevelSequenceEditorBlueprintLibrary.open_level_sequence(sequence)
-        print("  ✓ Sequence opened (may timeout but works)")
+        print("  [OK] Sequence opened (may timeout but works)")
     except:
         pass
 
     print("\n" + "=" * 60)
-    print("✅ COMPLETE")
+    print("[OK] COMPLETE")
     print("=" * 60)
 
     return sequence
@@ -359,11 +359,11 @@ def verify_sequence(sequence_path: str) -> None:
     print(f"\nPossessables: {len(possessables)}")
 
     if len(possessables) == 0:
-        print("  ⚠️  No possessables - manually add actor")
+        print("  [WARN] No possessables - manually add actor")
         return
 
     binding = possessables[0]
-    print(f"  ✓ Binding: {binding.get_display_name()}")
+    print(f"  [OK] Binding: {binding.get_display_name()}")
 
     # Check tracks
     tracks = binding.get_tracks()

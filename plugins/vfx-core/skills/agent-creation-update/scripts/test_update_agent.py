@@ -109,13 +109,13 @@ def test_increment_version():
         try:
             result = increment_version(current, increment_type)
             if result == expected:
-                print(f"✅ {current} + {increment_type} = {result}")
+                print(f"[OK] {current} + {increment_type} = {result}")
                 passed += 1
             else:
-                print(f"❌ {current} + {increment_type} = {result} (expected {expected})")
+                print(f"[FAIL] {current} + {increment_type} = {result} (expected {expected})")
                 failed += 1
         except Exception as e:
-            print(f"❌ {current} + {increment_type} raised {e}")
+            print(f"[FAIL] {current} + {increment_type} raised {e}")
             failed += 1
 
     # Test error cases
@@ -128,10 +128,10 @@ def test_increment_version():
     for current, increment_type in error_tests:
         try:
             result = increment_version(current, increment_type)
-            print(f"❌ {current} + {increment_type} should have raised error but got {result}")
+            print(f"[FAIL] {current} + {increment_type} should have raised error but got {result}")
             failed += 1
         except ValueError:
-            print(f"✅ {current} + {increment_type} correctly raised ValueError")
+            print(f"[OK] {current} + {increment_type} correctly raised ValueError")
             passed += 1
 
     print(f"\nVersion Increment: {passed} passed, {failed} failed")
@@ -154,13 +154,13 @@ def test_parse_frontmatter():
         assert '# Test Agent' in body_content, "Body should contain heading"
         assert '## Core Features' in body_content, "Body should contain features section"
 
-        print("✅ Frontmatter parsing works correctly")
+        print("[OK] Frontmatter parsing works correctly")
         print(f"   - Extracted {len(metadata)} metadata fields")
         print(f"   - Body content: {len(body_content)} chars")
         return True
 
     except Exception as e:
-        print(f"❌ Frontmatter parsing failed: {e}")
+        print(f"[FAIL] Frontmatter parsing failed: {e}")
         return False
 
 
@@ -179,13 +179,13 @@ def test_update_frontmatter():
         assert 'last_updated: 2025-10-25' in updated, "Updated date not found"
         assert 'version: 1.2.3' not in updated, "Old version still present"
 
-        print("✅ Frontmatter update works correctly")
+        print("[OK] Frontmatter update works correctly")
         print(f"   - version: 1.2.3 -> 2.0.0")
         print(f"   - last_updated: 2025-10-20 -> 2025-10-25")
         return True
 
     except Exception as e:
-        print(f"❌ Frontmatter update failed: {e}")
+        print(f"[FAIL] Frontmatter update failed: {e}")
         return False
 
 
@@ -215,15 +215,15 @@ def test_changelog_formatting():
         try:
             result = format_changelog_entry(changelog, "2.0.0", "2025-10-25")
             if result == expected:
-                print(f"✅ Changelog formatted correctly")
+                print(f"[OK] Changelog formatted correctly")
                 passed += 1
             else:
-                print(f"❌ Changelog formatting mismatch")
+                print(f"[FAIL] Changelog formatting mismatch")
                 print(f"   Expected: {repr(expected)}")
                 print(f"   Got: {repr(result)}")
                 failed += 1
         except Exception as e:
-            print(f"❌ Changelog formatting raised {e}")
+            print(f"[FAIL] Changelog formatting raised {e}")
             failed += 1
 
     print(f"\nChangelog Formatting: {passed} passed, {failed} failed")
@@ -249,13 +249,13 @@ def test_changelog_insertion():
         v1_pos = updated_body.index("**v1.2.3**")
         assert v2_pos < v1_pos, "New entry should come before old entry"
 
-        print("✅ Changelog insertion works correctly")
+        print("[OK] Changelog insertion works correctly")
         print("   - New entry inserted before old entries")
         print("   - Old entries preserved")
         return True
 
     except Exception as e:
-        print(f"❌ Changelog insertion failed: {e}")
+        print(f"[FAIL] Changelog insertion failed: {e}")
         return False
 
 
@@ -273,13 +273,13 @@ def test_changelog_insertion_no_history():
         assert "## Version History" in updated_body, "Version History section not created"
         assert "**v1.1.0** (2025-10-25) - Minor update" in updated_body, "Changelog entry not found"
 
-        print("✅ Version History section created successfully")
+        print("[OK] Version History section created successfully")
         print("   - Section added to end of body")
         print("   - Changelog entry inserted")
         return True
 
     except Exception as e:
-        print(f"❌ Changelog insertion (no history) failed: {e}")
+        print(f"[FAIL] Changelog insertion (no history) failed: {e}")
         return False
 
 
@@ -307,7 +307,7 @@ def test_full_update_workflow():
         )
 
         if not result['success']:
-            print(f"❌ Update failed: {result['message']}")
+            print(f"[FAIL] Update failed: {result['message']}")
             return False
 
         # Verify result
@@ -327,7 +327,7 @@ def test_full_update_workflow():
         # Verify archive exists
         assert os.path.exists(result['archive_path']), "Archive file not created"
 
-        print("✅ Full update workflow successful")
+        print("[OK] Full update workflow successful")
         print(f"   - Version: {result['old_version']} -> {result['new_version']}")
         print(f"   - Archive: {os.path.basename(result['archive_path'])}")
         print(f"   - Changelog: 3 entries")
@@ -351,21 +351,21 @@ def test_update_minor_and_patch():
         result = update_agent("test-agent", "minor", "Added new feature", False, agents_dir)
 
         if not result['success']:
-            print(f"❌ Minor update failed: {result['message']}")
+            print(f"[FAIL] Minor update failed: {result['message']}")
             return False
 
         assert result['new_version'] == '1.3.0', f"Expected 1.3.0, got {result['new_version']}"
-        print(f"✅ Minor update: 1.2.3 -> 1.3.0")
+        print(f"[OK] Minor update: 1.2.3 -> 1.3.0")
 
         # Test patch update
         result = update_agent("test-agent", "patch", "Fixed bug", False, agents_dir)
 
         if not result['success']:
-            print(f"❌ Patch update failed: {result['message']}")
+            print(f"[FAIL] Patch update failed: {result['message']}")
             return False
 
         assert result['new_version'] == '1.3.1', f"Expected 1.3.1, got {result['new_version']}"
-        print(f"✅ Patch update: 1.3.0 -> 1.3.1")
+        print(f"[OK] Patch update: 1.3.0 -> 1.3.1")
 
         return True
 
@@ -382,7 +382,7 @@ def test_error_handling():
         result = update_agent("nonexistent", "major", "Update", False, agents_dir)
         assert not result['success'], "Should fail for nonexistent agent"
         assert "not found" in result['message'].lower(), "Error message should mention 'not found'"
-        print("✅ Handles missing agent correctly")
+        print("[OK] Handles missing agent correctly")
 
         # Test 2: Invalid version format
         agent_path = os.path.join(agents_dir, "invalid-version.md")
@@ -400,7 +400,7 @@ status: active
 
         result = update_agent("invalid-version", "major", "Update", False, agents_dir)
         assert not result['success'], "Should fail for invalid version"
-        print("✅ Handles invalid version format correctly")
+        print("[OK] Handles invalid version format correctly")
 
         # Test 3: Empty changelog
         agent_path = os.path.join(agents_dir, "test-agent.md")
@@ -409,7 +409,7 @@ status: active
 
         result = update_agent("test-agent", "major", "", False, agents_dir)
         assert not result['success'], "Should fail for empty changelog"
-        print("✅ Handles empty changelog correctly")
+        print("[OK] Handles empty changelog correctly")
 
         return True
 
@@ -442,7 +442,7 @@ def main():
             passed = test_func()
             results.append((test_name, passed))
         except Exception as e:
-            print(f"\n❌ {test_name} raised unexpected error: {e}")
+            print(f"\n[FAIL] {test_name} raised unexpected error: {e}")
             import traceback
             traceback.print_exc()
             results.append((test_name, False))
@@ -456,16 +456,16 @@ def main():
     failed_count = len(results) - passed_count
 
     for test_name, passed in results:
-        status = "✅ PASS" if passed else "❌ FAIL"
+        status = "[OK] PASS" if passed else "[FAIL] FAIL"
         print(f"{status} - {test_name}")
 
     print(f"\nTotal: {passed_count} passed, {failed_count} failed")
 
     if failed_count == 0:
-        print("\n🎉 All tests passed!")
+        print("\nAll tests passed!")
         return 0
     else:
-        print(f"\n⚠️  {failed_count} test(s) failed")
+        print(f"\n[WARN] {failed_count} test(s) failed")
         return 1
 
 

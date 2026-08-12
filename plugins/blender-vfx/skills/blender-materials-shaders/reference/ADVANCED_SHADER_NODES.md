@@ -142,7 +142,7 @@ Rust_BSDF ────────────────────→ MixSha
 **Use Case:** Organic materials (skin, wax, marble, jade)
 
 ```python
-# Via HTTP Bridge
+# Via the official Blender MCP
 code = """
 import bpy
 
@@ -524,7 +524,7 @@ group_node.node_tree = bpy.data.node_groups[node_group_name]
 """
 ```
 
-**HTTP Bridge Limitation:** File I/O works, but use absolute paths (no relative paths in HTTP context).
+**Note:** File I/O works via the official Blender MCP, but use absolute paths (no relative paths).
 
 ---
 
@@ -1074,7 +1074,7 @@ bpy.data.libraries.write(
 """
 ```
 
-**HTTP Bridge Note:** File I/O works via HTTP Bridge, but paths must be absolute.
+**Note:** File I/O works via the official Blender MCP, but paths must be absolute.
 
 ---
 
@@ -1137,32 +1137,6 @@ nodes = mat.node_tree.nodes
 output = next((n for n in nodes if n.type == 'OUTPUT_MATERIAL'), None)
 if output and not output.inputs['Surface'].is_linked:
     print("ERROR: Material Output not connected!")
-```
-
----
-
-## HTTP Bridge Limitations
-
-**Known Issues:**
-1. **Operators Fail:** `bpy.ops.material.*` doesn't work → Use `bpy.data.materials.new()`
-2. **File Paths:** Must be absolute (no `//` relative paths)
-3. **Context:** No `bpy.context.active_object` in some cases → Pass object explicitly
-4. **UI Updates:** Viewport doesn't auto-refresh → Force redraw via `bpy.ops.wm.redraw_timer()`
-
-**Workarounds:**
-```python
-# WRONG (operator)
-bpy.ops.material.new()
-
-# CORRECT (direct API)
-mat = bpy.data.materials.new("Material")
-mat.use_nodes = True
-
-# WRONG (relative path)
-bpy.data.images.load("//textures/image.png")
-
-# CORRECT (absolute path)
-bpy.data.images.load("C:/Project/textures/image.png")
 ```
 
 ---

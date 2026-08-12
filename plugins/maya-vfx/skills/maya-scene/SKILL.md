@@ -11,7 +11,7 @@ Queries and modifies a live Maya session via the commandPort bridge on `localhos
 ## Prerequisites
 
 - Maya is open with commandPort active (auto-started by `userSetup.mel`)
-- Maya MCP bridge running (`D:\GITHUB\maya-mcp`)
+- Maya MCP bridge running (bundled at `connectors\maya\bridge\` in vfx-agent-toolkit)
 - Claude Code MCP entry for `maya` configured
 
 ## Common Operations

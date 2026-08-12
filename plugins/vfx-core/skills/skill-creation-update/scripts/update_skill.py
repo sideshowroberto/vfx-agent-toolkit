@@ -269,13 +269,13 @@ class SkillUpdater:
         """
         # Verify skill exists
         if not self.skill_md.exists():
-            print(f"❌ SKILL.md not found: {self.skill_md}")
+            print(f"[FAIL] SKILL.md not found: {self.skill_md}")
             return False
 
         # Validate new version format
         new_ver_tuple = parse_version(new_version)
         if not new_ver_tuple:
-            print(f"❌ Invalid version format: {new_version}")
+            print(f"[FAIL] Invalid version format: {new_version}")
             print("   Must be semantic version (X.Y.Z)")
             print("   Examples: 1.0.0, 1.1.0, 2.0.0")
             return False
@@ -287,7 +287,7 @@ class SkillUpdater:
         # Extract current version
         current_version = extract_current_version(original_content)
         if not current_version:
-            print("⚠️  Warning: Could not detect current version")
+            print("[WARN] Warning: Could not detect current version")
             print("   Proceeding with version update...")
         else:
             current_ver_tuple = parse_version(current_version)
@@ -295,11 +295,11 @@ class SkillUpdater:
                 change_type = compare_versions(current_ver_tuple, new_ver_tuple)
 
                 if change_type == "downgrade":
-                    print(f"❌ Version downgrade not allowed")
-                    print(f"   Current: {current_version} → New: {new_version}")
+                    print(f"[FAIL] Version downgrade not allowed")
+                    print(f"   Current: {current_version} -> New: {new_version}")
                     return False
                 elif change_type == "same":
-                    print(f"⚠️  Warning: Version unchanged ({new_version})")
+                    print(f"[WARN] Warning: Version unchanged ({new_version})")
                     print("   Continuing with changelog update...")
 
         # Update content
@@ -315,14 +315,14 @@ class SkillUpdater:
 
         # Dry run - show diff
         if dry_run:
-            print(f"📦 Dry Run: {self.skill_name}\n")
+            print(f"Dry Run: {self.skill_name}\n")
             print(f"Previous version: {current_version or 'unknown'}")
             print(f"New version: {new_version}")
             print(f"Change type: {change_type if current_version else 'initial'}")
             print("\nChanges to be applied:")
-            print("  ✅ Update version in SKILL.md")
-            print("  ✅ Update 'Last Updated' date")
-            print("  ✅ Add changelog entry")
+            print("  [OK] Update version in SKILL.md")
+            print("  [OK] Update 'Last Updated' date")
+            print("  [OK] Add changelog entry")
             print("\nChangelog entry:")
             current_date = datetime.now().strftime("%Y-%m-%d")
             change_lines = [line.strip() for line in changes.split('\n') if line.strip()]
@@ -342,7 +342,7 @@ class SkillUpdater:
             f.write(updated_content)
 
         # Print summary
-        print(f"📦 Updating {self.skill_name}\n")
+        print(f"Updating {self.skill_name}\n")
         print(f"Previous version: {current_version or 'unknown'}")
         print(f"New version: {new_version}")
 
@@ -359,12 +359,12 @@ class SkillUpdater:
             print(f"Change type: {change_type_desc}")
 
         print()
-        print("✅ Updated version in SKILL.md")
-        print(f"✅ Updated 'Last Updated' to {datetime.now().strftime('%Y-%m-%d')}")
-        print("✅ Added changelog entry")
+        print("[OK] Updated version in SKILL.md")
+        print(f"[OK] Updated 'Last Updated' to {datetime.now().strftime('%Y-%m-%d')}")
+        print("[OK] Added changelog entry")
 
         # Re-validate compliance
-        print("\n🔍 Re-validating constitutional compliance...")
+        print("\nRe-validating constitutional compliance...")
         script_dir = Path(__file__).parent
         validate_script = script_dir / "validate_skill.py"
 
@@ -377,13 +377,13 @@ class SkillUpdater:
                     timeout=30
                 )
                 if result.returncode == 0:
-                    print("✅ Re-validated constitutional compliance")
+                    print("[OK] Re-validated constitutional compliance")
                 else:
-                    print("⚠️  Compliance validation warnings (see output above)")
+                    print("[WARN] Compliance validation warnings (see output above)")
             except Exception as e:
-                print(f"⚠️  Could not run validation: {e}")
+                print(f"[WARN] Could not run validation: {e}")
         else:
-            print("⚠️  Validation script not found - skipping")
+            print("[WARN] Validation script not found - skipping")
 
         # Show changelog entry
         print("\nChangelog entry added:")
@@ -399,7 +399,7 @@ class SkillUpdater:
             else:
                 print(change)
 
-        print(f"\n⏭️  Next: Test with production workflow")
+        print(f"\n-> Next: Test with production workflow")
         return True
 
 

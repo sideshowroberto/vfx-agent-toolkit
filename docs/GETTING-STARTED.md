@@ -127,7 +127,6 @@ connectors\unreal\register.ps1
 ```
 
 Registers the UE 5.8 NATIVE MCP (no bridge needed). One-time editor setup first: enable the ModelContextProtocol plugin (Edit > Plugins), optionally install VibeUE from the Fab marketplace for 25+ extra toolsets, and set bAutoStartServer=True / Port=8000 / URLPath=/mcp in Config\DefaultEditorPerProjectUser.ini. The server runs inside the editor - tools connect while the editor is open. Full steps are in the register.ps1 header.
-Built against UE 5.5.
 
 ### Maya
 

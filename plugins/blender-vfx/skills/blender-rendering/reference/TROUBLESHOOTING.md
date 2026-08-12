@@ -111,68 +111,7 @@ set_bsdf_input_safe(bsdf, 'Emission Color', (1,1,1,1))
 
 ---
 
-### Error 3: HTTP Bridge Context Error
-
-**Full Error Message:**
-```
-RuntimeError: Operator bpy.ops.render.render.poll() failed, context is incorrect
-RuntimeError: Operator bpy.ops.object.shade_smooth.poll() failed, context is incorrect
-```
-
-**Cause:**
-HTTP Bridge runs in background context without UI. Most operators require specific context states (active object, selection, edit mode) that don't exist.
-
-**Common Failing Operators:**
-```python
-# ❌ ALL FAIL via HTTP Bridge
-bpy.ops.render.render()           # No render context
-bpy.ops.object.shade_smooth()     # No active object
-bpy.ops.mesh.primitive_cube_add() # No edit context
-bpy.ops.material.new()            # No UI context
-bpy.ops.object.select_all()       # No selection context
-```
-
-**Solution - Direct API Equivalents:**
-```python
-import bpy
-
-# ❌ AVOID
-# bpy.ops.render.render(write_still=True)
-
-# ✅ USE - Configure only
-scene = bpy.context.scene
-scene.render.filepath = "/tmp/output.png"
-# Note: Actual rendering must be done in Blender UI or via command line
-# blender --background file.blend --render-frame 1
-
-
-# ❌ AVOID
-# bpy.ops.object.shade_smooth()
-
-# ✅ USE - Direct API
-obj = bpy.context.active_object
-if obj and obj.type == 'MESH':
-    for poly in obj.data.polygons:
-        poly.use_smooth = True
-    obj.data.update()
-
-
-# ❌ AVOID
-# bpy.ops.mesh.primitive_cube_add()
-
-# ✅ USE - Manual mesh creation
-mesh = bpy.data.meshes.new("Cube")
-vertices = [(-1,-1,-1), (1,-1,-1), (1,1,-1), (-1,1,-1),
-            (-1,-1,1), (1,-1,1), (1,1,1), (-1,1,1)]
-faces = [[0,1,2,3], [4,5,6,7], [0,1,5,4], [2,3,7,6], [0,3,7,4], [1,2,6,5]]
-mesh.from_pydata(vertices, [], faces)
-obj = bpy.data.objects.new("Cube", mesh)
-bpy.context.collection.objects.link(obj)
-```
-
----
-
-### Error 4: AttributeError - Bloom/SSR Settings
+### Error 3: AttributeError - Bloom/SSR Settings
 
 **Full Error Message:**
 ```

@@ -132,6 +132,54 @@ io.Autogrow.Input("inputs",
 - Slots below `min` are required; above `min` are optional
 - Maximum 100 names total
 
+### Calling an Autogrow node from API-format JSON
+
+The sections above are the node-author view. Calling one headless via `POST /prompt` is
+where it bites. **Address each slot with a DOT PATH - `<container>.<slot_name>`.**
+
+```json
+"7": {
+  "class_type": "MiniMaxH3ReferenceToVideo",
+  "inputs": {
+    "ref_images.ref_image_0": ["6", 0],
+    "ref_videos.ref_video_0": ["9", 0],
+    "ref_audios.ref_audio_0": ["11", 0]
+  }
+}
+```
+
+Two wrong forms, and the second is genuinely dangerous:
+
+```json
+"ref_image_0": ["6", 0]                        // ERRORS - loud, harmless
+"ref_images": { "ref_image_0": ["6", 0] }      // SILENTLY IGNORED - dangerous
+```
+
+- **Flat slot name** fails loudly with `execute() got an unexpected keyword argument
+  'ref_image_0'. Did you mean 'ref_images'?` Easy to spot.
+- **Dict value** passes validation, the workflow runs to completion, and the references are
+  **dropped without any warning**. The node receives an empty container and generates from
+  the text prompt alone. Nothing in the response indicates the references were lost.
+
+**Verified 2026-08-04** on `MiniMaxH3ReferenceToVideo` (ComfyUI v0.30.0). This cost a full
+day: two video generations (377s and 1001s) plus a whole model-comparison exercise were
+invalidated because the dict form ran cleanly while binding nothing.
+
+**How to prove references actually bound** - "it executed" is NOT evidence. A reference-
+conditioned node VAE-encodes its references *before* text encoding, so the load order in
+`ComfyUI/user/comfyui.log` is a free assertion:
+
+```
+Requested to load <Model>VideoVAE     <- references ARE being encoded
+Requested to load <Model>TEModel_
+```
+
+If the VAE only appears later (at decode time), the references never bound. Cheap probe:
+run the conditioning node alone with no sampler and watch that order - seconds, not minutes.
+
+The same dot-path rule applies when an Autogrow sits inside a DynamicCombo, just with the
+combo prefix too (`model.reference_images.image_1`) - see the DynamicCombo section below.
+
 ## DynamicCombo - Conditional Inputs
 
 A combo dropdown where each option reveals different sub-inputs:
@@ -185,6 +233,116 @@ io.DynamicCombo.Input("outer", options=[
     ]),
 ])
 ```
+
+### DynamicCombo params are REQUIRED and invisible in source
+
+A `DynamicCombo` shows up in `/object_info` as type `COMFY_DYNAMICCOMBO_V3`, but it is
+**not** declared as a plain `io.<Type>.Input(...)`. Grepping a node's source for
+`io.X.Input` therefore misses it entirely, and the omission only surfaces at execution:
+
+```
+SaveVideo.execute() missing 1 required positional argument: 'codec'
+```
+
+**Pass the option key as a plain string, and its sub-inputs with DOT NOTATION.**
+
+When the chosen option declares no sub-inputs, the bare key is enough:
+
+```json
+"13": {
+  "class_type": "SaveVideo",
+  "inputs": {
+    "video": ["12", 0],
+    "filename_prefix": "test",
+    "format": "auto",
+    "codec": "auto"
+  }
+}
+```
+
+When it does declare sub-inputs, prefix each with the combo's input id:
+
+```json
+"2": {
+  "class_type": "MinimaxHailuo03ReferenceNode",
+  "inputs": {
+    "model": "MiniMax H3",
+    "model.prompt": "...",
+    "model.resolution": "768P",
+    "model.ratio": "16:9",
+    "model.duration": 5,
+    "model.reference_images.image_1": ["1", 0],
+    "seed": 42,
+    "watermark": false
+  }
+}
+```
+
+**Autogrow nested inside a DynamicCombo takes the FULL dot path to each slot** -
+`model.<autogrow_id>.<slot_name>`. This is the same dot-path rule as a top-level Autogrow,
+just with the combo id prepended - the two are consistent:
+
+```json
+"ref_images.ref_image_0": ["6", 0]                 top-level Autogrow
+"model.reference_images.image_1": ["1", 0]         Autogrow inside a DynamicCombo
+```
+
+A dict value is silently ignored in BOTH positions. See the Autogrow section above for the
+log-order check that proves references actually bound.
+
+Passing a dict to the dot-prefixed name (`"model.reference_images": {...}`) is silently
+ignored - the node then fails its own emptiness check (`At least one reference image or
+video is required`) rather than reporting a binding error, which makes this one slow to
+diagnose.
+
+WRONG - a nested dict for the combo itself passes submission validation but dies at
+execution with `execute() missing 1 required positional argument: 'model'`:
+
+```json
+"model": { "model": "MiniMax H3", "prompt": "...", "resolution": "768P" }
+```
+
+Inputs NOT declared inside the selected option stay top-level and are never dot-prefixed
+(`seed`, `watermark` above; on Kling nodes `prompt`, `duration`, `generate_audio` are
+top-level while Seedance nests the same names under `model.`). Read `/object_info` to see
+which is which rather than assuming from another node's shape.
+
+Verified 2026-08-04 on `SaveVideo` and `MinimaxHailuo03ReferenceNode` (ComfyUI v0.30.0).
+
+## Building API-format workflows: validate against /object_info FIRST
+
+**Do not build a workflow graph by reading node source.** The live schema is authoritative
+and catches in one call what source-reading misses. This cost a 445-second generation that
+had already succeeded at every step except the final save.
+
+```python
+import json, urllib.request
+graph = json.load(open("workflow_api.json", encoding="utf-8"))
+info = json.load(urllib.request.urlopen("http://127.0.0.1:8188/object_info", timeout=90))
+for nid, node in graph.items():
+    ct = node["class_type"]
+    if ct not in info:
+        print("node", nid, "class", ct, "NOT REGISTERED"); continue
+    spec = info[ct]["input"]
+    valid = set(spec.get("required", {})) | set(spec.get("optional", {}))
+    missing = set(spec.get("required", {})) - set(node["inputs"])
+    for key in node["inputs"]:
+        if key not in valid:
+            print("node", nid, "unknown input", repr(key))
+    if missing:
+        print("node", nid, "MISSING required", sorted(missing))
+```
+
+Checking for **missing required** inputs matters as much as unknown ones - that is exactly
+the `codec` class of failure.
+
+Other API-format traps:
+- **UI-only widgets are rejected.** `LoadImage` accepts `image` but not `upload`; `upload`
+  exists only in the UI.
+- **UI-format JSON cannot run headless.** Graphs containing Get/Set virtual nodes or
+  subgraphs only resolve in the frontend - always export API format.
+- **Re-running is cheap after a late failure.** ComfyUI caches executed nodes, so fixing a
+  final save node and re-queueing returns in seconds rather than re-sampling.
 
 ## Node Expansion - Subgraph Injection
 
@@ -366,12 +524,12 @@ class MyExtension(ComfyExtension):
 ```
 
 **InputMap types**:
-- `InputMapOldId`: `{"new_id": str, "old_id": str}` — map old input to new
-- `InputMapSetValue`: `{"new_id": str, "set_value": Any}` — set fixed value on new
+- `InputMapOldId`: `{"new_id": str, "old_id": str}` - map old input to new
+- `InputMapSetValue`: `{"new_id": str, "set_value": Any}` - set fixed value on new
 - Dot notation for autogrow inputs: `{"new_id": "images.image0", "old_id": "image1"}`
 
 **OutputMap** (index-based, not name-based):
-- `{"new_idx": int, "old_idx": int}` — map old output index to new
+- `{"new_idx": int, "old_idx": int}` - map old output index to new
 
 **old_widget_ids**: Required because workflow JSON stores widget values by position, not by ID. This list maps positional indexes to input IDs for correct migration.
 

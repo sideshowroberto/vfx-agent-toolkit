@@ -166,7 +166,7 @@ def check_name_matches_filename(filename: str, metadata_name: str) -> Dict[str, 
     Check if metadata name field matches filename.
 
     Requirements:
-    - Extract name from filename: "agent-name.md" → "agent-name"
+    - Extract name from filename: "agent-name.md" -> "agent-name"
     - Compare with metadata name field
     - Must match exactly (case-sensitive)
 
@@ -242,7 +242,7 @@ def check_changelog_exists(agent_content: str, version_string: str) -> Dict[str,
     Requirements:
     - If version > 1.0.0, must have "## Version History" section
     - Must document at least 2 versions (current + previous)
-    - Parse version from header (1.0.0 → major=1, minor=0, patch=0)
+    - Parse version from header (1.0.0 -> major=1, minor=0, patch=0)
 
     Args:
         agent_content: Full text content of agent file

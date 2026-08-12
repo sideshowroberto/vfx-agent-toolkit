@@ -75,7 +75,7 @@ def find_template_path() -> Optional[Path]:
 
     # Search paths (relative to script location)
     search_paths = [
-        # From .claude/skills/skill-creation-update/scripts/ → ClaudeCode/templates/
+        # From .claude/skills/skill-creation-update/scripts/ -> ClaudeCode/templates/
         script_dir.parent.parent.parent.parent / "ClaudeCode" / "templates" / "VFX_SKILL_TEMPLATE.md",
         # Fallback: assume ClaudeCode is sibling to .claude
         script_dir.parent.parent.parent / "ClaudeCode" / "templates" / "VFX_SKILL_TEMPLATE.md",
@@ -94,9 +94,9 @@ def create_skill_directory(skill_name: str, base_path: Optional[Path] = None) ->
 
     Structure:
         .claude/skills/{skill_name}/
-        ├── SKILL.md
-        ├── reference/
-        └── scripts/
+        |-- SKILL.md
+        |-- reference/
+        `-- scripts/
 
     Args:
         skill_name: Name of skill to create
@@ -140,10 +140,10 @@ def apply_template(
     Apply template with placeholder replacement.
 
     Placeholders:
-        {{SKILL_NAME}} → skill_name
-        {{DESCRIPTION}} → description
-        {{DATE}} → current date (YYYY-MM-DD)
-        {{LIST_ALL_REQUIRED_SOFTWARE}} → dependencies
+        {{SKILL_NAME}} -> skill_name
+        {{DESCRIPTION}} -> description
+        {{DATE}} -> current date (YYYY-MM-DD)
+        {{LIST_ALL_REQUIRED_SOFTWARE}} -> dependencies
 
     Args:
         template_path: Path to VFX_SKILL_TEMPLATE.md
@@ -270,29 +270,29 @@ Examples:
 
     # Validate skill name
     if not validate_skill_name(args.name):
-        print(f"❌ Invalid skill name: '{args.name}'")
+        print(f"[FAIL] Invalid skill name: '{args.name}'")
         print("\nRequirements:")
         print("  - Lowercase only")
         print("  - Hyphens allowed (word separators)")
         print("  - No spaces, underscores, or special characters")
         print("  - Length: 3-50 characters")
         print("\nExamples:")
-        print("  ✅ houdini-hda-export")
-        print("  ✅ unreal-vfx-automation")
-        print("  ❌ Houdini_Export (uppercase, underscore)")
-        print("  ❌ hda export (space)")
+        print("  [OK] houdini-hda-export")
+        print("  [OK] unreal-vfx-automation")
+        print("  [FAIL] Houdini_Export (uppercase, underscore)")
+        print("  [FAIL] hda export (space)")
         return 1
 
     # Parse triggers
     triggers = [t.strip() for t in args.triggers.split(',') if t.strip()]
     if len(triggers) < 2:
-        print("❌ At least 2 trigger phrases required")
+        print("[FAIL] At least 2 trigger phrases required")
         print(f"   Provided: {len(triggers)} trigger(s)")
         return 1
 
     # Dry run exit
     if args.dry_run:
-        print(f"✅ Dry run successful for skill: {args.name}")
+        print(f"[OK] Dry run successful for skill: {args.name}")
         print(f"   Description: {args.description}")
         print(f"   Triggers: {', '.join(triggers)}")
         print(f"   Dependencies: {args.dependencies}")
@@ -302,7 +302,7 @@ Examples:
     # Find template
     template_path = find_template_path()
     if not template_path:
-        print("❌ Template not found: VFX_SKILL_TEMPLATE.md")
+        print("[FAIL] Template not found: VFX_SKILL_TEMPLATE.md")
         print("\nSearched paths:")
         script_dir = Path(__file__).parent.absolute()
         print(f"  - {script_dir.parent.parent.parent.parent / 'ClaudeCode' / 'templates' / 'VFX_SKILL_TEMPLATE.md'}")
@@ -312,7 +312,7 @@ Examples:
     try:
         # Create skill directory
         skill_dir = create_skill_directory(args.name)
-        print(f"✅ Created {skill_dir}/")
+        print(f"[OK] Created {skill_dir}/")
 
         # Apply template
         skill_md = skill_dir / "SKILL.md"
@@ -330,35 +330,35 @@ Examples:
         with open(skill_md, 'r', encoding='utf-8') as f:
             line_count = len(f.readlines())
 
-        print(f"✅ Created SKILL.md ({line_count} lines from template)")
+        print(f"[OK] Created SKILL.md ({line_count} lines from template)")
 
         # Create reference placeholders
         create_placeholder_references(skill_dir, args.name)
-        print("✅ Created reference/ directory with placeholders")
+        print("[OK] Created reference/ directory with placeholders")
 
-        print("✅ Created scripts/ directory")
+        print("[OK] Created scripts/ directory")
 
         # Success summary
-        print(f"\n📦 Skill '{args.name}' created successfully!")
-        print(f"\n⏭️  Next Steps:")
+        print(f"\nSkill '{args.name}' created successfully!")
+        print(f"\n-> Next Steps:")
         print(f"   1. Fill in Quick Start section in SKILL.md")
         print(f"   2. Add 3-5 Standard Workflows")
         print(f"   3. Document 4-5 common issues in Troubleshooting")
         print(f"   4. Move detailed content to reference/*.md if needed")
         print(f"   5. Validate compliance: python validate_skill.py {args.name}")
-        print(f"\n📍 Location: {skill_dir.absolute()}")
+        print(f"\nLocation: {skill_dir.absolute()}")
 
         return 0
 
     except FileExistsError as e:
-        print(f"❌ {e}")
+        print(f"[FAIL] {e}")
         print(f"\nOptions:")
         print(f"   1. Delete existing skill: rm -rf .claude/skills/{args.name}")
         print(f"   2. Update existing skill: python update_skill.py {args.name} --version X.Y.Z")
         return 1
 
     except Exception as e:
-        print(f"❌ Unexpected error: {e}")
+        print(f"[FAIL] Unexpected error: {e}")
         import traceback
         traceback.print_exc()
         return 1

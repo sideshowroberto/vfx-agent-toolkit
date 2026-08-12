@@ -128,11 +128,9 @@ bsdf.inputs['Roughness'].default_value = 0.2  # Polished
 
 ## Complete PBR Material Setup
 
-### Full Texture Setup (HTTP Bridge)
+### Full Texture Setup
 
 ```python
-import requests
-# Execute via the Blender MCP tool: execute_blender_code
 code = """
 import bpy
 import os
@@ -250,9 +248,6 @@ if obj and obj.type == 'MESH':
 
 print(f"Material '{material_name}' created with {len(tex_nodes)} textures")
 """
-
-response = requests.post(url, json={"code": code})
-print(response.json())
 ```
 
 **Node Layout:**
@@ -308,7 +303,7 @@ import bmesh
 
 obj = bpy.context.active_object
 if obj and obj.type == 'MESH':
-    # Enter edit mode via bmesh (HTTP Bridge compatible)
+    # Enter edit mode via bmesh
     bm = bmesh.new()
     bm.from_mesh(obj.data)
 
@@ -316,9 +311,9 @@ if obj and obj.type == 'MESH':
     for face in bm.faces:
         face.select = True
 
-    # Smart UV Project (direct API)
-    # NOTE: bpy.ops.uv.smart_project() FAILS in HTTP Bridge
-    # Use bmesh.ops instead
+    # Smart UV Project (direct API alternative)
+    # bpy.ops.uv.smart_project() works via the official Blender MCP too,
+    # but requires edit-mode context; bmesh.ops below avoids that dependency
 
     # Option 1: Cube projection
     bmesh.ops.create_cube(bm, size=2.0)
@@ -344,7 +339,7 @@ print(f"UV unwrapping completed for {obj.name}")
 """
 ```
 
-**HTTP Bridge Limitation:** UV operators (`bpy.ops.uv.*`) fail. Use bmesh direct manipulation.
+**Note:** bmesh direct manipulation avoids edit-mode context requirements that `bpy.ops.uv.*` operators need.
 
 ---
 
@@ -485,7 +480,7 @@ if obj and obj.type == 'MESH':
 """
 ```
 
-**HTTP Bridge Note:** Texture painting itself requires interactive viewport (not via HTTP Bridge), but setup works.
+**Note:** Texture painting itself requires an interactive viewport (not scriptable), but setup works via the official Blender MCP.
 
 ---
 
@@ -516,18 +511,18 @@ if obj and obj.type == 'MESH':
         bake_tex.image = img
         nodes.active = bake_tex  # CRITICAL: Active node is bake target
 
-    # Bake settings (HTTP Bridge compatible)
+    # Bake settings
     bpy.context.scene.render.engine = 'CYCLES'
     bpy.context.scene.cycles.samples = 32
     bpy.context.scene.cycles.bake_type = 'AO'
 
-    # NOTE: bpy.ops.object.bake() may fail in HTTP Bridge
-    # Use Cycles standalone or interactive Blender for baking
+    # NOTE: bpy.ops.object.bake() is a blocking operator
+    # Run interactively in Blender for long bakes
     print("Bake setup complete. Run bpy.ops.object.bake(type='AO') in interactive Blender")
 """
 ```
 
-**Baking Limitations:** `bpy.ops.object.bake()` requires interactive context. Setup via HTTP Bridge, execute bake manually.
+**Baking Limitations:** `bpy.ops.object.bake()` requires interactive context. Set up via the official Blender MCP, execute the bake manually.
 
 ---
 
@@ -640,7 +635,7 @@ import bpy
 obj = bpy.context.active_object
 export_path = "C:/Exports/model_for_unreal.fbx"
 
-# NOTE: bpy.ops.export_scene.fbx() may fail in HTTP Bridge
+# NOTE: bpy.ops.export_scene.fbx() may need interactive context
 # Setup only, execute in interactive Blender
 
 # Material naming convention for Unreal
@@ -735,7 +730,7 @@ if mat and mat.use_nodes:
 code = """
 import bpy
 
-# glTF export (HTTP Bridge compatible setup)
+# glTF export (setup via the official Blender MCP)
 export_path = "C:/Exports/model.glb"
 
 # Ensure materials are PBR-compatible
@@ -1075,26 +1070,12 @@ links.new(mix_ao.outputs['Result'], bsdf.inputs['Base Color'])
 
 ---
 
-## HTTP Bridge Limitations
+## Known Limitations
 
 **PBR Workflows:**
-1. **UV Unwrapping:** Use bmesh direct API (operators fail)
-2. **Texture Painting:** Setup works, painting requires interactive Blender
-3. **Baking:** Setup works, execution requires interactive/standalone
-4. **File Paths:** Use absolute paths only (no relative `//`)
-5. **Context Access:** Pass objects explicitly (don't rely on `bpy.context.active_object`)
-
-**Working Patterns:**
-```python
-# WORKS: Material creation, node setup, texture loading
-mat = bpy.data.materials.new("Material")
-mat.use_nodes = True
-img = bpy.data.images.load("C:/absolute/path.png")
-
-# FAILS: Operators
-bpy.ops.uv.smart_project()  # Use bmesh instead
-bpy.ops.object.bake()  # Run in interactive Blender
-```
+1. **Texture Painting:** Setup works via script; interactive painting itself requires the viewport
+2. **Baking:** Setup works via script; `bpy.ops.object.bake()` is a blocking operator - run it in interactive Blender for long bakes
+3. **File Paths:** Use absolute paths only (no relative `//`)
 
 ---
 

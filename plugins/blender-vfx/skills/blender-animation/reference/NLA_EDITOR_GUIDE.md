@@ -24,24 +24,11 @@ This reference covers the **Non-Linear Animation (NLA) Editor**, Blender's syste
 
 ---
 
-## 🚨 CRITICAL: HTTP Bridge Compatibility
+## 🎯 API STABILITY
 
 **100% STABLE API - NO VERSION CHECKING REQUIRED**
 
-All NLA APIs documented here are validated stable (see `ANIMATION_SYSTEM_VALIDATION_REPORT.md`).
-
-**HTTP Bridge Pattern:**
-```python
-import requests
-# Execute via the Blender MCP tool: execute_blender_code
-code = """
-import bpy
-# NLA code here (direct API only, no bpy.ops.nla operators)
-"""
-response = requests.post(url, json={"code": code})
-```
-
-**Critical Limitation:** NLA operators (`bpy.ops.nla.*`) fail in HTTP Bridge. Use direct API (`obj.animation_data.nla_tracks.new()`) exclusively.
+All NLA APIs documented here are validated stable (see `ANIMATION_SYSTEM_VALIDATION_REPORT.md`). Use the `mcp__blender__execute_blender_code` tool to run the snippets below via the official Blender MCP.
 
 ---
 
@@ -320,7 +307,7 @@ strip.use_animated_influence = True
 # Workaround: Manually create keyframes on influence property
 
 # Add keyframes to influence (requires direct access to NLA strip data)
-# This is complex in HTTP Bridge - use Blender UI or set constant influence
+# This is complex via the Python API - use Blender UI or set constant influence
 
 # Set influence curve points (conceptual - requires UI access)
 # Frame 1: influence = 0.0 (invisible)
@@ -340,7 +327,7 @@ Strip:          [===Wave===]
 Effect:    (fade in)(full)(fade out)
 ```
 
-**Workaround (HTTP Bridge):**
+**Workaround (Python API):**
 ```python
 # Set linear ramp via strip properties (no F-curve needed)
 strip.use_auto_blend = True  # Auto fade-in/out
@@ -496,7 +483,7 @@ strip.use_animated_time = True
 print(f"Animated time enabled: {strip.use_animated_time}")
 ```
 
-**Note:** Action time remapping via F-curves is difficult in HTTP Bridge. Use `strip.scale` for uniform timing, or edit in Blender UI.
+**Note:** Action time remapping via F-curves is difficult via the Python API. Use `strip.scale` for uniform timing, or edit in Blender UI.
 
 ---
 
@@ -817,7 +804,7 @@ import bpy
 
 armature_obj = bpy.data.objects["Armature"]
 
-# NOTE: Baking requires operator - not available in HTTP Bridge
+# NOTE: Baking requires operator - run interactively in Blender UI
 # Use Blender UI: Select armature → Animation menu → Bake Action
 # Settings: Visual Keying (enabled), Clear Constraints (disabled), Bake Data (Pose)
 
@@ -1102,9 +1089,9 @@ print("Tracks reordered")
 
 ---
 
-### Issue: Can't Edit Strip Properties in HTTP Bridge
+### Editing Strip Properties Directly
 
-**Symptoms:** Need to adjust strip timing/influence but UI access required
+**Use case:** Adjust strip timing/influence without going through the UI.
 
 **Solution:** All strip properties are accessible via Python API (no operators needed):
 
@@ -1114,7 +1101,7 @@ import bpy
 armature_obj = bpy.data.objects["Armature"]
 strip = armature_obj.animation_data.nla_tracks["Locomotion"].strips["Walk"]
 
-# All these are direct property access (HTTP Bridge safe)
+# All these are direct property access
 strip.frame_start = 10
 strip.frame_end = 50
 strip.scale = 1.5
@@ -1128,7 +1115,7 @@ strip.blend_out = 5
 strip.extrapolation = 'HOLD'
 strip.mute = False
 
-print("Strip properties updated (all HTTP Bridge safe)")
+print("Strip properties updated")
 ```
 
 ---
@@ -1137,9 +1124,6 @@ print("Strip properties updated (all HTTP Bridge safe)")
 
 **Animation System Validation Report:**
 `<workspace>\Blender\blender-ai-compatibility\ANIMATION_SYSTEM_VALIDATION_REPORT.md`
-
-**HTTP Bridge Documentation:**
-`<workspace>\Blender\blender-ai-compatibility\CLAUDE.md`
 
 **Blender NLA API Reference (Official):**
 https://docs.blender.org/api/current/bpy.types.NlaTrack.html

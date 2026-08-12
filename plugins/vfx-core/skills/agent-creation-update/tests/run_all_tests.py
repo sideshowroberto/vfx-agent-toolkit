@@ -133,7 +133,7 @@ def run_unit_tests(verbose: bool = False) -> Dict[str, Any]:
 
     except FileNotFoundError:
         error_msg = "pytest not installed. Install with: pip install pytest"
-        print(f"\n❌ Error: {error_msg}")
+        print(f"\n[FAIL] Error: {error_msg}")
         return {
             "success": False,
             "tests_run": 0,
@@ -142,7 +142,7 @@ def run_unit_tests(verbose: bool = False) -> Dict[str, Any]:
         }
     except Exception as e:
         error_msg = f"Error running pytest: {e}"
-        print(f"\n❌ Error: {error_msg}")
+        print(f"\n[FAIL] Error: {error_msg}")
         return {
             "success": False,
             "tests_run": 0,
@@ -227,7 +227,7 @@ def run_integration_tests(verbose: bool = False) -> Dict[str, Any]:
 
     except Exception as e:
         error_msg = f"Error running integration tests: {e}"
-        print(f"\n❌ Error: {error_msg}")
+        print(f"\n[FAIL] Error: {error_msg}")
         return {
             "success": False,
             "tests_run": 0,
@@ -256,13 +256,13 @@ def print_combined_report(unit_results: Dict[str, Any], integration_results: Dic
     print("\nUnit Tests:")
     print(f"  Tests Run: {unit_results['tests_run']}")
     print(f"  Failures: {unit_results['failures']}")
-    print(f"  Status: {'✅ PASS' if unit_results['success'] else '❌ FAIL'}")
+    print(f"  Status: {'[OK] PASS' if unit_results['success'] else '[FAIL] FAIL'}")
 
     # Integration test summary
     print("\nIntegration Tests:")
     print(f"  Tests Run: {integration_results['tests_run']}")
     print(f"  Failures: {integration_results['failures']}")
-    print(f"  Status: {'✅ PASS' if integration_results['success'] else '❌ FAIL'}")
+    print(f"  Status: {'[OK] PASS' if integration_results['success'] else '[FAIL] FAIL'}")
 
     # Overall summary
     total_tests = unit_results['tests_run'] + integration_results['tests_run']
@@ -272,12 +272,12 @@ def print_combined_report(unit_results: Dict[str, Any], integration_results: Dic
     print("\n" + "-" * 70)
     print(f"Total Tests: {total_tests}")
     print(f"Total Failures: {total_failures}")
-    print(f"Overall Status: {'✅ PASS' if all_passed else '❌ FAIL'}")
+    print(f"Overall Status: {'[OK] PASS' if all_passed else '[FAIL] FAIL'}")
 
     if all_passed:
-        print("\n🎉 All tests passed!")
+        print("\nAll tests passed!")
     else:
-        print(f"\n⚠️  {total_failures} test(s) failed")
+        print(f"\n[WARN] {total_failures} test(s) failed")
 
     print("=" * 70)
 

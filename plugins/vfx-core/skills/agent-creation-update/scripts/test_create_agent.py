@@ -41,10 +41,10 @@ def test_template_loading():
         assert '{{DESCRIPTION}}' in template, "Template missing {{DESCRIPTION}} placeholder"
         assert '{{TOOLS}}' in template, "Template missing {{TOOLS}} placeholder"
         assert '{{DATE}}' in template, "Template missing {{DATE}} placeholder"
-        print("✅ PASS: Template loaded successfully with all placeholders")
+        print("[OK] PASS: Template loaded successfully with all placeholders")
         return True
     except Exception as e:
-        print(f"❌ FAIL: {e}")
+        print(f"[FAIL] FAIL: {e}")
         return False
 
 
@@ -69,11 +69,11 @@ def test_placeholder_replacement():
         assert '  - Edit' in result, "TOOLS missing Edit"
         assert '{{' not in result, "Placeholders still present"
 
-        print("✅ PASS: All placeholders replaced correctly")
+        print("[OK] PASS: All placeholders replaced correctly")
         print(f"Sample output:\n{result[:200]}...")
         return True
     except Exception as e:
-        print(f"❌ FAIL: {e}")
+        print(f"[FAIL] FAIL: {e}")
         return False
 
 
@@ -105,10 +105,10 @@ def test_agent_name_validation():
         is_valid = result['valid']
 
         if is_valid == should_pass:
-            print(f"  ✅ {description}: '{name}' → {result['message']}")
+            print(f"  [OK] {description}: '{name}' -> {result['message']}")
             passed += 1
         else:
-            print(f"  ❌ {description}: '{name}' → Expected {should_pass}, got {is_valid}")
+            print(f"  [FAIL] {description}: '{name}' -> Expected {should_pass}, got {is_valid}")
             print(f"     Message: {result['message']}")
             failed += 1
 
@@ -135,30 +135,30 @@ def test_agent_creation():
         )
 
         if not result['success']:
-            print(f"❌ FAIL: Agent creation failed: {result['message']}")
+            print(f"[FAIL] FAIL: Agent creation failed: {result['message']}")
             return False
 
-        print(f"✅ Created agent: {result['agent_path']}")
+        print(f"[OK] Created agent: {result['agent_path']}")
 
         # Verify file exists
         agent_path = Path(result['agent_path'])
         if not agent_path.exists():
-            print(f"❌ FAIL: Agent file not created at {agent_path}")
+            print(f"[FAIL] FAIL: Agent file not created at {agent_path}")
             return False
 
-        print(f"✅ Agent file exists: {agent_path}")
+        print(f"[OK] Agent file exists: {agent_path}")
 
         # Verify content
         content = agent_path.read_text()
         if '{{' in content:
-            print(f"❌ FAIL: Placeholders still present in generated file")
+            print(f"[FAIL] FAIL: Placeholders still present in generated file")
             return False
 
         if 'test-workflow-agent' not in content:
-            print(f"❌ FAIL: Agent name not in content")
+            print(f"[FAIL] FAIL: Agent name not in content")
             return False
 
-        print(f"✅ Content verified (no placeholders, name present)")
+        print(f"[OK] Content verified (no placeholders, name present)")
 
         # Test 2: Try to create duplicate (should fail without force)
         result2 = create_agent(
@@ -171,10 +171,10 @@ def test_agent_creation():
         )
 
         if result2['success']:
-            print(f"❌ FAIL: Duplicate agent created without force flag")
+            print(f"[FAIL] FAIL: Duplicate agent created without force flag")
             return False
 
-        print(f"✅ Duplicate prevention works: {result2['message']}")
+        print(f"[OK] Duplicate prevention works: {result2['message']}")
 
         # Test 3: Force overwrite
         result3 = create_agent(
@@ -187,20 +187,20 @@ def test_agent_creation():
         )
 
         if not result3['success']:
-            print(f"❌ FAIL: Force overwrite failed: {result3['message']}")
+            print(f"[FAIL] FAIL: Force overwrite failed: {result3['message']}")
             return False
 
-        print(f"✅ Force overwrite works")
+        print(f"[OK] Force overwrite works")
 
         # Verify updated content
         updated_content = agent_path.read_text()
         if 'Updated agent' not in updated_content:
-            print(f"❌ FAIL: Content not updated after force overwrite")
+            print(f"[FAIL] FAIL: Content not updated after force overwrite")
             return False
 
-        print(f"✅ Content updated correctly")
+        print(f"[OK] Content updated correctly")
 
-        print("\n✅ PASS: All agent creation workflow tests passed")
+        print("\n[OK] PASS: All agent creation workflow tests passed")
         return True
 
 
@@ -221,7 +221,7 @@ def test_validation_integration():
         )
 
         if not result['success']:
-            print(f"❌ FAIL: Agent creation failed: {result['message']}")
+            print(f"[FAIL] FAIL: Agent creation failed: {result['message']}")
             return False
 
         # Check validation results
@@ -232,7 +232,7 @@ def test_validation_integration():
             print(f"Validation output:\n{validation['output']}")
             print("Note: Validation may fail due to template structure, but integration is working")
 
-        print("✅ PASS: Validation integration working (subprocess executed)")
+        print("[OK] PASS: Validation integration working (subprocess executed)")
         return True
 
 
@@ -244,11 +244,11 @@ def run_all_tests():
 
     # Check template exists
     if not TEMPLATE_PATH.exists():
-        print(f"❌ ERROR: Template not found: {TEMPLATE_PATH}")
+        print(f"[FAIL] ERROR: Template not found: {TEMPLATE_PATH}")
         print(f"Expected path: {TEMPLATE_PATH.absolute()}")
         return False
 
-    print(f"✅ Template found: {TEMPLATE_PATH}")
+    print(f"[OK] Template found: {TEMPLATE_PATH}")
 
     tests = [
         test_template_loading,
@@ -264,7 +264,7 @@ def run_all_tests():
             passed = test_func()
             results.append((test_func.__name__, passed))
         except Exception as e:
-            print(f"\n❌ EXCEPTION in {test_func.__name__}: {e}")
+            print(f"\n[FAIL] EXCEPTION in {test_func.__name__}: {e}")
             import traceback
             traceback.print_exc()
             results.append((test_func.__name__, False))
@@ -278,7 +278,7 @@ def run_all_tests():
     total_count = len(results)
 
     for test_name, passed in results:
-        symbol = "✅" if passed else "❌"
+        symbol = "[OK]" if passed else "[FAIL]"
         print(f"{symbol} {test_name}")
 
     print(f"\nTotal: {passed_count}/{total_count} tests passed")

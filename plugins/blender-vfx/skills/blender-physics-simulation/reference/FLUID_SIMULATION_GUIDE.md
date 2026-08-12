@@ -10,7 +10,7 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [HTTP Bridge Limitations](#http-bridge-limitations)
+2. [Baking Limitations](#baking-limitations)
 3. [Mantaflow Architecture](#mantaflow-architecture)
 4. [Domain Setup](#domain-setup)
 5. [Liquid Simulations](#liquid-simulations)
@@ -45,37 +45,35 @@ Blender's Mantaflow system (introduced in 2.82) provides unified fluid simulatio
 
 ---
 
-## HTTP Bridge Limitations
+## Baking Limitations
 
 ### CRITICAL: Baking Restriction
 
-**Cannot bake via HTTP Bridge:**
+**Cannot bake via a scripted call - these are long-running, blocking operators:**
 ```python
-# ❌ ALL FAIL in HTTP Bridge
+# ❌ ALL require interactive Blender (blocking, frame-stepped simulation)
 bpy.ops.fluid.bake_all()
 bpy.ops.fluid.free_all()
 bpy.ops.fluid.bake_data()
 bpy.ops.fluid.bake_mesh()
 ```
 
-**HTTP Bridge Can:**
-- ✅ Create domain and flow objects
-- ✅ Configure all fluid settings
-- ✅ Set resolution, viscosity, diffusion
-- ✅ Configure cache paths
-- ✅ Verify bake status
+**The official Blender MCP can:**
+- Create domain and flow objects
+- Configure all fluid settings
+- Set resolution, viscosity, diffusion
+- Configure cache paths
+- Verify bake status
 
-**HTTP Bridge Cannot:**
-- ❌ Trigger baking
-- ❌ Free baked cache
-- ❌ Pause/resume baking
+**The official Blender MCP cannot (practically):**
+- Trigger a full bake and wait for it to finish within a single tool call
+- Free baked cache mid-bake
+- Pause/resume baking
 
 ### Recommended Workflow
 
-**Step 1: Configure via HTTP Bridge**
+**Step 1: Configure via the official Blender MCP**
 ```python
-import requests
-
 code = """
 import bpy
 
@@ -94,7 +92,7 @@ import bpy
 4. Click "Bake All" or specific data types
 5. Wait for completion
 
-**Step 3: Verify via HTTP Bridge**
+**Step 3: Verify via the official Blender MCP**
 ```python
 code = """
 import bpy
@@ -629,7 +627,7 @@ Blender fluid simulations have multiple cache types:
 4. **Noise:** High-res detail (gas only)
 5. **Guide:** Velocity guide cache
 
-### Cache Settings (HTTP Bridge)
+### Cache Settings (official Blender MCP)
 
 ```python
 # Configure before manual bake
@@ -652,7 +650,7 @@ domain_settings.cache_resumable = True
 
 **Manual Bake Steps:**
 
-1. **Configure via HTTP Bridge:**
+1. **Configure via the official Blender MCP:**
    ```python
    # Set all domain/flow/effector settings
    # Configure cache path
@@ -682,7 +680,7 @@ domain_settings.cache_resumable = True
    - Cache info shows frames cached
    - Viewport displays fluid correctly
 
-### Verify Bake Status (HTTP Bridge)
+### Verify Bake Status (official Blender MCP)
 
 ```python
 code = """
@@ -733,10 +731,10 @@ else:
 
 ### Free Cache (Manual)
 
-Cannot use operators in HTTP Bridge:
+`bpy.ops.fluid.free_all()` is a blocking operator - run it in interactive Blender rather than scripting it:
 
 ```python
-# ❌ Fails
+# Run interactively, not via a scripted call
 bpy.ops.fluid.free_all()
 ```
 

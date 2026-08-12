@@ -89,7 +89,7 @@ class SkillValidator:
         # Check file exists
         if not self.skill_md.exists():
             entity_type = "Agent OS standard" if self.is_agent_os else "Skill"
-            print(f"❌ {entity_type} not found: {self.skill_name}")
+            print(f"[FAIL] {entity_type} not found: {self.skill_name}")
             print(f"   Expected path: {self.skill_md}")
             return False
 
@@ -128,7 +128,7 @@ class SkillValidator:
         issues = []
 
         if not content.strip().startswith("---"):
-            issues.append("❌ Missing YAML frontmatter with constitutional headers")
+            issues.append("[FAIL] Missing YAML frontmatter with constitutional headers")
             self.results.append(ValidationResult(
                 article="Agent OS Headers",
                 status="FAIL",
@@ -140,7 +140,7 @@ class SkillValidator:
         # Extract frontmatter
         parts = content.split("---", 2)
         if len(parts) < 2:
-            issues.append("❌ Malformed YAML frontmatter")
+            issues.append("[FAIL] Malformed YAML frontmatter")
             self.results.append(ValidationResult(
                 article="Agent OS Headers",
                 status="FAIL",
@@ -161,9 +161,9 @@ class SkillValidator:
 
         for field_name, pattern in required_fields.items():
             if re.search(pattern, frontmatter):
-                details.append(f"✅ {field_name}")
+                details.append(f"[OK] {field_name}")
             else:
-                issues.append(f"❌ Missing or malformed: {field_name}")
+                issues.append(f"[FAIL] Missing or malformed: {field_name}")
 
         # Extract articles_compliant list
         articles_match = re.search(r"articles_compliant:\s*\[(.*?)\]", frontmatter)
@@ -245,13 +245,13 @@ class SkillValidator:
             # Check hard-coded paths
             for pattern, desc in hard_coded_patterns:
                 if re.search(pattern, content):
-                    details.append(f"❌ {script.name}: {desc} detected")
+                    details.append(f"[FAIL] {script.name}: {desc} detected")
                     has_hard_coded = True
 
             # Check hard-coded project names
             for pattern, desc in project_patterns:
                 if re.search(pattern, content):
-                    details.append(f"❌ {script.name}: {desc}")
+                    details.append(f"[FAIL] {script.name}: {desc}")
                     has_hard_coded = True
 
             # Check for parameterization
@@ -274,8 +274,8 @@ class SkillValidator:
                 details=[f"Scripts: {', '.join(s.name for s in scripts)}"]
             ))
         else:
-            details.append(f"✅ No hard-coded paths detected in {len(scripts)} script(s)")
-            details.append(f"✅ Parameterization verified (argparse/sys.argv)")
+            details.append(f"[OK] No hard-coded paths detected in {len(scripts)} script(s)")
+            details.append(f"[OK] Parameterization verified (argparse/sys.argv)")
             self.results.append(ValidationResult(
                 article="Article I",
                 status="PASS",
@@ -303,17 +303,17 @@ class SkillValidator:
         
         if self.is_agent_os:
             # Agent OS standards: Track but don't enforce <500 line limit
-            details.append(f"📊 {line_count} lines (Agent OS standard)")
+            details.append(f"{line_count} lines (Agent OS standard)")
             
             # Calculate context efficiency
             # Typical before: Complete tool docs (1000-2000 lines)
             # After: Focused standard (300-600 lines)
             if line_count < 400:
-                details.append(f"✅ Excellent context efficiency (<400 lines)")
+                details.append(f"[OK] Excellent context efficiency (<400 lines)")
             elif line_count < 550:
-                details.append(f"✅ Good context efficiency (400-550 lines)")
+                details.append(f"[OK] Good context efficiency (400-550 lines)")
             else:
-                details.append(f"⚠️  Consider refactoring (>550 lines)")
+                details.append(f"[WARN] Consider refactoring (>550 lines)")
                 details.append("   Complex topics acceptable, but aim for <550")
             
             self.results.append(ValidationResult(
@@ -334,16 +334,16 @@ class SkillValidator:
                 status="FAIL",
                 message=f"SKILL.md exceeds 500 line limit ({line_count} lines)",
                 details=[
-                    f"❌ {line_count} lines (>{500} limit)",
+                    f"[FAIL] {line_count} lines (>{500} limit)",
                     f"Overage: {margin} lines ({margin / 500 * 100:.1f}%)",
                     "Fix: Move detailed content to reference/*.md",
-                    "Example: Troubleshooting (>100 lines) → reference/troubleshooting_guide.md"
+                    "Example: Troubleshooting (>100 lines) -> reference/troubleshooting_guide.md"
                 ]
             ))
         elif line_count > 450:
             margin = 500 - line_count
             buffer_pct = margin / 500 * 100
-            details.append(f"⚠️  {line_count} lines (approaching 500 limit)")
+            details.append(f"[WARN] {line_count} lines (approaching 500 limit)")
             details.append(f"Margin: {margin} lines ({buffer_pct:.1f}% buffer)")
             details.append("Consider moving content to reference docs before adding more")
             self.results.append(ValidationResult(
@@ -355,15 +355,15 @@ class SkillValidator:
         else:
             margin = 500 - line_count
             buffer_pct = margin / 500 * 100
-            details.append(f"✅ {line_count} lines (<500 limit)")
+            details.append(f"[OK] {line_count} lines (<500 limit)")
             details.append(f"Margin: {margin} lines ({buffer_pct:.1f}% buffer)")
 
             # Check reference directory
             if reference_dir.exists():
                 ref_files = list(reference_dir.glob("*.md"))
-                details.append(f"✅ Reference directory: {len(ref_files)} file(s)")
+                details.append(f"[OK] Reference directory: {len(ref_files)} file(s)")
             else:
-                details.append("⚠️  No reference/ directory (may not be needed)")
+                details.append("[WARN] No reference/ directory (may not be needed)")
 
             self.results.append(ValidationResult(
                 article="Article III",
@@ -402,7 +402,7 @@ class SkillValidator:
                 content = f.read()
             if 'if __name__ == "__main__"' in content:
                 has_main_block = True
-                details.append(f"✅ {script.name}: Has __main__ block")
+                details.append(f"[OK] {script.name}: Has __main__ block")
 
         # Check for test files
         test_files = (
@@ -417,15 +417,15 @@ class SkillValidator:
             session_docs = list((parent_dir / "development").glob("Session_*.md"))
 
         if has_main_block:
-            details.append(f"✅ Independent testing possible (__main__ blocks present)")
+            details.append(f"[OK] Independent testing possible (__main__ blocks present)")
         else:
-            details.append("⚠️  No __main__ blocks found - add for independent testing")
+            details.append("[WARN] No __main__ blocks found - add for independent testing")
 
         if test_files:
-            details.append(f"✅ Test files: {', '.join(f.name for f in test_files)}")
+            details.append(f"[OK] Test files: {', '.join(f.name for f in test_files)}")
 
         if session_docs:
-            details.append(f"✅ Session docs available: {len(session_docs)} file(s)")
+            details.append(f"[OK] Session docs available: {len(session_docs)} file(s)")
 
         # Determine status
         if has_main_block or test_files:
@@ -455,7 +455,7 @@ class SkillValidator:
             status="SKIP",
             message="Manual verification required",
             details=[
-                "⚠️  Verify tool/engine documentation is referenced",
+                "[WARN] Verify tool/engine documentation is referenced",
                 "Check: Quick Start and Workflows cite official docs",
                 "Example: 'See Unreal Engine 5.5 documentation for...'",
                 "Example: 'Follows Houdini 20.0 Python API patterns'"
@@ -469,7 +469,7 @@ class SkillValidator:
         Checks:
         - Context savings metrics in Constitutional Compliance
         - Progressive disclosure structure
-        - Metadata → SKILL.md → reference pattern
+        - Metadata -> SKILL.md -> reference pattern
         """
         details = []
 
@@ -481,7 +481,7 @@ class SkillValidator:
         has_context_metrics = False
         if "context reduction" in content.lower() or "context efficiency" in content.lower():
             has_context_metrics = True
-            details.append("✅ Context efficiency documented in SKILL.md")
+            details.append("[OK] Context efficiency documented in SKILL.md")
 
             # Extract metrics if present
             metrics_match = re.search(r'(\d+)%\s+(?:context\s+)?(?:reduction|savings)', content, re.IGNORECASE)
@@ -489,20 +489,20 @@ class SkillValidator:
                 pct = int(metrics_match.group(1))
                 details.append(f"   Context reduction: {pct}%")
                 if pct < 50:
-                    details.append(f"   ⚠️  <50% reduction - consider more aggressive refactoring")
+                    details.append(f"   [WARN] <50% reduction - consider more aggressive refactoring")
 
         # Check progressive disclosure structure
         reference_dir = self.skill_dir / "reference"
         if reference_dir.exists():
             ref_files = list(reference_dir.glob("*.md"))
-            details.append(f"✅ Progressive disclosure: {len(ref_files)} reference file(s)")
+            details.append(f"[OK] Progressive disclosure: {len(ref_files)} reference file(s)")
         else:
-            details.append("⚠️  No reference/ directory - consider for future content")
+            details.append("[WARN] No reference/ directory - consider for future content")
 
         # Check metadata (YAML frontmatter)
         has_frontmatter = content.strip().startswith("---")
         if has_frontmatter:
-            details.append("✅ YAML frontmatter present (metadata layer)")
+            details.append("[OK] YAML frontmatter present (metadata layer)")
 
         if has_context_metrics or (reference_dir.exists() and len(list(reference_dir.glob("*.md"))) > 0):
             self.results.append(ValidationResult(
@@ -556,10 +556,10 @@ class SkillValidator:
             has_naming = any(kw in content for kw in naming_keywords)
 
             if has_file_format:
-                details.append("✅ File format standards documented")
+                details.append("[OK] File format standards documented")
 
             if has_naming:
-                details.append("✅ Asset naming conventions documented")
+                details.append("[OK] Asset naming conventions documented")
 
             if has_file_format and has_naming:
                 self.results.append(ValidationResult(
@@ -569,7 +569,7 @@ class SkillValidator:
                     details=details
                 ))
             else:
-                details.append("⚠️  Consider documenting:")
+                details.append("[WARN] Consider documenting:")
                 if not has_file_format:
                     details.append("   - File format standards (.fbx, .hda, etc.)")
                 if not has_naming:
@@ -600,7 +600,7 @@ class SkillValidator:
 
         # Check YAML frontmatter
         if not content.strip().startswith("---"):
-            issues.append("❌ Missing YAML frontmatter")
+            issues.append("[FAIL] Missing YAML frontmatter")
         else:
             parts = content.split("---", 2)
             if len(parts) >= 2:
@@ -622,9 +622,9 @@ class SkillValidator:
                 
                 for field in required_fields:
                     if field not in frontmatter:
-                        issues.append(f"❌ Missing frontmatter field: {field}")
+                        issues.append(f"[FAIL] Missing frontmatter field: {field}")
                     else:
-                        details.append(f"✅ {field.rstrip(':')}")
+                        details.append(f"[OK] {field.rstrip(':')}")
 
         if self.is_agent_os:
             # Agent OS standards: Check for standard sections
@@ -650,21 +650,21 @@ class SkillValidator:
 
         for section_name, pattern in required_sections:
             if re.search(pattern, content, re.IGNORECASE):
-                details.append(f"✅ {section_name} section present")
+                details.append(f"[OK] {section_name} section present")
             else:
                 # Only warn for Agent OS (some sections optional)
                 if self.is_agent_os:
-                    details.append(f"⚠️  {section_name} section recommended")
+                    details.append(f"[WARN] {section_name} section recommended")
                 else:
-                    issues.append(f"❌ Missing section: {section_name}")
+                    issues.append(f"[FAIL] Missing section: {section_name}")
 
         # Check semantic versioning (Skills only)
         if not self.is_agent_os:
             version_match = re.search(r'[Vv]ersion.*?(\d+\.\d+\.\d+)', content)
             if version_match:
-                details.append(f"✅ Semantic versioning: {version_match.group(1)}")
+                details.append(f"[OK] Semantic versioning: {version_match.group(1)}")
             else:
-                issues.append("❌ Version not in semantic format (X.Y.Z)")
+                issues.append("[FAIL] Version not in semantic format (X.Y.Z)")
 
         # Determine status
         if issues:
@@ -722,17 +722,17 @@ class SkillValidator:
         report.append(f"- **FAIL:** {len(failed)}\n")
         report.append(f"- **WARN:** {len(warned)}\n")
         report.append(f"- **SKIP:** {len(skipped)}\n")
-        report.append(f"\n**Overall Status:** {'✅ PASS' if len(failed) == 0 else '❌ FAIL'}\n\n")
+        report.append(f"\n**Overall Status:** {'[OK] PASS' if len(failed) == 0 else '[FAIL] FAIL'}\n\n")
         report.append("---\n\n")
 
         # Detailed results
         report.append("## Detailed Results\n\n")
         for result in self.results:
             status_icon = {
-                "PASS": "✅",
-                "FAIL": "❌",
-                "WARN": "⚠️",
-                "SKIP": "⊘"
+                "PASS": "[OK]",
+                "FAIL": "[FAIL]",
+                "WARN": "[WARN]",
+                "SKIP": "[SKIP]"
             }.get(result.status, "?")
 
             report.append(f"### {result.article}: {status_icon} {result.status}\n\n")
@@ -768,10 +768,10 @@ class SkillValidator:
 
         for result in self.results:
             status_icon = {
-                "PASS": "✅",
-                "FAIL": "❌",
-                "WARN": "⚠️",
-                "SKIP": "⊘"
+                "PASS": "[OK]",
+                "FAIL": "[FAIL]",
+                "WARN": "[WARN]",
+                "SKIP": "[SKIP]"
             }.get(result.status, "?")
 
             print(f"{result.article}: {status_icon} {result.status}")
@@ -791,7 +791,7 @@ class SkillValidator:
         automated = len([r for r in self.results if r.status != "SKIP"])
         manual = len([r for r in self.results if r.status == "SKIP" and "Manual" in r.message])
 
-        overall = "✅ PASS" if len(failed) == 0 else "❌ FAIL"
+        overall = "[OK] PASS" if len(failed) == 0 else "[FAIL] FAIL"
         print(f"Overall: {overall} ({len(passed)}/{automated} automated checks")
         if manual > 0:
             print(f"         {manual} manual verification(s) needed)")
@@ -856,7 +856,7 @@ Examples:
             report_path = reports_dir / f"{args.name}_COMPLIANCE_REPORT.md"
 
         validator.generate_report(report_path)
-        print(f"\n📄 Detailed report saved to: {report_path.absolute()}")
+        print(f"\nDetailed report saved to: {report_path.absolute()}")
 
     return 0 if success else 1
 

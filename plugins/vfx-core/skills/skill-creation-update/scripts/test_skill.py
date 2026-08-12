@@ -198,14 +198,14 @@ class SkillTester:
         if script is None:
             script = self.find_main_script()
             if script is None:
-                print(f"❌ No executable script found in {self.scripts_dir}")
+                print(f"[FAIL] No executable script found in {self.scripts_dir}")
                 print("\nGuidance:")
                 print("  - Documentation-only skills: Skip test_skill.py (not applicable)")
                 print("  - MCP-based skills: Create test wrapper script")
                 print("  - Add if __name__ == '__main__' block to make script executable")
                 return False
 
-        print(f"🧪 Testing {self.skill_name} with {len(targets)} targets\n")
+        print(f"Testing {self.skill_name} with {len(targets)} targets\n")
         print(f"Script: {script.name}\n")
 
         # Run tests
@@ -214,7 +214,7 @@ class SkillTester:
             result = self.run_test(script, target, timeout)
             self.results.append(result)
 
-            status_icon = "✅" if result.status == "PASS" else "❌"
+            status_icon = "[OK]" if result.status == "PASS" else "[FAIL]"
             print(f"  Command: {result.command}")
             print(f"  Status: {status_icon} {result.status}")
             print(f"  Duration: {result.duration_ms}ms")
@@ -246,17 +246,17 @@ class SkillTester:
 
         print(f"Summary: {len(passed)}/{len(targets)} targets passed", end=" ")
         if len(failed) == 0:
-            print("✅")
+            print("[OK]")
         else:
-            print("❌")
+            print("[FAIL]")
 
         # Article I validation
         if len(targets) >= 3 and len(failed) == 0:
-            print(f"Article I compliance: ✅ VALIDATED (script is general-purpose)")
+            print(f"Article I compliance: [OK] VALIDATED (script is general-purpose)")
         elif len(targets) < 3:
-            print(f"Article I compliance: ⚠️  INSUFFICIENT (need 3+ targets, got {len(targets)})")
+            print(f"Article I compliance: [WARN] INSUFFICIENT (need 3+ targets, got {len(targets)})")
         else:
-            print(f"Article I compliance: ❌ FAILED ({len(failed)} target(s) failed)")
+            print(f"Article I compliance: [FAIL] FAILED ({len(failed)} target(s) failed)")
 
         return len(failed) == 0
 
@@ -283,21 +283,21 @@ class SkillTester:
         report.append(f"- **Passed:** {len(passed)}\n")
         report.append(f"- **Failed:** {len(failed)}\n")
         report.append(f"- **Average Duration:** {avg_duration:.0f}ms\n")
-        report.append(f"\n**Overall Status:** {'✅ PASS' if len(failed) == 0 else '❌ FAIL'}\n\n")
+        report.append(f"\n**Overall Status:** {'[OK] PASS' if len(failed) == 0 else '[FAIL] FAIL'}\n\n")
 
         # Article I validation
         if len(self.results) >= 3:
-            article_i = "✅ VALIDATED" if len(failed) == 0 else "❌ FAILED"
+            article_i = "[OK] VALIDATED" if len(failed) == 0 else "[FAIL] FAILED"
             report.append(f"**Article I Compliance:** {article_i} (script tested with {len(self.results)} targets)\n\n")
         else:
-            report.append(f"**Article I Compliance:** ⚠️ INSUFFICIENT (need 3+ targets, got {len(self.results)})\n\n")
+            report.append(f"**Article I Compliance:** [WARN] INSUFFICIENT (need 3+ targets, got {len(self.results)})\n\n")
 
         report.append("---\n\n")
 
         # Detailed results
         report.append("## Test Results\n\n")
         for i, result in enumerate(self.results, 1):
-            status_icon = "✅" if result.status == "PASS" else "❌"
+            status_icon = "[OK]" if result.status == "PASS" else "[FAIL]"
             report.append(f"### Test {i}: {result.target} {status_icon}\n\n")
             report.append(f"**Command:** `{result.command}`\n\n")
             report.append(f"**Status:** {result.status}\n\n")
@@ -382,11 +382,11 @@ Examples:
     # Parse targets
     targets = [t.strip() for t in args.targets.split(',') if t.strip()]
     if len(targets) < 1:
-        print("❌ At least 1 target required")
+        print("[FAIL] At least 1 target required")
         return 1
 
     if len(targets) < 3:
-        print(f"⚠️  Warning: {len(targets)} target(s) provided")
+        print(f"[WARN] Warning: {len(targets)} target(s) provided")
         print("   Article I requires 3+ targets for validation")
         print("   Continuing with limited testing...\n")
 
@@ -395,7 +395,7 @@ Examples:
 
     # Verify skill exists
     if not tester.skill_dir.exists():
-        print(f"❌ Skill not found: {args.name}")
+        print(f"[FAIL] Skill not found: {args.name}")
         print(f"   Expected path: {tester.skill_dir}")
         return 1
 
@@ -404,7 +404,7 @@ Examples:
     if args.script:
         script = tester.scripts_dir / args.script
         if not script.exists():
-            print(f"❌ Script not found: {args.script}")
+            print(f"[FAIL] Script not found: {args.script}")
             print(f"   Expected path: {script}")
             return 1
 
@@ -413,7 +413,7 @@ Examples:
 
     # Save report
     report_path = tester.save_report()
-    print(f"\n📄 Report saved to: {report_path.absolute()}")
+    print(f"\nReport saved to: {report_path.absolute()}")
 
     return 0 if success else 1
 

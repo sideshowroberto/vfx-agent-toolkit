@@ -50,7 +50,7 @@ Agent content here.
 
     assert result['name'] == 'test-agent'
     assert result['version'] == '2.0.0'
-    print("✅ YAML parsing works correctly")
+    print("[OK] YAML parsing works correctly")
 
 
 def test_version_validation():
@@ -63,16 +63,16 @@ def test_version_validation():
     print("\nValid versions:")
     for v in valid_versions:
         is_valid = validate_version_format(v)
-        print(f"  {v}: {'✅ Valid' if is_valid else '❌ Invalid'}")
+        print(f"  {v}: {'[OK] Valid' if is_valid else '[FAIL] Invalid'}")
         assert is_valid
 
     print("\nInvalid versions:")
     for v in invalid_versions:
         is_valid = validate_version_format(v)
-        print(f"  {v}: {'✅ Valid' if is_valid else '❌ Invalid'}")
+        print(f"  {v}: {'[OK] Valid' if is_valid else '[FAIL] Invalid'}")
         assert not is_valid
 
-    print("✅ Version validation works correctly")
+    print("[OK] Version validation works correctly")
 
 
 def test_with_temp_agent():
@@ -120,7 +120,7 @@ This is a test agent for manual validation.
 
         archive_path = Path(result['archive_path'])
         assert archive_path.exists()
-        print(f"✅ Archive created: {archive_path.name}")
+        print(f"[OK] Archive created: {archive_path.name}")
 
         # Test 2: Try archiving again without force (should fail)
         print("\n--- Test 3b: Archive Without Force (should fail) ---")
@@ -135,7 +135,7 @@ This is a test agent for manual validation.
 
         assert not result2['success']
         assert "Archive already exists" in result2['message']
-        print("✅ Correctly prevented duplicate archive")
+        print("[OK] Correctly prevented duplicate archive")
 
         # Test 3: Archive with force (should succeed)
         print("\n--- Test 3c: Archive With Force (should succeed) ---")
@@ -149,7 +149,7 @@ This is a test agent for manual validation.
         print(f"Message: {result3['message']}")
 
         assert result3['success']
-        print("✅ Force overwrite works correctly")
+        print("[OK] Force overwrite works correctly")
 
         # Test 4: Archive non-existent agent (should fail)
         print("\n--- Test 3d: Non-Existent Agent (should fail) ---")
@@ -163,7 +163,7 @@ This is a test agent for manual validation.
 
         assert not result4['success']
         assert "Agent file not found" in result4['message']
-        print("✅ Correctly handled missing agent")
+        print("[OK] Correctly handled missing agent")
 
         # Verify archive directory structure
         print("\n--- Archive Directory Structure ---")
@@ -173,12 +173,12 @@ This is a test agent for manual validation.
         for item in archive_dir.iterdir():
             print(f"  - {item.name}")
 
-        print("\n✅ All temp agent tests passed!")
+        print("\n[OK] All temp agent tests passed!")
 
     finally:
         # Cleanup
         shutil.rmtree(temp_dir)
-        print(f"\n🧹 Cleaned up temp directory: {temp_dir}")
+        print(f"\nCleaned up temp directory: {temp_dir}")
 
 
 def test_with_real_agent():
@@ -189,13 +189,13 @@ def test_with_real_agent():
     real_agents_dir = Path(__file__).parent.parent.parent.parent / ".claude" / "agents"
 
     if not real_agents_dir.exists():
-        print(f"⚠️  Real agents directory not found: {real_agents_dir}")
+        print(f"[WARN] Real agents directory not found: {real_agents_dir}")
         print("Skipping real agent test (this is optional)")
         return
 
     doc_specialist = real_agents_dir / "documentation-specialist.md"
     if not doc_specialist.exists():
-        print(f"⚠️  documentation-specialist.md not found: {doc_specialist}")
+        print(f"[WARN] documentation-specialist.md not found: {doc_specialist}")
         print("Skipping real agent test (this is optional)")
         return
 
@@ -212,14 +212,14 @@ def test_with_real_agent():
     version = metadata.get('version', '')
     if version:
         is_valid = validate_version_format(version)
-        print(f"\nVersion '{version}' is {'✅ valid' if is_valid else '❌ invalid'}")
+        print(f"\nVersion '{version}' is {'[OK] valid' if is_valid else '[FAIL] invalid'}")
 
         if is_valid:
-            print(f"\n📋 To archive this agent, run:")
+            print(f"\nTo archive this agent, run:")
             print(f"   python archive_agent.py documentation-specialist")
             print(f"   Expected output: documentation-specialist-v{version}.md")
     else:
-        print("⚠️  No version found in agent metadata")
+        print("[WARN] No version found in agent metadata")
 
 
 def main():
@@ -235,17 +235,17 @@ def main():
         test_with_real_agent()
 
         print_section("All Tests Complete!")
-        print("\n✅ archive_agent.py is working correctly")
+        print("\n[OK] archive_agent.py is working correctly")
         print("\nNext steps:")
         print("1. Run pytest: pytest test_archive.py -v")
         print("2. Test with real agent: python ../scripts/archive_agent.py documentation-specialist --agents-dir ../../..")
         print("3. Verify archive created in .claude/agents/archive/")
 
     except AssertionError as e:
-        print(f"\n❌ Test failed: {e}")
+        print(f"\n[FAIL] Test failed: {e}")
         sys.exit(1)
     except Exception as e:
-        print(f"\n❌ Unexpected error: {e}")
+        print(f"\n[FAIL] Unexpected error: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

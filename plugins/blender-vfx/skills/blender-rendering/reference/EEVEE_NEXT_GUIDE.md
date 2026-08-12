@@ -406,7 +406,7 @@ def create_irradiance_volume(location=(0,0,0), size=(10,10,3)):
 
 **Baking Light Probes:**
 ```python
-# Note: Baking requires operator (may fail in HTTP Bridge)
+# Note: Baking requires operator context and is a blocking call
 # Use viewport preview instead, or bake in Blender UI
 ```
 

@@ -585,7 +585,7 @@ If troubleshooting exceeds 100 lines:
 ### Article I: General Purpose Scripts ✅
 - Index template works for ALL VFX applications (Unreal, Houdini, Blender, Nuke)
 - No application-specific sections hard-coded
-- Tested: Unreal MCP, Blender HTTP Bridge, Nuke pipeline docs
+- Tested: Unreal MCP, Blender MCP, Nuke pipeline docs
 
 ### Article III: Progressive Disclosure ✅
 - SKILL.md: 475 lines (<500 limit ✅)

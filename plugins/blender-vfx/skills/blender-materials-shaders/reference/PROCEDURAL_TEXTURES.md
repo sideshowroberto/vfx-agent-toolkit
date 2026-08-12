@@ -1377,8 +1377,6 @@ if obj and obj.type == 'MESH':
 """
 ```
 
-**HTTP Bridge Limitation:** Setup works, but `bpy.ops.object.bake()` requires interactive Blender.
-
 ---
 
 ### Node Complexity Reduction
@@ -1411,17 +1409,6 @@ if mat and mat.use_nodes:
         print("OPTIMIZATION: Replace Mix Shaders with color mixing")
 """
 ```
-
----
-
-## HTTP Bridge Limitations
-
-**Procedural Workflows:**
-1. **Node Creation:** Fully supported
-2. **Texture Baking:** Setup works, execution requires interactive Blender
-3. **UV Unwrapping:** Use bmesh direct API (operators fail)
-4. **File Paths:** Absolute paths only (no relative)
-5. **Performance:** Procedural materials work identically via HTTP Bridge
 
 ---
 

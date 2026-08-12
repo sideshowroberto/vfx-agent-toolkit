@@ -10,24 +10,23 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [HTTP Bridge Compatibility](#http-bridge-compatibility)
-3. [Particle System Architecture](#particle-system-architecture)
-4. [Emission Methods](#emission-methods)
-5. [Physics Types](#physics-types)
-6. [Particle Instancing](#particle-instancing)
-7. [Force Fields](#force-fields)
-8. [Collision Detection](#collision-detection)
-9. [Caching and Baking](#caching-and-baking)
-10. [Performance Optimization](#performance-optimization)
-11. [Render Settings](#render-settings)
-12. [Advanced Techniques](#advanced-techniques)
-13. [Troubleshooting](#troubleshooting)
+2. [Particle System Architecture](#particle-system-architecture)
+3. [Emission Methods](#emission-methods)
+4. [Physics Types](#physics-types)
+5. [Particle Instancing](#particle-instancing)
+6. [Force Fields](#force-fields)
+7. [Collision Detection](#collision-detection)
+8. [Caching and Baking](#caching-and-baking)
+9. [Performance Optimization](#performance-optimization)
+10. [Render Settings](#render-settings)
+11. [Advanced Techniques](#advanced-techniques)
+12. [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Overview
 
-Blender's particle system is a complex framework for creating dynamic effects ranging from rain and snow to debris, sparks, smoke trails, and instanced geometry forests. This reference covers advanced particle workflows optimized for HTTP Bridge automation.
+Blender's particle system is a complex framework for creating dynamic effects ranging from rain and snow to debris, sparks, smoke trails, and instanced geometry forests. This reference covers advanced particle workflows automated via the official Blender MCP.
 
 **Key Capabilities:**
 - Emitter-based particle generation
@@ -38,53 +37,7 @@ Blender's particle system is a complex framework for creating dynamic effects ra
 - Hair and fluid particle systems
 - Caching for performance and repeatability
 
-**Critical Limitation:** 80% of `bpy.ops` operators fail in HTTP Bridge context. Use direct API patterns documented below.
-
----
-
-## HTTP Bridge Compatibility
-
-### Critical Patterns
-
-**ALWAYS USE Direct API:**
-```python
-import requests
-
-code = """
-import bpy
-
-# ✅ CORRECT: Direct modifier creation
-obj = bpy.data.objects['Emitter']
-psys_mod = obj.modifiers.new("ParticleSystem", 'PARTICLE_SYSTEM')
-settings = obj.particle_systems[-1].settings
-settings.count = 1000
-"""
-
-# Run via the Blender MCP tool: execute_blender_code(code=code)
-```
-
-**NEVER USE Operators:**
-```python
-# ❌ WRONG: Context failure
-bpy.ops.object.particle_system_add()  # Fails in HTTP Bridge
-bpy.ops.particle.new()                # Fails in HTTP Bridge
-bpy.ops.ptcache.bake_all()           # Fails in HTTP Bridge
-```
-
-### Verification Pattern
-
-```python
-# Always verify HTTP Bridge before execution
-import requests
-
-try:
-    health = requests.get("http://the Blender MCP/health", timeout=2)
-    if health.status_code != 200:
-        raise ConnectionError("HTTP Bridge unhealthy")
-except Exception as e:
-    print(f"ERROR: HTTP Bridge not available - {e}")
-    exit(1)
-```
+**Note:** `bpy.ops.ptcache.bake_all()` and related cache-bake operators are blocking calls that need to run over the full frame range - run them in interactive Blender rather than scripting them. Most other particle-system operators work normally via `mcp__blender__execute_blender_code`.
 
 ---
 
@@ -663,17 +616,9 @@ Blender stores particle simulation results in cache for playback performance. Ca
 - **Memory Cache:** Stored in RAM (fast, lost on close)
 - **Disk Cache:** Stored as files (persistent, slower)
 
-### HTTP Bridge Limitation
+### Baking Limitation
 
-**CRITICAL:** Baking cannot be triggered via HTTP Bridge. Operators fail.
-
-```python
-# ❌ FAILS in HTTP Bridge
-bpy.ops.ptcache.bake_all()
-bpy.ops.ptcache.free_bake_all()
-```
-
-**Workaround:** Configure via HTTP Bridge, bake manually in UI.
+**CRITICAL:** Baking is a blocking operation that runs over the full frame range. Don't script `bpy.ops.ptcache.bake_all()` - configure the cache via the MCP, then bake manually in interactive Blender.
 
 ### Cache Configuration
 
@@ -697,10 +642,8 @@ pcache.name = "ParticleCache_001"
 
 ### Manual Baking Workflow
 
-**Step 1: Configure via HTTP Bridge**
+**Step 1: Configure via the official Blender MCP**
 ```python
-import requests
-
 code = """
 import bpy
 
@@ -729,7 +672,7 @@ pcache.filepath = "//cache/particles/"
 4. Click "Bake All Dynamics"
 5. Wait for bake completion
 
-**Step 3: Verify via HTTP Bridge**
+**Step 3: Verify via the official Blender MCP**
 ```python
 code = """
 import bpy
@@ -749,7 +692,7 @@ is_outdated = pcache.is_outdated
 frame_range = (pcache.frame_start, pcache.frame_end)
 
 # Free cache (via UI only)
-# bpy.ops.ptcache.free_bake_all()  # Operator - fails in HTTP Bridge
+# bpy.ops.ptcache.free_bake_all()  # Blocking operator - run in interactive Blender
 
 # Delete cache files manually
 import os
@@ -1155,8 +1098,8 @@ settings.physics_type = 'NEWTON'  # Must be physics-enabled type
 - Bake operation completes but no cache files
 
 **Solutions:**
-1. **HTTP Bridge Limitation:**
-   - Cannot bake via HTTP Bridge
+1. **Baking is a blocking operation:**
+   - Cannot bake via a scripted `bpy.ops.ptcache.bake_all()` call
    - Must use Blender UI (see Caching section)
 
 2. **Cache path invalid:**

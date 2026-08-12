@@ -289,7 +289,7 @@ Session_2025-10-23_HDACompilation.md
 **Applications covered:**
 - Nuke (compositing, gizmos, color management)
 - Houdini (HDAs, PDG/TOPs, FX)
-- Blender (addons, HTTP Bridge, Geometry Nodes)
+- Blender (addons, MCP integration, Geometry Nodes)
 - Unreal (MCP commands, plugin architecture)
 - Multi-Application Projects (master index structure)
 

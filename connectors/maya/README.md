@@ -14,7 +14,7 @@ Connects Claude Code to a live Maya session via Maya's built-in `commandPort`.
 | Maya 2023 or 2025 | Tested on both |
 | Python 3.10+ | For the MCP server process (outside Maya) |
 | [uv](https://docs.astral.sh/uv/) | `winget install astral-sh.uv` |
-| [git](https://git-scm.com) | For cloning the bridge |
+| [git](https://git-scm.com) | Only if using an external bridge clone (`-BridgeDir`) |
 | Claude Code | `npm install -g @anthropic-ai/claude-code` |
 
 ---
@@ -28,11 +28,10 @@ Run this once on a new machine. It handles everything:
 ```
 
 What it does:
-1. Clones [PatrickPalmer/MayaMCP](https://github.com/PatrickPalmer/MayaMCP) to `D:\GITHUB\maya-mcp`
-2. Installs Python dependencies via `uv sync`
-3. Creates `%USERPROFILE%\Documents\maya\scripts\userSetup.mel` with an auto-start `commandPort` entry
-4. Sets `MAYA_MCP_SERVER_PATH`, `MAYA_HOST`, `MAYA_PORT` as user env vars
-5. Registers the `maya` MCP server with Claude Code
+1. Uses the bridge bundled with this connector (`maya\bridge\`, based on [PatrickPalmer/MayaMCP](https://github.com/PatrickPalmer/MayaMCP)) — pass `-BridgeDir` to use an external clone instead
+2. Creates `%USERPROFILE%\Documents\maya\scripts\userSetup.mel` with an auto-start `commandPort` entry
+3. Sets `MAYA_MCP_SERVER_PATH`, `MAYA_HOST`, `MAYA_PORT` as user env vars
+4. Registers the `maya` MCP server with Claude Code (dependencies resolve via `uv run` on first launch)
 
 Then open (or restart) Maya. The commandPort opens automatically — no manual steps needed.
 
@@ -127,7 +126,7 @@ claude mcp list
 
 | Var | Value |
 |-----|-------|
-| `MAYA_MCP_SERVER_PATH` | `D:\GITHUB\maya-mcp\src\maya_mcp_server.py` |
+| `MAYA_MCP_SERVER_PATH` | `<this connector>\bridge\maya_mcp_server.py` (or your `-BridgeDir` path) |
 | `MAYA_HOST` | `localhost` |
 | `MAYA_PORT` | `7001` |
 
@@ -135,4 +134,4 @@ claude mcp list
 
 ## Skills & Agents
 
-This connector only handles MCP registration. For Maya skills and agents (scene manipulation, materials, rigging), use `claude-plugins-marketplace/plugins/maya-vfx/`.
+This connector only handles MCP registration. For Maya skills and agents (scene manipulation, materials, rigging), install the `maya-vfx` plugin: `/plugin install maya-vfx@vfx-agent-toolkit`.

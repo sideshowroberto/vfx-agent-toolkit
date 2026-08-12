@@ -36,7 +36,7 @@ Everything else is likely a **custom node**.
 
 Most follow the pattern `ComfyUI-RepoName` or similar. For each custom node class:
 - Identify the likely repo name from the class prefix/naming
-- Check if it matches any of the user's already-installed nodes in `D:\COMFYUI\ComfyUI_windows_portable\ComfyUI\custom_nodes\`
+- Check if it matches any of the user's already-installed nodes in `<ComfyUI install>\custom_nodes\`
 - Note whether it needs to be installed via ComfyUI Manager
 
 ### Step 4 — Extract model references
@@ -55,7 +55,7 @@ Map each to the correct models subfolder:
 | UNET / diffusion model | `models/diffusion_models/` or `models/unet/` |
 | Embedding | `models/embeddings/` |
 
-Models root: `D:\COMFYUI\ComfyUI_windows_portable\ComfyUI\models\`
+Models root: `<ComfyUI install>\models\`
 
 ### Step 5 — Output a setup checklist
 

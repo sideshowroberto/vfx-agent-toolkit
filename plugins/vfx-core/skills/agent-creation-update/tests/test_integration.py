@@ -5,7 +5,7 @@ Tests: All 4 scripts working together in realistic workflows
 Coverage: Complete agent lifecycle, version management, validation, archiving
 
 Test Scenarios:
-1. Complete agent lifecycle (create → validate → update → archive → delete)
+1. Complete agent lifecycle (create -> validate -> update -> archive -> delete)
 2. Create from all templates (tool-specialist, cross-tool, general-helper)
 3. Version increments (major, minor, patch)
 4. Validation prevents invalid agents
@@ -153,7 +153,7 @@ def test_complete_agent_lifecycle(suite: IntegrationTestSuite) -> bool:
     checks.append(("Create agent (v1.0.0)", create_success))
 
     if not create_success:
-        print(f"  ❌ Create failed: {result.stderr}")
+        print(f"  [FAIL] Create failed: {result.stderr}")
         return suite.add_result("Complete Agent Lifecycle", checks)
 
     # Step 2: Validate agent
@@ -258,9 +258,9 @@ def test_version_increments(suite: IntegrationTestSuite) -> bool:
     """
     Test version increment logic:
     - Create agent (v1.0.0)
-    - Update major (v1.0.0 → v2.0.0)
-    - Update minor (v2.0.0 → v2.1.0)
-    - Update patch (v2.1.0 → v2.1.1)
+    - Update major (v1.0.0 -> v2.0.0)
+    - Update minor (v2.0.0 -> v2.1.0)
+    - Update patch (v2.1.0 -> v2.1.1)
     - Verify 3 archives created (v1.0.0, v2.0.0, v2.1.0)
     - Validate final agent (should PASS)
     """
@@ -286,7 +286,7 @@ def test_version_increments(suite: IntegrationTestSuite) -> bool:
     if not create_success:
         return suite.add_result("Version Increments", checks)
 
-    # Major increment (1.0.0 → 2.0.0)
+    # Major increment (1.0.0 -> 2.0.0)
     result = suite.run_script('update_agent.py', [
         agent_name,
         'major',
@@ -297,9 +297,9 @@ def test_version_increments(suite: IntegrationTestSuite) -> bool:
     major_success = (result.returncode == 0 and
                     suite.verify_version_in_file(agent_file, "2.0.0") and
                     suite.verify_file_exists(suite.archive_dir / f"{agent_name}-v1.0.0.md"))
-    checks.append(("Major increment (1.0.0 → 2.0.0)", major_success))
+    checks.append(("Major increment (1.0.0 -> 2.0.0)", major_success))
 
-    # Minor increment (2.0.0 → 2.1.0)
+    # Minor increment (2.0.0 -> 2.1.0)
     result = suite.run_script('update_agent.py', [
         agent_name,
         'minor',
@@ -310,9 +310,9 @@ def test_version_increments(suite: IntegrationTestSuite) -> bool:
     minor_success = (result.returncode == 0 and
                     suite.verify_version_in_file(agent_file, "2.1.0") and
                     suite.verify_file_exists(suite.archive_dir / f"{agent_name}-v2.0.0.md"))
-    checks.append(("Minor increment (2.0.0 → 2.1.0)", minor_success))
+    checks.append(("Minor increment (2.0.0 -> 2.1.0)", minor_success))
 
-    # Patch increment (2.1.0 → 2.1.1)
+    # Patch increment (2.1.0 -> 2.1.1)
     result = suite.run_script('update_agent.py', [
         agent_name,
         'patch',
@@ -323,7 +323,7 @@ def test_version_increments(suite: IntegrationTestSuite) -> bool:
     patch_success = (result.returncode == 0 and
                     suite.verify_version_in_file(agent_file, "2.1.1") and
                     suite.verify_file_exists(suite.archive_dir / f"{agent_name}-v2.1.0.md"))
-    checks.append(("Patch increment (2.1.0 → 2.1.1)", patch_success))
+    checks.append(("Patch increment (2.1.0 -> 2.1.1)", patch_success))
 
     # Verify all 3 archives created
     archives_exist = (
@@ -614,11 +614,11 @@ def print_test_results(suite: IntegrationTestSuite):
     passed_tests = sum(1 for r in suite.results if r['passed'])
 
     for i, result in enumerate(suite.results, 1):
-        status = "✅ PASS" if result['passed'] else "❌ FAIL"
+        status = "[OK] PASS" if result['passed'] else "[FAIL] FAIL"
         print(f"\nTest {i}: {result['name']} - {status}")
 
         for check_desc, check_passed in result['checks']:
-            symbol = "  ✅" if check_passed else "  ❌"
+            symbol = "  [OK]" if check_passed else "  [FAIL]"
             print(f"{symbol} {check_desc}")
 
     print("\n" + "=" * 70)
@@ -627,9 +627,9 @@ def print_test_results(suite: IntegrationTestSuite):
     print(f"Failed: {total_tests - passed_tests}")
 
     if passed_tests == total_tests:
-        print("\n🎉 All integration tests passed!")
+        print("\nAll integration tests passed!")
     else:
-        print(f"\n⚠️  {total_tests - passed_tests} test(s) failed")
+        print(f"\n[WARN] {total_tests - passed_tests} test(s) failed")
 
     print("=" * 70)
 

@@ -19,7 +19,7 @@ except ImportError as e:
     print(f"Script location: {os.path.abspath(__file__)}", file=sys.stderr)
     sys.exit(1)
 
-# Thread-safe node lookup — _find_node() is unreliable from background threads;
+# Thread-safe node lookup - _find_node() is unreliable from background threads;
 # nuke.root().nodes() is proven reliable across all thread/GUI-mode combinations.
 def _find_node(name):
     for node in nuke.root().nodes():

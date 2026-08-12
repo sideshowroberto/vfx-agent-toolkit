@@ -24,24 +24,13 @@ This reference covers advanced armature rigging techniques for character animati
 
 ---
 
-## 🚨 CRITICAL: HTTP Bridge Compatibility
+## 🎯 API STABILITY
 
 **100% STABLE API - NO VERSION CHECKING REQUIRED**
 
-All rigging APIs in this document have been validated stable across Blender 4.2 → 4.5.0 (validated in `ANIMATION_SYSTEM_VALIDATION_REPORT.md`).
+All rigging APIs in this document have been validated stable across Blender 4.2 → 4.5.0 (validated in `ANIMATION_SYSTEM_VALIDATION_REPORT.md`). Use the `mcp__blender__execute_blender_code` tool to run the snippets below via the official Blender MCP.
 
-**HTTP Bridge Pattern:**
-```python
-import requests
-# Execute via the Blender MCP tool: execute_blender_code
-code = """
-import bpy
-# Your rigging code here (ALWAYS use direct API, not operators)
-"""
-response = requests.post(url, json={"code": code})
-```
-
-**Critical Limitation:** Mode switching (`bpy.ops.object.mode_set()`) is unreliable in HTTP Bridge context. Structure code to minimize mode changes or use Blender's Python API Timers.
+**Note:** Mode switching (`bpy.ops.object.mode_set()`) still depends on active object/selection context. Verify or set mode explicitly before calling mode-dependent operators - see the general Blender MCP execution notes.
 
 ---
 
@@ -563,7 +552,7 @@ armature_mod = mesh_obj.modifiers.new(name="Armature", type='ARMATURE')
 armature_mod.object = armature_obj
 
 # Parent mesh to armature with automatic weights
-# NOTE: Requires operator - use Blender UI or timer for HTTP Bridge
+# NOTE: Requires operator context (active + selected objects)
 # bpy.ops.object.parent_set(type='ARMATURE_AUTO')
 
 # Manual parenting (operator-free)
@@ -790,7 +779,7 @@ def export_for_unreal(filepath, armature_obj, mesh_obj):
     mesh_obj.select_set(True)
     bpy.context.view_layer.objects.active = armature_obj
 
-    # NOTE: FBX export requires operator - use Blender UI for HTTP Bridge
+    # NOTE: FBX export requires operator - run interactively in Blender UI
     # bpy.ops.export_scene.fbx(
     #     filepath=filepath,
     #     use_selection=True,
@@ -997,7 +986,7 @@ print(f"Constraint stack created: {len(pose_bone.constraints)} constraints")
 **Reordering Constraints:**
 ```python
 # Move constraint to different position in stack
-# NOTE: Requires operator - not available in HTTP Bridge
+# NOTE: Requires operator context (active object)
 # bpy.ops.constraint.move_up()
 # bpy.ops.constraint.move_down()
 
@@ -1388,9 +1377,6 @@ else:
 
 **Animation System Validation Report:**
 `<workspace>\Blender\blender-ai-compatibility\ANIMATION_SYSTEM_VALIDATION_REPORT.md`
-
-**HTTP Bridge Documentation:**
-`<workspace>\Blender\blender-ai-compatibility\CLAUDE.md`
 
 **Blender Animation Specialist Agent:**
 `<workspace>\.claude\agents\blender-animation-specialist.md`

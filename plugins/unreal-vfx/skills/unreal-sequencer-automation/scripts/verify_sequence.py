@@ -30,14 +30,14 @@ def create_test_sequence() -> bool:
         )
 
         if sequence:
-            print(f"  ✓ Created: {sequence.get_name()}")
+            print(f"  [OK] Created: {sequence.get_name()}")
             return True
         else:
-            print(f"  ✗ Failed to create sequence")
+            print(f"  [FAIL] Failed to create sequence")
             return False
 
     except Exception as e:
-        print(f"  ✗ Error: {e}")
+        print(f"  [FAIL] Error: {e}")
         return False
 
 
@@ -54,14 +54,14 @@ def verify_test_sequence() -> bool:
         sequence = unreal.load_asset("/Game/Temp/LS_SequencerTest")
 
         if sequence:
-            print(f"  ✓ Sequence exists: {sequence.get_name()}")
+            print(f"  [OK] Sequence exists: {sequence.get_name()}")
             return True
         else:
-            print(f"  ✗ Sequence not found")
+            print(f"  [FAIL] Sequence not found")
             return False
 
     except Exception as e:
-        print(f"  ✗ Error: {e}")
+        print(f"  [FAIL] Error: {e}")
         return False
 
 
@@ -79,14 +79,14 @@ def cleanup_test_sequence() -> bool:
         deleted = unreal.EditorAssetLibrary.delete_asset("/Game/Temp/LS_SequencerTest")
 
         if deleted:
-            print(f"  ✓ Deleted test sequence")
+            print(f"  [OK] Deleted test sequence")
             return True
         else:
-            print(f"  ⚠️  Could not delete (may not exist)")
+            print(f"  [WARN] Could not delete (may not exist)")
             return True  # Not a failure
 
     except Exception as e:
-        print(f"  ✗ Error: {e}")
+        print(f"  [FAIL] Error: {e}")
         return False
 
 
@@ -103,22 +103,22 @@ def run_verification() -> int:
 
     # Step 1: Create test sequence
     if not create_test_sequence():
-        print("\n✗ FAILED: Could not create sequence")
+        print("\n[FAIL] FAILED: Could not create sequence")
         return 1
 
     # Step 2: Verify it exists
     if not verify_test_sequence():
-        print("\n✗ FAILED: Sequence not found after creation")
+        print("\n[FAIL] FAILED: Sequence not found after creation")
         cleanup_test_sequence()
         return 1
 
     # Step 3: Clean up
     if not cleanup_test_sequence():
-        print("\n✗ FAILED: Could not clean up")
+        print("\n[FAIL] FAILED: Could not clean up")
         return 1
 
     print("\n" + "=" * 60)
-    print("✅ ALL TESTS PASSED")
+    print("[OK] ALL TESTS PASSED")
     print("=" * 60)
 
     return 0

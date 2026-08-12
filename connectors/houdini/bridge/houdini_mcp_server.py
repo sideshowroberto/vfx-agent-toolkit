@@ -264,7 +264,7 @@ def get_formatted_opus_params(structure: str) -> dict:
         # structure_json should contain the error from get_struct_params
         status_code = 500 # Default error code
         if isinstance(structure_json, dict) and "error" in structure_json:
-             if "RapidAPI Error 4" in structure_json["error"]: #粗略检查 4xx 错误
+             if "RapidAPI Error 4" in structure_json["error"]: # rough check for 4xx errors
                   status_code = 400 # Or map specific codes if needed
              elif "RapidAPI Error 5" in structure_json["error"]:
                   status_code = 503 # Service unavailable or internal error

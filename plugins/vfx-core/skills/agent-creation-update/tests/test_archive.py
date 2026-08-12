@@ -374,8 +374,8 @@ You are a preservation test agent.
 
 ## Special Characters
 
-- Emoji: 🔥 ✅ ❌
-- Unicode: αβγ δεζ
+- Emoji: \U0001F525 \u2705 \u274C
+- Unicode: \u03B1\u03B2\u03B3 \u03B4\u03B5\u03B6
 - Quotes: "double" 'single'
 - Symbols: @#$%^&*()
 

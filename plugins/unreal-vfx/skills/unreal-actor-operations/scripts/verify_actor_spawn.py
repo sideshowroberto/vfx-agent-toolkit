@@ -35,9 +35,9 @@ def verify_actor_spawn():
     print("Test 1: EditorLevelLibrary availability")
     try:
         editor_lib = unreal.EditorLevelLibrary
-        print("  ✅ EditorLevelLibrary available")
+        print("  [OK] EditorLevelLibrary available")
     except AttributeError as e:
-        print(f"  ❌ EditorLevelLibrary not available: {e}")
+        print(f"  [FAIL] EditorLevelLibrary not available: {e}")
         return 1
 
     # Test 2: Get editor world
@@ -46,11 +46,11 @@ def verify_actor_spawn():
     try:
         world = unreal.EditorLevelLibrary.get_editor_world()
         if world is None:
-            print("  ❌ Editor world is None")
+            print("  [FAIL] Editor world is None")
             return 1
-        print(f"  ✅ Editor world: {world.get_name()}")
+        print(f"  [OK] Editor world: {world.get_name()}")
     except Exception as e:
-        print(f"  ❌ Failed to get editor world: {e}")
+        print(f"  [FAIL] Failed to get editor world: {e}")
         return 1
 
     # Test 3: Spawn test actor
@@ -64,17 +64,17 @@ def verify_actor_spawn():
         )
 
         if test_actor is None:
-            print("  ❌ spawn_actor_from_class returned None")
+            print("  [FAIL] spawn_actor_from_class returned None")
             return 1
 
         if not test_actor.is_valid():
-            print("  ❌ Spawned actor is invalid")
+            print("  [FAIL] Spawned actor is invalid")
             return 1
 
-        print(f"  ✅ Actor spawned: {test_actor.get_name()}")
+        print(f"  [OK] Actor spawned: {test_actor.get_name()}")
 
     except Exception as e:
-        print(f"  ❌ Failed to spawn actor: {e}")
+        print(f"  [FAIL] Failed to spawn actor: {e}")
         return 1
 
     # Test 4: Set actor label
@@ -86,13 +86,13 @@ def verify_actor_spawn():
 
         actual_label = test_actor.get_editor_property('actor_label')
         if actual_label != test_label:
-            print(f"  ❌ Label mismatch: expected '{test_label}', got '{actual_label}'")
+            print(f"  [FAIL] Label mismatch: expected '{test_label}', got '{actual_label}'")
             return 1
 
-        print(f"  ✅ Label set: {actual_label}")
+        print(f"  [OK] Label set: {actual_label}")
 
     except Exception as e:
-        print(f"  ❌ Failed to set label: {e}")
+        print(f"  [FAIL] Failed to set label: {e}")
         return 1
 
     # Test 5: Set transform
@@ -107,20 +107,20 @@ def verify_actor_spawn():
         )
 
         if not success:
-            print("  ❌ set_actor_location returned False")
+            print("  [FAIL] set_actor_location returned False")
             return 1
 
         actual_location = test_actor.get_actor_location()
         if (abs(actual_location.x - test_location.x) > 1.0 or
             abs(actual_location.y - test_location.y) > 1.0 or
             abs(actual_location.z - test_location.z) > 1.0):
-            print(f"  ❌ Location mismatch: expected {test_location}, got {actual_location}")
+            print(f"  [FAIL] Location mismatch: expected {test_location}, got {actual_location}")
             return 1
 
-        print(f"  ✅ Transform set: {actual_location}")
+        print(f"  [OK] Transform set: {actual_location}")
 
     except Exception as e:
-        print(f"  ❌ Failed to set transform: {e}")
+        print(f"  [FAIL] Failed to set transform: {e}")
         return 1
 
     # Test 6: Query actor
@@ -130,13 +130,13 @@ def verify_actor_spawn():
         all_actors = unreal.EditorLevelLibrary.get_all_level_actors()
 
         if test_actor not in all_actors:
-            print("  ❌ Test actor not found in level actors")
+            print("  [FAIL] Test actor not found in level actors")
             return 1
 
-        print(f"  ✅ Query successful: {len(all_actors)} actors in level")
+        print(f"  [OK] Query successful: {len(all_actors)} actors in level")
 
     except Exception as e:
-        print(f"  ❌ Failed to query actors: {e}")
+        print(f"  [FAIL] Failed to query actors: {e}")
         return 1
 
     # Test 7: Cleanup - delete test actor
@@ -147,13 +147,13 @@ def verify_actor_spawn():
 
         # Verify deletion
         if test_actor.is_valid():
-            print("  ❌ Actor still valid after destroy")
+            print("  [FAIL] Actor still valid after destroy")
             return 1
 
-        print("  ✅ Test actor deleted")
+        print("  [OK] Test actor deleted")
 
     except Exception as e:
-        print(f"  ❌ Failed to delete actor: {e}")
+        print(f"  [FAIL] Failed to delete actor: {e}")
         return 1
 
     # All tests passed

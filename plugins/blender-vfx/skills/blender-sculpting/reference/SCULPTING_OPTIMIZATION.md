@@ -150,7 +150,7 @@ print('Viewport optimized for performance')
 
 ### **Manual Dynamic Topology**
 
-Since `bpy.ops.sculpt.dynamic_topology_toggle()` may fail via HTTP Bridge, implement manual dynamic subdivision:
+For programmatic control without relying on interactive mode toggling, implement manual dynamic subdivision:
 
 ```python
 code = """
@@ -417,7 +417,7 @@ else:
     print('No duplicate vertices found')
 
 # Recalculate normals
-# NOTE: bpy.ops.mesh.normals_make_consistent() may fail via HTTP bridge
+# NOTE: bpy.ops.mesh.normals_make_consistent() requires edit-mode context
 print('Recalculate normals in Blender: Edit Mode > Mesh > Normals > Recalculate Outside')
 """
 
@@ -438,7 +438,7 @@ unreal_scale = 100
 sculpture.scale = (unreal_scale, unreal_scale, unreal_scale)
 
 # 2. Apply transforms
-# NOTE: bpy.ops.object.transform_apply() may fail via HTTP bridge
+# NOTE: bpy.ops.object.transform_apply() requires the object to be selected and active
 # Apply manually or do in Blender UI
 
 # 3. Create LOD versions

@@ -1,6 +1,6 @@
 # blender-vfx installer (vfx-agent-toolkit)
-# Delegates to the blender MCP connector, which installs the bridge and
-# registers the MCP server with Claude Code.
+# Delegates to the blender MCP connector, which installs the official
+# Blender MCP add-on and registers the MCP server with Claude Code.
 
 $connector = Join-Path $PSScriptRoot "..\..\connectors\blender\install.ps1"
 if (-not (Test-Path $connector)) {

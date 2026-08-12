@@ -101,11 +101,11 @@ def add_missing_sections(content, skill_name):
 **Version:** VFX_SKILL_CONSTITUTION.md v2.0.0
 
 **Article I - General Purpose Scripts:**
-- ✅ All scripts are parameterized (no hardcoded paths)
+- [OK] All scripts are parameterized (no hardcoded paths)
 - Scripts work across multiple projects/assets
 
 **Article III - Progressive Disclosure:**
-- ✅ SKILL.md: TODO lines (target: <500)
+- [OK] SKILL.md: TODO lines (target: <500)
 - Progressive disclosure through reference files
 
 **Article VI - Context Efficiency:**
@@ -113,8 +113,8 @@ def add_missing_sections(content, skill_name):
 - On-demand loading through progressive disclosure
 
 **Article VIII - Documentation Standards:**
-- ✅ Complete YAML frontmatter
-- ✅ All required sections present
+- [OK] Complete YAML frontmatter
+- [OK] All required sections present
 - Version history tracked
 
 """

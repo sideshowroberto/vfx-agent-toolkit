@@ -10,19 +10,18 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [HTTP Bridge Compatibility](#http-bridge-compatibility)
-3. [Rigid Body System](#rigid-body-system)
-4. [Rigid Body World](#rigid-body-world)
-5. [Active vs Passive Objects](#active-vs-passive-objects)
-6. [Collision Shapes](#collision-shapes)
-7. [Constraints](#constraints)
-8. [Soft Body Physics](#soft-body-physics)
-9. [Cloth Simulation](#cloth-simulation)
-10. [Performance Optimization](#performance-optimization)
-11. [Baking and Cache](#baking-and-cache)
-12. [Export Workflows](#export-workflows)
-13. [Troubleshooting](#troubleshooting)
-14. [Production Examples](#production-examples)
+2. [Rigid Body System](#rigid-body-system)
+3. [Rigid Body World](#rigid-body-world)
+4. [Active vs Passive Objects](#active-vs-passive-objects)
+5. [Collision Shapes](#collision-shapes)
+6. [Constraints](#constraints)
+7. [Soft Body Physics](#soft-body-physics)
+8. [Cloth Simulation](#cloth-simulation)
+9. [Performance Optimization](#performance-optimization)
+10. [Baking and Cache](#baking-and-cache)
+11. [Export Workflows](#export-workflows)
+12. [Troubleshooting](#troubleshooting)
+13. [Production Examples](#production-examples)
 
 ---
 
@@ -39,71 +38,6 @@ Blender's physics system provides realistic motion for:
 - Constraint systems (hinges, motors, springs)
 - Integration with particle systems
 - Export to game engines (FBX, Alembic)
-
----
-
-## HTTP Bridge Compatibility
-
-### Working Patterns
-
-**Direct API (98% Success):**
-```python
-import requests
-
-code = """
-import bpy
-
-# ✅ CORRECT: Direct property access
-obj = bpy.data.objects['Cube']
-obj.rigid_body.type = 'ACTIVE'
-obj.rigid_body.mass = 1.0
-obj.rigid_body.friction = 0.5
-obj.rigid_body.restitution = 0.3
-
-# ✅ Enable rigid body world
-if not bpy.context.scene.rigidbody_world:
-    bpy.context.scene.rigidbody_world.enabled = True
-"""
-
-# Run via the Blender MCP tool: execute_blender_code(code=code)
-```
-
-### Failing Patterns
-
-**Operators (80% Failure Rate):**
-```python
-# ❌ WRONG: Context errors in HTTP Bridge
-bpy.ops.rigidbody.world_add()
-bpy.ops.rigidbody.object_add()
-bpy.ops.rigidbody.objects_add()
-bpy.ops.rigidbody.constraint_add()
-bpy.ops.ptcache.bake_all()
-```
-
-### Workarounds
-
-**Enable Rigid Body (No Operator):**
-```python
-# Create object first
-bpy.ops.mesh.primitive_cube_add()
-obj = bpy.context.active_object
-
-# Enable rigid body world
-if not bpy.context.scene.rigidbody_world:
-    bpy.context.scene.rigidbody_world = bpy.data.scenes[0].rigidbody_world or ...
-    # Note: Complex initialization - see below
-
-# Set rigid body properties directly
-obj.rigid_body.type = 'ACTIVE'  # Triggers creation if None
-```
-
-**Best Practice - Pre-configure in Blender:**
-```python
-# 1. Open Blender manually
-# 2. Add one rigid body object (creates world)
-# 3. Save .blend file
-# 4. HTTP Bridge can now modify properties
-```
 
 ---
 
@@ -769,16 +703,16 @@ sb_settings.use_self_collision = False
 
 ## Baking and Cache
 
-### HTTP Bridge Limitation
+### Baking Limitation
 
-**Cannot bake via operators:**
+**Don't script the bake - it's a blocking, frame-stepped operation:**
 ```python
-# ❌ FAILS
+# Run interactively in Blender, not via a scripted call
 bpy.ops.ptcache.bake_all()
 bpy.ops.ptcache.free_bake_all()
 ```
 
-**Workaround:** Configure in HTTP Bridge, bake in UI.
+**Workaround:** Configure via the official Blender MCP, bake in UI.
 
 ### Cache Configuration
 
@@ -818,7 +752,7 @@ sb_cache.filepath = "//cache/softbody/"
 
 ### Manual Baking Workflow
 
-1. **Configure via HTTP Bridge**
+1. **Configure via the official Blender MCP**
 2. **Open Blender UI**
 3. **Select object**
 4. **Physics Properties > Cache**

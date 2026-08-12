@@ -24,24 +24,11 @@ This reference covers advanced **Shape Key** workflows for facial animation, cor
 
 ---
 
-## 🚨 CRITICAL: HTTP Bridge Compatibility
+## 🎯 API STABILITY
 
 **100% STABLE API - NO VERSION CHECKING REQUIRED**
 
-All shape key APIs validated stable (see `ANIMATION_SYSTEM_VALIDATION_REPORT.md`).
-
-**HTTP Bridge Pattern:**
-```python
-import requests
-# Execute via the Blender MCP tool: execute_blender_code
-code = """
-import bpy
-# Shape key code here (direct API only)
-"""
-response = requests.post(url, json={"code": code})
-```
-
-**Critical Note:** Shape key operators (`bpy.ops.object.shape_key_*`) fail in HTTP Bridge. Use direct API (`mesh.shape_key_add()`, `key_block.driver_add()`) exclusively.
+All shape key APIs validated stable (see `ANIMATION_SYSTEM_VALIDATION_REPORT.md`). Use the `mcp__blender__execute_blender_code` tool to run the snippets below via the official Blender MCP.
 
 ---
 
@@ -699,7 +686,6 @@ for i, kb in enumerate(shape_keys.key_blocks):
     print(f"  {i}: {kb.name}")
 
 # Move shape key to different position
-# NOTE: Requires operator - not available in HTTP Bridge
 # bpy.ops.object.shape_key_move(type='UP')  # Move active up
 # bpy.ops.object.shape_key_move(type='DOWN')  # Move active down
 
@@ -1190,9 +1176,6 @@ print("Mesh parented to armature (no modifier)")
 
 **Animation System Validation Report:**
 `<workspace>\Blender\blender-ai-compatibility\ANIMATION_SYSTEM_VALIDATION_REPORT.md`
-
-**HTTP Bridge Documentation:**
-`<workspace>\Blender\blender-ai-compatibility\CLAUDE.md`
 
 **Blender Shape Keys API Reference (Official):**
 https://docs.blender.org/api/current/bpy.types.ShapeKey.html

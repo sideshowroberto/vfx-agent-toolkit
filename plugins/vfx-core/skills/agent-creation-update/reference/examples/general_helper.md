@@ -510,13 +510,13 @@ Refactoring Specialist:
 **Changes Made:**
 1. Template application: Replaced {{SKILL_NAME}} placeholders (3 skills)
 2. Type Safety: Added type hints to 23 functions, mypy strict mode passing
-3. Async Conversion: Converted 5 HTTP Bridge calls to async, 2x speedup
+3. Async Conversion: Converted 5 HTTP API calls to async, 2x speedup
 4. Pythonic Patterns: Applied 12 comprehensions, 3 dataclasses
 
 **Metrics:**
 - Type Coverage: 100% (mypy strict mode)
 - Test Coverage: 95% (pytest-cov)
-- Performance: 2.1x faster (async HTTP Bridge calls)
+- Performance: 2.1x faster (async HTTP API calls)
 - Lines of Code: 450 → 385 (Pythonic refactoring)
 
 **Verification:**

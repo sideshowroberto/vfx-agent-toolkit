@@ -32,7 +32,7 @@ def test_check_filename_format():
     assert not check_filename_format("Agent_Name.md")['passed']
     assert not check_filename_format("agent-v1.0.0.md")['passed']
 
-    print("  ✅ All filename format tests passed")
+    print("  [OK] All filename format tests passed")
 
 
 def test_check_version_format():
@@ -50,7 +50,7 @@ def test_check_version_format():
     assert not check_version_format("1.0.0-beta")['passed']
     assert not check_version_format("1.0.0.0")['passed']
 
-    print("  ✅ All version format tests passed")
+    print("  [OK] All version format tests passed")
 
 
 def test_check_description_quality():
@@ -71,7 +71,7 @@ def test_check_description_quality():
     # FAIL cases - no triggers
     assert not check_description_quality("This is a documentation agent that updates files and creates summaries.")['passed']
 
-    print("  ✅ All description quality tests passed")
+    print("  [OK] All description quality tests passed")
 
 
 def test_check_name_matches_filename():
@@ -84,7 +84,7 @@ def test_check_name_matches_filename():
     # FAIL case
     assert not check_name_matches_filename("test-agent.md", "different-name")['passed']
 
-    print("  ✅ All name matching tests passed")
+    print("  [OK] All name matching tests passed")
 
 
 def test_check_metadata_present():
@@ -131,7 +131,7 @@ status: invalid-status
 """
     assert not check_metadata_present(invalid_status_content)['passed']
 
-    print("  ✅ All metadata tests passed")
+    print("  [OK] All metadata tests passed")
 
 
 def test_check_changelog_exists():
@@ -165,7 +165,7 @@ def test_check_changelog_exists():
 """
     assert not check_changelog_exists(content_one_version, "2.0.0")['passed']
 
-    print("  ✅ All changelog tests passed")
+    print("  [OK] All changelog tests passed")
 
 
 def test_full_validation():
@@ -179,26 +179,26 @@ def test_full_validation():
     if os.path.exists(valid_path):
         result = validate_agent(valid_path)
         if result['passed']:
-            print("  ✅ Valid agent test passed")
+            print("  [OK] Valid agent test passed")
         else:
-            print(f"  ❌ Valid agent test failed: {result['violations']}")
+            print(f"  [FAIL] Valid agent test failed: {result['violations']}")
 
     # Test invalid agent with version suffix
     invalid_path = os.path.join(agents_dir, "test-agent-invalid-v2.md")
     if os.path.exists(invalid_path):
         result = validate_agent(invalid_path)
         if not result['passed'] and 'Filename Format' in str(result['violations']):
-            print("  ✅ Invalid agent test passed (correctly detected version suffix)")
+            print("  [OK] Invalid agent test passed (correctly detected version suffix)")
         else:
-            print(f"  ❌ Invalid agent test failed")
+            print(f"  [FAIL] Invalid agent test failed")
 
     # Test non-existent file
     nonexistent_path = os.path.join(agents_dir, "nonexistent-agent.md")
     result = validate_agent(nonexistent_path)
     if not result['passed'] and 'File not found' in str(result['violations']):
-        print("  ✅ Non-existent file test passed")
+        print("  [OK] Non-existent file test passed")
     else:
-        print("  ❌ Non-existent file test failed")
+        print("  [FAIL] Non-existent file test failed")
 
 
 def main():
@@ -217,15 +217,15 @@ def main():
         test_full_validation()
 
         print("\n" + "="*60)
-        print("All tests passed! ✅")
+        print("All tests passed! [OK]")
         print("="*60 + "\n")
         return 0
 
     except AssertionError as e:
-        print(f"\n❌ Test failed: {e}")
+        print(f"\n[FAIL] Test failed: {e}")
         return 1
     except Exception as e:
-        print(f"\n❌ Unexpected error: {e}")
+        print(f"\n[FAIL] Unexpected error: {e}")
         return 1
 
 

@@ -118,7 +118,7 @@ if head:
     # Add multires modifier
     multires = head.modifiers.new('Multires', 'MULTIRES')
 
-    # NOTE: Subdivision must be done in Blender UI due to HTTP bridge limitations
+    # NOTE: Subdivision must be done in Blender UI (multires_subdivide needs interactive sculpt-mode context)
     # bpy.ops.object.multires_subdivide() will fail
 
     print(f'Multires modifier added - subdivide in Blender UI')

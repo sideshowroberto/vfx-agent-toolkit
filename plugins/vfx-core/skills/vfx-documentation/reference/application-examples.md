@@ -33,7 +33,7 @@
 ## Blender
 
 **Common Tasks:**
-- Create addon with HTTP Bridge
+- Create addon with MCP integration
 - Debug API breaking changes (4.2 → 4.5+)
 - Set up Geometry Nodes
 - Export to game engine
@@ -42,7 +42,7 @@
 **Key Files:**
 - Addon `__init__.py` - Registration
 - Addon operators - Tool implementation
-- HTTP Bridge integration
+- MCP integration
 - Export scripts
 
 ## Unreal

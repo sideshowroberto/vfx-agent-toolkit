@@ -61,8 +61,7 @@ MCP servers connect Claude directly to VFX applications. Run `/mcp` to see activ
 - `ue58-mcp` — Unreal Engine 5.8 control (native MCP, HTTP port 8000)
 - `comfyui` — AI image generation
 
-**Note on Blender:** Uses the official Blender MCP (blender.org). Enable the MCP add-on in Blender preferences and register via `connectorslender
-egister.ps1`.
+**Note on Blender:** Uses the official Blender MCP (blender.org). Enable the MCP add-on in Blender preferences and register via `connectors\blender\register.ps1`.
 
 **MCP image pattern:** Render tools return a `filepath`, not base64. Use the `Read` tool to view the image after a render call.
 

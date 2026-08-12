@@ -193,7 +193,7 @@ def create_tile_branch(input_node, tile_x, tile_y, grid_x, grid_y, tile_size, ov
                        image_width, image_height, tile_x_pos, base_y):
     """
     Creates a complete tile processing branch (vertical stack):
-    Transform → Reformat → NoOp → Expression (mask) → Premult → InverseTransform
+    Transform -> Reformat -> NoOp -> Expression (mask) -> Premult -> InverseTransform
 
     Args:
         input_node (nuke.Node): Input image node

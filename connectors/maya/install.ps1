@@ -1,10 +1,9 @@
 # maya/install.ps1
 # Installs Maya MCP bridge + copies agents/skills into Claude Code config
 #
-# NOTE (migration): the previous version of this script hardcoded
-# D:\GITHUB\maya-mcp and a self-referencing path into the private
-# claude-mcp-connectors checkout. It now uses the bridge bundled with
-# this connector and standard user-level Claude Code config paths.
+# Uses the bridge bundled with this connector (bridge\) and standard
+# user-level Claude Code config paths. Pass -BridgeDir to point at an
+# external maya-mcp checkout instead.
 
 param(
     # Bridge is bundled with this connector; override for an external clone
