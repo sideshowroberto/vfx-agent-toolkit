@@ -6,14 +6,14 @@ allowed-tools: mcp__magnific__video_plan,mcp__magnific__video_generate,mcp__magn
 
 # Magnific Video Generation Skill
 
-## Before Generating — Routing and Session Rules
+## Before Generating - Routing and Session Rules
 
-1. **Routing check:** on production jobs with ComfyUI API-node credits, video generation is usually cheaper via ComfyUI (`comfy generate --api-key` headless, or the workflow UI) — Magnific video is for tests, personal work, or when its models/features are specifically wanted. Confirm the route if a production job is active.
+1. **Routing check:** on production jobs with ComfyUI API-node credits, video generation is usually cheaper via ComfyUI (`comfy generate --api-key` headless, or the workflow UI) - Magnific video is for tests, personal work, or when its models/features are specifically wanted. Confirm the route if a production job is active.
 2. **Confirm the destination folder** before generating (teams accumulate multiple similarly-named project folders). Never generate into the workspace root.
-3. **On an auth/re-authorization error, stop — don't retry.** Tell the user to run `/mcp` to re-authenticate, then resume. Presigned upload URLs go stale across re-auth; re-request them.
-4. **Default audio OFF** — audio generation costs significantly more; only enable when the user asks.
+3. **On an auth/re-authorization error, stop - don't retry.** Tell the user to run `/mcp` to re-authenticate, then resume. Presigned upload URLs go stale across re-auth; re-request them.
+4. **Default audio OFF** - audio generation costs significantly more; only enable when the user asks.
 
-## Skill Pairing — Seedance Prompt System
+## Skill Pairing - Seedance Prompt System
 
 The `seedance-20` skill ecosystem handles **prompt writing and shot direction**. Use it before generating via Magnific for better results.
 
@@ -26,7 +26,7 @@ The `seedance-20` skill ecosystem handles **prompt writing and shot direction**.
 | VFX effects in the video | `seedance-vfx` |
 | Bad result, diagnosing | `seedance-troubleshoot` |
 
-**Workflow:** Seedance skills → polished prompt → `magnific-video-gen` for MCP execution.
+**Workflow:** Seedance skills -> polished prompt -> `magnific-video-gen` for MCP execution.
 
 ---
 
@@ -38,7 +38,7 @@ The `seedance-20` skill ecosystem handles **prompt writing and shot direction**.
 
 ```python
 video_plan(
-    prompt="raw user idea — pass verbatim",
+    prompt="raw user idea - pass verbatim",
     aspectRatioHint="16:9",
     durationHint=6,
     styleHint="cinematic photorealistic",
@@ -52,8 +52,8 @@ video_plan(
 
 | Model | Slug | Speed | Best For |
 |-------|------|-------|----------|
-| **Seedance 2.0** ✅ DEFAULT | `bytedance-seedance-pro-2.0` | ~5 min | Best overall — camera controls, audio, lipsync, multishot, image/video refs |
-| Seedance 2.0 Fast | `bytedance-seedance-fast-2.0` | ~5 min | Draft rounds — same controls as Pro, 720p max |
+| **Seedance 2.0** [OK] DEFAULT | `bytedance-seedance-pro-2.0` | ~5 min | Best overall - camera controls, audio, lipsync, multishot, image/video refs |
+| Seedance 2.0 Fast | `bytedance-seedance-fast-2.0` | ~5 min | Draft rounds - same controls as Pro, 720p max |
 | Kling 3.0 | `kling-30` | ~10 min | 4K, 15s, character/product refs, multishot (6) |
 | Kling 3.0 Omni | `kling-omni3` | ~10 min | 4K, video-to-video reference (style from existing footage) |
 | Kling 2.5 | `kling-25` | ~10 min | Best value, reliable start+end frame control |
@@ -63,15 +63,15 @@ video_plan(
 
 ---
 
-## Seedance 2.0 — Full Capabilities
+## Seedance 2.0 - Full Capabilities
 
 ### Specs
 - **Resolutions:** 1080p, 720p, 480p
-- **Durations:** 4–15 seconds
+- **Durations:** 4-15 seconds
 - **Aspect ratios:** `21:9` `16:9` `4:3` `1:1` `3:4` `9:16`
 - **Multishot:** up to 6 shots (use `multi_prompt` array)
-- **Sound effects:** OFF by default — only enable if user explicitly requests audio (`withSoundEffects: true`). Audio generation is significantly more expensive.
-- **Native audio/lipsync:** pass audio as `references[]` with `type: "audio"` — also requires explicit user request
+- **Sound effects:** OFF by default - only enable if user explicitly requests audio (`withSoundEffects: true`). Audio generation is significantly more expensive.
+- **Native audio/lipsync:** pass audio as `references[]` with `type: "audio"` - also requires explicit user request
 
 ### Camera Motion (52 values)
 **Lateral:** `truckLeft` `truckRight` `panLeft` `panRight` `moveLeft` `moveRight`
@@ -92,9 +92,9 @@ video_plan(
 | `character` | 1 | Library asset |
 | `product` | 1 | Library asset |
 | `style` | 1 | Style reference image |
-| `color` | — | Color reference |
-| `effect` | — | Effect reference |
-| `audio` | 3 | For lipsync/voiceover — requires a visual reference too |
+| `color` | - | Color reference |
+| `effect` | - | Effect reference |
+| `audio` | 3 | For lipsync/voiceover - requires a visual reference too |
 
 ---
 
@@ -103,7 +103,7 @@ video_plan(
 **Keyframes (start/end frames) ALWAYS go in `keyframes.{start,end}`, NEVER in `references[]`.**
 
 ```python
-# CORRECT — image-to-video with start frame
+# CORRECT - image-to-video with start frame
 video_generate(video={"clips": [{
     "slug": "bytedance-seedance-pro-2.0",
     "prompt": "...",
@@ -111,22 +111,22 @@ video_generate(video={"clips": [{
     "duration": 6,
     "resolution": "1080p",
     "cameraMotion": "pushIn",
-    # withSoundEffects omitted — OFF by default, only add if user requests audio
+    # withSoundEffects omitted - OFF by default, only add if user requests audio
     "keyframes": {
         "start": {"type": "image", "url": "<creation_id or asset URL>"}
     }
 }]})
 
-# WRONG — never put keyframes in references[]
+# WRONG - never put keyframes in references[]
 ```
 
-For Seedance 2.0: if using `keyframes`, you cannot also use `image` or `video` in `references[]` — they are mutually exclusive.
+For Seedance 2.0: if using `keyframes`, you cannot also use `image` or `video` in `references[]` - they are mutually exclusive.
 
 ---
 
 ## Generation Patterns
 
-### Image-to-video (I2V) — most common VFX use
+### Image-to-video (I2V) - most common VFX use
 ```python
 video_generate(video={"clips": [{
     "slug": "bytedance-seedance-pro-2.0",
@@ -150,7 +150,7 @@ video_generate(video={"clips": [{
     "duration": 8,
     "resolution": "1080p",
     "cameraMotion": "handheld"
-    # withSoundEffects omitted — only add if user explicitly requests audio
+    # withSoundEffects omitted - only add if user explicitly requests audio
 }]})
 ```
 
@@ -193,7 +193,7 @@ video_generate(video={"clips": [{
 
 ---
 
-## Long Videos (>15s) — Multi-Clip
+## Long Videos (>15s) - Multi-Clip
 
 `video_plan` auto-generates a split plan. Then:
 1. Generate each clip separately with `video_generate`
@@ -217,7 +217,7 @@ Always save video to the project's video folder via `folderReference`.
 ### Wait for asset URL (needed for chaining)
 ```python
 creations_wait(identifiers=["<id>"], timeoutSeconds=25)
-# Returns asset URL when complete — use for video_concatenate or upscale
+# Returns asset URL when complete - use for video_concatenate or upscale
 ```
 
 ### Upscale
@@ -229,11 +229,11 @@ video_upscale(creationIdentifier="<id>")
 
 ## VFX Previs Workflow
 
-1. **Generate still** — NB2 Pro via `magnific-image-gen` skill
-2. **Plan video** — `video_plan` with still as `referenceIdentifiers`
-3. **Generate** — Seedance 2.0, start keyframe = NB2 Pro result, choose camera motion
-4. **Review** — share `webUrl`, check motion and consistency
-5. **Iterate** — adjust prompt/camera, or use result as input for next shot
-6. **Upscale** — `video_upscale` on approved clip
-7. **Concatenate** — `video_concatenate` if multi-clip
-8. **Export** — asset URL for Nuke composite or Kling downstream
+1. **Generate still** - NB2 Pro via `magnific-image-gen` skill
+2. **Plan video** - `video_plan` with still as `referenceIdentifiers`
+3. **Generate** - Seedance 2.0, start keyframe = NB2 Pro result, choose camera motion
+4. **Review** - share `webUrl`, check motion and consistency
+5. **Iterate** - adjust prompt/camera, or use result as input for next shot
+6. **Upscale** - `video_upscale` on approved clip
+7. **Concatenate** - `video_concatenate` if multi-clip
+8. **Export** - asset URL for Nuke composite or Kling downstream

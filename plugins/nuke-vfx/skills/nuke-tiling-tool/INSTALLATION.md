@@ -4,13 +4,13 @@
 
 ```
 .claude/skills/nuke-tiling-tool/
-├── scripts/
-│   ├── auto_tile_processor.py      # Core implementation
-│   ├── auto_tile_processor_1k.py   # 1K tiles (1024x1024)
-│   └── auto_tile_processor_2k.py   # 2K tiles (2048x2048)
-├── SKILL.md
-├── README.md
-└── INSTALLATION.md (this file)
++-- scripts/
+|   +-- auto_tile_processor.py      # Core implementation
+|   +-- auto_tile_processor_1k.py   # 1K tiles (1024x1024)
+|   +-- auto_tile_processor_2k.py   # 2K tiles (2048x2048)
++-- SKILL.md
++-- README.md
++-- INSTALLATION.md (this file)
 ```
 
 ---

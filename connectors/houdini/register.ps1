@@ -4,7 +4,7 @@
 
 param([string]$ServerPath = "")
 
-Write-Host "=== Houdini MCP — Register ===" -ForegroundColor Cyan
+Write-Host "=== Houdini MCP - Register ===" -ForegroundColor Cyan
 
 function Test-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
 if (-not (Test-Command "uv")) { Write-Error "uv not found. Run: pip install uv"; exit 1 }

@@ -64,8 +64,8 @@ else:
 ```
 
 **Difference from Pattern 1:**
-- `get_components_by_class()` → List (always)
-- `get_component_by_class()` → Single object or None
+- `get_components_by_class()` -> List (always)
+- `get_component_by_class()` -> Single object or None
 
 ---
 
@@ -93,7 +93,7 @@ for comp in all_comps:
 
 **Blueprint Setup:**
 1. Select component in Blueprint
-2. Tags section → Add tag (e.g., "MainCamera")
+2. Tags section -> Add tag (e.g., "MainCamera")
 
 **Python:**
 ```python
@@ -248,10 +248,10 @@ component.set_relative_location(unreal.Vector(0, 0, 100))
 
 **Common Mistakes:**
 ```python
-# ❌ WRONG: Tuple won't work
+# [FAIL] WRONG: Tuple won't work
 actor.set_actor_location((0, 0, 100))
 
-# ✅ CORRECT: Must use unreal.Vector
+# [OK] CORRECT: Must use unreal.Vector
 actor.set_actor_location(unreal.Vector(0, 0, 100))
 ```
 
@@ -472,19 +472,19 @@ print_component_hierarchy(root)
 
 **Finding Existing Attachments:**
 ```python
-# ✅ Get parent
+# [OK] Get parent
 parent = component.get_attach_parent()
 
-# ✅ Get children
+# [OK] Get children
 children = component.get_attach_children()
 
-# ✅ Traverse hierarchy
+# [OK] Traverse hierarchy
 root = actor.get_editor_property('root_component')
 ```
 
 **Setting Properties on Attached Components:**
 ```python
-# ✅ Configure attached components
+# [OK] Configure attached components
 component = actor.get_component_by_class(unreal.ImagePlateComponent)
 component.set_editor_property('plate', material)
 ```
@@ -495,13 +495,13 @@ component.set_editor_property('plate', material)
 
 **Runtime Component Attachment:**
 ```python
-# ❌ setup_attachment() not available
+# [FAIL] setup_attachment() not available
 component.setup_attachment(parent)  # AttributeError
 
-# ❌ attach_to_component() not available
+# [FAIL] attach_to_component() not available
 component.attach_to_component(parent, ...)  # AttributeError
 
-# ❌ Component registration not available
+# [FAIL] Component registration not available
 component.register_component()  # AttributeError
 ```
 
@@ -545,13 +545,13 @@ component = actor.get_component_by_class(unreal.ImagePlateComponent)
 **Blueprint Setup (Editor):**
 
 **Step 1:** Create Blueprint
-- File → New C++ Class → CineCameraActor (or Blueprint Class)
+- File -> New C++ Class -> CineCameraActor (or Blueprint Class)
 - Name: `BP_CameraWithPlate`
 - Save to: `/Game/`
 
 **Step 2:** Add Components
 1. Open Blueprint editor
-2. Components panel → Add Component → ImagePlate Component
+2. Components panel -> Add Component -> ImagePlate Component
 3. ImagePlateComponent auto-creates ImagePlateFrustumComponent
 
 **Step 3:** Configure Hierarchy

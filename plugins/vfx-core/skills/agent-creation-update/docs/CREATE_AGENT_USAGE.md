@@ -74,7 +74,7 @@ python create_agent.py nuke-compositing-specialist \
 
 **Output:**
 ```
-✅ Created: <workspace>\.claude\agents\nuke-compositing-specialist.md
+[OK] Created: <workspace>\.claude\agents\nuke-compositing-specialist.md
 Validation: PASS
 ```
 
@@ -130,13 +130,13 @@ python create_agent.py test-agent \
 
 ### Examples
 
-**✅ Valid:**
+**[OK] Valid:**
 - `unreal-blueprint-specialist`
 - `blender-geometry-nodes`
 - `python-refactoring-helper`
 - `test123`
 
-**❌ Invalid:**
+**[FAIL] Invalid:**
 - `Agent_Name` (uppercase, underscore)
 - `agent-v2` (version suffix)
 - `a` (too short)
@@ -152,17 +152,17 @@ Follow the **What + When + Triggers** formula:
 ### Good Descriptions
 
 ```
-✅ "Unreal Blueprint automation. Use when working with Blueprints, actors, or components"
-✅ "Houdini to Unreal pipeline. Use when exporting HDAs or validating FBX files"
-✅ "Python refactoring specialist. Use when applying templates or adding type hints"
+[OK] "Unreal Blueprint automation. Use when working with Blueprints, actors, or components"
+[OK] "Houdini to Unreal pipeline. Use when exporting HDAs or validating FBX files"
+[OK] "Python refactoring specialist. Use when applying templates or adding type hints"
 ```
 
 ### Bad Descriptions
 
 ```
-❌ "Helps with stuff" (vague)
-❌ "Agent" (too short)
-❌ "This is a very long description that exceeds the 300 character limit..." (too long)
+[FAIL] "Helps with stuff" (vague)
+[FAIL] "Agent" (too short)
+[FAIL] "This is a very long description that exceeds the 300 character limit..." (too long)
 ```
 
 ---
@@ -222,17 +222,17 @@ The script automatically validates created agents against Article IX requirement
 
 **Pass:**
 ```
-✅ Created: C:\...\agents\my-agent.md
+[OK] Created: C:\...\agents\my-agent.md
 Validation: PASS
 ```
 
 **Fail:**
 ```
-✅ Created: C:\...\agents\my-agent.md
+[OK] Created: C:\...\agents\my-agent.md
 Validation: FAIL
 
 Validation Output:
-❌ Description Quality: Description too short (5 chars, need 10-300)
+[FAIL] Description Quality: Description too short (5 chars, need 10-300)
 
 Agent created but failed validation. Please review and fix issues.
 ```
@@ -272,9 +272,9 @@ The file includes:
 ### 3. Customize Agent
 
 Replace template placeholders:
-- `[Capability Category 1]` → Actual capability names
-- `[Tool1]` → Actual tool names
-- `[Example request]` → Actual example requests
+- `[Capability Category 1]` -> Actual capability names
+- `[Tool1]` -> Actual tool names
+- `[Example request]` -> Actual example requests
 - Remove "Template Usage Notes" section
 
 ### 4. Test Agent
@@ -302,10 +302,10 @@ python validate_agent.py my-new-agent
 
 ```bash
 # Bad
-python create_agent.py My_Agent  # ❌ Uppercase, underscore
+python create_agent.py My_Agent  # [FAIL] Uppercase, underscore
 
 # Good
-python create_agent.py my-agent  # ✅ Lowercase, dash
+python create_agent.py my-agent  # [OK] Lowercase, dash
 ```
 
 ### Error: "Agent already exists"
@@ -339,10 +339,10 @@ ls <workspace>\.claude\skills\agent-creation-update\reference\agent_template.md
 
 ```bash
 # Bad
---description "Helper"  # ❌ Too short
+--description "Helper"  # [FAIL] Too short
 
 # Good
---description "Python helper. Use when refactoring code or adding type hints"  # ✅
+--description "Python helper. Use when refactoring code or adding type hints"  # [OK]
 ```
 
 ### Error: "Validation script not found"
@@ -381,16 +381,16 @@ python test_create_agent.py
 ============================================================
 Running create_agent.py Test Suite
 ============================================================
-✅ Template found: ...
+[OK] Template found: ...
 
 === Test 1: Template Loading ===
-✅ PASS: Template loaded successfully with all placeholders
+[OK] PASS: Template loaded successfully with all placeholders
 
 === Test 2: Placeholder Replacement ===
-✅ PASS: All placeholders replaced correctly
+[OK] PASS: All placeholders replaced correctly
 
 === Test 3: Agent Name Validation ===
-  ✅ Valid name: 'valid-agent-name' → Valid agent name
+  [OK] Valid name: 'valid-agent-name' -> Valid agent name
   ...
 Results: 12 passed, 0 failed
 
@@ -399,11 +399,11 @@ Results: 12 passed, 0 failed
 ============================================================
 Test Summary
 ============================================================
-✅ test_template_loading
-✅ test_placeholder_replacement
-✅ test_agent_name_validation
-✅ test_agent_creation
-✅ test_validation_integration
+[OK] test_template_loading
+[OK] test_placeholder_replacement
+[OK] test_agent_name_validation
+[OK] test_agent_creation
+[OK] test_validation_integration
 
 Total: 5/5 tests passed
 ```
@@ -498,9 +498,9 @@ tools:
 
 ```
 .claude/agents/
-├── my-agent.md
-├── another-agent.md
-└── yet-another-agent.md
++-- my-agent.md
++-- another-agent.md
++-- yet-another-agent.md
 ```
 
 ---

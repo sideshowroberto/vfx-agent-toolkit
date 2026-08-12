@@ -45,6 +45,6 @@ cmds.file(r'C:/exports/hero.fbx', exportSelected=True, type='FBX export', force=
 
 ## Gotchas
 
-- **PyMEL is dead** — always use `maya.cmds` or `maya.api.OpenMaya as om2`
-- **Long names** — use `cmds.ls(long=True)` to avoid name conflicts in complex scenes
-- **Undo** — wrap destructive operations in `cmds.undoInfo(openChunk=True)` / `closeChunk`
+- **PyMEL is dead** - always use `maya.cmds` or `maya.api.OpenMaya as om2`
+- **Long names** - use `cmds.ls(long=True)` to avoid name conflicts in complex scenes
+- **Undo** - wrap destructive operations in `cmds.undoInfo(openChunk=True)` / `closeChunk`

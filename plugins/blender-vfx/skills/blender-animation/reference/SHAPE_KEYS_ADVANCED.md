@@ -7,9 +7,9 @@
 
 ---
 
-## 🎯 SCOPE
+## SCOPE
 
-This reference covers advanced **Shape Key** workflows for facial animation, corrective deformations, and mesh morphing. All APIs documented are **100% STABLE** across Blender 4.2 → 4.5.0.
+This reference covers advanced **Shape Key** workflows for facial animation, corrective deformations, and mesh morphing. All APIs documented are **100% STABLE** across Blender 4.2 -> 4.5.0.
 
 **Audience:** Character artists and technical animators working with blend shapes, morph targets, and facial animation systems.
 
@@ -24,7 +24,7 @@ This reference covers advanced **Shape Key** workflows for facial animation, cor
 
 ---
 
-## 🎯 API STABILITY
+## API STABILITY
 
 **100% STABLE API - NO VERSION CHECKING REQUIRED**
 
@@ -32,7 +32,7 @@ All shape key APIs validated stable (see `ANIMATION_SYSTEM_VALIDATION_REPORT.md`
 
 ---
 
-## 📚 TABLE OF CONTENTS
+## TABLE OF CONTENTS
 
 1. [Shape Key Fundamentals](#shape-key-fundamentals)
 2. [Creating Shape Keys](#creating-shape-keys)
@@ -55,12 +55,12 @@ All shape key APIs validated stable (see `ANIMATION_SYSTEM_VALIDATION_REPORT.md`
 **Data Structure:**
 ```
 Mesh Object
-└── data (Mesh datablock)
-    └── shape_keys (Key datablock)
-        ├── reference_key (Basis - original vertex positions)
-        ├── key_blocks[0] (Smile - offset from Basis)
-        ├── key_blocks[1] (Blink_L - offset from Basis)
-        └── key_blocks[2] (Blink_R - offset from Basis)
++-- data (Mesh datablock)
+    +-- shape_keys (Key datablock)
+        +-- reference_key (Basis - original vertex positions)
+        +-- key_blocks[0] (Smile - offset from Basis)
+        +-- key_blocks[1] (Blink_L - offset from Basis)
+        +-- key_blocks[2] (Blink_R - offset from Basis)
 ```
 
 **How It Works:**
@@ -220,7 +220,7 @@ duplicate = mesh_obj.shape_key_add(name="Smile_R", from_mix=False)
 for i, source_vert in enumerate(source_key.data):
     duplicate.data[i].co = source_vert.co.copy()
 
-print(f"Duplicated '{source_key.name}' → '{duplicate.name}'")
+print(f"Duplicated '{source_key.name}' -> '{duplicate.name}'")
 
 # Mirror across X-axis (for symmetrical shapes)
 for i, vert in enumerate(duplicate.data):
@@ -295,7 +295,7 @@ driver_var.targets[0].data_path = 'pose.bones["Face_Control"]["Smile"]'
 # Simple pass-through expression
 driver.driver.expression = "smile_control"
 
-print(f"Driver added: Face_Control['Smile'] → {smile_key.name}.value")
+print(f"Driver added: Face_Control['Smile'] -> {smile_key.name}.value")
 ```
 
 **Test Driver:**
@@ -312,9 +312,9 @@ print(f"Shape key value: {smile_key.value}")  # Should be 0.5
 
 ---
 
-### Transform Driver (Bone Rotation → Shape Key)
+### Transform Driver (Bone Rotation -> Shape Key)
 
-**Goal:** Drive shape key with bone rotation (e.g., jaw rotation → mouth open)
+**Goal:** Drive shape key with bone rotation (e.g., jaw rotation -> mouth open)
 
 **Implementation:**
 ```python
@@ -337,19 +337,19 @@ driver_var.targets[0].transform_type = 'ROT_X'  # X-axis rotation
 driver_var.targets[0].transform_space = 'LOCAL_SPACE'
 
 # Expression: Convert rotation (radians) to 0-1 range
-# Jaw opens ~0.5 radians max → map to shape key 0.0-1.0
+# Jaw opens ~0.5 radians max -> map to shape key 0.0-1.0
 driver.driver.expression = "max(0, min(1, -jaw_rot / 0.5))"
 
-print(f"Transform driver added: Jaw.rotation_x → {mouth_open_key.name}.value")
+print(f"Transform driver added: Jaw.rotation_x -> {mouth_open_key.name}.value")
 ```
 
 **Rotation Mapping:**
 ```
-Jaw rotation (radians) → Shape key value:
-  0.0 rad (closed) → 0.0 (no shape key)
-  -0.25 rad → 0.5 (50% mouth open)
-  -0.5 rad (max open) → 1.0 (100% mouth open)
-  -1.0 rad (beyond max) → 1.0 (clamped)
+Jaw rotation (radians) -> Shape key value:
+  0.0 rad (closed) -> 0.0 (no shape key)
+  -0.25 rad -> 0.5 (50% mouth open)
+  -0.5 rad (max open) -> 1.0 (100% mouth open)
+  -1.0 rad (beyond max) -> 1.0 (clamped)
 ```
 
 ---
@@ -411,7 +411,7 @@ driver.driver.expression = "1.0 if (smile > 0.7 and blink > 0.7) else 0.0"
 
 ### Distance Driver (Proximity-Based Deformation)
 
-**Goal:** Drive shape key based on distance between two objects (e.g., lips close → pucker)
+**Goal:** Drive shape key based on distance between two objects (e.g., lips close -> pucker)
 
 **Implementation:**
 ```python
@@ -444,11 +444,11 @@ lower_var.targets[0].transform_type = 'LOC_Y'
 lower_var.targets[0].transform_space = 'WORLD_SPACE'
 
 # Expression: Pucker inversely proportional to lip distance
-# Lips apart (0.1 units) → pucker = 0.0
-# Lips touching (0.0 units) → pucker = 1.0
+# Lips apart (0.1 units) -> pucker = 0.0
+# Lips touching (0.0 units) -> pucker = 1.0
 driver.driver.expression = "max(0, min(1, 1.0 - abs(upper_y - lower_y) * 10))"
 
-print("Distance driver added: Lip proximity → Pucker.value")
+print("Distance driver added: Lip proximity -> Pucker.value")
 ```
 
 ---
@@ -467,7 +467,7 @@ mesh_obj = bpy.data.objects["CharacterBody"]
 armature_obj = bpy.data.objects["Armature"]
 
 # Create corrective shape key
-# 1. Pose arm at 90° (where artifact occurs)
+# 1. Pose arm at 90 deg (where artifact occurs)
 shoulder_bone = armature_obj.pose.bones["UpperArm.R"]
 shoulder_bone.rotation_euler.z = 1.5708  # 90 degrees
 
@@ -491,8 +491,8 @@ driver_var.targets[0].bone_target = "UpperArm.R"
 driver_var.targets[0].transform_type = 'ROT_Z'
 driver_var.targets[0].transform_space = 'LOCAL_SPACE'
 
-# Expression: Activate corrective from 45° to 90°
-# 0.785 rad = 45°, 1.5708 rad = 90°
+# Expression: Activate corrective from 45 deg to 90 deg
+# 0.785 rad = 45 deg, 1.5708 rad = 90 deg
 driver.driver.expression = "max(0, min(1, (arm_rot - 0.785) / (1.5708 - 0.785)))"
 
 print(f"Corrective shape key '{corrective.name}' added with driver")
@@ -500,12 +500,12 @@ print(f"Corrective shape key '{corrective.name}' added with driver")
 
 **Result:**
 ```
-Arm rotation (radians) → Corrective value:
-  0.0 (rest) → 0.0 (no correction)
-  0.785 (45°) → 0.0 (start of correction)
-  1.178 (67.5°) → 0.5 (50% correction)
-  1.5708 (90°) → 1.0 (full correction)
-  3.14 (180°) → 1.0 (clamped at max)
+Arm rotation (radians) -> Corrective value:
+  0.0 (rest) -> 0.0 (no correction)
+  0.785 (45 deg) -> 0.0 (start of correction)
+  1.178 (67.5 deg) -> 0.5 (50% correction)
+  1.5708 (90 deg) -> 1.0 (full correction)
+  3.14 (180 deg) -> 1.0 (clamped at max)
 ```
 
 ---
@@ -523,7 +523,7 @@ armature_obj = bpy.data.objects["Armature"]
 
 # Pose arm bent (where pinching occurs)
 forearm = armature_obj.pose.bones["Forearm.R"]
-forearm.rotation_euler.x = 2.0  # ~115° bend
+forearm.rotation_euler.x = 2.0  # ~115 deg bend
 
 bpy.context.view_layer.update()
 
@@ -543,7 +543,7 @@ driver_var.targets[0].bone_target = "Forearm.R"
 driver_var.targets[0].transform_type = 'ROT_X'
 driver_var.targets[0].transform_space = 'LOCAL_SPACE'
 
-# Linear activation from 90° to 135°
+# Linear activation from 90 deg to 135 deg
 driver.driver.expression = "max(0, min(1, (forearm_rot - 1.5708) / (2.356 - 1.5708)))"
 
 print("Elbow corrective added")
@@ -662,7 +662,7 @@ for key_block in shape_keys.key_blocks:
     else:
         key_block["Folder"] = "Other"
 
-    print(f"{key_block.name} → Folder: {key_block['Folder']}")
+    print(f"{key_block.name} -> Folder: {key_block['Folder']}")
 ```
 
 **Note:** Blender doesn't have native folder UI for shape keys. Custom properties help organize in code/scripts.
@@ -714,7 +714,7 @@ else:
     print(f"Exporting {len(mesh_obj.data.shape_keys.key_blocks)} shape keys")
 
     # FBX export settings (requires operator - use Blender UI)
-    # File → Export → FBX
+    # File -> Export -> FBX
     # Settings:
     #   - Apply Modifiers: YES (except Armature if exporting rig separately)
     #   - Shape Keys: ENABLED (exports morph targets)
@@ -734,7 +734,7 @@ print("FBX export configured for Unreal Engine")
 1. Import FBX to Unreal Content Browser
 2. Import dialog: Enable "Import Morph Targets"
 3. Each Blender shape key becomes Unreal morph target
-4. Access in Skeletal Mesh Editor → Morph Targets panel
+4. Access in Skeletal Mesh Editor -> Morph Targets panel
 5. Animate via Animation Blueprint or Control Rig
 ```
 
@@ -763,11 +763,11 @@ smile_key.value = 1.0
 smile_key.keyframe_insert(data_path="value", frame=24)
 
 # Alembic export (requires operator - use Blender UI)
-# File → Export → Alembic (.abc)
+# File -> Export -> Alembic (.abc)
 # Settings:
-#   - Frame Range: Animation length
-#   - Geometry: Face Sets (for shape keys)
-#   - Transform: Scene (or custom)
+# - Frame Range: Animation length
+# - Geometry: Face Sets (for shape keys)
+# - Transform: Scene (or custom)
 
 print("Alembic export configured (frames 1-24)")
 print("Shape key animation will bake as geometry cache")
@@ -928,7 +928,7 @@ mesh_obj.data.shape_keys.key_blocks["Blink_L"].value = 0.3
 
 # Apply shape keys as basis (destructive - duplicate mesh first)
 # NOTE: Requires operator - use Blender UI
-# Object menu → Apply → Shape Keys
+# Object menu -> Apply -> Shape Keys
 
 # Workaround: Create new mesh with applied shape keys
 applied_mesh = mesh_obj.data.copy()
@@ -1201,4 +1201,4 @@ https://docs.blender.org/api/current/bpy.types.Key.html
 **Maintainer:** VFX Pipeline Team
 **Last Updated:** 2025-10-25
 **Lines:** ~800
-**API Stability:** 100% STABLE (Blender 4.2 → 4.5.0)
+**API Stability:** 100% STABLE (Blender 4.2 -> 4.5.0)

@@ -2,11 +2,11 @@
 
 ## File Format Standards
 
-| Source → Target | Formats |
+| Source -> Target | Formats |
 |----------------|---------|
-| Houdini → Unreal | `.hda`, `.fbx` (SM_, SK_, M_, T_ naming) |
-| Blender → Unreal | `.fbx` (M_ materials, UCX_/UBX_/USP_ collision) |
-| Unreal → Nuke | `.exr` multi-channel, ACES color space |
+| Houdini -> Unreal | `.hda`, `.fbx` (SM_, SK_, M_, T_ naming) |
+| Blender -> Unreal | `.fbx` (M_ materials, UCX_/UBX_/USP_ collision) |
+| Unreal -> Nuke | `.exr` multi-channel, ACES color space |
 
 ## Asset Naming
 

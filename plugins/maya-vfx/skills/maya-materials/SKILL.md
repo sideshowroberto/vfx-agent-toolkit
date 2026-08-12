@@ -1,6 +1,6 @@
 ---
 name: maya-materials
-description: Create and assign materials in Maya via MCP — Arnold (aiStandardSurface), Lambert, Blinn, and USD Preview Surface. Use for shader creation, texture assignment, material assignment to geometry, and look dev workflows. Triggers on "maya material", "assign shader", "aiStandardSurface", "maya texture", "look dev".
+description: Create and assign materials in Maya via MCP - Arnold (aiStandardSurface), Lambert, Blinn, and USD Preview Surface. Use for shader creation, texture assignment, material assignment to geometry, and look dev workflows. Triggers on "maya material", "assign shader", "aiStandardSurface", "maya texture", "look dev".
 allowed-tools: Read,Write,Bash
 ---
 
@@ -13,7 +13,7 @@ Creates and assigns shaders in a live Maya session via the commandPort bridge.
 - Maya is open with commandPort active
 - For Arnold shaders: Arnold for Maya (MtoA) loaded
 
-## Standard Surface (Arnold — preferred for production)
+## Standard Surface (Arnold - preferred for production)
 
 ```python
 import maya.cmds as cmds
@@ -59,5 +59,5 @@ cmds.sets('hero_geo', edit=True, forceElement='quick_matSG')
 ## Gotchas
 
 - **Arnold plugin** must be loaded: `cmds.loadPlugin('mtoa', quiet=True)` before using `aiStandardSurface`
-- **ColorSpace** — set `file_node.colorSpace` to `'sRGB'` for diffuse, `'Raw'` for normal/roughness maps
-- **UDP paths** — use forward slashes or raw strings for texture paths on Windows
+- **ColorSpace** - set `file_node.colorSpace` to `'sRGB'` for diffuse, `'Raw'` for normal/roughness maps
+- **UDP paths** - use forward slashes or raw strings for texture paths on Windows

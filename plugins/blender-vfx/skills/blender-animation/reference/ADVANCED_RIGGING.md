@@ -7,9 +7,9 @@
 
 ---
 
-## 🎯 SCOPE
+## SCOPE
 
-This reference covers advanced armature rigging techniques for character animation, creature rigs, and mechanical systems. All APIs documented here are **100% STABLE** (no breaking changes from Blender 4.2 → 4.5.0).
+This reference covers advanced armature rigging techniques for character animation, creature rigs, and mechanical systems. All APIs documented here are **100% STABLE** (no breaking changes from Blender 4.2 -> 4.5.0).
 
 **Audience:** Intermediate to advanced riggers familiar with basic bone creation and parenting.
 
@@ -24,17 +24,17 @@ This reference covers advanced armature rigging techniques for character animati
 
 ---
 
-## 🎯 API STABILITY
+## API STABILITY
 
 **100% STABLE API - NO VERSION CHECKING REQUIRED**
 
-All rigging APIs in this document have been validated stable across Blender 4.2 → 4.5.0 (validated in `ANIMATION_SYSTEM_VALIDATION_REPORT.md`). Use the `mcp__blender__execute_blender_code` tool to run the snippets below via the official Blender MCP.
+All rigging APIs in this document have been validated stable across Blender 4.2 -> 4.5.0 (validated in `ANIMATION_SYSTEM_VALIDATION_REPORT.md`). Use the `mcp__blender__execute_blender_code` tool to run the snippets below via the official Blender MCP.
 
 **Note:** Mode switching (`bpy.ops.object.mode_set()`) still depends on active object/selection context. Verify or set mode explicitly before calling mode-dependent operators - see the general Blender MCP execution notes.
 
 ---
 
-## 📚 TABLE OF CONTENTS
+## TABLE OF CONTENTS
 
 1. [Complex Armature Hierarchies](#complex-armature-hierarchies)
 2. [IK/FK Switching Systems](#ikfk-switching-systems)
@@ -101,13 +101,13 @@ print(f"Spine rig configured with {len(spine_bones)} bones")
 **Hierarchy Structure:**
 ```
 Root
-└── Pelvis (Hip_Control drives position)
-    ├── Spine1 (Tracks Torso_IK, stretches to Chest_Control)
-    ├── Spine2 (Tracks Torso_IK, stretches to Chest_Control)
-    └── Spine3 (Tracks Torso_IK, stretches to Chest_Control)
-        └── Chest (Copy rotation from Chest_Control)
-            └── Neck
-                └── Head
++-- Pelvis (Hip_Control drives position)
+    +-- Spine1 (Tracks Torso_IK, stretches to Chest_Control)
+    +-- Spine2 (Tracks Torso_IK, stretches to Chest_Control)
+    +-- Spine3 (Tracks Torso_IK, stretches to Chest_Control)
+        +-- Chest (Copy rotation from Chest_Control)
+            +-- Neck
+                +-- Head
 ```
 
 **Key Principles:**
@@ -178,10 +178,10 @@ print(f"Pole angle set to {math.degrees(pole_angle):.2f} degrees")
 **Hierarchy:**
 ```
 Pelvis
-└── Thigh.L (IK constraint → Foot_IK.L, pole → Pole.L)
-    └── Shin.L (IK chain member)
-        └── Foot.L (Copy rotation from Foot_IK.L)
-            └── Toe.L
++-- Thigh.L (IK constraint -> Foot_IK.L, pole -> Pole.L)
+    +-- Shin.L (IK chain member)
+        +-- Foot.L (Copy rotation from Foot_IK.L)
+            +-- Toe.L
 
 Controls (not in hierarchy):
 - Foot_IK.L (position + rotation control)
@@ -312,9 +312,9 @@ print("IK/FK switching drivers configured")
 
 **Switching Timeline:**
 ```
-Frame 1: IK_FK_Switch = 0.0 → IK active (100%), FK inactive (0%)
-Frame 12: IK_FK_Switch = 1.0 → IK inactive (0%), FK active (100%)
-Frame 24: IK_FK_Switch = 0.5 → Blend 50/50 (smooth transition)
+Frame 1: IK_FK_Switch = 0.0 -> IK active (100%), FK inactive (0%)
+Frame 12: IK_FK_Switch = 1.0 -> IK inactive (0%), FK active (100%)
+Frame 24: IK_FK_Switch = 0.5 -> Blend 50/50 (smooth transition)
 ```
 
 ---
@@ -492,7 +492,7 @@ print("Custom bone shapes assigned")
 # Adjust custom shape display
 pose_bone = armature_obj.pose.bones["Hand_IK.R"]
 pose_bone.custom_shape_scale_xyz = (0.5, 0.5, 0.5)  # 50% size
-pose_bone.custom_shape_rotation_euler = (1.5708, 0, 0)  # 90° X rotation
+pose_bone.custom_shape_rotation_euler = (1.5708, 0, 0)  # 90 deg X rotation
 pose_bone.use_custom_shape_bone_size = False  # Ignore bone length scaling
 
 # Transform shape relative to bone
@@ -623,7 +623,7 @@ def gradient_weights(mesh, bone1_name, bone2_name, start_vertex_indices, end_ver
         vg1.add([vert.index], 1.0 - t, 'REPLACE')
         vg2.add([vert.index], t, 'REPLACE')
 
-    print(f"Gradient weights applied: {bone1_name} → {bone2_name}")
+    print(f"Gradient weights applied: {bone1_name} -> {bone2_name}")
 
 # Example: Gradient from UpperArm to Forearm
 gradient_weights(
@@ -687,7 +687,7 @@ def mirror_vertex_groups(mesh, axis='X', left_suffix='.L', right_suffix='.R'):
             if mirror_index is not None and min_dist < 0.001:  # Tolerance
                 right_vg.add([mirror_index], weight, 'REPLACE')
 
-        print(f"Mirrored weights: {left_vg.name} → {right_vg.name}")
+        print(f"Mirrored weights: {left_vg.name} -> {right_vg.name}")
 
 # Execute mirror
 mirror_vertex_groups(mesh_obj, axis='X', left_suffix='.L', right_suffix='.R')
@@ -850,11 +850,11 @@ for eye_name in ["Eye.L", "Eye.R"]:
     track.track_axis = 'TRACK_NEGATIVE_Z'  # Eye looks down -Z
     track.up_axis = 'UP_Y'
 
-    # Limit rotation range (eyes don't rotate 360°)
+    # Limit rotation range (eyes don't rotate 360 deg)
     limit_rot = eye.constraints.new(type='LIMIT_ROTATION')
     limit_rot.use_limit_x = True
-    limit_rot.min_x = -0.5  # ~-30°
-    limit_rot.max_x = 0.5   # ~+30°
+    limit_rot.min_x = -0.5  # ~-30 deg
+    limit_rot.max_x = 0.5   # ~+30 deg
     limit_rot.use_limit_y = True
     limit_rot.min_y = -0.5
     limit_rot.max_y = 0.5
@@ -901,7 +901,7 @@ driver_var.targets[0].transform_space = 'LOCAL_SPACE'
 # Jaw opens ~0.5 radians = shape key 1.0
 driver.driver.expression = "max(0, min(1, -jaw_rot / 0.5))"
 
-print("Shape key driver added: Mouth_Open ← Jaw.rotation_y")
+print("Shape key driver added: Mouth_Open <- Jaw.rotation_y")
 
 # Drive "Smile" with custom bone property
 control_bone = armature_obj.pose.bones["Face_Control"]
@@ -916,7 +916,7 @@ driver_var.targets[0].id = armature_obj
 driver_var.targets[0].data_path = 'pose.bones["Face_Control"]["Smile"]'
 driver.driver.expression = "smile"
 
-print("Shape key driver added: Smile ← Face_Control['Smile']")
+print("Shape key driver added: Smile <- Face_Control['Smile']")
 ```
 
 **Blink Animation Pattern:**
@@ -953,9 +953,9 @@ Constraints are evaluated TOP-TO-BOTTOM in the constraint stack.
 Each constraint modifies the bone's transformation sequentially.
 
 Example:
-  1. Copy Location (influence 1.0) → Sets bone location to target
-  2. Damped Track (influence 0.5) → Rotates bone 50% toward target
-  3. Limit Rotation (influence 1.0) → Clamps rotation to max range
+  1. Copy Location (influence 1.0) -> Sets bone location to target
+  2. Damped Track (influence 0.5) -> Rotates bone 50% toward target
+  3. Limit Rotation (influence 1.0) -> Clamps rotation to max range
 ```
 
 **Implementation:**
@@ -1120,9 +1120,9 @@ driver_var.targets[0].bone_target = "Vehicle_Root"
 driver_var.targets[0].transform_type = 'LOC_Y'
 driver_var.targets[0].transform_space = 'WORLD_SPACE'
 
-# Expression: rotation (radians) = travel_distance / circumference * 2π
+# Expression: rotation (radians) = travel_distance / circumference * 2pi
 circumference = wheel["Circumference"]
-driver.driver.expression = f"(travel / {circumference}) * 6.28318"  # 2π
+driver.driver.expression = f"(travel / {circumference}) * 6.28318"  # 2pi
 
 print(f"Wheel rotation driven by vehicle movement (circumference={circumference}m)")
 ```
@@ -1154,10 +1154,10 @@ driver_var.targets[0].bone_target = "UpperArm.R"
 driver_var.targets[0].transform_type = 'ROT_Z'  # Arm raise rotation
 driver_var.targets[0].transform_space = 'LOCAL_SPACE'
 
-# Expression: Activate corrective when arm raised >45° (0.785 rad)
+# Expression: Activate corrective when arm raised >45 deg (0.785 rad)
 driver.driver.expression = "1.0 if arm_rot > 0.785 else 0.0"
 
-print("Corrective bone configured: Activates at arm rotation >45°")
+print("Corrective bone configured: Activates at arm rotation >45 deg")
 ```
 
 **Smooth Activation:**
@@ -1216,7 +1216,7 @@ for bone_name in ["UpperArm.R", "Forearm.R"]:
 # Check 4: Pole angle adjustment
 if ik_constraint.pole_target:
     print(f"Current pole angle: {ik_constraint.pole_angle:.2f} rad")
-    # Try adjusting ±90° (1.57 rad)
+    # Try adjusting +/-90 deg (1.57 rad)
     ik_constraint.pole_angle += 1.57
 ```
 
@@ -1224,7 +1224,7 @@ if ik_constraint.pole_target:
 
 ### Issue: Bone Flipping During Animation
 
-**Symptoms:** Bone suddenly rotates 180° between keyframes, IK "pops"
+**Symptoms:** Bone suddenly rotates 180 deg between keyframes, IK "pops"
 
 **Causes:**
 1. Gimbal lock (Euler rotation mode)
@@ -1241,13 +1241,13 @@ armature_obj = bpy.data.objects["Armature"]
 for bone in armature_obj.pose.bones:
     if "Arm" in bone.name or "Leg" in bone.name:
         bone.rotation_mode = 'QUATERNION'  # Avoids gimbal lock
-        print(f"{bone.name}: Rotation mode → QUATERNION")
+        print(f"{bone.name}: Rotation mode -> QUATERNION")
 
 # Solution 2: Add Limit Rotation constraint
 problem_bone = armature_obj.pose.bones["Forearm.R"]
 limit = problem_bone.constraints.new(type='LIMIT_ROTATION')
 limit.use_limit_x = True
-limit.min_x = -3.14  # -180°
+limit.min_x = -3.14  # -180 deg
 limit.max_x = 0.0    # Prevent hyperextension
 limit.owner_space = 'LOCAL'
 
@@ -1406,4 +1406,4 @@ https://docs.blender.org/api/current/bpy.types.Constraint.html
 **Maintainer:** VFX Pipeline Team
 **Last Updated:** 2025-10-25
 **Lines:** ~1050
-**API Stability:** 100% STABLE (Blender 4.2 → 4.5.0)
+**API Stability:** 100% STABLE (Blender 4.2 -> 4.5.0)

@@ -15,7 +15,7 @@ python create_agent.py --name <agent_name> --type <specialist|pipeline|helper>
 
 ---
 
-### 2. update_agent.py ✅
+### 2. update_agent.py [OK]
 **Status:** Fully implemented
 
 Updates existing agents with version increments and changelog entries.
@@ -51,9 +51,9 @@ python update_agent.py my-agent minor --agents-dir ../agents --changelog "New fe
 - `--agents-dir` - Agents directory (default: `.claude/agents`)
 
 **Version Increment Rules:**
-- **major**: Breaking changes (1.2.3 → 2.0.0)
-- **minor**: New features (1.2.3 → 1.3.0)
-- **patch**: Bug fixes (1.2.3 → 1.2.4)
+- **major**: Breaking changes (1.2.3 -> 2.0.0)
+- **minor**: New features (1.2.3 -> 1.3.0)
+- **patch**: Bug fixes (1.2.3 -> 1.2.4)
 
 **Workflow:**
 1. Archive current version (if `--no-archive` not set)
@@ -83,7 +83,7 @@ python archive_agent.py --agent <path> --reason <consolidation|deprecated|obsole
 
 ---
 
-### 4. validate_agent.py ✅
+### 4. validate_agent.py [OK]
 **Status:** Fully implemented
 
 Validates agents against Article IX requirements.
@@ -108,7 +108,7 @@ python validate_agent.py <agent_name> [--agents-dir <path>]
 
 ---
 
-### 5. test_validation.py ✅
+### 5. test_validation.py [OK]
 **Status:** Fully implemented
 
 Test suite for `validate_agent.py`.
@@ -119,7 +119,7 @@ python test_validation.py
 
 ---
 
-### 6. test_update_agent.py ✅
+### 6. test_update_agent.py [OK]
 **Status:** Fully implemented
 
 Comprehensive test suite for `update_agent.py`.
@@ -143,22 +143,22 @@ UPDATE_AGENT.PY TEST SUITE
 ======================================================================
 
 === Testing Version Increment ===
-✅ 1.2.3 + major = 2.0.0
-✅ 1.2.3 + minor = 1.3.0
-✅ 1.2.3 + patch = 1.2.4
+[OK] 1.2.3 + major = 2.0.0
+[OK] 1.2.3 + minor = 1.3.0
+[OK] 1.2.3 + patch = 1.2.4
 ...
 
 ======================================================================
 TEST SUMMARY
 ======================================================================
-✅ PASS - Version Increment
-✅ PASS - Parse Frontmatter
-✅ PASS - Update Frontmatter
+[OK] PASS - Version Increment
+[OK] PASS - Parse Frontmatter
+[OK] PASS - Update Frontmatter
 ...
 
 Total: 9 passed, 0 failed
 
-🎉 All tests passed!
+ All tests passed!
 ```
 
 ---
@@ -224,11 +224,11 @@ New changelog entries are inserted **before** existing entries:
 ```markdown
 ## Version History
 
-**v2.0.0** (2025-10-25) - Major update    ← NEW ENTRY
+**v2.0.0** (2025-10-25) - Major update    <- NEW ENTRY
 - Breaking changes
 - New features
 
-**v1.2.3** (2025-10-20) - Bug fixes       ← OLD ENTRY
+**v1.2.3** (2025-10-20) - Bug fixes       <- OLD ENTRY
 - Fixed critical bug
 
 **v1.0.0** (2025-10-01) - Initial release
@@ -391,7 +391,7 @@ python update_agent.py documentation-specialist minor
 # > Improved session documentation format
 # >
 
-# ✅ Updated: documentation-specialist
+# [OK] Updated: documentation-specialist
 # Version: 1.0.0 -> 1.1.0
 # Archived: .claude/agents/archive/documentation-specialist-v1.0.0.md
 ```
@@ -401,7 +401,7 @@ python update_agent.py documentation-specialist minor
 ```bash
 python update_agent.py test-agent patch --changelog "Fixed typo in description" --no-archive
 
-# ✅ Updated: test-agent
+# [OK] Updated: test-agent
 # Version: 1.2.3 -> 1.2.4
 ```
 

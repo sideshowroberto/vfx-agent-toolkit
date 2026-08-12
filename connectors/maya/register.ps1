@@ -4,7 +4,7 @@
 
 param([string]$MayaPort = "7001")
 
-Write-Host "=== Maya MCP — Register ===" -ForegroundColor Cyan
+Write-Host "=== Maya MCP - Register ===" -ForegroundColor Cyan
 
 function Test-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
 if (-not (Test-Command "uv")) { Write-Error "uv not found."; exit 1 }

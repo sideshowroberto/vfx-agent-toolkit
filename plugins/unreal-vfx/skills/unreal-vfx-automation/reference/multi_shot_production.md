@@ -28,8 +28,8 @@ Batch loops run in a single `execute_python_code` call (plate setup does not tri
 Master Material + Material Instances pattern
 - ONE master material with shared logic
 - ONE material instance PER SHOT with unique texture
-- Update master → All shots update
-- Update instance texture → Only that shot changes
+- Update master -> All shots update
+- Update instance texture -> Only that shot changes
 
 ---
 
@@ -46,18 +46,18 @@ Master Material + Material Instances pattern
 **Architecture:**
 ```
 M_ForegroundPlate_Master (Master Material)
-├── Texture Parameter: PlateTexture (default: None)
-├── Scalar Parameter: OpacityMultiplier (default: 1.0)
-├── Scalar Parameter: EmissiveMultiplier (default: 1.0)
-└── Material Graph (shared logic)
++-- Texture Parameter: PlateTexture (default: None)
++-- Scalar Parameter: OpacityMultiplier (default: 1.0)
++-- Scalar Parameter: EmissiveMultiplier (default: 1.0)
++-- Material Graph (shared logic)
 
 MI_Shot001_FG (Material Instance)
-├── Parent: M_ForegroundPlate_Master
-└── PlateTexture = MT_Shot001_FG (OVERRIDDEN)
++-- Parent: M_ForegroundPlate_Master
++-- PlateTexture = MT_Shot001_FG (OVERRIDDEN)
 
 MI_Shot002_FG (Material Instance)
-├── Parent: M_ForegroundPlate_Master
-└── PlateTexture = MT_Shot002_FG (OVERRIDDEN)
++-- Parent: M_ForegroundPlate_Master
++-- PlateTexture = MT_Shot002_FG (OVERRIDDEN)
 
 ... (50+ instances)
 ```
@@ -88,24 +88,24 @@ for shot_num in range(2, 51):  # Shots 2-50
 ```
 
 **Benefits:**
-- ✅ Material logic shared (one update propagates to all)
-- ✅ Texture changes isolated (Shot002 doesn't affect Shot003)
-- ✅ Scalable to 100+ shots (instances are lightweight)
-- ✅ Consistent look enforced
-- ✅ Easy to adjust all shots (change master parameters)
+- [OK] Material logic shared (one update propagates to all)
+- [OK] Texture changes isolated (Shot002 doesn't affect Shot003)
+- [OK] Scalable to 100+ shots (instances are lightweight)
+- [OK] Consistent look enforced
+- [OK] Easy to adjust all shots (change master parameters)
 
 **Example Scenario:**
 ```
 VFX Supervisor: "All plates need to be 20% brighter"
 
 WITHOUT master material:
-- Open M_Shot001_FG → Change EmissiveMultiplier → Save
-- Open M_Shot002_FG → Change EmissiveMultiplier → Save
-- ... (repeat 50 times) ❌
+- Open M_Shot001_FG -> Change EmissiveMultiplier -> Save
+- Open M_Shot002_FG -> Change EmissiveMultiplier -> Save
+- ... (repeat 50 times) [FAIL]
 
 WITH master material:
-- Open M_ForegroundPlate_Master → Change EmissiveMultiplier → Save
-- All 50 instances update automatically ✅
+- Open M_ForegroundPlate_Master -> Change EmissiveMultiplier -> Save
+- All 50 instances update automatically [OK]
 ```
 
 ---
@@ -136,13 +136,13 @@ for shot_num in range(1, 5):
 ```
 
 **Benefits:**
-- ✅ Maximum flexibility per shot
-- ✅ No dependencies between shots
+- [OK] Maximum flexibility per shot
+- [OK] No dependencies between shots
 
 **Drawbacks:**
-- ❌ Updates must be applied to each shot individually
-- ❌ Inconsistency risk (easy to forget to update all shots)
-- ❌ Not scalable beyond ~5 shots
+- [FAIL] Updates must be applied to each shot individually
+- [FAIL] Inconsistency risk (easy to forget to update all shots)
+- [FAIL] Not scalable beyond ~5 shots
 
 ---
 
@@ -153,13 +153,13 @@ for shot_num in range(1, 5):
 **Directory Structure:**
 ```
 D:/VFX/Plates/
-├── Shot001/
-│   └── Shot001_0001.exr, Shot001_0002.exr, ...
-├── Shot002/
-│   └── Shot002_0001.exr, Shot002_0002.exr, ...
-├── Shot003/
-│   └── Shot003_0001.exr, Shot003_0002.exr, ...
-└── ... (50+ shot folders)
++-- Shot001/
+|   +-- Shot001_0001.exr, Shot001_0002.exr, ...
++-- Shot002/
+|   +-- Shot002_0001.exr, Shot002_0002.exr, ...
++-- Shot003/
+|   +-- Shot003_0001.exr, Shot003_0002.exr, ...
++-- ... (50+ shot folders)
 ```
 
 **Python Batch Script:**
@@ -183,14 +183,14 @@ for shot_folder in sorted(shot_folders):
     first_frame = next((f for f in files if f.endswith("_0001.exr")), None)
 
     if not first_frame:
-        print(f"⚠️  Skipping {shot_folder}: No _0001.exr found")
+        print(f"[WARN]  Skipping {shot_folder}: No _0001.exr found")
         continue
 
     sequence_path = os.path.join(shot_path, first_frame)
     plate_name = f"{shot_folder}_FG"
 
     # Create foreground plate
-    print(f"📦 Processing {shot_folder}...")
+    print(f" Processing {shot_folder}...")
     result = create_foreground_plate(
         sequence_path=sequence_path,
         plate_name=plate_name,
@@ -198,23 +198,23 @@ for shot_folder in sorted(shot_folders):
     )
 
     if result["success"]:
-        print(f"   ✅ {shot_folder} complete")
+        print(f"   [OK] {shot_folder} complete")
     else:
-        print(f"   ❌ {shot_folder} failed: {result['errors']}")
+        print(f"   [FAIL] {shot_folder} failed: {result['errors']}")
 
-print("\n🎬 Batch processing complete!")
+print("\n Batch processing complete!")
 ```
 
 **Expected Output:**
 ```
-📦 Processing Shot001...
-   ✅ Shot001 complete
-📦 Processing Shot002...
-   ✅ Shot002 complete
-📦 Processing Shot003...
-   ✅ Shot003 complete
+ Processing Shot001...
+   [OK] Shot001 complete
+ Processing Shot002...
+   [OK] Shot002 complete
+ Processing Shot003...
+   [OK] Shot003 complete
 ...
-🎬 Batch processing complete!
+ Batch processing complete!
 ```
 
 ---
@@ -242,7 +242,7 @@ with open("D:/VFX/shots.csv", "r") as f:
 
 # Process each shot
 for shot in shots:
-    print(f"📦 Processing {shot['shot_name']}...")
+    print(f" Processing {shot['shot_name']}...")
 
     result = create_foreground_plate(
         sequence_path=shot['sequence_path'],
@@ -254,16 +254,16 @@ for shot in shots:
     )
 
     if result["success"]:
-        print(f"   ✅ {shot['shot_name']} complete")
+        print(f"   [OK] {shot['shot_name']} complete")
     else:
-        print(f"   ❌ {shot['shot_name']} failed: {result['errors']}")
+        print(f"   [FAIL] {shot['shot_name']} failed: {result['errors']}")
 ```
 
 **Benefits:**
-- ✅ Per-shot configuration (opacity, emissive, proxy)
-- ✅ Easy to review/edit (spreadsheet-friendly)
-- ✅ Version control friendly (text-based)
-- ✅ Can be generated by pipeline tools
+- [OK] Per-shot configuration (opacity, emissive, proxy)
+- [OK] Easy to review/edit (spreadsheet-friendly)
+- [OK] Version control friendly (text-based)
+- [OK] Can be generated by pipeline tools
 
 ---
 
@@ -338,11 +338,11 @@ create_foreground_plate(
 **Scenario:** Need to change blend mode from Masked to Translucent for all shots
 
 **Process:**
-1. Content Browser → Find M_ForegroundPlate_Master
-2. Double-click → Material Editor
-3. Details Panel → Blend Mode → Change to Translucent
+1. Content Browser -> Find M_ForegroundPlate_Master
+2. Double-click -> Material Editor
+3. Details Panel -> Blend Mode -> Change to Translucent
 4. Save and compile
-5. **Result:** All 50 material instances update automatically ✅
+5. **Result:** All 50 material instances update automatically [OK]
 
 **What Updates Automatically:**
 - Shading model (Unlit, Lit, etc.)
@@ -375,8 +375,8 @@ unreal.MaterialEditingLibrary.set_material_instance_scalar_parameter_value(
 )
 
 # Option 2: Manual adjustment
-# 1. Content Browser → Find MI_Shot025_FG
-# 2. Double-click → Material Instance Editor
+# 1. Content Browser -> Find MI_Shot025_FG
+# 2. Double-click -> Material Instance Editor
 # 3. Check "Override" next to OpacityMultiplier
 # 4. Set value to 0.5
 # 5. Save
@@ -396,13 +396,13 @@ unreal.MaterialEditingLibrary.set_material_instance_scalar_parameter_value(
 **Directory Structure:**
 ```
 D:/Plates/Shot001/
-├── Shot001_0001.exr (4K full-res)
-├── Shot001_0002.exr
-├── ...
-└── lowres/
-    ├── Shot001_0001.exr (1080p proxy)
-    ├── Shot001_0002.exr
-    └── ...
++-- Shot001_0001.exr (4K full-res)
++-- Shot001_0002.exr
++-- ...
++-- lowres/
+    +-- Shot001_0001.exr (1080p proxy)
+    +-- Shot001_0002.exr
+    +-- ...
 ```
 
 **Setup (All Shots with Proxy):**
@@ -428,8 +428,8 @@ for shot_num in range(1, 51):
 
 **Option 1: Manual Switch (Per Shot)**
 ```
-1. Content Browser → Find MS_Shot001_FG
-2. Double-click → ImgMediaSource Editor
+1. Content Browser -> Find MS_Shot001_FG
+2. Double-click -> ImgMediaSource Editor
 3. Sequence Path:
    - FROM: D:/Plates/Shot001/lowres
    - TO: D:/Plates/Shot001
@@ -458,7 +458,7 @@ for asset_data in media_sources:
         # Remove /lowres from path
         new_path = current_path.replace("/lowres", "")
 
-        print(f"📦 Switching {asset_data.asset_name}")
+        print(f" Switching {asset_data.asset_name}")
         print(f"   FROM: {current_path}")
         print(f"   TO: {new_path}")
 
@@ -469,19 +469,19 @@ for asset_data in media_sources:
         # Save asset
         unreal.EditorAssetLibrary.save_asset(asset_data.package_name)
 
-print("\n✅ All shots switched to full-res")
+print("\n[OK] All shots switched to full-res")
 ```
 
 **Expected Output:**
 ```
-📦 Switching MS_Shot001_FG
+ Switching MS_Shot001_FG
    FROM: D:/Plates/Shot001/lowres
    TO: D:/Plates/Shot001
-📦 Switching MS_Shot002_FG
+ Switching MS_Shot002_FG
    FROM: D:/Plates/Shot002/lowres
    TO: D:/Plates/Shot002
 ...
-✅ All shots switched to full-res
+[OK] All shots switched to full-res
 ```
 
 ---
@@ -493,29 +493,29 @@ print("\n✅ All shots switched to full-res")
 **Content Browser Structure:**
 ```
 /Game/
-├── Media/
-│   ├── Sources/
-│   │   ├── MS_Shot001_FG
-│   │   ├── MS_Shot002_FG
-│   │   └── ... (50+ sources)
-│   ├── Players/
-│   │   ├── MP_Shot001_FG
-│   │   ├── MP_Shot002_FG
-│   │   └── ... (50+ players)
-│   └── Textures/
-│       ├── MT_Shot001_FG
-│       ├── MT_Shot002_FG
-│       └── ... (50+ textures)
-├── Materials/
-│   ├── M_ForegroundPlate_Master (ONE master)
-│   └── Instances/
-│       ├── MI_Shot001_FG
-│       ├── MI_Shot002_FG
-│       └── ... (50+ instances)
-└── Cameras/
-    ├── Cam_Shot001_FG
-    ├── Cam_Shot002_FG
-    └── ... (50+ cameras)
++-- Media/
+|   +-- Sources/
+|   |   +-- MS_Shot001_FG
+|   |   +-- MS_Shot002_FG
+|   |   +-- ... (50+ sources)
+|   +-- Players/
+|   |   +-- MP_Shot001_FG
+|   |   +-- MP_Shot002_FG
+|   |   +-- ... (50+ players)
+|   +-- Textures/
+|       +-- MT_Shot001_FG
+|       +-- MT_Shot002_FG
+|       +-- ... (50+ textures)
++-- Materials/
+|   +-- M_ForegroundPlate_Master (ONE master)
+|   +-- Instances/
+|       +-- MI_Shot001_FG
+|       +-- MI_Shot002_FG
+|       +-- ... (50+ instances)
++-- Cameras/
+    +-- Cam_Shot001_FG
+    +-- Cam_Shot002_FG
+    +-- ... (50+ cameras)
 ```
 
 **Folder Benefits:**
@@ -554,15 +554,15 @@ media_player.pause()
 **Manual Process:**
 ```
 1. Delete camera:
-   - World Outliner → Right-click Cam_Shot020_FG → Delete
+   - World Outliner -> Right-click Cam_Shot020_FG -> Delete
 
 2. Delete assets:
-   - Content Browser → Select all Shot020 assets:
+   - Content Browser -> Select all Shot020 assets:
      - MS_Shot020_FG
      - MP_Shot020_FG
      - MT_Shot020_FG
      - MI_Shot020_FG (keep master!)
-   - Right-click → Delete
+   - Right-click -> Delete
    - Fix Up Redirectors (important!)
 ```
 
@@ -584,17 +584,17 @@ def delete_shot(shot_name):
     # Delete each asset
     for asset_path in assets_to_delete:
         if unreal.EditorAssetLibrary.does_asset_exist(asset_path):
-            print(f"🗑️  Deleting {asset_path}")
+            print(f"  Deleting {asset_path}")
             unreal.EditorAssetLibrary.delete_asset(asset_path)
 
     # Delete camera actor
     camera_name = f"Cam_{shot_name}"
     camera = unreal.EditorLevelLibrary.get_actor_reference(camera_name)
     if camera:
-        print(f"🗑️  Deleting {camera_name}")
+        print(f"  Deleting {camera_name}")
         unreal.EditorLevelLibrary.destroy_actor(camera)
 
-    print(f"✅ {shot_name} deleted")
+    print(f"[OK] {shot_name} deleted")
 
 # Usage
 delete_shot("Shot020_FG")
@@ -606,7 +606,7 @@ delete_shot("Shot020_FG")
 
 ### Memory Management
 
-**Challenge:** 50 shots × 500MB each = 25GB memory usage
+**Challenge:** 50 shots x 500MB each = 25GB memory usage
 
 **Solution 1: Level Streaming**
 ```
@@ -615,7 +615,7 @@ Create level per shot group:
 - Level_Shots011-020 (10 cameras)
 - Level_Shots021-030 (10 cameras)
 
-Only load active level → 5GB memory instead of 25GB
+Only load active level -> 5GB memory instead of 25GB
 ```
 
 **Solution 2: MediaPlayer Pooling**
@@ -625,15 +625,15 @@ Only load active level → 5GB memory instead of 25GB
 
 # In Sequencer:
 # - Add Media Track
-# - Add Shot001 clip → Plays MP_Shot001_FG
-# - Add Shot002 clip → Plays MP_Shot002_FG
+# - Add Shot001 clip -> Plays MP_Shot001_FG
+# - Add Shot002 clip -> Plays MP_Shot002_FG
 # Only one player active at a time
 ```
 
 **Solution 3: Proxy Workflow**
 ```
-1080p proxy: ~100MB per shot × 50 = 5GB ✅
-4K full-res: ~500MB per shot × 50 = 25GB ❌
+1080p proxy: ~100MB per shot x 50 = 5GB [OK]
+4K full-res: ~500MB per shot x 50 = 25GB [FAIL]
 
 Use proxy during development, full-res only for final render
 ```
@@ -657,7 +657,7 @@ create_foreground_plate(
 
 **2. ImgMedia Cache Settings:**
 ```
-Edit → Project Settings → Plugins → ImgMedia
+Edit -> Project Settings -> Plugins -> ImgMedia
 - Cache Size: 2GB (increase from default 1GB)
 - Cache Mode: Behind + Ahead
 - Max Cache Size: 4GB
@@ -666,8 +666,8 @@ Edit → Project Settings → Plugins → ImgMedia
 **3. SSD Storage:**
 ```
 Move image sequences to SSD (not HDD)
-- HDD: ~100MB/s → 4K EXR = 12fps max
-- SSD: ~500MB/s → 4K EXR = 24fps+ ✅
+- HDD: ~100MB/s -> 4K EXR = 12fps max
+- SSD: ~500MB/s -> 4K EXR = 24fps+ [OK]
 ```
 
 ---
@@ -734,7 +734,7 @@ for shot_num in range(2, 51):
         master_material_path="/Game/Materials/M_ForegroundPlate_Master"
     )
 
-# Time: ~30 seconds for 50 shots ✅
+# Time: ~30 seconds for 50 shots [OK]
 ```
 
 **Week 1-2: Development (Proxy)**
@@ -755,11 +755,11 @@ for shot_num in range(2, 51):
 ```
 
 **Results:**
-- ✅ 50 shots set up in <1 minute (vs 8+ hours manual)
-- ✅ Consistent look across all shots (master material)
-- ✅ Per-shot adjustments where needed (material instances)
-- ✅ Smooth development workflow (proxy)
-- ✅ High-quality final renders (full-res)
+- [OK] 50 shots set up in <1 minute (vs 8+ hours manual)
+- [OK] Consistent look across all shots (master material)
+- [OK] Per-shot adjustments where needed (material instances)
+- [OK] Smooth development workflow (proxy)
+- [OK] High-quality final renders (full-res)
 
 ---
 
@@ -769,7 +769,7 @@ for shot_num in range(2, 51):
 
 **Symptom:**
 ```
-Changed Shot002 texture → Shot003 also changed ❌
+Changed Shot002 texture -> Shot003 also changed [FAIL]
 ```
 
 **Diagnosis:**
@@ -779,7 +779,7 @@ mi = unreal.load_asset("/Game/Materials/Instances/MI_Shot002_FG")
 parent = mi.get_editor_property('parent')
 
 if parent.get_name() != "M_ForegroundPlate_Master":
-    print("❌ ERROR: Not using master material pattern")
+    print("[FAIL] ERROR: Not using master material pattern")
 ```
 
 **Fix:**
@@ -797,12 +797,12 @@ create_foreground_plate(
 
 **Symptom:**
 ```
-Changed M_ForegroundPlate_Master → Instances didn't update ❌
+Changed M_ForegroundPlate_Master -> Instances didn't update [FAIL]
 ```
 
 **Diagnosis:**
 ```
-Instance has parameter override → Override takes precedence
+Instance has parameter override -> Override takes precedence
 ```
 
 **Fix:**
@@ -819,9 +819,9 @@ Instance has parameter override → Override takes precedence
 
 **Symptom:**
 ```
-Shots 1-15 created ✅
-Shot 16 failed ❌
-Shots 17-50 not created ❌
+Shots 1-15 created [OK]
+Shot 16 failed [FAIL]
+Shots 17-50 not created [FAIL]
 ```
 
 **Diagnosis:**
@@ -840,11 +840,11 @@ for shot_num in range(1, 51):
     try:
         result = create_foreground_plate(...)
         if result["success"]:
-            print(f"✅ Shot{shot_num:03d}")
+            print(f"[OK] Shot{shot_num:03d}")
         else:
-            print(f"❌ Shot{shot_num:03d}: {result['errors']}")
+            print(f"[FAIL] Shot{shot_num:03d}: {result['errors']}")
     except Exception as e:
-        print(f"❌ Shot{shot_num:03d}: {str(e)}")
+        print(f"[FAIL] Shot{shot_num:03d}: {str(e)}")
         continue  # Continue with next shot
 ```
 

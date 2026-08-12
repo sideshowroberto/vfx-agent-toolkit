@@ -18,12 +18,12 @@ ComfyUI/custom_nodes/
     pyproject.toml         # Package metadata
     README.md              # Documentation
     js/                    # Frontend extensions (optional)
-    │   └── my_extension.js
+    |   +-- my_extension.js
     docs/                  # Help pages (optional)
-    │   └── MyNode.md
+    |   +-- MyNode.md
     locales/               # i18n translations (optional)
-        └── zh/
-            └── main.json
+        +-- zh/
+            +-- main.json
 ```
 
 ## Entry Point: __init__.py

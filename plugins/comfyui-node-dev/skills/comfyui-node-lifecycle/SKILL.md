@@ -12,17 +12,17 @@ Understanding the execution lifecycle helps build efficient, correct nodes.
 ```
 1. Prompt received from frontend
 2. Validation phase
-   ├── Look up each node class
-   ├── Call INPUT_TYPES() / define_schema() for input specs
-   ├── Validate connections and types
-   └── Call validate_inputs() for each node
+   +-- Look up each node class
+   +-- Call INPUT_TYPES() / define_schema() for input specs
+   +-- Validate connections and types
+   +-- Call validate_inputs() for each node
 3. Build execution order (topological sort from output nodes)
 4. For each node in order:
-   ├── Cache check (fingerprint_inputs)
-   ├── Input resolution (get upstream values)
-   ├── Lazy evaluation (check_lazy_status)
-   ├── Execute function
-   └── Store outputs in cache
+   +-- Cache check (fingerprint_inputs)
+   +-- Input resolution (get upstream values)
+   +-- Lazy evaluation (check_lazy_status)
+   +-- Execute function
+   +-- Store outputs in cache
 5. Return results to frontend
 ```
 
@@ -69,9 +69,9 @@ class RandomNode(io.ComfyNode):
 **How caching works**:
 - Before execution, `fingerprint_inputs()` is called with the same args as `execute()`
 - Return value is compared to the previous run's return value
-- If **same** → skip execution, use cached output
-- If **different** → re-execute the node
-- If `fingerprint_inputs` is not defined → cache based on input values
+- If **same** -> skip execution, use cached output
+- If **different** -> re-execute the node
+- If `fingerprint_inputs` is not defined -> cache based on input values
 
 **V1 equivalent** (`IS_CHANGED`):
 ```python
@@ -94,7 +94,7 @@ io.Schema(
 
 ### has_intermediate_output Flag
 
-For nodes with interactive UI that produce intermediate outputs (e.g., Image Crop, Painter). These behave like output nodes (UI results are cached and resent to the frontend on page refresh) but do NOT automatically get added to the execution list — they only execute if on the dependency path of a real output node.
+For nodes with interactive UI that produce intermediate outputs (e.g., Image Crop, Painter). These behave like output nodes (UI results are cached and resent to the frontend on page refresh) but do NOT automatically get added to the execution list - they only execute if on the dependency path of a real output node.
 
 ```python
 io.Schema(
@@ -183,7 +183,7 @@ def check_lazy_status(cls, condition, value_a=None, value_b=None):
 
 ## Output Nodes
 
-Nodes with `is_output_node=True` are execution roots — ComfyUI traces backward from these:
+Nodes with `is_output_node=True` are execution roots - ComfyUI traces backward from these:
 
 ```python
 class SaveMyData(io.ComfyNode):
@@ -217,7 +217,7 @@ class SaveMyData(io.ComfyNode):
 
 ```python
 # V3: is_input_list=True in Schema (same as V1 INPUT_IS_LIST)
-# All inputs arrive as lists — including widget values like batch_size
+# All inputs arrive as lists - including widget values like batch_size
 # Widget values: use widget_value[0] to get the scalar
 # Shorter lists are padded by repeating the last value
 

@@ -14,7 +14,7 @@ metadata:
   author: "Iamemily2050 (@iamemily2050)"
   repository: "https://github.com/Emily2040/seedance-2.0"
   openclaw:
-    emoji: "🎬"
+    emoji: ""
     homepage: "https://github.com/Emily2040/seedance-2.0"
 ---
 
@@ -46,7 +46,7 @@ Load `[ref:anti-slop-lexicon]` for the extended replacement table.
 
 ## Filmable Test (Final Check)
 
-After rewriting, apply this gate: **could a cinematographer film this on a set?** If any phrase would not make sense as a direction to a DP, camera operator, or gaffer, it is still slop. Replace it with something physically achievable — a real camera move, a practical light source, a material behavior, or a timed action.
+After rewriting, apply this gate: **could a cinematographer film this on a set?** If any phrase would not make sense as a direction to a DP, camera operator, or gaffer, it is still slop. Replace it with something physically achievable - a real camera move, a practical light source, a material behavior, or a timed action.
 
 ## Output Contract
 

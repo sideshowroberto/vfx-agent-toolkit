@@ -18,16 +18,16 @@ allowed-tools: Read,Write
 ```python
 import bpy
 
-# ❌ OLD
+# [FAIL] OLD
 # space.shading.type = 'MATERIAL_PREVIEW'
 
-# ✅ NEW (4.5.0+)
+# [OK] NEW (4.5.0+)
 space.shading.type = 'MATERIAL'
 
 # Valid modes: 'WIREFRAME', 'SOLID', 'MATERIAL', 'RENDERED'
 ```
 
-**Sculpting operators require Blender context** — use the Blender MCP's `execute_blender_code` tool, which has full context. For high-resolution mesh deformation, direct vertex manipulation is more reliable than sculpt brush operators.
+**Sculpting operators require Blender context** - use the Blender MCP's `execute_blender_code` tool, which has full context. For high-resolution mesh deformation, direct vertex manipulation is more reliable than sculpt brush operators.
 
 ---
 
@@ -208,7 +208,7 @@ print(f'Vertex groups created. Height range: {min_h:.2f} to {max_h:.2f}')
 
 ### Workflow 3: Organic Model Base Creation
 
-**Pattern:** Create low-res base → Add Multires → Set up symmetry → Sculpt details
+**Pattern:** Create low-res base -> Add Multires -> Set up symmetry -> Sculpt details
 
 ```python
 import bpy
@@ -258,7 +258,7 @@ For fine-grained sculpt brushes, use Blender's Sculpt Mode UI. For scripted terr
 ```python
 import bpy
 
-# Direct vertex modification — always works
+# Direct vertex modification - always works
 mesh = bpy.data.objects['Terrain'].data
 for v in mesh.vertices:
     v.co.z += some_height_function(v.co.x, v.co.y)

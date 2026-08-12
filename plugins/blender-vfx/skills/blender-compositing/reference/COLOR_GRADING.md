@@ -422,7 +422,7 @@ scene.display_settings.display_device = 'sRGB'
 1. **Render in linear color space** (scene_linear)
 2. **Apply color grading in linear** (before view transform)
 3. **Output in appropriate color space** (sRGB for web, ACES for film)
-4. **Match color spaces across pipeline** (Blender → Nuke → final output)
+4. **Match color spaces across pipeline** (Blender -> Nuke -> final output)
 
 ---
 

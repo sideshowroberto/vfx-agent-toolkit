@@ -95,7 +95,7 @@ def create_offset_animation(obj, start_offset=(0,0,0), end_offset=(2,0,0),
     offset_mod.rotation = (0, 0, 0.5)  # 0.5 radians
     offset_mod.keyframe_insert(data_path='rotation', frame=end_frame)
 
-    print(f"Offset animation created: {start_offset} → {end_offset}")
+    print(f"Offset animation created: {start_offset} -> {end_offset}")
     return offset_mod
 
 # Example: Text sliding in from left
@@ -216,7 +216,7 @@ def animate_color_tint(obj, start_color=(1,1,1), end_color=(1,0,0),
     tint_mod.color = end_color
     tint_mod.keyframe_insert(data_path='color', frame=end_frame)
 
-    print(f"Color tint animation: {start_color} → {end_color}")
+    print(f"Color tint animation: {start_color} -> {end_color}")
     return tint_mod
 
 # Example: Character turns red when angry

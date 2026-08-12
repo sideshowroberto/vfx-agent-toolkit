@@ -11,13 +11,13 @@
 **Cause:** `setParameterRange()` does **not exist** in BlinkScript
 
 ```cpp
-// ❌ WRONG - This function doesn't exist!
+// [FAIL] WRONG - This function doesn't exist!
 void define() {
   defineParam(thickness, "Thickness", 2.0f);
   setParameterRange(thickness, 0.5f, 10.0f);  // ERROR!
 }
 
-// ✅ CORRECT - Just use defineParam
+// [OK] CORRECT - Just use defineParam
 void define() {
   defineParam(thickness, "Thickness", 7.0f);  // Set good default
 }
@@ -32,12 +32,12 @@ void define() {
 **Cause:** Parameter name conflicts (multiple params with same display name)
 
 ```cpp
-// ❌ WRONG - Name conflicts
+// [FAIL] WRONG - Name conflicts
 defineParam(colorThirds, "Colour", ...);   // Conflict!
 defineParam(colorGolden, "Colour", ...);   // Same name!
 defineParam(colorSpiral, "Colour", ...);   // Same name!
 
-// ✅ CORRECT - Unique names with prefixes
+// [OK] CORRECT - Unique names with prefixes
 defineParam(colorThirds, "Thirds Colour", ...);
 defineParam(colorGolden, "Golden Colour", ...);
 defineParam(colorSpiral, "Spiral Colour", ...);
@@ -50,7 +50,7 @@ defineParam(colorSpiral, "Spiral Colour", ...);
 **Cause:** float2 uses **pixel coordinates**, not normalized (0-1)
 
 ```cpp
-// ❌ WRONG - Treating as normalized
+// [FAIL] WRONG - Treating as normalized
 param:
   float2 center;
 
@@ -62,7 +62,7 @@ void init() {
   actualX = imgWidth * center.x;   // Multiplying normalized values
 }
 
-// ✅ CORRECT - Use pixel coordinates directly
+// [OK] CORRECT - Use pixel coordinates directly
 param:
   float2 center;
 
@@ -101,7 +101,7 @@ defineParam(spiralThickness, "Thickness", 15.0f); // Spirals need more
 **Always use prefixes** to avoid conflicts when multiple grids/effects use similar parameters:
 
 ```cpp
-// ✅ GOOD - Unique names
+// [OK] GOOD - Unique names
 defineParam(colorThirds, "Thirds Colour", ...);
 defineParam(thicknessThirds, "Thirds Thickness", ...);
 defineParam(colorSpiral, "Spiral Colour", ...);

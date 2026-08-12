@@ -15,24 +15,24 @@ The `create_foreground_plate()` automation replaces a manual 23-step process wit
 **What Artists Previously Had to Do:**
 
 ### Phase 1: Media Source Setup (5 steps)
-1. Content Browser → Right-click → Media → Img Media Source
+1. Content Browser -> Right-click -> Media -> Img Media Source
 2. Name the asset (MS_ShotName)
 3. Open ImgMediaSource
 4. Set Sequence Path to first frame (D:/Plates/Shot001/Shot001_*.exr)
 5. Configure frame rate and loop settings
 
 ### Phase 2: Media Player Setup (4 steps)
-6. Content Browser → Right-click → Media → Media Player
+6. Content Browser -> Right-click -> Media -> Media Player
 7. Check "Create Media Texture" checkbox
 8. Name assets (MP_ShotName, MT_ShotName)
-9. Open MediaPlayer → Set MediaSource → Click Play
+9. Open MediaPlayer -> Set MediaSource -> Click Play
 
 ### Phase 3: Material Creation (6 steps)
-10. Content Browser → Right-click → Material
+10. Content Browser -> Right-click -> Material
 11. Name material (M_ShotName)
 12. Open Material Editor
-13. Set Shading Model → Unlit
-14. Set Blend Mode → Masked (or Translucent)
+13. Set Shading Model -> Unlit
+14. Set Blend Mode -> Masked (or Translucent)
 15. Enable Two-Sided
 16. Create texture sampler node
 17. Connect MediaTexture to sampler
@@ -98,7 +98,7 @@ def create_foreground_plate(sequence_path, plate_name, ...):
 def create_img_media_source(sequence_path, proxy_path):
     # Parse file path to extract directory and pattern
     # D:/Plates/Shot001/Shot001_0001.exr
-    # → D:/Plates/Shot001/Shot001_*.exr
+    # -> D:/Plates/Shot001/Shot001_*.exr
 
     base_dir = os.path.dirname(sequence_path)
     file_name = os.path.basename(sequence_path)
@@ -130,15 +130,15 @@ def create_img_media_source(sequence_path, proxy_path):
 ```
 
 **Key Details:**
-- **Wildcard Pattern:** Converts `Shot001_0001.exr` → `Shot001_*.exr`
+- **Wildcard Pattern:** Converts `Shot001_0001.exr` -> `Shot001_*.exr`
 - **Proxy Support:** Uses subfolder if `proxy_path="lowres"` provided
 - **Asset Location:** Created at `/Game/Media/Sources/` by default
 - **Validation:** Checks that first frame exists before creating
 
 **Common Issues:**
-- If sequence_path doesn't exist → Error: "First frame not found"
-- If wildcard pattern wrong → MediaPlayer shows black frame
-- If frame rate mismatch → Playback speed incorrect
+- If sequence_path doesn't exist -> Error: "First frame not found"
+- If wildcard pattern wrong -> MediaPlayer shows black frame
+- If frame rate mismatch -> Playback speed incorrect
 
 ---
 
@@ -297,24 +297,24 @@ def create_material_instance(master_material_path, media_texture):
 **Master Material Pattern:**
 ```
 M_ForegroundPlate_Master (created once)
-├── Texture Parameter: PlateTexture
-├── Scalar Parameter: OpacityMultiplier
-├── Scalar Parameter: EmissiveMultiplier
-└── [Material graph with shared logic]
++-- Texture Parameter: PlateTexture
++-- Scalar Parameter: OpacityMultiplier
++-- Scalar Parameter: EmissiveMultiplier
++-- [Material graph with shared logic]
 
 MI_Shot001_FG (instance)
-├── PlateTexture = MT_Shot001_FG (OVERRIDDEN)
-├── OpacityMultiplier = 1.0 (inherited)
-└── EmissiveMultiplier = 1.0 (inherited)
++-- PlateTexture = MT_Shot001_FG (OVERRIDDEN)
++-- OpacityMultiplier = 1.0 (inherited)
++-- EmissiveMultiplier = 1.0 (inherited)
 
 MI_Shot002_FG (instance)
-├── PlateTexture = MT_Shot002_FG (OVERRIDDEN)
-├── OpacityMultiplier = 1.0 (inherited)
-└── EmissiveMultiplier = 1.0 (inherited)
++-- PlateTexture = MT_Shot002_FG (OVERRIDDEN)
++-- OpacityMultiplier = 1.0 (inherited)
++-- EmissiveMultiplier = 1.0 (inherited)
 ```
 
 **Benefits:**
-- Update master → All instances update
+- Update master -> All instances update
 - Texture changes isolated (Shot002 doesn't affect Shot003)
 - Scalable to 100+ shots
 - Consistent look across shots
@@ -390,9 +390,9 @@ def spawn_blueprint_camera(plate_name, material):
 - **Component hierarchy:**
   ```
   CineCameraActor
-  └── CineCameraComponent
-      └── ImagePlateComponent
-          └── ImagePlateFrustumComponent (auto-created)
+  +-- CineCameraComponent
+      +-- ImagePlateComponent
+          +-- ImagePlateFrustumComponent (auto-created)
   ```
 
 ---
@@ -413,8 +413,8 @@ def auto_play_media_player(media_player, media_source):
 ```
 
 **Playback Lifecycle:**
-1. `open_source()` → Loads first frame (~1-2 seconds for EXR)
-2. `play()` → Starts playback at real-time frame rate
+1. `open_source()` -> Loads first frame (~1-2 seconds for EXR)
+2. `play()` -> Starts playback at real-time frame rate
 3. MediaTexture updates every frame
 4. Material displays updated texture
 5. ImagePlate shows material in viewport
@@ -462,31 +462,31 @@ frame_rate = media_player.get_video_track_frame_rate(0, 0)
 **After Automation Completes:**
 
 1. **Content Browser Check:**
-   - ✅ MS_{plate_name} exists in /Game/Media/Sources/
-   - ✅ MP_{plate_name} exists in /Game/Media/Players/
-   - ✅ MT_{plate_name} exists in /Game/Media/Textures/
-   - ✅ M_{plate_name} or MI_{plate_name} exists in /Game/Materials/
-   - ✅ Cam_{plate_name} exists in World Outliner
+   - [OK] MS_{plate_name} exists in /Game/Media/Sources/
+   - [OK] MP_{plate_name} exists in /Game/Media/Players/
+   - [OK] MT_{plate_name} exists in /Game/Media/Textures/
+   - [OK] M_{plate_name} or MI_{plate_name} exists in /Game/Materials/
+   - [OK] Cam_{plate_name} exists in World Outliner
 
 2. **MediaPlayer Check:**
-   - ✅ Double-click MP_{plate_name} → Shows first frame
-   - ✅ Play button active (green)
-   - ✅ Timeline scrubbing works
-   - ✅ Loop enabled (if requested)
+   - [OK] Double-click MP_{plate_name} -> Shows first frame
+   - [OK] Play button active (green)
+   - [OK] Timeline scrubbing works
+   - [OK] Loop enabled (if requested)
 
 3. **Camera Check:**
-   - ✅ Select Cam_{plate_name} in Outliner
-   - ✅ Right-click → Pilot Camera Actor
-   - ✅ Viewport shows image sequence
-   - ✅ ImagePlate fills screen (FIT_TO_FRUSTUM mode)
+   - [OK] Select Cam_{plate_name} in Outliner
+   - [OK] Right-click -> Pilot Camera Actor
+   - [OK] Viewport shows image sequence
+   - [OK] ImagePlate fills screen (FIT_TO_FRUSTUM mode)
 
 4. **Material Check:**
-   - ✅ Open material/instance
-   - ✅ PlateTexture parameter = MT_{plate_name}
-   - ✅ OpacityMultiplier = expected value
-   - ✅ EmissiveMultiplier = expected value
-   - ✅ Blend mode = Masked or Translucent
-   - ✅ Two-Sided = True
+   - [OK] Open material/instance
+   - [OK] PlateTexture parameter = MT_{plate_name}
+   - [OK] OpacityMultiplier = expected value
+   - [OK] EmissiveMultiplier = expected value
+   - [OK] Blend mode = Masked or Translucent
+   - [OK] Two-Sided = True
 
 ---
 
@@ -523,9 +523,9 @@ def inspect_camera_components():
     # Check frustum component
     frustums = camera.get_components_by_class(unreal.ImagePlateFrustumComponent)
     if frustums:
-        print(f"✅ ImagePlateFrustumComponent present: {frustums[0].get_name()}")
+        print(f"[OK] ImagePlateFrustumComponent present: {frustums[0].get_name()}")
     else:
-        print("❌ WARNING: ImagePlateFrustumComponent missing")
+        print("[FAIL] WARNING: ImagePlateFrustumComponent missing")
 
 # Run diagnostic
 inspect_camera_components()
@@ -569,7 +569,7 @@ if not os.path.exists(sequence_path):
 
 **Case 2: Invalid Wildcard Pattern**
 ```python
-# Pattern must match: ShotName_0001.exr → ShotName_*.exr
+# Pattern must match: ShotName_0001.exr -> ShotName_*.exr
 # If pattern wrong: MediaPlayer loads but shows black
 ```
 
@@ -597,19 +597,19 @@ if not plugin_manager.is_plugin_enabled("ImagePlate"):
 **After Setup Completes:**
 
 1. **Adjust Material Parameters** (if needed):
-   - Content Browser → Find MI_{plate_name}
-   - Double-click → Material Instance Editor
+   - Content Browser -> Find MI_{plate_name}
+   - Double-click -> Material Instance Editor
    - Adjust OpacityMultiplier for ghosting (0.5 for alignment)
    - Adjust EmissiveMultiplier for brightness (2.0 for better visibility)
 
 2. **Switch Proxy to Full-Res** (when ready):
-   - Content Browser → Find MS_{plate_name}
+   - Content Browser -> Find MS_{plate_name}
    - Change Sequence Path from `/lowres/` to `/` (parent folder)
    - MediaPlayer automatically updates
 
 3. **Camera Animation** (optional):
    - Select Cam_{plate_name}
-   - Sequencer → Add Camera Track
+   - Sequencer -> Add Camera Track
    - Animate transform to match live-action camera move
 
 4. **Multi-Shot Setup** (if scaling):

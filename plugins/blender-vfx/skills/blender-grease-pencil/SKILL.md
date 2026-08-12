@@ -14,11 +14,11 @@ allowed-tools: Read,Write
 
 ## API Stability (5.1+)
 
-Core Grease Pencil API is stable across 4.x → 5.1:
-- `bpy.data.grease_pencils` — data creation
-- `gpencil.layers` — layer management
-- `layer.frames` — frame management
-- `frame.strokes` — stroke data
+Core Grease Pencil API is stable across 4.x -> 5.1:
+- `bpy.data.grease_pencils` - data creation
+- `gpencil.layers` - layer management
+- `layer.frames` - frame management
+- `frame.strokes` - stroke data
 - Material slots and properties
 
 ---
@@ -74,7 +74,7 @@ bpy.context.scene.collection.objects.link(obj)
 layer = gpencil.layers.new("DrawingLayer")
 layer.use_onion_skinning = True  # Enable onion skinning
 
-# Frame 1 — starting position
+# Frame 1 - starting position
 f1 = layer.frames.new(1)
 s1 = f1.strokes.new()
 s1.points.add(count=2)
@@ -82,7 +82,7 @@ s1.points[0].co = (0, 0, 0)
 s1.points[1].co = (1, 0, 0)
 s1.line_width = 10
 
-# Frame 12 — midpoint
+# Frame 12 - midpoint
 f12 = layer.frames.new(12)
 s12 = f12.strokes.new()
 s12.points.add(count=2)
@@ -90,7 +90,7 @@ s12.points[0].co = (0, 0.5, 0)
 s12.points[1].co = (1, 0.5, 0)
 s12.line_width = 10
 
-# Frame 24 — end position
+# Frame 24 - end position
 f24 = layer.frames.new(24)
 s24 = f24.strokes.new()
 s24.points.add(count=2)

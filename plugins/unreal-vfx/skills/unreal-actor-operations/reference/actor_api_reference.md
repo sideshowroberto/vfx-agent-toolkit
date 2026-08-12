@@ -24,7 +24,7 @@
 ### spawn_actor_from_class()
 
 **Module:** `unreal.EditorLevelLibrary`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 spawn_actor_from_class(actor_class, location, rotation) -> Actor
@@ -61,7 +61,7 @@ if actor is None:
 ### spawn_actor_from_object()
 
 **Module:** `unreal.EditorLevelLibrary`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 spawn_actor_from_object(object_to_use, location, rotation) -> Actor
@@ -96,7 +96,7 @@ actor = unreal.EditorLevelLibrary.spawn_actor_from_object(
 ### set_actor_location()
 
 **Module:** `unreal.EditorLevelLibrary`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 set_actor_location(actor, location, sweep) -> bool
@@ -128,7 +128,7 @@ success = unreal.EditorLevelLibrary.set_actor_location(
 ### set_actor_rotation()
 
 **Module:** `unreal.EditorLevelLibrary`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 set_actor_rotation(actor, rotation) -> bool
@@ -154,7 +154,7 @@ success = unreal.EditorLevelLibrary.set_actor_rotation(
 ### set_actor_scale3d()
 
 **Module:** `unreal.EditorLevelLibrary`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 **NOTE:** API is `set_actor_scale3d`, NOT `set_actor_scale`
 
@@ -186,7 +186,7 @@ success = unreal.EditorLevelLibrary.set_actor_scale3d(
 ### set_actor_location_and_rotation()
 
 **Module:** `unreal.EditorLevelLibrary`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 set_actor_location_and_rotation(actor, location, rotation) -> bool
@@ -218,7 +218,7 @@ success = unreal.EditorLevelLibrary.set_actor_location_and_rotation(
 ### set_actor_transform()
 
 **Module:** `unreal.EditorLevelLibrary`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 set_actor_transform(actor, transform) -> bool
@@ -252,7 +252,7 @@ success = unreal.EditorLevelLibrary.set_actor_transform(actor, transform)
 ### set_editor_property()
 
 **Module:** `unreal._ObjectBase` (available on all UObject instances)
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 actor.set_editor_property(property_name, value) -> bool
@@ -285,7 +285,7 @@ actor.set_editor_property('mobility', unreal.ComponentMobility.MOVABLE)
 ### get_editor_property()
 
 **Module:** `unreal._ObjectBase` (available on all UObject instances)
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 actor.get_editor_property(property_name) -> Any
@@ -319,7 +319,7 @@ root = actor.get_editor_property('root_component')
 ### get_all_level_actors()
 
 **Module:** `unreal.EditorLevelLibrary`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 get_all_level_actors() -> Array[Actor]
@@ -349,7 +349,7 @@ for actor in all_actors:
 ### get_selected_level_actors()
 
 **Module:** `unreal.EditorLevelLibrary`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 get_selected_level_actors() -> Array[Actor]
@@ -381,7 +381,7 @@ else:
 ### get_all_actors_of_class()
 
 **Module:** `unreal.GameplayStatics`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 get_all_actors_of_class(world_context, actor_class) -> Array[Actor]
@@ -418,7 +418,7 @@ print(f"Found {len(static_mesh_actors)} static mesh actors")
 ### get_component_by_class()
 
 **Module:** `unreal.Actor`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 actor.get_component_by_class(component_class) -> Component
@@ -452,7 +452,7 @@ else:
 ### get_components_by_class()
 
 **Module:** `unreal.Actor`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 actor.get_components_by_class(component_class) -> Array[Component]
@@ -486,7 +486,7 @@ for comp in mesh_components:
 ### load_asset()
 
 **Module:** `unreal`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 load_asset(asset_path) -> Object
@@ -519,7 +519,7 @@ bp_class = unreal.load_asset('/Game/Blueprints/BP_MyActor')
 ### get_asset()
 
 **Module:** `unreal.AssetRegistryHelpers`
-**Status:** ✅ VALIDATED
+**Status:** [OK] VALIDATED
 
 ```python
 get_asset(asset_path) -> AssetData
@@ -601,18 +601,18 @@ if label is None:
 
 | API | UE 5.5 | EditorLevelLibrary | EditorActorSubsystem | Notes |
 |-----|--------|-------------------|---------------------|-------|
-| `spawn_actor_from_class()` | ✅ | ✅ | ⚠️ | Subsystem variant not found in Python |
-| `spawn_actor_from_object()` | ✅ | ✅ | ❌ | EditorLevelLibrary only |
-| `set_actor_location()` | ✅ | ✅ | ❌ | EditorLevelLibrary only |
-| `set_actor_rotation()` | ✅ | ✅ | ❌ | EditorLevelLibrary only |
-| `set_actor_scale3d()` | ✅ | ✅ | ❌ | EditorLevelLibrary only |
-| `set_actor_transform()` | ✅ | ✅ | ❌ | EditorLevelLibrary only |
-| `get_all_level_actors()` | ✅ | ✅ | ✅ | Both subsystems work |
-| `get_selected_level_actors()` | ✅ | ✅ | ✅ | Both subsystems work |
-| `set_editor_property()` | ✅ | N/A | N/A | All UObject instances |
-| `get_editor_property()` | ✅ | N/A | N/A | All UObject instances |
-| `get_component_by_class()` | ✅ | N/A | N/A | Actor method |
-| `get_components_by_class()` | ✅ | N/A | N/A | Actor method |
+| `spawn_actor_from_class()` | [OK] | [OK] | [WARN] | Subsystem variant not found in Python |
+| `spawn_actor_from_object()` | [OK] | [OK] | [FAIL] | EditorLevelLibrary only |
+| `set_actor_location()` | [OK] | [OK] | [FAIL] | EditorLevelLibrary only |
+| `set_actor_rotation()` | [OK] | [OK] | [FAIL] | EditorLevelLibrary only |
+| `set_actor_scale3d()` | [OK] | [OK] | [FAIL] | EditorLevelLibrary only |
+| `set_actor_transform()` | [OK] | [OK] | [FAIL] | EditorLevelLibrary only |
+| `get_all_level_actors()` | [OK] | [OK] | [OK] | Both subsystems work |
+| `get_selected_level_actors()` | [OK] | [OK] | [OK] | Both subsystems work |
+| `set_editor_property()` | [OK] | N/A | N/A | All UObject instances |
+| `get_editor_property()` | [OK] | N/A | N/A | All UObject instances |
+| `get_component_by_class()` | [OK] | N/A | N/A | Actor method |
+| `get_components_by_class()` | [OK] | N/A | N/A | Actor method |
 
 ---
 

@@ -47,11 +47,11 @@ Blender's physics system provides realistic motion for:
 
 ```
 Scene
-└── Rigid Body World
-    ├── Simulation settings (gravity, steps, solver)
-    └── Objects
-        ├── Active objects (dynamic)
-        └── Passive objects (static collision)
++-- Rigid Body World
+    +-- Simulation settings (gravity, steps, solver)
+    +-- Objects
+        +-- Active objects (dynamic)
+        +-- Passive objects (static collision)
 ```
 
 ### Rigid Body World
@@ -214,18 +214,18 @@ obj.rigid_body.collision_shape = 'MESH'
 ### Shape Selection Guidelines
 
 ```python
-# Simple objects → Primitives
+# Simple objects -> Primitives
 cube.rigid_body.collision_shape = 'BOX'
 sphere.rigid_body.collision_shape = 'SPHERE'
 
-# Complex active objects → Convex Hull
+# Complex active objects -> Convex Hull
 rock.rigid_body.collision_shape = 'CONVEX_HULL'
 
-# Complex passive objects → Mesh
+# Complex passive objects -> Mesh
 terrain.rigid_body.type = 'PASSIVE'
 terrain.rigid_body.collision_shape = 'MESH'
 
-# Moving objects → Avoid MESH
+# Moving objects -> Avoid MESH
 moving_obstacle.rigid_body.type = 'ACTIVE'
 moving_obstacle.rigid_body.collision_shape = 'CONVEX_HULL'  # Not MESH
 ```
@@ -498,7 +498,7 @@ cloth_settings = cloth_mod.settings
 cloth_settings.quality = 5  # 1=fast, 10=accurate
 
 # Physical properties
-cloth_settings.mass = 0.3  # kg/m² (cotton ≈ 0.3)
+cloth_settings.mass = 0.3  # kg/m^2 (cotton ~ 0.3)
 cloth_settings.air_damping = 1.0  # Air resistance
 
 # Stiffness

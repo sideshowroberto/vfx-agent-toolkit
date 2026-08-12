@@ -74,10 +74,10 @@ for pin in node.input_pins:
     print(f"  {pin.properties.label}")
 
 # Output:
-#   In
-#   Projection Target
-#   Overrides
-#   ...
+# In
+# Projection Target
+# Overrides
+# ...
 ```
 
 ---
@@ -108,9 +108,9 @@ g.add_edge(n[5], unreal.Name("Out"), o, unreal.Name("Out"))
 ### Y-Pattern Layout (Dual Input Convergence)
 
 ```
-Get Spline (-600, -100) → Sampler (-300, -100) ┐
-                                                 ├→ Projection (0, 0) → Transform (300, 0) → Spawn (600, 0) → Output
-Get Landscape (-600, 100) ──────────────────────┘
+Get Spline (-600, -100) -> Sampler (-300, -100) +
+                                                 +-> Projection (0, 0) -> Transform (300, 0) -> Spawn (600, 0) -> Output
+Get Landscape (-600, 100) ----------------------+
 ```
 
 **Spacing:**
@@ -121,7 +121,7 @@ Get Landscape (-600, 100) ──────────────────
 ### Horizontal Layout (Linear Chain)
 
 ```
-Node1 (-400, 0) → Node2 (0, 0) → Node3 (400, 0)
+Node1 (-400, 0) -> Node2 (0, 0) -> Node3 (400, 0)
 ```
 
 **Use for:** Simple linear processing chains

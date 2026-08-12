@@ -61,18 +61,18 @@ When applying agent-skill templates:
 ## Critical Rules
 
 **DO:**
-- ✅ Follow template patterns exactly
-- ✅ Preserve working functionality
-- ✅ Create parameterized, reusable scripts
-- ✅ Document any deviations from template
-- ✅ Report ambiguities immediately
+- [OK] Follow template patterns exactly
+- [OK] Preserve working functionality
+- [OK] Create parameterized, reusable scripts
+- [OK] Document any deviations from template
+- [OK] Report ambiguities immediately
 
 **DON'T:**
-- ❌ Make architectural decisions (escalate to main Claude)
-- ❌ Add features beyond template scope
-- ❌ Create per-asset specific scripts
-- ❌ Skip validation steps
-- ❌ Assume - ask if unclear
+- [FAIL] Make architectural decisions (escalate to main Claude)
+- [FAIL] Add features beyond template scope
+- [FAIL] Create per-asset specific scripts
+- [FAIL] Skip validation steps
+- [FAIL] Assume - ask if unclear
 
 ## Output Format
 

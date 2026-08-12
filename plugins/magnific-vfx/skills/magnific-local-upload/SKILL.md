@@ -9,7 +9,7 @@ allowed-tools: mcp__magnific__creations_request_upload,mcp__magnific__creations_
 **Version:** 1.1.0
 **Last Updated:** 2026-06-09
 
-Handles the full pipeline: local folder → upload to Magnific → move to folder → use as generation references → download output to local folder.
+Handles the full pipeline: local folder -> upload to Magnific -> move to folder -> use as generation references -> download output to local folder.
 
 ---
 
@@ -18,20 +18,20 @@ Handles the full pipeline: local folder → upload to Magnific → move to folde
 Magnific does **not** accept file paths directly. Local files require a 3-step presigned upload:
 
 ```
-1. creations_request_upload(mimeType, count=N)  →  N presigned PUT URLs + temp paths
+1. creations_request_upload(mimeType, count=N)  ->  N presigned PUT URLs + temp paths
 2. Python: PUT each file's bytes to its directUploadUrl (GCS)
-3. creations_finalize_upload(uploads=[...paths])  →  creation identifiers
+3. creations_finalize_upload(uploads=[...paths])  ->  creation identifiers
 ```
 
-`creations_upload_file` is for host-attached files (ChatGPT-style uploads) — it does **not** work for local disk files. Always use the 3-step flow.
+`creations_upload_file` is for host-attached files (ChatGPT-style uploads) - it does **not** work for local disk files. Always use the 3-step flow.
 
 ---
 
 ## Critical: Use directUploadUrl, NOT proxyUploadUrl
 
 Each `creations_request_upload` response includes two PUT targets:
-- `directUploadUrl` — GCS (`storage.googleapis.com`) — **use this always**
-- `proxyUploadUrl` — Magnific proxy — **unreliable, returns 503/404 in batch operations**
+- `directUploadUrl` - GCS (`storage.googleapis.com`) - **use this always**
+- `proxyUploadUrl` - Magnific proxy - **unreliable, returns 503/404 in batch operations**
 
 Always PUT to `directUploadUrl`.
 
@@ -50,7 +50,7 @@ Always PUT to `directUploadUrl`.
 
 ---
 
-## Workflow 1 — Batch Upload from Folder
+## Workflow 1 - Batch Upload from Folder
 
 **Step 1: Scan folder with Glob**
 ```
@@ -63,7 +63,7 @@ creations_request_upload(mimeType="image/png", count=8)
 # Returns: { uploads: [ {directUploadUrl, path}, ... ] }
 ```
 
-Request the full batch count upfront — all URLs expire in 1 hour, so get them all before starting uploads.
+Request the full batch count upfront - all URLs expire in 1 hour, so get them all before starting uploads.
 
 **Step 3: Write and run a Python upload script**
 
@@ -118,11 +118,11 @@ creations_move(
 )
 ```
 
-`creations_finalize_upload` has no folder targeting — uploads land in root. Always call `creations_move` immediately after. See the `magnific-image-gen` skill for known folder references.
+`creations_finalize_upload` has no folder targeting - uploads land in root. Always call `creations_move` immediately after. See the `magnific-image-gen` skill for known folder references.
 
 ---
 
-## Workflow 2 — Single File Upload
+## Workflow 2 - Single File Upload
 
 For one file, use an inline heredoc instead of writing a script:
 
@@ -150,7 +150,7 @@ creations_finalize_upload(path="temp-files/<uuid>.jpg")
 
 ---
 
-## Workflow 3 — Generate with Uploaded Refs + Download
+## Workflow 3 - Generate with Uploaded Refs + Download
 
 **Generate:**
 ```python
@@ -169,10 +169,10 @@ images_generate(
 )
 ```
 
-**Wait — `creations_wait` returns the URL directly:**
+**Wait - `creations_wait` returns the URL directly:**
 ```python
 result = creations_wait(identifiers=["<id>"])
-# result.results[0].results.url  ← full-res URL, no need to call creations_get
+# result.results[0].results.url  <- full-res URL, no need to call creations_get
 ```
 
 Only call `creations_get` if you need metadata beyond the URL.
@@ -200,7 +200,7 @@ python -c "from PIL import Image; Image.open('result.png').convert('RGB').save('
 
 ---
 
-## Workflow 4 — Variations on a Generation
+## Workflow 4 - Variations on a Generation
 
 After a successful generation, run variations to explore looks:
 
@@ -208,7 +208,7 @@ After a successful generation, run variations to explore looks:
 images_variations(
     creationIdentifier="<id_of_successful_generation>",
     variationMode="custom",
-    prompt="Describe what to vary — lighting, mood, angle, etc.",
+    prompt="Describe what to vary - lighting, mood, angle, etc.",
     gridRows=2,
     gridCols=2,    # 2x2 = 4 tiles; max 9 total
     resolution="2k"
@@ -216,11 +216,11 @@ images_variations(
 # Returns a single creation identifier for the grid image
 ```
 
-Wait and download the same way as a generation. The grid is one image — pick a tile visually, then use it as an `image` reference in the next generation pass.
+Wait and download the same way as a generation. The grid is one image - pick a tile visually, then use it as an `image` reference in the next generation pass.
 
 ---
 
-## NSFW Filter — Action/Violence Content
+## NSFW Filter - Action/Violence Content
 
 Magnific's NSFW filter triggers on **style references** that contain:
 - Fighting, brawling, combat scenes
@@ -229,22 +229,22 @@ Magnific's NSFW filter triggers on **style references** that contain:
 
 **Workaround:** Use action/violence content as `image` type (composition) rather than `style`. The filter is stricter on style references. If NSFW keeps triggering, remove those refs from style and use only calm, photographic refs for style.
 
-For combat-sports / action content specifically — use the stills as `image` refs only, never `style`.
+For combat-sports / action content specifically - use the stills as `image` refs only, never `style`.
 
 ---
 
 ## Full Pipeline Summary
 
 ```
-1.  Glob local folder           → collect paths
-2.  creations_request_upload    → get N presigned URLs (count=N)
-3.  Write tmp/magnific_upload.py → pair files to directUploadUrls
-4.  python tmp/magnific_upload.py → PUT all files, collect OK paths
-5.  creations_finalize_upload   → batch finalize → get identifiers
-6.  creations_move              → move to target Magnific folder
-7.  images_generate             → use identifiers as references, folderReference for output
-8.  creations_wait              → poll until complete, get URL from results
-9.  urllib.request.urlretrieve  → download to local output folder
+1.  Glob local folder           -> collect paths
+2.  creations_request_upload    -> get N presigned URLs (count=N)
+3.  Write tmp/magnific_upload.py -> pair files to directUploadUrls
+4.  python tmp/magnific_upload.py -> PUT all files, collect OK paths
+5.  creations_finalize_upload   -> batch finalize -> get identifiers
+6.  creations_move              -> move to target Magnific folder
+7.  images_generate             -> use identifiers as references, folderReference for output
+8.  creations_wait              -> poll until complete, get URL from results
+9.  urllib.request.urlretrieve  -> download to local output folder
 10. WebP check + convert if needed
 ```
 
@@ -275,5 +275,5 @@ For combat-sports / action content specifically — use the stills as `image` re
 
 ## Related Skills
 
-- **`magnific-image-gen`** — generation workflow, model selection, folder map, upscaling, variations
-- **`magnific-video-gen`** — video generation with Magnific
+- **`magnific-image-gen`** - generation workflow, model selection, folder map, upscaling, variations
+- **`magnific-video-gen`** - video generation with Magnific

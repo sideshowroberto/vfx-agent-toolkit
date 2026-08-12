@@ -44,7 +44,7 @@ settings.comparison_source = unreal.PCGSelfPruningComparisonSource.BOUNDS
 **Connection Pattern:**
 ```python
 # Typical workflow
-surface_sampler → transform → self_pruning → bounds_modifier → difference
+surface_sampler -> transform -> self_pruning -> bounds_modifier -> difference
 ```
 
 **Use Cases:**
@@ -56,7 +56,7 @@ surface_sampler → transform → self_pruning → bounds_modifier → differenc
 ```python
 # Node 8 in PCG_forest_basic_v001
 # Large tree layer with self-pruning
-sampler → transform → self_pruning → bounds_modifier → difference → collapse → spawner
+sampler -> transform -> self_pruning -> bounds_modifier -> difference -> collapse -> spawner
 ```
 
 **Key Settings:**
@@ -87,7 +87,7 @@ settings.mode = unreal.PCGCollapseMode.AVERAGE  # Or FIRST, LAST, etc.
 **Connection Pattern:**
 ```python
 # Typical workflow
-difference → collapse → static_mesh_spawner
+difference -> collapse -> static_mesh_spawner
 ```
 
 **Use Cases:**
@@ -101,7 +101,7 @@ difference → collapse → static_mesh_spawner
 # Nodes 13, 19, 26, 28, 57
 
 # Pattern: Each vegetation layer collapses after difference
-difference → collapse → spawner
+difference -> collapse -> spawner
 ```
 
 **Collapse Modes:**
@@ -138,10 +138,10 @@ usage_settings.declaration_name = "SplineData"
 **Connection Pattern:**
 ```python
 # One source, multiple destinations
-source → named_reroute_declaration →
-  ├→ named_reroute_usage → branch_1
-  ├→ named_reroute_usage → branch_2
-  └→ named_reroute_usage → branch_3
+source -> named_reroute_declaration ->
+  +-> named_reroute_usage -> branch_1
+  +-> named_reroute_usage -> branch_2
+  +-> named_reroute_usage -> branch_3
 ```
 
 **Use Cases:**
@@ -156,10 +156,10 @@ source → named_reroute_declaration →
 # Nodes 35, 46, 47, 48: Usages
 
 # Pattern: Spline extents shared across filter operations
-spline_sampler → extents_modifier → named_reroute_declaration →
-  ├→ named_reroute_usage → filter_type (trees)
-  ├→ named_reroute_usage → filter_type (rocks)
-  └→ named_reroute_usage → filter_type (grass)
+spline_sampler -> extents_modifier -> named_reroute_declaration ->
+  +-> named_reroute_usage -> filter_type (trees)
+  +-> named_reroute_usage -> filter_type (rocks)
+  +-> named_reroute_usage -> filter_type (grass)
 ```
 
 **Workflow:**
@@ -198,7 +198,7 @@ settings.upper_bound = 1.0  # Maximum density threshold (0.0-1.0)
 **Connection Pattern:**
 ```python
 # Typical workflow
-collapse → density_filter → transform → spawner
+collapse -> density_filter -> transform -> spawner
 ```
 
 **Use Cases:**
@@ -212,11 +212,11 @@ collapse → density_filter → transform → spawner
 # 3 density levels from one undergrowth layer
 # Nodes 54, 55, 56
 
-# Pattern: Single source → 3 density variations
-collapse →
-  ├→ density_filter(0.2-0.4) → transform → spawner  # Sparse
-  ├→ density_filter(0.4-0.7) → transform → spawner  # Medium
-  └→ density_filter(0.7-1.0) → transform → spawner  # Dense
+# Pattern: Single source -> 3 density variations
+collapse ->
+  +-> density_filter(0.2-0.4) -> transform -> spawner  # Sparse
+  +-> density_filter(0.4-0.7) -> transform -> spawner  # Medium
+  +-> density_filter(0.7-1.0) -> transform -> spawner  # Dense
 ```
 
 **Density Ranges:**
@@ -224,7 +224,7 @@ collapse →
 - **Medium:** `lower_bound=0.4, upper_bound=0.7` (40-70% of points)
 - **Dense:** `lower_bound=0.7, upper_bound=1.0` (70-100% of points)
 
-**Key Insight:** Single source → 3 density variations = better performance than 3 separate surface samplers. Reduces computational cost while maintaining variety.
+**Key Insight:** Single source -> 3 density variations = better performance than 3 separate surface samplers. Reduces computational cost while maintaining variety.
 
 ---
 
@@ -247,7 +247,7 @@ settings.target_filter_type = unreal.PCGDataType.SPLINE  # Or VOLUME, POINT, etc
 **Connection Pattern:**
 ```python
 # Typical workflow
-named_reroute → filter_type → difference
+named_reroute -> filter_type -> difference
 ```
 
 **Use Cases:**
@@ -260,9 +260,9 @@ named_reroute → filter_type → difference
 # Nodes 35, 46, 47, 48
 
 # Pattern: Separate spline data for different exclusion layers
-named_reroute_usage → filter_by_type(SPLINE) → difference(trees)
-named_reroute_usage → filter_by_type(SPLINE) → difference(rocks)
-named_reroute_usage → filter_by_type(SPLINE) → difference(grass)
+named_reroute_usage -> filter_by_type(SPLINE) -> difference(trees)
+named_reroute_usage -> filter_by_type(SPLINE) -> difference(rocks)
+named_reroute_usage -> filter_by_type(SPLINE) -> difference(grass)
 ```
 
 **Filter Types:**
@@ -297,7 +297,7 @@ settings.scale_inheritance = unreal.PCGCopyPointsInheritanceMode.RELATIVE
 **Connection Pattern:**
 ```python
 # Typical workflow
-load_data_asset → copy_points(source) + spline_points(target) → transform → spawner
+load_data_asset -> copy_points(source) + spline_points(target) -> transform -> spawner
 ```
 
 **Use Cases:**
@@ -310,8 +310,8 @@ load_data_asset → copy_points(source) + spline_points(target) → transform �
 # Nodes 40, 41
 
 # Pattern: External asset integration
-load_data_asset → copy_points(source) +
-spline_points(target) → transform → spawner
+load_data_asset -> copy_points(source) +
+spline_points(target) -> transform -> spawner
 ```
 
 **Inheritance Modes:**
@@ -341,7 +341,7 @@ settings.data_asset = unreal.load_asset('/Game/PCG/ScatterPatterns/ForestPattern
 **Connection Pattern:**
 ```python
 # Typical workflow
-load_data_asset → copy_points → transform → spawner
+load_data_asset -> copy_points -> transform -> spawner
 ```
 
 **Use Cases:**
@@ -355,7 +355,7 @@ load_data_asset → copy_points → transform → spawner
 # Nodes 38, 39
 
 # Pattern: Reusable scatter template
-load_data_asset(forest_pattern) → copy_points → transform → spawner
+load_data_asset(forest_pattern) -> copy_points -> transform -> spawner
 ```
 
 **Workflow:**
@@ -394,7 +394,7 @@ settings.mode = unreal.PCGPointExtentsModifierMode.SET  # Or ADD, MULTIPLY
 **Connection Pattern:**
 ```python
 # Typical workflow
-spline_sampler → point_extents_modifier → filter/spawn
+spline_sampler -> point_extents_modifier -> filter/spawn
 ```
 
 **Use Cases:**
@@ -407,7 +407,7 @@ spline_sampler → point_extents_modifier → filter/spawn
 # Node 34
 
 # Pattern: Spline extents for exclusion control
-spline_sampler → point_extents_modifier → named_reroute_declaration
+spline_sampler -> point_extents_modifier -> named_reroute_declaration
 ```
 
 **Modifier Modes:**
@@ -431,22 +431,22 @@ These advanced nodes enable complex production patterns:
 
 **Multi-Layer Vegetation:**
 ```
-Surface Sampler → Self Pruning → Bounds Modifier → Difference → Collapse → Spawner
+Surface Sampler -> Self Pruning -> Bounds Modifier -> Difference -> Collapse -> Spawner
 ```
 
 **Density Variations:**
 ```
-Collapse → Density Filter (3 ranges) → Transform → Spawner (sparse/medium/dense)
+Collapse -> Density Filter (3 ranges) -> Transform -> Spawner (sparse/medium/dense)
 ```
 
 **External Asset Integration:**
 ```
-Load Data Asset → Copy Points + Spline → Transform → Spawner
+Load Data Asset -> Copy Points + Spline -> Transform -> Spawner
 ```
 
 **Graph Organization:**
 ```
-Source → Named Reroute Declaration → Named Reroute Usage (multiple branches)
+Source -> Named Reroute Declaration -> Named Reroute Usage (multiple branches)
 ```
 
 ---

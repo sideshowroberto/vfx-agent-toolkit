@@ -65,9 +65,9 @@
 **How to use:**
 1. Copy entire template to `.claude/skills/[skill-name]/`
 2. Search/replace placeholders:
-   - `{{SKILL_NAME}}` → Your skill name
-   - `{{TOOL_NAME}}` → Tool/application (Unreal, Blender, etc.)
-   - `{{WORKFLOW_TYPE}}` → Workflow type (export, compile, validate)
+   - `{{SKILL_NAME}}` -> Your skill name
+   - `{{TOOL_NAME}}` -> Tool/application (Unreal, Blender, etc.)
+   - `{{WORKFLOW_TYPE}}` -> Workflow type (export, compile, validate)
 3. Customize scripts for your workflow
 4. Test independently before agent integration
 5. Verify <500 lines SKILL.md

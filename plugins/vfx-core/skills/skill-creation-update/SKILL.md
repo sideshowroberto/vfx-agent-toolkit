@@ -28,18 +28,18 @@ python .claude\skills\skill-creation-update\scripts\create_skill.py houdini-hda-
 ```bash
 # Validate Claude Code skill
 python .claude\skills\skill-creation-update\scripts\validate_skill.py unreal-vfx-automation
-# Output: Article I: ✅ PASS, Article III: ✅ PASS (470 lines), Overall: ✅ PASS
+# Output: Article I: [OK] PASS, Article III: [OK] PASS (470 lines), Overall: [OK] PASS
 
 # Validate Agent OS standard
 python .claude\skills\skill-creation-update\scripts\validate_skill.py unreal-engine-standards --agent-os
-# Output: Agent OS Headers: ✅ PASS, Article III: ✅ PASS (414 lines), Overall: ✅ PASS
+# Output: Agent OS Headers: [OK] PASS, Article III: [OK] PASS (414 lines), Overall: [OK] PASS
 ```
 
 ### Test with Multiple Targets (Article I)
 ```bash
 python .claude\skills\skill-creation-update\scripts\test_skill.py unreal-vfx-automation \
   --targets Shot001,Shot002,Shot003
-# Output: 3/3 passed ✅, Article I: ✅ VALIDATED
+# Output: 3/3 passed [OK], Article I: [OK] VALIDATED
 ```
 
 ### Update Skill Version
@@ -47,7 +47,7 @@ python .claude\skills\skill-creation-update\scripts\test_skill.py unreal-vfx-aut
 python .claude\skills\skill-creation-update\scripts\update_skill.py unreal-vfx-automation \
   --version 1.1.0 \
   --changes "Added Sequencer integration"
-# Output: ✅ Updated to 1.1.0, ✅ Compliance maintained
+# Output: [OK] Updated to 1.1.0, [OK] Compliance maintained
 ```
 
 ---
@@ -91,16 +91,16 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py unreal-vfx-a
    python .claude\skills\skill-creation-update\scripts\validate_skill.py SKILL_NAME
    ```
 2. **Review report:**
-   - Article I: No hard-coded paths detected ✅
-   - Article III: 470 lines <500 ✅
-   - Article IV: Independent testing documented ✅
-   - Article VI: 70% context reduction ✅
-   - Article VIII: All sections present ✅
+   - Article I: No hard-coded paths detected [OK]
+   - Article III: 470 lines <500 [OK]
+   - Article IV: Independent testing documented [OK]
+   - Article VI: 70% context reduction [OK]
+   - Article VIII: All sections present [OK]
 3. **Address failures:**
    - Article I: Remove hard-coded paths, add params
    - Article III: Move details to reference docs
    - Article VIII: Add missing sections
-4. **Re-validate:** Run validate_skill.py again until ✅ PASS
+4. **Re-validate:** Run validate_skill.py again until [OK] PASS
 5. **Generate report:**
    ```bash
    python .claude\skills\skill-creation-update\scripts\validate_skill.py SKILL_NAME --report
@@ -121,10 +121,10 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py unreal-vfx-a
      --targets target1,target2,target3
    ```
 3. **Review results:**
-   - Test 1/3: target1 ✅ PASS (487ms)
-   - Test 2/3: target2 ✅ PASS (502ms)
-   - Test 3/3: target3 ✅ PASS (495ms)
-   - Article I: ✅ VALIDATED
+   - Test 1/3: target1 [OK] PASS (487ms)
+   - Test 2/3: target2 [OK] PASS (502ms)
+   - Test 3/3: target3 [OK] PASS (495ms)
+   - Article I: [OK] VALIDATED
 4. **Address failures:** Fix script bugs if any target fails
 5. **Document testing:** Add to Constitutional Compliance section
 
@@ -169,7 +169,7 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py unreal-vfx-a
 
 ### Issue 1: "Skill Already Exists"
 
-**Symptom:** `❌ Error: Skill 'skill-name' already exists`
+**Symptom:** `[FAIL] Error: Skill 'skill-name' already exists`
 
 **Fix:**
 ```bash
@@ -185,7 +185,7 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py skill-name -
 
 ### Issue 2: "SKILL.md >500 Lines"
 
-**Symptom:** `Article III: ❌ FAIL - SKILL.md: 547 lines (>500 limit)`
+**Symptom:** `Article III: [FAIL] FAIL - SKILL.md: 547 lines (>500 limit)`
 
 **Fix:**
 1. **Identify verbose sections:**
@@ -193,8 +193,8 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py skill-name -
    grep -n "^## " .claude/skills/SKILL_NAME/SKILL.md
    ```
 2. **Move detailed content to reference:**
-   - Troubleshooting too long (200 lines)? → Move to `reference/troubleshooting_guide.md`, keep 4-5 issues (50 lines)
-   - Workflows too detailed (300 lines)? → Move to `reference/detailed_workflow.md`, keep summaries (150 lines)
+   - Troubleshooting too long (200 lines)? -> Move to `reference/troubleshooting_guide.md`, keep 4-5 issues (50 lines)
+   - Workflows too detailed (300 lines)? -> Move to `reference/detailed_workflow.md`, keep summaries (150 lines)
 3. **Add references:**
    ```markdown
    **For complete troubleshooting:** See reference/troubleshooting_guide.md
@@ -202,33 +202,33 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py skill-name -
 4. **Re-validate:**
    ```bash
    python .claude\skills\skill-creation-update\scripts\validate_skill.py SKILL_NAME
-   # Should show: Article III: ✅ PASS
+   # Should show: Article III: [OK] PASS
    ```
 
 ---
 
 ### Issue 3: "Hard-Coded Paths Detected"
 
-**Symptom:** `Article I: ❌ FAIL - Hard-coded paths in scripts/export.py`
+**Symptom:** `Article I: [FAIL] FAIL - Hard-coded paths in scripts/export.py`
 
 **Fix:**
 ```python
-# ❌ WRONG
+# [FAIL] WRONG
 project_path = "C:\\Users\\Me\\UnrealProjects\\MyProject"
 
-# ✅ CORRECT: Parameterized
+# [OK] CORRECT: Parameterized
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--project-path", required=True)
 args = parser.parse_args()
 project_path = args.project_path
 
-# ✅ CORRECT: Relative
+# [OK] CORRECT: Relative
 import os
 script_dir = os.path.dirname(__file__)
 project_path = os.path.join(script_dir, "..", "..", "Projects", "MyProject")
 
-# ✅ CORRECT: Environment variable
+# [OK] CORRECT: Environment variable
 project_path = os.getenv("UNREAL_PROJECT_PATH", "DefaultPath")
 ```
 
@@ -236,7 +236,7 @@ project_path = os.getenv("UNREAL_PROJECT_PATH", "DefaultPath")
 
 ### Issue 4: "No Script Found" (Test Fails)
 
-**Symptom:** `❌ Error: No executable script found in scripts/`
+**Symptom:** `[FAIL] Error: No executable script found in scripts/`
 
 **Fix:**
 - **Documentation-only skills:** Skip test_skill.py (not applicable)
@@ -260,15 +260,15 @@ project_path = os.getenv("UNREAL_PROJECT_PATH", "DefaultPath")
 
   skill_md = os.path.join(os.path.dirname(__file__), "..", "SKILL.md")
   if not os.path.exists(skill_md):
-      print("❌ SKILL.md not found")
+      print("[FAIL] SKILL.md not found")
       sys.exit(1)
 
   with open(skill_md) as f:
       if len(f.readlines()) > 500:
-          print("❌ SKILL.md >500 lines")
+          print("[FAIL] SKILL.md >500 lines")
           sys.exit(1)
 
-  print("✅ Valid")
+  print("[OK] Valid")
   sys.exit(0)
   ```
 
@@ -294,57 +294,57 @@ project_path = os.getenv("UNREAL_PROJECT_PATH", "DefaultPath")
 
 ## Constitutional Compliance
 
-### Article I: General Purpose Scripts ✅
+### Article I: General Purpose Scripts [OK]
 - create_skill.py works for ALL skill types (tested: vfx-documentation, unreal-vfx-automation, agent-creation-update)
 - validate_skill.py validates ANY skill (no hard-coded skill names)
 - test_skill.py tests ANY skill with scripts
 - No per-skill script generation
 
-### Article II: MCP vs Direct ✅
-- Complex workflows → Direct Python scripts (not MCP tools)
+### Article II: MCP vs Direct [OK]
+- Complex workflows -> Direct Python scripts (not MCP tools)
 - Multi-step processes (creation, validation, testing)
 - Skill-specific logic (constitutional rules, line counting)
 
-### Article III: Progressive Disclosure ✅
-- SKILL.md: 465 lines (<500 limit ✅)
+### Article III: Progressive Disclosure [OK]
+- SKILL.md: 465 lines (<500 limit [OK])
 - Margin: 35 lines (7% buffer)
 - Reference docs: 2 files (on-demand loading)
 
-### Article IV: Test Independently ✅
+### Article IV: Test Independently [OK]
 - create_skill.py tested with test-skill (deleted after)
 - validate_skill.py tested against all existing skills
 - test_skill.py tested with unreal-vfx-automation
 - update_skill.py tested with version increments
 
-### Article V: Follow Official Patterns ✅
+### Article V: Follow Official Patterns [OK]
 - Python argparse (Python standard)
 - JSON output (industry standard)
 - Semantic versioning (SemVer 2.0)
 - Markdown docs (GitHub standard)
 
-### Article VI: Context Efficiency ✅
+### Article VI: Context Efficiency [OK]
 **Context Reduction:**
 ```
 Before: VFX_SKILL_CONSTITUTION (862) + VFX_SKILL_TEMPLATE (350) + VFX_AGENT_SKILLS_GUIDE (500) = 1,712 lines (~8,560 tokens)
 After: Metadata (12) + SKILL.md (465) + Reference avg (300) = ~777 lines (3,885 tokens)
-Savings: 73% reduction ✅
+Savings: 73% reduction [OK]
 ```
 
-### Article VII: Cross-App Integration ⊘
+### Article VII: Cross-App Integration [SKIP]
 Not applicable (skill management tool, not cross-app workflow)
 
-### Article VIII: Documentation Standards ✅
-- ✅ YAML frontmatter (name, description, triggers, model)
-- ✅ Version/Last Updated/Dependencies
-- ✅ Quick Start (4 workflows)
-- ✅ Standard Workflows (4 detailed)
-- ✅ Troubleshooting (4 issues)
-- ✅ Reference Documentation (2 guides)
-- ✅ Constitutional Compliance (applicable articles)
-- ✅ Version History (SemVer)
-- ✅ Description formula: What + When + Triggers
+### Article VIII: Documentation Standards [OK]
+- [OK] YAML frontmatter (name, description, triggers, model)
+- [OK] Version/Last Updated/Dependencies
+- [OK] Quick Start (4 workflows)
+- [OK] Standard Workflows (4 detailed)
+- [OK] Troubleshooting (4 issues)
+- [OK] Reference Documentation (2 guides)
+- [OK] Constitutional Compliance (applicable articles)
+- [OK] Version History (SemVer)
+- [OK] Description formula: What + When + Triggers
 
-### Article IX: Agent Versioning ⊘
+### Article IX: Agent Versioning [SKIP]
 Not applicable (this is a skill, uses directory structure)
 
 ---

@@ -21,25 +21,25 @@ Reads a workflow JSON and produces a complete setup checklist: custom nodes to i
 
 ## Instructions
 
-### Step 1 — Read the workflow JSON
+### Step 1 - Read the workflow JSON
 
 Read the file and extract all unique `class_type` values from the nodes array.
 
-### Step 2 — Separate built-in vs custom nodes
+### Step 2 - Separate built-in vs custom nodes
 
 **Built-in nodes** (no install needed) include:
 `KSampler`, `CLIPTextEncode`, `VAEDecode`, `VAEEncode`, `CheckpointLoaderSimple`, `LoraLoader`, `ControlNetLoader`, `ImageScale`, `SaveImage`, `PreviewImage`, `LoadImage`, `EmptyLatentImage`, `LatentUpscale`, `ConditioningCombine`, `ConditioningSetArea`, `CLIPSetLastLayer`, `UNETLoader`, `DualCLIPLoader`, `VAELoader`, `FluxGuidance`, `ModelSamplingFlux`, `BasicGuider`, `BasicScheduler`, `SamplerCustomAdvanced`, `RandomNoise`, `CFGGuider`
 
 Everything else is likely a **custom node**.
 
-### Step 3 — Map custom nodes to repos
+### Step 3 - Map custom nodes to repos
 
 Most follow the pattern `ComfyUI-RepoName` or similar. For each custom node class:
 - Identify the likely repo name from the class prefix/naming
 - Check if it matches any of the user's already-installed nodes in `<ComfyUI install>\custom_nodes\`
 - Note whether it needs to be installed via ComfyUI Manager
 
-### Step 4 — Extract model references
+### Step 4 - Extract model references
 
 Scan node inputs for model filename references (`.safetensors`, `.ckpt`, `.pt`, `.onnx`, `.bin`).
 Map each to the correct models subfolder:
@@ -57,7 +57,7 @@ Map each to the correct models subfolder:
 
 Models root: `<ComfyUI install>\models\`
 
-### Step 5 — Output a setup checklist
+### Step 5 - Output a setup checklist
 
 Format the result as:
 
@@ -65,7 +65,7 @@ Format the result as:
 ## Workflow: [filename]
 
 ### Custom Nodes to Install (via ComfyUI Manager)
-- [ ] ComfyUI-ExampleNode — search "ExampleNode" in Manager
+- [ ] ComfyUI-ExampleNode - search "ExampleNode" in Manager
 - [ ] ...
 
 ### Already Installed
@@ -73,8 +73,8 @@ Format the result as:
 - ...
 
 ### Models Needed
-- [ ] flux1-dev.safetensors → models/checkpoints/
-- [ ] ae.safetensors → models/vae/
+- [ ] flux1-dev.safetensors -> models/checkpoints/
+- [ ] ae.safetensors -> models/vae/
 - ...
 
 ### Models Already Present
@@ -87,5 +87,5 @@ Format the result as:
 
 - ComfyUI Manager is the easiest install path for custom nodes
 - If a node repo is unknown, search for the class_type name on GitHub or Civitai
-- Model download sources vary — Hugging Face, Civitai, or project GitHub releases
+- Model download sources vary - Hugging Face, Civitai, or project GitHub releases
 - After installing custom nodes, ComfyUI needs a restart to load them

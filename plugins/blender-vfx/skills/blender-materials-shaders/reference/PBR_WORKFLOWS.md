@@ -252,12 +252,12 @@ print(f"Material '{material_name}' created with {len(tex_nodes)} textures")
 
 **Node Layout:**
 ```
-TexCoord → Mapping → [All Texture Nodes]
-                           ↓
-Base Color ─┐         Normal → NormalMap ─┐
-AO ─────────┴→ Mix →                      ├→ Bump → BSDF → Output
-Roughness ───────────────────────────────→│
-Height ──────────────────────────────────→┘
+TexCoord -> Mapping -> [All Texture Nodes]
+                           v
+Base Color -+         Normal -> NormalMap -+
+AO ---------+-> Mix ->                      +-> Bump -> BSDF -> Output
+Roughness -------------------------------->|
+Height ----------------------------------->+
 ```
 
 ---
@@ -429,7 +429,7 @@ links.new(bsdf.outputs['BSDF'], output.inputs['Surface'])
 
 **Mapping Parameters:**
 - **Location:** Offset texture (0.5 = 50% shift)
-- **Rotation:** Rotate texture (radians: 1.5708 = 90°)
+- **Rotation:** Rotate texture (radians: 1.5708 = 90 deg)
 - **Scale:** Tile count (2.0 = 2x2 tiles)
 
 ---
@@ -698,7 +698,7 @@ if mat and mat.use_nodes:
         links.new(metallic_tex.outputs['Color'], sep_metal.inputs['Color'])
         links.new(roughness_tex.outputs['Color'], sep_rough.inputs['Color'])
 
-        # Metallic → RGB, Smoothness (1-Roughness) → Alpha
+        # Metallic -> RGB, Smoothness (1-Roughness) -> Alpha
         links.new(sep_metal.outputs['Red'], combine.inputs['Red'])
         links.new(sep_metal.outputs['Red'], combine.inputs['Green'])
         links.new(sep_metal.outputs['Red'], combine.inputs['Blue'])

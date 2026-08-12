@@ -26,12 +26,12 @@ Known constraints and workarounds for PCG Python API in Unreal Engine 5.4+.
 ### What Was Removed in UE 5.4
 
 **Removed Classes:**
-- ❌ `PCGStaticMeshSpawnerEntry` - Completely removed
-- ❌ `meshes` property on `PCGStaticMeshSpawnerSettings` - Completely removed
+- [FAIL] `PCGStaticMeshSpawnerEntry` - Completely removed
+- [FAIL] `meshes` property on `PCGStaticMeshSpawnerSettings` - Completely removed
 
 **Example of Removed API:**
 ```python
-# ❌ THIS DOESN'T WORK IN UE 5.4+
+# [FAIL] THIS DOESN'T WORK IN UE 5.4+
 
 # Old pattern (pre-5.4):
 mesh_entry = unreal.PCGStaticMeshSpawnerEntry()  # Class doesn't exist!
@@ -45,8 +45,8 @@ spawner_settings.meshes = [mesh_entry]  # Property doesn't exist!
 
 **What's Available:**
 ```python
-spawner_settings.mesh_selector_type          # Read-Write ✅
-spawner_settings.mesh_selector_parameters    # Read-Only ❌
+spawner_settings.mesh_selector_type          # Read-Write [OK]
+spawner_settings.mesh_selector_parameters    # Read-Only [FAIL]
 ```
 
 **Why It Doesn't Work:**
@@ -64,13 +64,13 @@ graph = unreal.load_asset('/Game/PCG/MyGraph')
 spawner_settings = graph.nodes[4].get_settings()
 
 # Read mesh selector type
-print(spawner_settings.mesh_selector_type)  # Works ✅
+print(spawner_settings.mesh_selector_type)  # Works [OK]
 
 # Read mesh selector parameters
-print(spawner_settings.mesh_selector_parameters)  # Works ✅
+print(spawner_settings.mesh_selector_parameters)  # Works [OK]
 
 # Try to modify mesh selector parameters
-spawner_settings.mesh_selector_parameters = new_value  # Fails! ❌
+spawner_settings.mesh_selector_parameters = new_value  # Fails! [FAIL]
 # AttributeError: attribute 'mesh_selector_parameters' of 'PCGStaticMeshSpawnerSettings' object is not writable
 ```
 
@@ -86,7 +86,7 @@ Since Python API can't configure mesh entries, use this two-phase workflow:
 ```python
 import unreal
 
-# ✅ Create graph structure
+# [OK] Create graph structure
 graph = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
     asset_name="PCG_MyGraph",
     package_path="/Game/PCG",
@@ -94,24 +94,24 @@ graph = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
     factory=unreal.PCGGraphFactory()
 )
 
-# ✅ Add nodes
+# [OK] Add nodes
 get_landscape, _ = graph.add_node_of_type(unreal.PCGGetLandscapeSettings)
 surface_sampler, _ = graph.add_node_of_type(unreal.PCGSurfaceSamplerSettings)
 transform, _ = graph.add_node_of_type(unreal.PCGTransformPointsSettings)
 mesh_spawner, _ = graph.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
 
-# ✅ Position nodes
+# [OK] Position nodes
 get_landscape.set_node_position(-600, 0)
 surface_sampler.set_node_position(-300, 0)
 transform.set_node_position(0, 0)
 mesh_spawner.set_node_position(300, 0)
 
-# ✅ Connect nodes
+# [OK] Connect nodes
 graph.add_edge(get_landscape, unreal.Name("Out"), surface_sampler, unreal.Name("Surface"))
 graph.add_edge(surface_sampler, unreal.Name("Out"), transform, unreal.Name("In"))
 graph.add_edge(transform, unreal.Name("Out"), mesh_spawner, unreal.Name("In"))
 
-# ✅ Configure Transform Points (scale/rotation randomization)
+# [OK] Configure Transform Points (scale/rotation randomization)
 transform_settings = transform.get_settings()
 transform_settings.rotation_min = unreal.Rotator(0, 0, 0)
 transform_settings.rotation_max = unreal.Rotator(0, 360, 0)
@@ -125,9 +125,9 @@ transform_settings.scale_max = unreal.Vector(1.2, 1.2, 1.2)
 ```
 1. Open PCG graph in Unreal Editor
 2. Click on Surface Sampler node
-3. Details panel → Points Per Squared Meter → Set density (e.g., 1.0)
+3. Details panel -> Points Per Squared Meter -> Set density (e.g., 1.0)
 4. Click on Static Mesh Spawner node
-5. Details panel → Mesh Selector → Mesh Entries → Click "+"
+5. Details panel -> Mesh Selector -> Mesh Entries -> Click "+"
 6. Select mesh from asset browser (e.g., /Engine/BasicShapes/Cube)
 7. Set weight (e.g., 1.0)
 8. Add more meshes if desired
@@ -135,7 +135,7 @@ transform_settings.scale_max = unreal.Vector(1.2, 1.2, 1.2)
 ```
 
 **UI Configuration Screenshot Location:**
-- Mesh Spawner → Details → Mesh Selector → Mesh Entries array
+- Mesh Spawner -> Details -> Mesh Selector -> Mesh Entries array
 
 ---
 
@@ -143,7 +143,7 @@ transform_settings.scale_max = unreal.Vector(1.2, 1.2, 1.2)
 
 ### Attempt 1: Create Mesh Entries Programmatically
 ```python
-# ❌ FAILED
+# [FAIL] FAILED
 mesh_entry = unreal.PCGStaticMeshSpawnerEntry()
 # AttributeError: module 'unreal' has no attribute 'PCGStaticMeshSpawnerEntry'
 ```
@@ -151,7 +151,7 @@ mesh_entry = unreal.PCGStaticMeshSpawnerEntry()
 
 ### Attempt 2: Set meshes Property
 ```python
-# ❌ FAILED
+# [FAIL] FAILED
 spawner_settings.meshes = [...]
 # AttributeError: 'PCGStaticMeshSpawnerSettings' object has no attribute 'meshes'
 ```
@@ -159,7 +159,7 @@ spawner_settings.meshes = [...]
 
 ### Attempt 3: Modify mesh_selector_parameters
 ```python
-# ❌ FAILED
+# [FAIL] FAILED
 spawner_settings.mesh_selector_parameters = new_params
 # AttributeError: attribute 'mesh_selector_parameters' of 'PCGStaticMeshSpawnerSettings' object is not writable
 ```
@@ -167,7 +167,7 @@ spawner_settings.mesh_selector_parameters = new_params
 
 ### Attempt 4: Use Deprecated API
 ```python
-# ❌ FAILED
+# [FAIL] FAILED
 spawner_settings.set_editor_property('meshes', [...])
 # RuntimeError: Property 'meshes' not found
 ```
@@ -175,7 +175,7 @@ spawner_settings.set_editor_property('meshes', [...])
 
 ### Attempt 5: Direct Mesh Assignment
 ```python
-# ❌ FAILED
+# [FAIL] FAILED
 mesh = unreal.load_asset('/Engine/BasicShapes/Cube')
 spawner_settings.mesh = mesh
 # AttributeError: 'PCGStaticMeshSpawnerSettings' object has no attribute 'mesh'
@@ -192,21 +192,21 @@ While `PCGGetLandscapeSettings` node can be created via Python, some configurati
 
 ### What Works
 ```python
-# ✅ Create node
+# [OK] Create node
 get_landscape, settings = graph.add_node_of_type(unreal.PCGGetLandscapeSettings)
 
-# ✅ Basic configuration works
+# [OK] Basic configuration works
 settings.set_editor_property('get_height', True)
 settings.set_editor_property('get_layer_weights', False)
 ```
 
 ### What's Limited
 ```python
-# ⚠️ May not stick - requires verification
+# [WARN] May not stick - requires verification
 # Layer weight configuration often needs UI
 settings.set_editor_property('landscape_layer', "MyLayer")
 
-# ⚠️ Verify this property stuck
+# [WARN] Verify this property stuck
 graph = unreal.load_asset('/Game/PCG/MyGraph')
 read_back = graph.nodes[0].get_settings().get_editor_property('landscape_layer')
 print(f"Verified: {read_back}")
@@ -299,17 +299,17 @@ spawner_settings.configure_mesh_entries([
 ## Summary
 
 **What Python CAN'T Do:**
-- ❌ Configure mesh spawner mesh entries
-- ❌ Modify mesh_selector_parameters
-- ❌ Set specific landscape layers (unreliable)
+- [FAIL] Configure mesh spawner mesh entries
+- [FAIL] Modify mesh_selector_parameters
+- [FAIL] Set specific landscape layers (unreliable)
 
 **What Python CAN Do:**
-- ✅ Create complete graph structure
-- ✅ Add all node types
-- ✅ Connect nodes
-- ✅ Position nodes
-- ✅ Configure basic numeric properties
-- ✅ Configure Transform Points (scale/rotation)
+- [OK] Create complete graph structure
+- [OK] Add all node types
+- [OK] Connect nodes
+- [OK] Position nodes
+- [OK] Configure basic numeric properties
+- [OK] Configure Transform Points (scale/rotation)
 
 **Required Hybrid Workflow:**
 - Python: Automate graph structure (80%)

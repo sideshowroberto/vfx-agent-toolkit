@@ -20,7 +20,7 @@ import bpy
 # Render engine (5.1+)
 bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT'  # Not 'BLENDER_EEVEE'
 
-# Principled BSDF input names changed in 4.5.0 — use names not indices
+# Principled BSDF input names changed in 4.5.0 - use names not indices
 bsdf.inputs['Transmission Weight'].default_value = 1.0  # was 'Transmission'
 bsdf.inputs['Subsurface Weight'].default_value = 0.2    # was 'Subsurface'
 bsdf.inputs['Emission Color'].default_value = (1,1,1,1) # was 'Emission'
@@ -215,7 +215,7 @@ if engine == 'BLENDER_EEVEE_NEXT':
     mat.refraction_depth = 0.1
     # Real-time: avoid expensive SSS and volumetrics unless needed
 else:  # CYCLES
-    # Full ray tracing — enable SSS, caustics, etc.
+    # Full ray tracing - enable SSS, caustics, etc.
     bsdf.inputs['Subsurface Weight'].default_value = 0.1
     bsdf.inputs['Subsurface Radius'].default_value = (0.1, 0.05, 0.03)
 ```
@@ -240,9 +240,9 @@ for area in bpy.context.screen.areas:
 ### Shader Socket AttributeError
 
 ```python
-# 'NodeSocketShader' has no default_value — it only accepts links
-# ❌ bsdf.outputs['BSDF'].default_value = ...
-# ✅ Just connect it:
+# 'NodeSocketShader' has no default_value - it only accepts links
+# [FAIL] bsdf.outputs['BSDF'].default_value = ...
+# [OK] Just connect it:
 links.new(bsdf.outputs['BSDF'], output.inputs['Surface'])
 ```
 

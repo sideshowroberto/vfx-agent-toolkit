@@ -37,25 +37,25 @@ The VFX_SKILL_TEMPLATE.md provides a standardized structure for creating Agent S
 
 ```markdown
 YAML Frontmatter (4 lines)
-  ↓
+  v
 Critical First Step (20 lines)
-  ↓
+  v
 Quick Start (80 lines)
-  ↓
+  v
 Standard Workflows (120 lines) - 3 workflows recommended
-  ↓
+  v
 Advanced Techniques (60 lines)
-  ↓
+  v
 Script Reference (60 lines)
-  ↓
+  v
 Troubleshooting (80 lines) - 3-5 issues recommended
-  ↓
+  v
 Reference Documentation (20 lines)
-  ↓
+  v
 Validation Checklist (30 lines)
-  ↓
+  v
 Output Standards (40 lines)
-  ↓
+  v
 Version History (10 lines)
 ```
 
@@ -387,16 +387,16 @@ Edit: YourProject/DEVELOPMENT_DOCUMENTATION_INDEX.md
 ### Step 3: Validate
 ```bash
 python scripts/validate_index.py YourProject/
-# Expected: ✅ All cross-references valid
+# Expected: [OK] All cross-references valid
 ```
 ```
 
 **Anti-Pattern:**
 ```markdown
-# ❌ WRONG: Too many placeholders
+# [FAIL] WRONG: Too many placeholders
 python script.py <PROJECT_NAME> --path <YOUR_PATH> --option <VALUE>
 
-# ✅ RIGHT: Concrete example
+# [OK] RIGHT: Concrete example
 python script.py CharacterRig --path /Projects/MyProject --option auto
 ```
 
@@ -406,7 +406,7 @@ python script.py CharacterRig --path /Projects/MyProject --option auto
 
 **Purpose:** Cover 3-5 common patterns with detailed step-by-step instructions
 
-**Recommended Count:** 3-5 workflows (more → reference docs)
+**Recommended Count:** 3-5 workflows (more -> reference docs)
 
 **Structure per Workflow:**
 ```markdown
@@ -528,7 +528,7 @@ ls MyPlugin/Binaries/Win64/UnrealEditor-MyPlugin.dll
 - Use build script that checks editor status first
 ```
 
-**Line Budget:** ~80 lines (4 issues × 20 lines each)
+**Line Budget:** ~80 lines (4 issues x 20 lines each)
 
 **When to Move to Reference:**
 If troubleshooting exceeds 100 lines:
@@ -558,10 +558,10 @@ If troubleshooting exceeds 100 lines:
 ```
 
 **Status Icons:**
-- ✅ Compliant
-- ❌ Non-compliant (requires fix)
-- ⚠️ Partially compliant (improvement needed)
-- ⊘ Not applicable
+- [OK] Compliant
+- [FAIL] Non-compliant (requires fix)
+- [WARN] Partially compliant (improvement needed)
+- [SKIP] Not applicable
 
 **Detail Level:**
 - **Applicable articles:** 2-3 lines explanation + evidence
@@ -569,12 +569,12 @@ If troubleshooting exceeds 100 lines:
 
 **Example (Script-Based Skill):**
 ```markdown
-### Article I: General Purpose Scripts ✅
+### Article I: General Purpose Scripts [OK]
 - export_hda.py works for ALL Houdini assets (tested: CharacterRig, TreeScatter, RockFormation)
 - No hard-coded project names (uses --asset parameter)
 - Tested with 3+ projects: verified general-purpose design
 
-### Article II: MCP vs Direct ✅
+### Article II: MCP vs Direct [OK]
 - Complex workflow (HDA export, validation, UE compatibility check)
 - Tool-specific logic (Houdini Python API)
 - Direct script appropriate for 5+ parameter operations
@@ -582,22 +582,22 @@ If troubleshooting exceeds 100 lines:
 
 **Example (Documentation Skill):**
 ```markdown
-### Article I: General Purpose Scripts ✅
+### Article I: General Purpose Scripts [OK]
 - Index template works for ALL VFX applications (Unreal, Houdini, Blender, Nuke)
 - No application-specific sections hard-coded
 - Tested: Unreal MCP, Blender MCP, Nuke pipeline docs
 
-### Article III: Progressive Disclosure ✅
-- SKILL.md: 475 lines (<500 limit ✅)
+### Article III: Progressive Disclosure [OK]
+- SKILL.md: 475 lines (<500 limit [OK])
 - Margin: 25 lines (5% buffer)
 - Reference docs: 3 files (loaded on-demand)
 
-### Article VI: Context Efficiency ✅
+### Article VI: Context Efficiency [OK]
 **Context Reduction:**
 ```
 Before: Manual doc creation (no standard) = ~2,000 lines reference material
 After: Metadata (12) + SKILL.md (475) + Reference avg (300) = ~787 lines
-Savings: 60% reduction ✅
+Savings: 60% reduction [OK]
 ```
 ```
 
@@ -669,14 +669,14 @@ Savings: 60% reduction ✅
 
 | Content Type | SKILL.md | Reference Docs |
 |--------------|----------|----------------|
-| Quick Start (most common workflow) | ✅ Full | Summary only |
-| Standard Workflows (3-5 patterns) | ✅ Full | Detailed variations |
-| Troubleshooting (4-5 common issues) | ✅ Full | Complete error catalog |
-| Advanced Techniques (2-3 patterns) | ✅ Summary | ✅ Full implementation |
-| Script Reference (usage) | ✅ Full | Source code analysis |
-| API Documentation | Summary + link | ✅ Full reference |
-| Build Requirements | Checklist | ✅ Detailed setup |
-| Version-Specific Details | Current version | ✅ All versions |
+| Quick Start (most common workflow) | [OK] Full | Summary only |
+| Standard Workflows (3-5 patterns) | [OK] Full | Detailed variations |
+| Troubleshooting (4-5 common issues) | [OK] Full | Complete error catalog |
+| Advanced Techniques (2-3 patterns) | [OK] Summary | [OK] Full implementation |
+| Script Reference (usage) | [OK] Full | Source code analysis |
+| API Documentation | Summary + link | [OK] Full reference |
+| Build Requirements | Checklist | [OK] Detailed setup |
+| Version-Specific Details | Current version | [OK] All versions |
 
 ### Refactoring Example
 
@@ -745,7 +745,7 @@ taskkill /F /IM UnrealEditor.exe
 [... complete catalog ...]
 ```
 
-**Savings:** 557 lines → 470 lines (SKILL.md) + 300 lines (on-demand reference) = 87 lines saved in always-loaded content
+**Savings:** 557 lines -> 470 lines (SKILL.md) + 300 lines (on-demand reference) = 87 lines saved in always-loaded content
 
 ---
 
@@ -776,9 +776,9 @@ wc -l .claude/skills/SKILL_NAME/SKILL.md
 
 | Line Count | Status | Action Required |
 |------------|--------|-----------------|
-| <450 lines | ✅ PASS | Healthy margin (10%+ buffer) |
-| 450-500 lines | ⚠️ WARN | Approaching limit, monitor additions |
-| >500 lines | ❌ FAIL | MUST refactor to reference docs |
+| <450 lines | [OK] PASS | Healthy margin (10%+ buffer) |
+| 450-500 lines | [WARN] WARN | Approaching limit, monitor additions |
+| >500 lines | [FAIL] FAIL | MUST refactor to reference docs |
 
 ### Refactoring Strategies
 
@@ -814,7 +814,7 @@ grep -n "^### Issue" SKILL.md | wc -l
 
 **Use Case:** 50+ shots with shared material logic
 
-**Pattern:** One master material → Instance per shot
+**Pattern:** One master material -> Instance per shot
 
 **Benefits:**
 - 90% faster shot setup (instance vs full material)
@@ -909,7 +909,7 @@ grep -n "^### Issue" SKILL.md | wc -l
 - Constitutional Compliance: 60 lines
 - Reference links: 25 lines
 - Version History: 18 lines
-- **Total:** 475 lines (5% margin) ✅
+- **Total:** 475 lines (5% margin) [OK]
 
 **Progressive Disclosure Strategy:**
 - SKILL.md: Core workflows for creating and using documentation index
@@ -937,7 +937,7 @@ grep -n "^### Issue" SKILL.md | wc -l
 - Reference links: 20 lines
 - Output standards: 25 lines
 - Version History: 14 lines
-- **Total:** 470 lines (6% margin) ✅
+- **Total:** 470 lines (6% margin) [OK]
 
 **Progressive Disclosure Strategy:**
 - SKILL.md: Production workflows for foreground plates
@@ -963,7 +963,7 @@ grep -n "^### Issue" SKILL.md | wc -l
 - Reference links: 10 lines
 - Constitutional Compliance: 55 lines
 - Version History: 16 lines
-- **Total:** 364 lines (27% margin - very healthy) ✅
+- **Total:** 364 lines (27% margin - very healthy) [OK]
 
 **Progressive Disclosure Strategy:**
 - SKILL.md: CLI usage for skill management scripts
@@ -1012,30 +1012,30 @@ grep -n "^### Issue" SKILL.md | wc -l
 
 **Mistake 1: Too many placeholders in Quick Start**
 ```markdown
-# ❌ WRONG
+# [FAIL] WRONG
 python script.py <PROJECT> --path <PATH> --option <VALUE>
 
-# ✅ RIGHT
+# [OK] RIGHT
 python script.py CharacterRig --path /Projects/Demo --option auto
 ```
 
 **Mistake 2: Exceeding workflow count**
 ```markdown
-# ❌ WRONG: 8 workflows (>180 lines)
+# [FAIL] WRONG: 8 workflows (>180 lines)
 ### Workflow 1-8: [Each 25 lines]
 
-# ✅ RIGHT: 3 core workflows + reference link
+# [OK] RIGHT: 3 core workflows + reference link
 ### Workflow 1-3: [Core patterns]
 **More workflows:** See reference/workflow_variations.md
 ```
 
 **Mistake 3: Duplicating official documentation**
 ```markdown
-# ❌ WRONG: Copy-paste from Unreal docs (150 lines)
+# [FAIL] WRONG: Copy-paste from Unreal docs (150 lines)
 ## Plugin Architecture
 [Complete Unreal documentation]
 
-# ✅ RIGHT: Link + summary (15 lines)
+# [OK] RIGHT: Link + summary (15 lines)
 ## Plugin Architecture
 **Official Guide:** https://docs.unrealengine.com/...
 **Quick summary:** 3 required files, module registration, build config
@@ -1043,10 +1043,10 @@ python script.py CharacterRig --path /Projects/Demo --option auto
 
 **Mistake 4: Verbose troubleshooting**
 ```markdown
-# ❌ WRONG: 10 issues × 20 lines = 200 lines
+# [FAIL] WRONG: 10 issues x 20 lines = 200 lines
 ### Issue 1-10: [Comprehensive guide]
 
-# ✅ RIGHT: 4-5 issues + reference link
+# [OK] RIGHT: 4-5 issues + reference link
 ### Issue 1-5: [Most common]
 **Complete catalog:** See reference/troubleshooting_guide.md
 ```

@@ -1,10 +1,10 @@
 # unreal-vfx Plugin
 
-Connects Claude Code to Unreal Engine 5.8 via MCP. Enables Blueprint creation, PCG automation, actor operations, Sequencer workflows, and Python scripting — all from Claude Code.
+Connects Claude Code to Unreal Engine 5.8 via MCP. Enables Blueprint creation, PCG automation, actor operations, Sequencer workflows, and Python scripting - all from Claude Code.
 
 ---
 
-## Before You Install — What Kind of UE Project Do You Need?
+## Before You Install - What Kind of UE Project Do You Need?
 
 The MCP connection works with **any running UE 5.8 Editor instance** with the plugin enabled. The question is what kind of project to run it against. This depends on your role:
 
@@ -51,7 +51,7 @@ The MCP connection works with **any running UE 5.8 Editor instance** with the pl
 **You need:** A C++ UE 5.8 install as your primary sandbox
 
 **What this gives you:**
-- Full engine access — extend anything
+- Full engine access - extend anything
 - Compile custom C++ plugins and distribute them as `.uplugin` packages
 - Build tools in C++ and expose them to Blueprints for artists
 - Use the C++ project as a development environment, then migrate compiled output to artist BP projects
@@ -67,7 +67,7 @@ C++ UE project (your sandbox)
 
 **What you need installed:**
 - Visual Studio 2022 (Community or higher) with "Game development with C++" workload
-- UE 5.8 source build or the standard UE 5.8 install (either works — C++ game projects don't require a source build)
+- UE 5.8 source build or the standard UE 5.8 install (either works - C++ game projects don't require a source build)
 
 ---
 
@@ -86,7 +86,7 @@ The MCP server runs INSIDE the editor - it serves whatever UE project is current
 
 ## Prerequisites
 
-- Unreal Engine 5.8 (any project type — see above)
+- Unreal Engine 5.8 (any project type - see above)
 - `uv` Python package manager (installed by vfx-base)
 - The `unreal-mcp-main` Python server (see install notes below)
 
@@ -114,7 +114,7 @@ If the server can't be auto-detected, you'll be prompted for the path to the `un
 1. Open UE 5.8 with your project
 2. Enable the **ModelContextProtocol** plugin: Edit > Plugins > search "Model Context Protocol" > Enable > Restart (recommended: also install **VibeUE** from the Fab marketplace)
 3. Set auto-start in Config/DefaultEditorPerProjectUser.ini: bAutoStartServer=True, Port=8000, URLPath=/mcp (see connectors/unreal/register.ps1 header)
-4. Open Claude Code and run `/mcp` — `ue58-mcp` should show as connected
+4. Open Claude Code and run `/mcp` - `ue58-mcp` should show as connected
 5. Test: ask Claude "List all actors in the current level"
 
 ---
@@ -127,7 +127,7 @@ When you've built and tested something in your sandbox:
 
 **Python scripts:** Copy to the artist project's `Content/Python/` folder or share via your studio's script distribution system
 
-**C++ plugins:** Package as `.uplugin` — artists enable it via Edit > Plugins, no C++ install needed on their end
+**C++ plugins:** Package as `.uplugin` - artists enable it via Edit > Plugins, no C++ install needed on their end
 
 ---
 

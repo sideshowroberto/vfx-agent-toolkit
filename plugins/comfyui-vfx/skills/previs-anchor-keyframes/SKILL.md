@@ -115,7 +115,7 @@ at frame edges.
 
 ## 7. Match the model's aspect ratio (applies to everything above)
 
-Generation models output standard aspects only — 1:1, 3:4, 4:3, 16:9, 9:16.
+Generation models output standard aspects only - 1:1, 3:4, 4:3, 16:9, 9:16.
 If your plate/render aspect is non-standard (full-aperture formats often
 are, e.g. ~1.46), the model resamples the input to its grid and the whole
 background SHIFTS subtly in every output. It looks like model drift; it is
@@ -126,7 +126,7 @@ resampling.
   (usually width). In a 2D app, that means letterboxing and cropping the
   bars off afterward. When rendering from a 3D scene, skip the letterbox:
   enlarge the render canvas to the standard aspect with the camera set to
-  horizontal sensor fit — horizontal framing stays identical and the extra
+  horizontal sensor fit - horizontal framing stays identical and the extra
   rows are real scene content, which gives the model better context than
   black bars.
 - Set the generation tool's aspect parameter to the SAME aspect so input

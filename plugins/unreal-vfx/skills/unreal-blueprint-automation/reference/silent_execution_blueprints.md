@@ -151,10 +151,10 @@ After running compilation phase:
 
 **Test Sequence:**
 
-1. **Create Blueprint** - ✅ Success (no crashes)
-2. **Add Component** - ✅ Success (no crashes)
-3. **Set Property** - ✅ Success (no crashes)
-4. **Compile** - ✅ Success (Silent Execution)
+1. **Create Blueprint** - [OK] Success (no crashes)
+2. **Add Component** - [OK] Success (no crashes)
+3. **Set Property** - [OK] Success (no crashes)
+4. **Compile** - [OK] Success (Silent Execution)
 
 **Previous Failures (before pattern):**
 - Crashes on compilation with validation code
@@ -201,10 +201,10 @@ unreal.KismetSystemLibrary.compile_blueprint(unreal.load_asset('/Game/Blueprints
 ### "Why do I still get crashes?"
 
 **Check:**
-1. ✅ Is compilation the last operation in script?
-2. ✅ Are you using separate phases (not one big script)?
-3. ✅ Did you remove all print/debug statements after compilation?
-4. ✅ Are you running via `execute_python_code` (not an interactive Python console)?
+1. [OK] Is compilation the last operation in script?
+2. [OK] Are you using separate phases (not one big script)?
+3. [OK] Did you remove all print/debug statements after compilation?
+4. [OK] Are you running via `execute_python_code` (not an interactive Python console)?
 
 ### "Script runs but Blueprint not compiled"
 

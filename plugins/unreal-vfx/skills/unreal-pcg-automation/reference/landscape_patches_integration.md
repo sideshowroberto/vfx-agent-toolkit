@@ -16,11 +16,11 @@ LandscapeCircleHeightPatch allows PCG to deform landscapes procedurally. Spawned
 ### Create Patch Blueprint (Manual - One Time)
 
 **Steps:**
-1. Content Browser → Add → Blueprint Class
+1. Content Browser -> Add -> Blueprint Class
 2. Parent: Actor
 3. Name: BP_LandscapePatch
 4. Open Blueprint
-5. Add Component → LandscapeCircleHeightPatch
+5. Add Component -> LandscapeCircleHeightPatch
 6. Configure in Details:
    - Radius: 10cm (will scale via PCG)
    - Falloff: 100cm (blend distance)
@@ -110,5 +110,5 @@ spawn_settings.option = unreal.EPCGSpawnActorOption.COLLAPSEACTOR
 
 ## Reference
 
-**Plugin Docs:** Edit → Plugins → Search "Landscape Patch" → Documentation
+**Plugin Docs:** Edit -> Plugins -> Search "Landscape Patch" -> Documentation
 **Session:** `Session_2025-10-26_PCG_LandscapeDeformation.md`

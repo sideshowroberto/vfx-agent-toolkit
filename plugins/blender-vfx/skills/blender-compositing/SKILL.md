@@ -24,10 +24,10 @@ import bpy
 scene = bpy.context.scene
 scene.use_nodes = True
 
-# ❌ BROKEN in 5.1+
+# [FAIL] BROKEN in 5.1+
 # compositor = scene.node_tree
 
-# ✅ Access or create compositor node group
+# [OK] Access or create compositor node group
 comp_tree = scene.compositing_node_group
 if comp_tree is None:
     comp_tree = bpy.data.node_groups.new(name="Compositor", type='CompositorNodeTree')
@@ -43,15 +43,15 @@ There is no Composite output node in 5.1+. The main render output comes directly
 ```python
 import bpy
 
-# ❌ BROKEN in 5.1+ (RuntimeError: Node type undefined)
+# [FAIL] BROKEN in 5.1+ (RuntimeError: Node type undefined)
 # composite = nodes.new('CompositorNodeComposite')
 
-# ✅ Main render output is controlled by scene.render settings
+# [OK] Main render output is controlled by scene.render settings
 scene = bpy.context.scene
 scene.render.filepath = "//output/render_"
 scene.render.image_settings.file_format = 'PNG'
 
-# ✅ Use Viewer for compositor preview
+# [OK] Use Viewer for compositor preview
 viewer = comp_tree.nodes.new('CompositorNodeViewer')
 ```
 
@@ -62,10 +62,10 @@ No Map Range node in the compositor. Use `ShaderNodeMath` (works in compositor c
 ```python
 import bpy
 
-# ❌ BROKEN in 5.1+
+# [FAIL] BROKEN in 5.1+
 # map_range = comp_tree.nodes.new('CompositorNodeMapRange')
 
-# ✅ Use Math nodes for range mapping
+# [OK] Use Math nodes for range mapping
 # Example: clamp depth to max 80m, then normalize
 clamp = comp_tree.nodes.new('ShaderNodeMath')
 clamp.operation = 'MINIMUM'
@@ -81,10 +81,10 @@ comp_tree.links.new(clamp.outputs[0], normalize.inputs[0])
 ```python
 import bpy
 
-# ❌ BROKEN in 4.5.0+
+# [FAIL] BROKEN in 4.5.0+
 # color_ramp = nodes.new('CompositorNodeColorRamp')
 
-# ✅ Use ShaderNodeValToRGB (identical API, works in compositor)
+# [OK] Use ShaderNodeValToRGB (identical API, works in compositor)
 color_ramp = comp_tree.nodes.new('ShaderNodeValToRGB')
 ```
 
@@ -95,23 +95,23 @@ Multilayer EXR can only be created via the compositor's File Output node (which 
 ```python
 import bpy
 
-# ❌ BROKEN in 5.1+ — not in scene render format enum
+# [FAIL] BROKEN in 5.1+ - not in scene render format enum
 # scene.render.image_settings.file_format = 'OPEN_EXR_MULTILAYER'
 
-# ✅ Use File Output compositor node (defaults to OPEN_EXR_MULTILAYER)
+# [OK] Use File Output compositor node (defaults to OPEN_EXR_MULTILAYER)
 fo = comp_tree.nodes.new('CompositorNodeOutputFile')
 print(fo.format.file_format)  # 'OPEN_EXR_MULTILAYER'
 ```
 
-### EEVEE Bloom → Compositor Glare (4.5.3+)
+### EEVEE Bloom -> Compositor Glare (4.5.3+)
 
 ```python
 import bpy
 
-# ❌ BROKEN
+# [FAIL] BROKEN
 # scene.eevee.use_bloom = True
 
-# ✅ Use Compositor Glare node
+# [OK] Use Compositor Glare node
 glare = comp_tree.nodes.new('CompositorNodeGlare')
 glare.glare_type = 'FOG_GLOW'
 glare.threshold = 0.8
@@ -157,7 +157,7 @@ comp_tree.links.new(rl.outputs['Image'], viewer.inputs['Image'])
 
 The File Output node in 5.1+ uses `directory` and `file_name` (not `base_path`/`file_slots`). Add pass inputs via `file_output_items.new()`.
 
-**CRITICAL: Trailing dot in `file_name`** — the File Output node appends the scene frame number to `file_name`. Without a trailing `.`, sequential numbering like `0001` gets the scene frame appended (e.g., `00010276`). Add `.` to terminate: `"output_0001."` → `output_0001.exr`.
+**CRITICAL: Trailing dot in `file_name`** - the File Output node appends the scene frame number to `file_name`. Without a trailing `.`, sequential numbering like `0001` gets the scene frame appended (e.g., `00010276`). Add `.` to terminate: `"output_0001."` -> `output_0001.exr`.
 
 ```python
 import bpy
@@ -199,7 +199,7 @@ comp_tree.links.new(rl.outputs['CryptoObject00'], fo.inputs['CryptoObject00'])
 
 ### Workflow 2: Depth Pass Normalization
 
-**IMPORTANT: Never change camera `clip_end` to control depth range.** Reducing `clip_end` clips geometry from the render entirely — far objects disappear. Instead, clamp depth values in the compositor.
+**IMPORTANT: Never change camera `clip_end` to control depth range.** Reducing `clip_end` clips geometry from the render entirely - far objects disappear. Instead, clamp depth values in the compositor.
 
 ```python
 import bpy
@@ -222,7 +222,7 @@ normalize.location = (400, -200)
 invert = comp_tree.nodes.new('CompositorNodeInvert')
 invert.location = (600, -200)
 
-# Chain: Depth → Clamp → Normalize → Invert → Viewer
+# Chain: Depth -> Clamp -> Normalize -> Invert -> Viewer
 comp_tree.links.new(rl.outputs['Depth'], clamp.inputs[0])
 comp_tree.links.new(clamp.outputs[0], normalize.inputs[0])
 comp_tree.links.new(normalize.outputs[0], invert.inputs['Color'])
@@ -302,7 +302,7 @@ vl.use_pass_cryptomatte_accurate = True
 
 # Cryptomatte outputs appear as CryptoObject00, CryptoObject01, CryptoObject02
 # on the Render Layers node. Must be saved in multilayer EXR to be useful
-# (use File Output node — see Workflow 1)
+# (use File Output node - see Workflow 1)
 ```
 
 ---
@@ -349,7 +349,7 @@ view_layer.use_pass_normal = True
 
 - [ ] Compositor accessed via `scene.compositing_node_group` (not `scene.node_tree`)
 - [ ] No `CompositorNodeComposite` nodes (removed in 5.1)
-- [ ] No `CompositorNodeMapRange` nodes (removed — use ShaderNodeMath)
+- [ ] No `CompositorNodeMapRange` nodes (removed - use ShaderNodeMath)
 - [ ] ColorRamp nodes use `ShaderNodeValToRGB`
 - [ ] File Output uses `directory`/`file_name` (not `base_path`/`file_slots`)
 - [ ] File Output `file_name` ends with `.` when using custom frame numbering
@@ -363,10 +363,10 @@ view_layer.use_pass_normal = True
 ## VERSION HISTORY
 
 **v3.0.0** (2026-06-15) - Blender 5.1.2 compositor overhaul
-- `scene.node_tree` → `scene.compositing_node_group` (CompositorNodeTree)
-- `CompositorNodeComposite` removed — documented replacement pattern
-- `CompositorNodeMapRange` removed — Math node workaround
-- File Output node: `base_path`→`directory`, `file_slots`→`file_output_items`
+- `scene.node_tree` -> `scene.compositing_node_group` (CompositorNodeTree)
+- `CompositorNodeComposite` removed - documented replacement pattern
+- `CompositorNodeMapRange` removed - Math node workaround
+- File Output node: `base_path`->`directory`, `file_slots`->`file_output_items`
 - File Output trailing dot naming fix
 - OPEN_EXR_MULTILAYER only via File Output node
 - Depth normalization: never change clip_end, use compositor clamp

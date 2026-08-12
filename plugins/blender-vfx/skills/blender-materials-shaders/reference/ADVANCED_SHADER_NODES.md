@@ -124,14 +124,14 @@ print(response.json())
 
 **Node Tree Diagram:**
 ```
-Voronoi(Scratches) → ColorRamp → MixShader1[Fac]
-Metal_BSDF ────────────────────→ MixShader1[1]
-Scratch_BSDF ──────────────────→ MixShader1[2]
-                                      ↓
-Noise(Rust) → ColorRamp → MixShader2[Fac]
-MixShader1[Output] ───────────→ MixShader2[1]
-Rust_BSDF ────────────────────→ MixShader2[2]
-                                      ↓
+Voronoi(Scratches) -> ColorRamp -> MixShader1[Fac]
+Metal_BSDF ---------------------> MixShader1[1]
+Scratch_BSDF -------------------> MixShader1[2]
+                                      v
+Noise(Rust) -> ColorRamp -> MixShader2[Fac]
+MixShader1[Output] ------------> MixShader2[1]
+Rust_BSDF ---------------------> MixShader2[2]
+                                      v
                                 Material Output
 ```
 
@@ -889,7 +889,7 @@ texcoord = nodes.new('ShaderNodeTexCoord')
 # Mapping node (translate, rotate, scale)
 mapping = nodes.new('ShaderNodeMapping')
 mapping.inputs['Location'].default_value = (0.5, 0.5, 0.0)  # Offset
-mapping.inputs['Rotation'].default_value = (0.0, 0.0, 0.785)  # 45° rotation (radians)
+mapping.inputs['Rotation'].default_value = (0.0, 0.0, 0.785)  # 45 deg rotation (radians)
 mapping.inputs['Scale'].default_value = (2.0, 2.0, 1.0)  # 2x tiling
 
 noise = nodes.new('ShaderNodeTexNoise')
@@ -1107,9 +1107,9 @@ print(f"Output type: {node1.outputs['BSDF'].type}")  # 'SHADER'
 print(f"Input type: {node2.inputs['Surface'].type}")  # 'SHADER'
 
 # Only link matching types:
-# SHADER → SHADER
-# RGBA → RGBA
-# VALUE → VALUE
+# SHADER -> SHADER
+# RGBA -> RGBA
+# VALUE -> VALUE
 ```
 
 ---
@@ -1149,7 +1149,7 @@ if output and not output.inputs['Surface'].is_linked:
 - `blender-api-compatibility` - Breaking changes database
 
 **blender-ai-compatibility Repository:**
-- `api_changes/4.5_lighting_changes.md` - EEVEE → EEVEE_NEXT
+- `api_changes/4.5_lighting_changes.md` - EEVEE -> EEVEE_NEXT
 - `api_changes/4.3_node_interface_changes.md` - Node group interface API
 - `examples/production_workflows/pbr_material_setup.py` - Complete PBR examples
 

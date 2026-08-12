@@ -21,7 +21,7 @@ import bpy
 modifier = obj.modifiers.new("GeometryNodes", type='NODES')
 ```
 
-`bpy.ops` works normally via the Blender MCP — use direct data API for explicit control, operators when convenient.
+`bpy.ops` works normally via the Blender MCP - use direct data API for explicit control, operators when convenient.
 
 ---
 
@@ -232,11 +232,11 @@ print("Curve-to-mesh created")
 
 ### Workflow 4: Multi-Lane Scatter System
 
-**Use When:** Production ground cover — pebbles, gravel, debris with realistic density falloff across size ranges
+**Use When:** Production ground cover - pebbles, gravel, debris with realistic density falloff across size ranges
 
 **Pattern:** Three lanes (large/medium/small) each with an independent mask input. Medium and small use a two-stage density multiply for non-linear falloff. All lanes share a single Factor input. Output joins all instance geo plus the pass-through ground.
 
-**Scale ranges:** Large 0.25–0.60 | Medium 0.25–0.45 | Small 0.10–0.35
+**Scale ranges:** Large 0.25-0.60 | Medium 0.25-0.45 | Small 0.10-0.35
 
 ```python
 import bpy
@@ -410,8 +410,8 @@ print("Notes: expose Seed input per-lane if needed; merge three Factor sockets i
 ```
 
 **Design notes:**
-- Large lane uses single-stage density (direct Factor × Density Factor) for natural sparse distribution
-- Medium/small use two-stage multiply (Factor × Mask) for non-linear density falloff in masked areas
+- Large lane uses single-stage density (direct Factor x Density Factor) for natural sparse distribution
+- Medium/small use two-stage multiply (Factor x Mask) for non-linear density falloff in masked areas
 - Expose `Seed` as a group input so iterations can be varied non-destructively
 - Merging all three per-lane Factor sockets to a single shared Factor makes the system easier to art-direct
 

@@ -1,6 +1,6 @@
 ---
 name: blender-api-compatibility
-description: Blender API compatibility across versions (4.2 → 5.1+), breaking changes detection, and migration strategies. Use for API errors, version migration, breaking changes, or when user mentions "compatibility," "breaking change," "migration," "API error," or "doesn't work in newer Blender."
+description: Blender API compatibility across versions (4.2 -> 5.1+), breaking changes detection, and migration strategies. Use for API errors, version migration, breaking changes, or when user mentions "compatibility," "breaking change," "migration," "API error," or "doesn't work in newer Blender."
 allowed-tools: Read,Write
 ---
 
@@ -12,9 +12,9 @@ allowed-tools: Read,Write
 
 ---
 
-## Breaking Changes (4.2 → 5.1)
+## Breaking Changes (4.2 -> 5.1)
 
-All changes below are tested and confirmed. The Blender MCP has full context, so **`bpy.ops` works normally** — the old HTTP Bridge limitation of 80% operator failure no longer applies.
+All changes below are tested and confirmed. The Blender MCP has full context, so **`bpy.ops` works normally** - the old HTTP Bridge limitation of 80% operator failure no longer applies.
 
 ---
 
@@ -25,10 +25,10 @@ All changes below are tested and confirmed. The Blender MCP has full context, so
 **Step 1: Identify the error pattern**
 ```python
 # Common error signatures:
-# AttributeError involving 'BLENDER_EEVEE'  → Render engine renamed
-# KeyError: 'GEOMETRY_NODES'                → Modifier type renamed
-# KeyError/AttributeError on BSDF inputs    → Input names changed
-# RuntimeError: "Cannot find node type"     → Node type removed/renamed
+# AttributeError involving 'BLENDER_EEVEE'  -> Render engine renamed
+# KeyError: 'GEOMETRY_NODES'                -> Modifier type renamed
+# KeyError/AttributeError on BSDF inputs    -> Input names changed
+# RuntimeError: "Cannot find node type"     -> Node type removed/renamed
 ```
 
 **Step 2: Apply the correct migration pattern** (see workflows below)
@@ -45,23 +45,23 @@ print(bpy.context.scene.render.engine)  # Should print BLENDER_EEVEE_NEXT or CYC
 
 ## STANDARD WORKFLOWS
 
-### Workflow 1: EEVEE → EEVEE_NEXT Migration
+### Workflow 1: EEVEE -> EEVEE_NEXT Migration
 
 **Use When:** Code references BLENDER_EEVEE or old EEVEE properties
 
 ```python
 import bpy
 
-# ❌ REMOVED in 4.5.0+
+# [FAIL] REMOVED in 4.5.0+
 # bpy.context.scene.render.engine = 'BLENDER_EEVEE'
 # scene.eevee.use_bloom = True
 # scene.eevee.use_ssr = True
 # scene.eevee.use_motion_blur = True
 
-# ✅ Render engine
+# [OK] Render engine
 bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT'
 
-# ✅ Bloom → Compositor Glare node
+# [OK] Bloom -> Compositor Glare node
 scene = bpy.context.scene
 scene.use_nodes = True
 nodes = scene.node_tree.nodes
@@ -70,27 +70,27 @@ glare = nodes.new(type='CompositorNodeGlare')
 glare.glare_type = 'FOG_GLOW'   # closest to old EEVEE bloom
 glare.threshold = 0.8
 
-# ✅ Motion blur → render settings
+# [OK] Motion blur -> render settings
 scene.render.use_motion_blur = True
 scene.render.motion_blur_shutter = 0.5
 
-# ✅ Screen space reflections → ray tracing
+# [OK] Screen space reflections -> ray tracing
 scene.eevee.use_raytracing = True
 ```
 
 ---
 
-### Workflow 2: GEOMETRY_NODES → NODES Modifier
+### Workflow 2: GEOMETRY_NODES -> NODES Modifier
 
 **Use When:** Creating geometry nodes modifiers
 
 ```python
 import bpy
 
-# ❌ BROKEN in 4.5.0+ (KeyError)
+# [FAIL] BROKEN in 4.5.0+ (KeyError)
 # modifier = obj.modifiers.new(name="GeoNodes", type='GEOMETRY_NODES')
 
-# ✅ WORKING in 4.5.0+
+# [OK] WORKING in 4.5.0+
 modifier = obj.modifiers.new(name="GeoNodes", type='NODES')
 modifier.node_group = node_tree   # Same property, still works
 
@@ -111,10 +111,10 @@ def add_geometry_nodes_safe(obj, name="GeoNodes"):
 ```python
 import bpy
 
-# ❌ BROKEN in 4.5.0+ (RuntimeError: Cannot find node type)
+# [FAIL] BROKEN in 4.5.0+ (RuntimeError: Cannot find node type)
 # color_ramp = compositor.nodes.new('CompositorNodeColorRamp')
 
-# ✅ WORKING — identical API
+# [OK] WORKING - identical API
 color_ramp = compositor.nodes.new('ShaderNodeValToRGB')
 color_ramp.color_ramp.elements.new(0.5)
 color_ramp.color_ramp.elements[0].color = (1.0, 0.0, 0.0, 1.0)
@@ -127,19 +127,19 @@ color_ramp.color_ramp.elements[0].color = (1.0, 0.0, 0.0, 1.0)
 ```python
 import bpy
 
-# ❌ OLD (Blender 4.2–4.4)
+# [FAIL] OLD (Blender 4.2-4.4)
 # bsdf.inputs["Transmission"].default_value = 1.0
 # bsdf.inputs["Subsurface"].default_value = 0.2
 # bsdf.inputs["Emission"].default_value = (1,1,1,1)
 
-# ✅ NEW (4.5.0+)
+# [OK] NEW (4.5.0+)
 bsdf.inputs["Transmission Weight"].default_value = 1.0
 bsdf.inputs["Subsurface Weight"].default_value = 0.2
 bsdf.inputs["Emission Color"].default_value = (1, 1, 1, 1)
 
 # Always use input names, not indices:
 bsdf.inputs['Base Color'].default_value = (0.8, 0.2, 0.1, 1.0)  # Safe
-# bsdf.inputs[0].default_value = ...  # Fragile — index order can change
+# bsdf.inputs[0].default_value = ...  # Fragile - index order can change
 ```
 
 ---
@@ -149,10 +149,10 @@ bsdf.inputs['Base Color'].default_value = (0.8, 0.2, 0.1, 1.0)  # Safe
 ```python
 import bpy
 
-# ❌ BROKEN in 4.5.0+
+# [FAIL] BROKEN in 4.5.0+
 # space.shading.type = 'MATERIAL_PREVIEW'
 
-# ✅ WORKING (4.5.0+)
+# [OK] WORKING (4.5.0+)
 space.shading.type = 'MATERIAL'
 
 # Valid shading modes in 5.1+:
@@ -246,49 +246,49 @@ def set_render_engine_safe(preference):
 ### KeyError on BSDF Input Names
 
 **Cause:** Input names changed in 4.5.0
-**Fix:** Use new names — `"Transmission Weight"`, `"Subsurface Weight"`, `"Emission Color"`
+**Fix:** Use new names - `"Transmission Weight"`, `"Subsurface Weight"`, `"Emission Color"`
 
 ---
 
-## COMPLETE BREAKING CHANGES REFERENCE (4.2 → 5.1)
+## COMPLETE BREAKING CHANGES REFERENCE (4.2 -> 5.1)
 
 ### Render Engine
-1. `BLENDER_EEVEE` → `BLENDER_EEVEE_NEXT` (complete removal in 4.5.0)
-2. `scene.eevee.use_bloom` → Compositor Glare node (`FOG_GLOW`)
-3. `scene.eevee.use_ssr` → `scene.eevee.use_raytracing`
-4. `scene.eevee.use_motion_blur` → `scene.render.use_motion_blur`
-5. `scene.eevee.use_volumetric_lights` → Removed
+1. `BLENDER_EEVEE` -> `BLENDER_EEVEE_NEXT` (complete removal in 4.5.0)
+2. `scene.eevee.use_bloom` -> Compositor Glare node (`FOG_GLOW`)
+3. `scene.eevee.use_ssr` -> `scene.eevee.use_raytracing`
+4. `scene.eevee.use_motion_blur` -> `scene.render.use_motion_blur`
+5. `scene.eevee.use_volumetric_lights` -> Removed
 
 ### Modifiers
-6. `GEOMETRY_NODES` modifier type → `NODES`
+6. `GEOMETRY_NODES` modifier type -> `NODES`
 
 ### Node Types (Compositor)
-7. `CompositorNodeColorRamp` → `ShaderNodeValToRGB`
-8. `CompositorNodeComposite` → Removed (no replacement — main output via `scene.render.filepath`)
-9. `CompositorNodeMapRange` → Removed (use `ShaderNodeMath` with MINIMUM/MAXIMUM/etc.)
+7. `CompositorNodeColorRamp` -> `ShaderNodeValToRGB`
+8. `CompositorNodeComposite` -> Removed (no replacement - main output via `scene.render.filepath`)
+9. `CompositorNodeMapRange` -> Removed (use `ShaderNodeMath` with MINIMUM/MAXIMUM/etc.)
 10. `ShaderNodeMath` works in compositor context (shared node type)
 
 ### Compositor Architecture (5.1+)
-11. `scene.node_tree` → `scene.compositing_node_group` (must create `CompositorNodeTree` if None)
-12. `OPEN_EXR_MULTILAYER` removed from main render format enum — only via File Output node
-13. File Output node: `base_path` → `directory`, `file_slots` → `file_output_items`
-14. File Output `file_name` appends scene frame number — add trailing `.` to prevent (e.g., `"out_0001."`)
-15. File Output `file_output_items.new(socket_type, name)` — required for node to produce output
+11. `scene.node_tree` -> `scene.compositing_node_group` (must create `CompositorNodeTree` if None)
+12. `OPEN_EXR_MULTILAYER` removed from main render format enum - only via File Output node
+13. File Output node: `base_path` -> `directory`, `file_slots` -> `file_output_items`
+14. File Output `file_name` appends scene frame number - add trailing `.` to prevent (e.g., `"out_0001."`)
+15. File Output `file_output_items.new(socket_type, name)` - required for node to produce output
 
 ### Principled BSDF Inputs
-16. `"Transmission"` → `"Transmission Weight"`
-17. `"Subsurface"` → `"Subsurface Weight"`
-18. `"Emission"` → `"Emission Color"`
+16. `"Transmission"` -> `"Transmission Weight"`
+17. `"Subsurface"` -> `"Subsurface Weight"`
+18. `"Emission"` -> `"Emission Color"`
 19. Use input names, not indices (indices can change between versions)
 
 ### Lighting
-20. `light.use_contact_shadow` → Removed
+20. `light.use_contact_shadow` -> Removed
 
 ### Viewport Shading
-21. `space.shading.type = 'MATERIAL_PREVIEW'` → `'MATERIAL'`
+21. `space.shading.type = 'MATERIAL_PREVIEW'` -> `'MATERIAL'`
 
 ### Cycles
-22. `from bpy_types import CyclesRenderSettings` → Use `bpy.context.scene.cycles` directly
+22. `from bpy_types import CyclesRenderSettings` -> Use `bpy.context.scene.cycles` directly
 
 ---
 

@@ -14,7 +14,7 @@ allowed-tools: Read,Write
 
 ## Animation System Status (5.1+)
 
-**All core animation APIs are stable — no breaking changes from 4.x to 5.1.**
+**All core animation APIs are stable - no breaking changes from 4.x to 5.1.**
 
 Validated: `obj.keyframe_insert()`, F-curve access, armature creation, constraints, shape keys, drivers, NLA system.
 
@@ -246,7 +246,7 @@ if hasattr(obj, "location"):
 if obj.animation_data and obj.animation_data.action:
     print(f"F-curves: {len(obj.animation_data.action.fcurves)}")
 else:
-    print("No animation data — keyframe_insert may have failed")
+    print("No animation data - keyframe_insert may have failed")
 ```
 
 ### Constraint Not Working

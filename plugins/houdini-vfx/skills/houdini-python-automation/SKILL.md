@@ -552,10 +552,10 @@ Script running outside Houdini Python environment (hou module only available in 
 **Solution:**
 ```bash
 # DON'T use standard Python
-python my_script.py  # ❌ WRONG
+python my_script.py  # [FAIL] WRONG
 
 # DO use hython (Houdini Python)
-hython my_script.py  # ✅ CORRECT
+hython my_script.py  # [OK] CORRECT
 
 # Or run in Houdini Python Shell (Windows -> Python Shell)
 # Or use Python Source Editor (Windows -> Python Source Editor)
@@ -586,12 +586,12 @@ Accessing geometry from node's cooked output (read-only). Need geometry object i
 
 **Solution:**
 ```python
-# ❌ WRONG: Cooked geometry is read-only
+# [FAIL] WRONG: Cooked geometry is read-only
 node = hou.node("/obj/geo1/mountain1")
 geo = node.geometry()  # Read-only
 geo.createPoint()  # ERROR
 
-# ✅ CORRECT: Use Python SOP or editable geometry
+# [OK] CORRECT: Use Python SOP or editable geometry
 # Method 1: Create Python SOP
 geo_node = hou.node("/obj/geo1")
 python_sop = geo_node.createNode("python", "modify_geo")
@@ -678,10 +678,10 @@ import hou
 
 parm = hou.node("/obj/geo1/mountain1").parm("height")
 
-# ❌ WRONG: Raw value
+# [FAIL] WRONG: Raw value
 parm.setKeyframe(5.0, 100)  # ERROR
 
-# ✅ CORRECT: Use hou.Keyframe
+# [OK] CORRECT: Use hou.Keyframe
 keyframe = hou.Keyframe(5.0, 100)  # (value, frame)
 parm.setKeyframe(keyframe)
 

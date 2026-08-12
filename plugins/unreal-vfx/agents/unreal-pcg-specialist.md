@@ -81,13 +81,13 @@ Expert in Unreal Engine PCG system for procedural terrain, vegetation, and asset
 
 **THE ISSUE:**
 ```python
-# ❌ WRONG - Fails silently
+# [FAIL] WRONG - Fails silently
 graph.add_edge(node1, "Out", node2, "In")
 ```
 
 **THE FIX:**
 ```python
-# ✅ CORRECT - Use unreal.Name()
+# [OK] CORRECT - Use unreal.Name()
 graph.add_edge(node1, unreal.Name("Out"), node2, unreal.Name("In"))
 ```
 
@@ -120,11 +120,11 @@ graph.add_edge(n2, unreal.Name("Out"), n3, unreal.Name("In"))
 
 **THE FIX:**
 ```python
-# ❌ WRONG
+# [FAIL] WRONG
 node = graph.add_node_of_type(unreal.PCGSplineSamplerSettings)
 node.get_settings()  # AttributeError: 'tuple' has no attribute
 
-# ✅ CORRECT - Unpack the tuple
+# [OK] CORRECT - Unpack the tuple
 node, settings = graph.add_node_of_type(unreal.PCGSplineSamplerSettings)
 settings.sampler_params.distance_increment = 100.0  # Works!
 ```
@@ -135,10 +135,10 @@ settings.sampler_params.distance_increment = 100.0  # Works!
 
 **THE FIX:**
 ```python
-# ❌ WRONG
+# [FAIL] WRONG
 settings.distance_increment = 100.0  # AttributeError
 
-# ✅ CORRECT - Nested structure
+# [OK] CORRECT - Nested structure
 settings.sampler_params.distance_increment = 100.0  # Works!
 ```
 
@@ -185,12 +185,12 @@ settings.sampler_params.distance_increment = 100.0  # Works!
 
 **Complete flow for road/river creation:**
 ```
-Get Spline Data → Spline Sampler → Projection ← Get Landscape Data
-                                        ↓
+Get Spline Data -> Spline Sampler -> Projection <- Get Landscape Data
+                                        v
                                  Transform Points
-                                        ↓
+                                        v
                                     Spawn Actor
-                                        ↓
+                                        v
                                       Output
 ```
 

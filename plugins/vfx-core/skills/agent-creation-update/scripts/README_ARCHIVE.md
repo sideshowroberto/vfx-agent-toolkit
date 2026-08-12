@@ -20,7 +20,7 @@ When updating or consolidating agents (e.g., Blender agent consolidation), prese
 python archive_agent.py documentation-specialist
 
 # Output:
-# ✅ Archived: <workspace>\.claude\agents\archive\documentation-specialist-v2.0.0.md
+# [OK] Archived: <workspace>\.claude\agents\archive\documentation-specialist-v2.0.0.md
 # Version: 2.0.0
 ```
 
@@ -86,7 +86,7 @@ Agent content...
 python archive_agent.py nonexistent-agent
 
 # Output:
-# ❌ Error: Agent file not found: C:\...\nonexistent-agent.md
+# [FAIL] Error: Agent file not found: C:\...\nonexistent-agent.md
 # Exit code: 1
 ```
 
@@ -94,14 +94,14 @@ python archive_agent.py nonexistent-agent
 
 ```bash
 # Agent file missing version field
-# ❌ Error: No version found in agent metadata. Agent must have 'version: X.Y.Z' in YAML frontmatter.
+# [FAIL] Error: No version found in agent metadata. Agent must have 'version: X.Y.Z' in YAML frontmatter.
 ```
 
 ### Invalid Version Format
 
 ```bash
 # Agent has version: 1.0 (invalid)
-# ❌ Error: Invalid version format: '1.0'. Expected semantic version (X.Y.Z, e.g., 1.0.0).
+# [FAIL] Error: Invalid version format: '1.0'. Expected semantic version (X.Y.Z, e.g., 1.0.0).
 ```
 
 ### Archive Already Exists
@@ -109,9 +109,9 @@ python archive_agent.py nonexistent-agent
 ```bash
 python archive_agent.py documentation-specialist
 
-# First time: ✅ Success
-# Second time: ❌ Error: Archive already exists: C:\...\archive\documentation-specialist-v2.0.0.md
-#              Use --force to overwrite.
+# First time: [OK] Success
+# Second time: [FAIL] Error: Archive already exists: C:\...\archive\documentation-specialist-v2.0.0.md
+# Use --force to overwrite.
 ```
 
 ### Force Overwrite
@@ -119,21 +119,21 @@ python archive_agent.py documentation-specialist
 ```bash
 python archive_agent.py documentation-specialist --force
 
-# ✅ Archived: C:\...\archive\documentation-specialist-v2.0.0.md (overwrites existing)
+# [OK] Archived: C:\...\archive\documentation-specialist-v2.0.0.md (overwrites existing)
 ```
 
 ## Directory Structure
 
 ```
 .claude/
-└── agents/
-    ├── documentation-specialist.md      (active agent)
-    ├── blender-specialist.md            (active agent)
-    └── archive/                         (created automatically)
-        ├── documentation-specialist-v1.0.0.md
-        ├── documentation-specialist-v2.0.0.md
-        ├── blender-geometry-nodes-v1.0.0.md
-        └── blender-materials-v2.1.0.md
++-- agents/
+    +-- documentation-specialist.md      (active agent)
+    +-- blender-specialist.md            (active agent)
+    +-- archive/                         (created automatically)
+        +-- documentation-specialist-v1.0.0.md
+        +-- documentation-specialist-v2.0.0.md
+        +-- blender-geometry-nodes-v1.0.0.md
+        +-- blender-materials-v2.1.0.md
 ```
 
 ## Use Cases
@@ -220,15 +220,15 @@ python manual_test_archive.py
 
 The test suite validates:
 
-- ✅ YAML frontmatter parsing (with/without frontmatter, multiline, whitespace)
-- ✅ Version validation (valid/invalid formats)
-- ✅ Successful archiving
-- ✅ Error conditions (missing agent, no version, invalid version)
-- ✅ Force overwrite functionality
-- ✅ Directory creation
-- ✅ Content preservation (byte-for-byte identical)
-- ✅ Multiple version archiving
-- ✅ Absolute path handling
+- [OK] YAML frontmatter parsing (with/without frontmatter, multiline, whitespace)
+- [OK] Version validation (valid/invalid formats)
+- [OK] Successful archiving
+- [OK] Error conditions (missing agent, no version, invalid version)
+- [OK] Force overwrite functionality
+- [OK] Directory creation
+- [OK] Content preservation (byte-for-byte identical)
+- [OK] Multiple version archiving
+- [OK] Absolute path handling
 
 ## API Usage
 
@@ -316,8 +316,8 @@ shutil.copy2(agent_file, archive_path)
 ls .claude/agents/
 
 # Use correct agent name (without .md)
-python archive_agent.py documentation-specialist  # ✅ Correct
-python archive_agent.py documentation-specialist.md  # ❌ Wrong
+python archive_agent.py documentation-specialist  # [OK] Correct
+python archive_agent.py documentation-specialist.md  # [FAIL] Wrong
 ```
 
 ### Issue: "No version found"
@@ -341,12 +341,12 @@ version: 1.0.0  # Add this line
 ```markdown
 # Update version to semantic format
 ---
-version: 1.0.0  # ✅ Valid
+version: 1.0.0  # [OK] Valid
 ---
 
 # Invalid formats:
-version: 1.0    # ❌ Missing patch
-version: v1.0.0 # ❌ Prefix not allowed
+version: 1.0    # [FAIL] Missing patch
+version: v1.0.0 # [FAIL] Prefix not allowed
 ```
 
 ### Issue: "Archive already exists"
@@ -369,16 +369,16 @@ This script is part of the **agent-creation-update** skill:
 
 ```
 .claude/skills/agent-creation-update/
-├── scripts/
-│   ├── create_agent.py      # Create new agents
-│   ├── update_agent.py      # Update existing agents
-│   ├── archive_agent.py     # Archive agents (this script)
-│   └── validate_agent.py    # Validate agent structure
-└── tests/
-    ├── test_create.py
-    ├── test_update.py
-    ├── test_archive.py      # Tests for this script
-    └── manual_test_archive.py
++-- scripts/
+|   +-- create_agent.py      # Create new agents
+|   +-- update_agent.py      # Update existing agents
+|   +-- archive_agent.py     # Archive agents (this script)
+|   +-- validate_agent.py    # Validate agent structure
++-- tests/
+    +-- test_create.py
+    +-- test_update.py
+    +-- test_archive.py      # Tests for this script
+    +-- manual_test_archive.py
 ```
 
 **Typical workflow:**

@@ -20,11 +20,11 @@ import bpy
 # 1. EEVEE engine renamed (complete removal)
 bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT'  # Not 'BLENDER_EEVEE'
 
-# 2. Bloom removed from EEVEE — use Compositor Glare node
-# scene.eevee.use_bloom = True  ← AttributeError in 4.5.3+
+# 2. Bloom removed from EEVEE - use Compositor Glare node
+# scene.eevee.use_bloom = True  <- AttributeError in 4.5.3+
 
-# 3. SSR removed — use ray tracing
-# scene.eevee.use_ssr = True  ← AttributeError
+# 3. SSR removed - use ray tracing
+# scene.eevee.use_ssr = True  <- AttributeError
 scene.eevee.use_raytracing = True  # replacement
 
 # 4. Principled BSDF input names changed
@@ -33,7 +33,7 @@ bsdf.inputs["Subsurface Weight"].default_value = 0.2     # was "Subsurface"
 bsdf.inputs["Emission Color"].default_value = (1,1,1,1)  # was "Emission"
 
 # 5. Cycles settings
-cycles = bpy.context.scene.cycles    # Direct access — no import needed
+cycles = bpy.context.scene.cycles    # Direct access - no import needed
 cycles.samples = 128
 ```
 
@@ -112,7 +112,7 @@ print(f"Cycles configured: {cycles.samples} samples, GPU={scene.cycles.device}")
 ```python
 import bpy
 
-# Key light — main directional
+# Key light - main directional
 key_data = bpy.data.lights.new("KeyLight", 'AREA')
 key_data.energy = 1000
 key_data.size = 2.0
@@ -121,7 +121,7 @@ bpy.context.scene.collection.objects.link(key_obj)
 key_obj.location = (3, -5, 5)
 key_obj.rotation_euler = (0.8, 0, 0.6)
 
-# Fill light — softer, opposite side
+# Fill light - softer, opposite side
 fill_data = bpy.data.lights.new("FillLight", 'AREA')
 fill_data.energy = 400
 fill_data.size = 4.0
@@ -130,7 +130,7 @@ bpy.context.scene.collection.objects.link(fill_obj)
 fill_obj.location = (-4, -3, 3)
 fill_obj.rotation_euler = (0.6, 0, -0.8)
 
-# Rim light — behind subject
+# Rim light - behind subject
 rim_data = bpy.data.lights.new("RimLight", 'SPOT')
 rim_data.energy = 600
 rim_data.spot_size = 0.5
@@ -162,16 +162,16 @@ background.inputs['Strength'].default_value = 1.5
 
 # Environment texture
 env_texture = nodes.new('ShaderNodeTexEnvironment')
-# Load HDRI — replace path with actual file
+# Load HDRI - replace path with actual file
 import bpy
 hdri_path = "//textures/studio_hdri.hdr"   # path relative to .blend
 try:
     env_texture.image = bpy.data.images.load(hdri_path)
     print(f"HDRI loaded: {hdri_path}")
 except Exception:
-    print(f"Could not load HDRI from {hdri_path} — set manually in Shader Editor")
+    print(f"Could not load HDRI from {hdri_path} - set manually in Shader Editor")
 
-# Texture Coordinate → Mapping → Environment Texture
+# Texture Coordinate -> Mapping -> Environment Texture
 tex_coord = nodes.new('ShaderNodeTexCoord')
 mapping = nodes.new('ShaderNodeMapping')
 mapping.inputs['Rotation'].default_value = (0, 0, 0)   # Rotate HDRI

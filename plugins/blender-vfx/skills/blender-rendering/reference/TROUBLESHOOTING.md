@@ -26,10 +26,10 @@ EEVEE (legacy) was completely removed in Blender 4.5.0. Only EEVEE_NEXT remains.
 
 **Solution:**
 ```python
-# ❌ OLD - Will fail in 4.5.0+
+# [FAIL] OLD - Will fail in 4.5.0+
 scene.render.engine = 'BLENDER_EEVEE'
 
-# ✅ NEW - Works in 4.5.0+
+# [OK] NEW - Works in 4.5.0+
 scene.render.engine = 'BLENDER_EEVEE_NEXT'
 ```
 
@@ -49,9 +49,9 @@ def get_available_engines():
 # Check if EEVEE_NEXT is available
 engines = get_available_engines()
 if 'BLENDER_EEVEE_NEXT' in engines:
-    print("✅ EEVEE_NEXT available")
+    print("[OK] EEVEE_NEXT available")
 else:
-    print("❌ EEVEE_NEXT not found (update Blender)")
+    print("[FAIL] EEVEE_NEXT not found (update Blender)")
 ```
 
 ---
@@ -122,8 +122,8 @@ AttributeError: 'SceneEEVEE' object has no attribute 'bloom_threshold'
 
 **Cause:**
 Bloom and Screen Space Reflections (SSR) were moved/removed in Blender 4.5.0:
-- Bloom → Compositor (Glare node)
-- SSR → Ray Tracing (use_raytracing)
+- Bloom -> Compositor (Glare node)
+- SSR -> Ray Tracing (use_raytracing)
 
 **Solution - Bloom via Compositor:**
 ```python
@@ -160,11 +160,11 @@ def add_bloom_compositor():
 
 **Solution - Reflections via Ray Tracing:**
 ```python
-# ❌ OLD (removed)
+# [FAIL] OLD (removed)
 # scene.eevee.use_ssr = True
 # scene.eevee.ssr_quality = 0.5
 
-# ✅ NEW - Enable ray tracing
+# [OK] NEW - Enable ray tracing
 scene.eevee.use_raytracing = True
 # Ray tracing provides better quality than old SSR
 ```
@@ -371,7 +371,7 @@ def add_default_light():
 mat = bpy.data.materials.get("MyMaterial")
 output = mat.node_tree.nodes.get("Material Output")
 if not output.inputs['Surface'].is_linked:
-    print("❌ Surface not connected to Material Output")
+    print("[FAIL] Surface not connected to Material Output")
 ```
 
 **Cause 3: Zero Emission/Reflectivity**
@@ -381,7 +381,7 @@ bsdf = mat.node_tree.nodes.get("Principled BSDF")
 if bsdf:
     base_color = bsdf.inputs['Base Color'].default_value
     if sum(base_color[:3]) < 0.01:
-        print("⚠️ Base color too dark (nearly black)")
+        print("[WARN] Base color too dark (nearly black)")
 ```
 
 ---
@@ -489,7 +489,7 @@ def verify_cryptomatte():
 
     # 1. Must be using Cycles
     if scene.render.engine != 'CYCLES':
-        print("❌ Cryptomatte only works with Cycles")
+        print("[FAIL] Cryptomatte only works with Cycles")
         return
 
     # 2. Enable cryptomatte passes
@@ -502,7 +502,7 @@ def verify_cryptomatte():
     # 3. Set cryptomatte accuracy
     cycles_passes.pass_crypto_depth = 6  # Number of layers (default 6)
 
-    print("✅ Cryptomatte configured")
+    print("[OK] Cryptomatte configured")
 ```
 
 ---

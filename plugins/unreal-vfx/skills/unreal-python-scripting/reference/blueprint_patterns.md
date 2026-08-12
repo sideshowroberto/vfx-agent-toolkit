@@ -44,7 +44,7 @@ Deep dive into Blueprint class loading, spawning, and component access patterns 
 **Content Browser:**
 ```
 /Game/Blueprints/
-  └── BP_Actor  (Blueprint asset - editor-only)
+  +-- BP_Actor  (Blueprint asset - editor-only)
 ```
 
 **Runtime:**
@@ -57,10 +57,10 @@ class BP_Actor_C : public AActor {
 
 **Python:**
 ```python
-# ❌ WRONG: Asset path
+# [FAIL] WRONG: Asset path
 bp = unreal.load_class(None, "/Game/Blueprints/BP_Actor")  # None returned
 
-# ✅ CORRECT: Compiled class path
+# [OK] CORRECT: Compiled class path
 bp = unreal.load_class(None, "/Game/Blueprints/BP_Actor.BP_Actor_C")
 ```
 
@@ -70,7 +70,7 @@ bp = unreal.load_class(None, "/Game/Blueprints/BP_Actor.BP_Actor_C")
 
 **Mistake 1: Forgetting `_C` Suffix**
 ```python
-# ❌ Returns None
+# [FAIL] Returns None
 bp = unreal.load_class(None, "/Game/BP_Actor")
 actor = unreal.EditorLevelLibrary.spawn_actor_from_class(bp, ...)
 # TypeError: 'NoneType' object is not callable
@@ -78,15 +78,15 @@ actor = unreal.EditorLevelLibrary.spawn_actor_from_class(bp, ...)
 
 **Mistake 2: Wrong Case**
 ```python
-# ❌ Case-sensitive
+# [FAIL] Case-sensitive
 bp = unreal.load_class(None, "/Game/BP_Actor.bp_actor_c")  # None
 ```
 
 **Mistake 3: Not Repeating Name**
 ```python
-# ❌ Must repeat Blueprint name
-bp = unreal.load_class(None, "/Game/BP_Actor.BP_Actor_C")  # ✅ Correct
-bp = unreal.load_class(None, "/Game/BP_Actor_C")           # ❌ Wrong
+# [FAIL] Must repeat Blueprint name
+bp = unreal.load_class(None, "/Game/BP_Actor.BP_Actor_C")  # [OK] Correct
+bp = unreal.load_class(None, "/Game/BP_Actor_C")           # [FAIL] Wrong
 ```
 
 ---
@@ -115,7 +115,7 @@ Extract: /Game/Blueprints/Cameras/BP_Camera.BP_Camera_C
 **Pattern:**
 ```
 /Game/<folder>/<subfolder>/<BlueprintName>.<BlueprintName>_C
-       ↑ Path to folder    ↑ Repeat name with _C
+       ^ Path to folder    ^ Repeat name with _C
 ```
 
 **Examples:**
@@ -150,12 +150,12 @@ actor = unreal.EditorLevelLibrary.spawn_actor_from_class(bp_class, ...)
 
 ### Path Format Rules
 
-**✅ Correct:**
+**[OK] Correct:**
 - Forward slashes: `/Game/BP_Actor.BP_Actor_C`
 - Repeat name: `/Game/BP_Name.BP_Name_C`
 - Case-sensitive: Match exact Blueprint name
 
-**❌ Wrong:**
+**[FAIL] Wrong:**
 - Backslashes: `\Game\BP_Actor.BP_Actor_C`
 - No repeat: `/Game/BP_Actor_C`
 - Wrong case: `/Game/bp_actor.bp_actor_c`
@@ -169,7 +169,7 @@ actor = unreal.EditorLevelLibrary.spawn_actor_from_class(bp_class, ...)
 
 | Feature | Blueprint Actor | Plain Actor |
 |---------|----------------|-------------|
-| **Component Setup** | Pre-configured ✅ | Limited (no `register_component`) ❌ |
+| **Component Setup** | Pre-configured [OK] | Limited (no `register_component`) [FAIL] |
 | **Flexibility** | Fixed in Blueprint | Fully code-driven |
 | **Setup Time** | Fast (spawn + access) | Slow (manual config) |
 | **Requires Asset** | Yes (Blueprint file) | No (code-only) |
@@ -282,8 +282,8 @@ else:
 ```
 
 **Difference:**
-- `get_components_by_class()` → List (always)
-- `get_component_by_class()` → Single object or None
+- `get_components_by_class()` -> List (always)
+- `get_component_by_class()` -> Single object or None
 
 ---
 

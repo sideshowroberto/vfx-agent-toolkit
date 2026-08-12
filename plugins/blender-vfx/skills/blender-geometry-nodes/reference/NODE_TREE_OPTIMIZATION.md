@@ -40,9 +40,9 @@ if obj and obj.type == 'MESH':
     print(f"Polygons: {poly_count:,}")
 
     if vert_count > 1_000_000:
-        print("⚠️ WARNING: High vertex count may impact performance")
+        print("[WARN] WARNING: High vertex count may impact performance")
     elif vert_count > 5_000_000:
-        print("❌ CRITICAL: Reduce geometry complexity")
+        print("[FAIL] CRITICAL: Reduce geometry complexity")
 """
 
 response = requests.post(url, json={"code": code})
@@ -117,13 +117,13 @@ nodes = node_tree.nodes
 links = node_tree.links
 nodes.clear()
 
-# ❌ SLOW: Joining real geometry (100 cubes = 800 verts each = 80k verts)
+# [FAIL] SLOW: Joining real geometry (100 cubes = 800 verts each = 80k verts)
 cube_slow = nodes.new('GeometryNodeMeshCube')
 duplicate_slow = nodes.new('GeometryNodeDuplicateElements')
 duplicate_slow.inputs["Amount"].default_value = 100
 realize_slow = nodes.new('GeometryNodeRealizeInstances')  # Makes real geometry
 
-# ✅ FAST: Using instances (100 cubes = 800 verts TOTAL)
+# [OK] FAST: Using instances (100 cubes = 800 verts TOTAL)
 cube_fast = nodes.new('GeometryNodeMeshCube')
 points = nodes.new('GeometryNodePoints')
 points.inputs["Count"].default_value = 100
@@ -435,9 +435,9 @@ if obj:
     print(f"Modifier evaluation time: {elapsed:.3f} seconds")
 
     if elapsed > 1.0:
-        print("⚠️ Slow evaluation - consider optimization")
+        print("[WARN] Slow evaluation - consider optimization")
     elif elapsed > 5.0:
-        print("❌ Very slow - reduce complexity or cache results")
+        print("[FAIL] Very slow - reduce complexity or cache results")
 """
 
 response = requests.post(url, json={"code": code})

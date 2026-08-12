@@ -14,25 +14,25 @@ allowed-tools: Read,Write
 
 ## API Stability (5.1+)
 
-Physics system is stable across 4.x → 5.1. All core APIs work via direct data access:
+Physics system is stable across 4.x -> 5.1. All core APIs work via direct data access:
 
 ```python
 import bpy
 
-# Particle system — direct API
+# Particle system - direct API
 psys = obj.modifiers.new("ParticleSystem", 'PARTICLE_SYSTEM')
 settings = obj.particle_systems[-1].settings
 
-# Rigid body — direct property access
+# Rigid body - direct property access
 obj.rigid_body.type = 'ACTIVE'
 obj.rigid_body.mass = 1.0
 
-# Cloth — direct modifier settings
+# Cloth - direct modifier settings
 cloth_mod = obj.modifiers.new("Cloth", 'CLOTH')
 cloth_mod.settings.mass = 0.3
 ```
 
-**Note on fluid baking:** Mantaflow baking cannot be triggered from Python — configure all settings via script, then bake in the Blender UI (Physics Properties > Fluid > Bake All).
+**Note on fluid baking:** Mantaflow baking cannot be triggered from Python - configure all settings via script, then bake in the Blender UI (Physics Properties > Fluid > Bake All).
 
 ---
 

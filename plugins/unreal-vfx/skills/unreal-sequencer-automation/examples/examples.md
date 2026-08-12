@@ -102,7 +102,7 @@ try:
 except:
     pass
 
-print("✅ PCG animation sequence created!")
+print("[OK] PCG animation sequence created!")
 ```
 
 ### Result
@@ -181,7 +181,7 @@ pitch_channel.add_key(unreal.FrameNumber(0), 0.0)
 pitch_channel.add_key(unreal.FrameNumber(300), -15.0)
 pitch_channel.add_key(unreal.FrameNumber(600), 0.0)
 
-print("✅ Camera animation created!")
+print("[OK] Camera animation created!")
 ```
 
 ### Result
@@ -274,7 +274,7 @@ x_loc.add_key(unreal.FrameNumber(300), 0.0)
 
 # ... (continue for all channels)
 
-print("✅ Transform animation created!")
+print("[OK] Transform animation created!")
 ```
 
 ### Result
@@ -448,7 +448,7 @@ for i, binding in enumerate(bindings):
     z_channel.add_key(unreal.FrameNumber(100 + offset), 500.0)
     z_channel.add_key(unreal.FrameNumber(200 + offset), 0.0)
 
-print("✅ Choreographed 3 actors with cascading animation!")
+print("[OK] Choreographed 3 actors with cascading animation!")
 ```
 
 ---

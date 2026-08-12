@@ -14,7 +14,7 @@ metadata:
   author: "Iamemily2050 (@iamemily2050)"
   repository: "https://github.com/Emily2040/seedance-2.0"
   openclaw:
-    emoji: "🎬"
+    emoji: ""
     homepage: "https://github.com/Emily2040/seedance-2.0"
 ---
 
@@ -60,7 +60,7 @@ First, identify the single visible beat: reveal, arrival, decision, transformati
 
 ## Length Target
 
-Aim for 30–120 words in the final prompt. Under 30 loses direction; over 120 causes model drift and competing instructions. The 2000-character platform limit is a hard cap, but the sweet spot is much shorter. If the prompt feels long, cut — do not add clarifiers.
+Aim for 30-120 words in the final prompt. Under 30 loses direction; over 120 causes model drift and competing instructions. The 2000-character platform limit is a hard cap, but the sweet spot is much shorter. If the prompt feels long, cut - do not add clarifiers.
 
 ## Compression Rules
 

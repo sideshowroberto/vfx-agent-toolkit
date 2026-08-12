@@ -14,7 +14,7 @@ metadata:
   author: "Iamemily2050 (@iamemily2050)"
   repository: "https://github.com/Emily2040/seedance-2.0"
   openclaw:
-    emoji: "🎬"
+    emoji: ""
     homepage: "https://github.com/Emily2040/seedance-2.0"
 ---
 

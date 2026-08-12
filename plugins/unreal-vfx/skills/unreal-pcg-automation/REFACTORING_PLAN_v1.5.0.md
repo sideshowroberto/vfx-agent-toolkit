@@ -17,10 +17,10 @@
 - New discoveries: Forest graph analysis (60-node production system)
 
 **Expected Outcome:**
-- ✅ Constitutional compliance (Article III: <500 lines)
-- ✅ Faster skill loading
-- ✅ Better organization
-- ✅ Room for growth (forest discoveries + future patterns)
+- [OK] Constitutional compliance (Article III: <500 lines)
+- [OK] Faster skill loading
+- [OK] Better organization
+- [OK] Room for growth (forest discoveries + future patterns)
 
 ---
 
@@ -29,16 +29,16 @@
 ### File Structure
 ```
 .claude/skills/unreal-pcg-automation/
-├── SKILL.md                              # 1,128 lines ❌ (OVER LIMIT)
-├── reference/
-│   ├── common_nodes.md                   # 548 lines ✅
-│   ├── complete_graph_template.md        # ~150 lines ✅
-│   ├── landscape_scatter_workflow.md     # ~200 lines ✅
-│   ├── landscape_patches_integration.md
-│   ├── pin_discovery_patterns.md         # ~100 lines ✅
-│   ├── silent_execution_deep_dive.md     # ~200 lines ✅
-│   └── spline_workflows.md               # ~400 lines ✅
-└── REFACTORING_PLAN_v1.5.0.md           # THIS FILE
++-- SKILL.md                              # 1,128 lines [FAIL] (OVER LIMIT)
++-- reference/
+|   +-- common_nodes.md                   # 548 lines [OK]
+|   +-- complete_graph_template.md        # ~150 lines [OK]
+|   +-- landscape_scatter_workflow.md     # ~200 lines [OK]
+|   +-- landscape_patches_integration.md
+|   +-- pin_discovery_patterns.md         # ~100 lines [OK]
+|   +-- silent_execution_deep_dive.md     # ~200 lines [OK]
+|   +-- spline_workflows.md               # ~400 lines [OK]
++-- REFACTORING_PLAN_v1.5.0.md           # THIS FILE
 ```
 
 ### Constitutional Violations
@@ -49,7 +49,7 @@
 - **Violation:** 628 lines over limit (225% of allowed)
 
 **Why This Matters:**
-- Skills should load fast (metadata → core → references)
+- Skills should load fast (metadata -> core -> references)
 - Larger SKILL.md = slower trigger response
 - Context efficiency: Load only what's needed when needed
 - Survival during compacts: Focused skills survive, monoliths don't
@@ -71,7 +71,7 @@
 - Workflow 3: Landscape Scatter with Noise (40 lines)
 - Workflow 4: Point Exclusion (50 lines)
 - Workflow 5: Spline-Based Exclusion (70 lines)
-- Workflow 6: Road Environment System (150 lines) ← Production-validated!
+- Workflow 6: Road Environment System (150 lines) <- Production-validated!
 - Workflow 7: Modify Existing Graph (35 lines)
 
 **Total:** ~450 lines to move
@@ -89,7 +89,7 @@
 ### Lines 851-950: Python API Limitations (CONDENSE)
 - Mesh spawner read-only status
 - Summarize in SKILL.md
-- Full details → reference/api_limitations.md
+- Full details -> reference/api_limitations.md
 
 ### Lines 951-1128: Version History (KEEP)
 - Essential for tracking changes
@@ -108,7 +108,7 @@
 
 #### 1. PCGSelfPruningSettings
 **Purpose:** Prevent overlapping points (tree clustering)
-**Pattern:** `Surface Sampler → Transform → Self Pruning → Bounds Modifier`
+**Pattern:** `Surface Sampler -> Transform -> Self Pruning -> Bounds Modifier`
 **Key Properties:**
 - `pruning_type`: Spatial overlap detection
 - `radius`: Minimum distance between points
@@ -116,7 +116,7 @@
 
 #### 2. PCGCollapseSettings (ToPoint)
 **Purpose:** Convert point cloud to single point
-**Pattern:** `Difference → Collapse → Static Mesh Spawner`
+**Pattern:** `Difference -> Collapse -> Static Mesh Spawner`
 **Use Case:** Create single spawn location from scattered exclusion data
 **Production Use:** Found 5 times in forest graph (critical for multi-layer)
 
@@ -125,7 +125,7 @@
 **Pattern:**
 ```
 Named Reroute Declaration (one source)
-  ↓
+  v
 Named Reroute Usage (multiple destinations)
 ```
 **Benefits:**
@@ -136,7 +136,7 @@ Named Reroute Usage (multiple destinations)
 
 #### 4. PCGDensityFilterSettings
 **Purpose:** Randomly thin out points by percentage
-**Pattern:** `Collapse → Density Filter → Transform → Spawner`
+**Pattern:** `Collapse -> Density Filter -> Transform -> Spawner`
 **Key Properties:**
 - `lower_bound`: Minimum density threshold (0.0-1.0)
 - `upper_bound`: Maximum density threshold (0.0-1.0)
@@ -145,14 +145,14 @@ Named Reroute Usage (multiple destinations)
 
 #### 5. PCGFilterByTypeSettings
 **Purpose:** Filter specific data types (splines, volumes, points)
-**Pattern:** `Named Reroute → Filter By Type → Difference`
+**Pattern:** `Named Reroute -> Filter By Type -> Difference`
 **Key Properties:**
 - `target_filter_type`: Which data type to allow through
 **Use Case:** Separate different input data streams cleanly
 
 #### 6. PCGCopyPointsSettings
 **Purpose:** Copy point attributes to different locations
-**Pattern:** `Load Data Asset → Copy Points (Source) + Spline (Target) → Transform → Spawner`
+**Pattern:** `Load Data Asset -> Copy Points (Source) + Spline (Target) -> Transform -> Spawner`
 **Key Properties:**
 - `source_points`: Point data to copy FROM
 - `target_points`: Location to copy TO
@@ -160,13 +160,13 @@ Named Reroute Usage (multiple destinations)
 
 #### 7. PCGLoadDataAssetSettings
 **Purpose:** Load external PCG data assets (reusable templates)
-**Pattern:** `Load Data Asset → Copy Points → Transform → Spawner`
+**Pattern:** `Load Data Asset -> Copy Points -> Transform -> Spawner`
 **Use Case:** Reusable scatter distributions, point patterns
 **Production Insight:** Found 2 instances - external asset integration workflow
 
 #### 8. PCGPointExtentsModifierSettings
 **Purpose:** Change point size/bounds (area of influence)
-**Pattern:** `Spline Sampler → Point Extents Modifier → Filter/Spawn`
+**Pattern:** `Spline Sampler -> Point Extents Modifier -> Filter/Spawn`
 **Key Properties:**
 - `extents`: Size of point bounds
 **Use Case:** Control spacing/overlap detection radius per point
@@ -178,7 +178,7 @@ Named Reroute Usage (multiple destinations)
 
 **Layer 1: Large Trees**
 ```
-Surface Sampler → Transform → Self Pruning → Bounds Modifier → Difference → Collapse → Spawner
+Surface Sampler -> Transform -> Self Pruning -> Bounds Modifier -> Difference -> Collapse -> Spawner
 ```
 - Self pruning prevents tree overlap
 - Bounds modifier creates exclusion zone
@@ -186,28 +186,28 @@ Surface Sampler → Transform → Self Pruning → Bounds Modifier → Differenc
 
 **Layer 2: Medium Trees**
 ```
-Surface Sampler → Transform → Bounds Modifier → Difference (excludes Layer 1) → Collapse → Spawner
+Surface Sampler -> Transform -> Bounds Modifier -> Difference (excludes Layer 1) -> Collapse -> Spawner
 ```
 
 **Layer 3: Rocks/Ground Cover**
 ```
-Surface Sampler → Transform → Bounds Modifier → Difference (excludes Layers 1+2) → Collapse → Spawner
+Surface Sampler -> Transform -> Bounds Modifier -> Difference (excludes Layers 1+2) -> Collapse -> Spawner
 ```
 
 **Layer 4: Undergrowth with Density Variations**
 ```
-Surface Sampler → Difference (excludes all above) → Collapse →
-  ├→ Density Filter (0.2-0.4) → Transform → Spawner  # Sparse
-  ├→ Density Filter (0.4-0.7) → Transform → Spawner  # Medium
-  └→ Density Filter (0.7-1.0) → Transform → Spawner  # Dense
+Surface Sampler -> Difference (excludes all above) -> Collapse ->
+  +-> Density Filter (0.2-0.4) -> Transform -> Spawner  # Sparse
+  +-> Density Filter (0.4-0.7) -> Transform -> Spawner  # Medium
+  +-> Density Filter (0.7-1.0) -> Transform -> Spawner  # Dense
 ```
 
-**Key Insight:** Single source → 3 density variations = performance + variety
+**Key Insight:** Single source -> 3 density variations = performance + variety
 
 #### Pattern 2: External Asset Integration
 ```
-Load Data Asset (scatter pattern) → Copy Points (Source) +
-Spline Points (Target) → Transform → Spawner
+Load Data Asset (scatter pattern) -> Copy Points (Source) +
+Spline Points (Target) -> Transform -> Spawner
 ```
 **Benefits:**
 - Reusable scatter templates
@@ -216,10 +216,10 @@ Spline Points (Target) → Transform → Spawner
 
 #### Pattern 3: Named Reroute for Clean Graphs
 ```
-Source Data → Named Reroute Declaration →
-  ├→ Named Reroute Usage → Branch 1
-  ├→ Named Reroute Usage → Branch 2
-  └→ Named Reroute Usage → Branch 3
+Source Data -> Named Reroute Declaration ->
+  +-> Named Reroute Usage -> Branch 1
+  +-> Named Reroute Usage -> Branch 2
+  +-> Named Reroute Usage -> Branch 3
 ```
 **Benefits:**
 - No wire crossing
@@ -265,13 +265,13 @@ Source Data → Named Reroute Declaration →
 - Complete Property Verification Workflow section (lines 129-229)
 - Real-world examples
 - Verification checklist
-- Timeout ≠ Success explanation
+- Timeout != Success explanation
 
 **Structure:**
 ```markdown
 # Property Verification Workflow
 
-## Critical Lesson: Timeout ≠ Success
+## Critical Lesson: Timeout != Success
 [Content from SKILL.md]
 
 ## The Problem
@@ -340,7 +340,7 @@ settings.comparison_source = unreal.PCGSelfPruningComparisonSource.BOUNDS
 **Connection Pattern:**
 ```python
 # Typical workflow
-surface_sampler → transform → self_pruning → bounds_modifier → difference
+surface_sampler -> transform -> self_pruning -> bounds_modifier -> difference
 ```
 
 **Use Cases:**
@@ -352,7 +352,7 @@ surface_sampler → transform → self_pruning → bounds_modifier → differenc
 ```python
 # Node 8 in PCG_forest_basic_v001
 # Large tree layer with self-pruning
-sampler → transform → self_pruning → bounds_modifier → difference → collapse → spawner
+sampler -> transform -> self_pruning -> bounds_modifier -> difference -> collapse -> spawner
 ```
 
 **Key Insight:** Self pruning BEFORE bounds modifier creates clean exclusion zones
@@ -378,7 +378,7 @@ settings.mode = unreal.PCGCollapseMode.AVERAGE  # Or FIRST, LAST, etc.
 **Connection Pattern:**
 ```python
 # Typical workflow
-difference → collapse → static_mesh_spawner
+difference -> collapse -> static_mesh_spawner
 ```
 
 **Use Cases:**
@@ -392,7 +392,7 @@ difference → collapse → static_mesh_spawner
 # Nodes 13, 19, 26, 28, 57
 
 # Pattern: Each vegetation layer collapses after difference
-difference → collapse → spawner
+difference -> collapse -> spawner
 ```
 
 **Key Insight:** Critical for multi-layer systems - converts exclusion data to spawn point
@@ -423,10 +423,10 @@ usage_settings.declaration_name = "SplineData"
 **Connection Pattern:**
 ```python
 # One source, multiple destinations
-source → named_reroute_declaration →
-  ├→ named_reroute_usage → branch_1
-  ├→ named_reroute_usage → branch_2
-  └→ named_reroute_usage → branch_3
+source -> named_reroute_declaration ->
+  +-> named_reroute_usage -> branch_1
+  +-> named_reroute_usage -> branch_2
+  +-> named_reroute_usage -> branch_3
 ```
 
 **Use Cases:**
@@ -440,10 +440,10 @@ source → named_reroute_declaration →
 # Nodes 35, 46, 47, 48: Usages
 
 # Pattern: Spline extents shared across filter operations
-spline_sampler → extents_modifier → named_reroute_declaration →
-  ├→ named_reroute_usage → filter_type (trees)
-  ├→ named_reroute_usage → filter_type (rocks)
-  └→ named_reroute_usage → filter_type (grass)
+spline_sampler -> extents_modifier -> named_reroute_declaration ->
+  +-> named_reroute_usage -> filter_type (trees)
+  +-> named_reroute_usage -> filter_type (rocks)
+  +-> named_reroute_usage -> filter_type (grass)
 ```
 
 **Key Insight:** Essential for readable graphs at scale (60+ nodes)
@@ -485,13 +485,13 @@ spline_sampler → extents_modifier → named_reroute_declaration →
 
 **Pattern:**
 ```
-Layer 1 (Large Trees): Self Pruning → Bounds Modifier → Spawner
-  ↓ (excludes Layer 1)
-Layer 2 (Medium Trees): Bounds Modifier → Difference → Spawner
-  ↓ (excludes Layers 1+2)
-Layer 3 (Ground Cover): Bounds Modifier → Difference → Spawner
-  ↓ (excludes Layers 1+2+3)
-Layer 4 (Undergrowth): Difference → Multiple Density Variations
+Layer 1 (Large Trees): Self Pruning -> Bounds Modifier -> Spawner
+  v (excludes Layer 1)
+Layer 2 (Medium Trees): Bounds Modifier -> Difference -> Spawner
+  v (excludes Layers 1+2)
+Layer 3 (Ground Cover): Bounds Modifier -> Difference -> Spawner
+  v (excludes Layers 1+2+3)
+Layer 4 (Undergrowth): Difference -> Multiple Density Variations
 ```
 
 **Complete Python Example:**
@@ -564,10 +564,10 @@ Layer 4 (Undergrowth): Difference → Multiple Density Variations
 
 **Removed in UE 5.4+:**
 ```python
-# ❌ Class doesn't exist
+# [FAIL] Class doesn't exist
 mesh_entry = unreal.PCGStaticMeshSpawnerEntry()
 
-# ❌ Property doesn't exist
+# [FAIL] Property doesn't exist
 settings.meshes = [...]
 ```
 
@@ -617,7 +617,7 @@ settings.meshes = [...]
    - **CONDENSE from current ~80 lines to ~50 lines**
 
 5. **Property Verification (SHORT)** (lines 131-180)
-   - **Critical lesson summary only:** "Timeout ≠ Success"
+   - **Critical lesson summary only:** "Timeout != Success"
    - Link to `reference/property_verification.md` for details
    - **REDUCE from 130 lines to ~50 lines**
 
@@ -648,7 +648,7 @@ settings.meshes = [...]
     - **ADD v1.5.0 entry**
     - **KEEP all version history (~80 lines)**
 
-**SKILL.md Estimated New Size:** ~460 lines ✅
+**SKILL.md Estimated New Size:** ~460 lines [OK]
 
 ---
 
@@ -666,13 +666,13 @@ settings.meshes = [...]
 
 ### Step 4: Version Update
 
-**Version:** 1.4.0 → 1.5.0
+**Version:** 1.4.0 -> 1.5.0
 
 **Changelog Entry:**
 ```markdown
 **v1.5.0** (2025-11-17) - Major Refactoring: Progressive Disclosure Compliance
-- 🏗️ MAJOR REFACTOR: Reduced SKILL.md from 1,128 to ~460 lines (59% reduction)
-- ✅ Constitutional compliance: Article III (<500 lines)
+- MAJOR REFACTOR: Reduced SKILL.md from 1,128 to ~460 lines (59% reduction)
+- [OK] Constitutional compliance: Article III (<500 lines)
 - Added reference/workflows.md - All 7 standard workflows
 - Added reference/property_verification.md - Complete verification guide
 - Added reference/advanced_nodes.md - 8 new nodes from forest graph analysis
@@ -684,7 +684,7 @@ settings.meshes = [...]
 - New nodes: SelfPruning, Collapse, NamedReroute, DensityFilter, CopyPoints, LoadDataAsset
 - Multi-layer vegetation workflow (4 layers with cascading exclusions)
 - External asset integration pattern
-- Density variation pattern (single source → 3 density levels)
+- Density variation pattern (single source -> 3 density levels)
 ```
 
 ---
@@ -707,11 +707,11 @@ settings.meshes = [...]
 **Phase 2: Update SKILL.md** (~20 min)
 - [ ] Update version to 1.5.0
 - [ ] Update Reference Documentation section (add 6 new links)
-- [ ] Condense Quick Start (80 → 50 lines)
-- [ ] Condense Property Verification (130 → 50 lines)
+- [ ] Condense Quick Start (80 -> 50 lines)
+- [ ] Condense Property Verification (130 -> 50 lines)
 - [ ] Keep Research & Debugging (70 lines)
-- [ ] Condense Troubleshooting (160 → 60 lines, top 3 only)
-- [ ] Condense API Limitations (100 → 30 lines, summary only)
+- [ ] Condense Troubleshooting (160 -> 60 lines, top 3 only)
+- [ ] Condense API Limitations (100 -> 30 lines, summary only)
 - [ ] Add v1.5.0 changelog entry
 - [ ] Remove Workflows 1-7 (moved to reference/workflows.md)
 
@@ -737,14 +737,14 @@ settings.meshes = [...]
 
 ## Success Criteria
 
-- ✅ SKILL.md < 500 lines (constitutional compliance)
-- ✅ All workflows accessible via reference/workflows.md
-- ✅ Forest graph discoveries documented in reference/advanced_nodes.md
-- ✅ Property verification has dedicated reference file
-- ✅ Version updated to 1.5.0 with detailed changelog
-- ✅ All reference links functional
-- ✅ Skill triggers correctly in Claude Code
-- ✅ No content loss (everything moved, not deleted)
+- [OK] SKILL.md < 500 lines (constitutional compliance)
+- [OK] All workflows accessible via reference/workflows.md
+- [OK] Forest graph discoveries documented in reference/advanced_nodes.md
+- [OK] Property verification has dedicated reference file
+- [OK] Version updated to 1.5.0 with detailed changelog
+- [OK] All reference links functional
+- [OK] Skill triggers correctly in Claude Code
+- [OK] No content loss (everything moved, not deleted)
 
 ---
 
@@ -795,7 +795,7 @@ settings.meshes = [...]
 **What Just Happened (Session Summary):**
 
 1. Built PCG Road Environment System (landscape spline + PCG hybrid)
-2. Discovered property verification gap (timeout ≠ success)
+2. Discovered property verification gap (timeout != success)
 3. Analyzed 60-node production forest graph (PCG_forest_basic_v001)
 4. Discovered 8 new advanced nodes
 5. Identified 4 production patterns
@@ -809,7 +809,7 @@ settings.meshes = [...]
 - Named Reroutes essential for graph maintainability at scale
 
 **Files Modified This Session:**
-- SKILL.md (v1.3.0 → v1.4.0, then identified need for v1.5.0)
+- SKILL.md (v1.3.0 -> v1.4.0, then identified need for v1.5.0)
 - Created this refactoring plan
 
 **Ready to Execute:**

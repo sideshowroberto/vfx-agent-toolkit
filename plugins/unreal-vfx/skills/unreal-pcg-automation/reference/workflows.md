@@ -272,13 +272,13 @@ spawn.set_node_position(600, 0)
    o = g.get_output_node()
    n = g.nodes
 
-   # Tree branch: Landscape → Sampler → Transform → Tree Spawner → Output
+   # Tree branch: Landscape -> Sampler -> Transform -> Tree Spawner -> Output
    g.add_edge(n[0], unreal.Name("Out"), n[1], unreal.Name("Surface"))
    g.add_edge(n[1], unreal.Name("Out"), n[2], unreal.Name("In"))
    g.add_edge(n[2], unreal.Name("Out"), n[3], unreal.Name("In"))
    g.add_edge(n[3], unreal.Name("Out"), o, unreal.Name("Out"))
 
-   # Rock branch: Landscape → Sampler → Difference → Transform → Rock Spawner → Output
+   # Rock branch: Landscape -> Sampler -> Difference -> Transform -> Rock Spawner -> Output
    g.add_edge(n[4], unreal.Name("Out"), n[5], unreal.Name("Surface"))
    g.add_edge(n[5], unreal.Name("Out"), n[6], unreal.Name("In"))  # Rocks to Difference
 
@@ -293,8 +293,8 @@ spawn.set_node_position(600, 0)
    ```
 
 **How it works:**
-- Trees generate at low density (0.1 pts/m²)
-- Rocks generate at high density (2.0 pts/m²)
+- Trees generate at low density (0.1 pts/m^2)
+- Rocks generate at high density (2.0 pts/m^2)
 - Difference node removes any rock points near tree points
 - Result: Dense rocks with gaps where trees are
 
@@ -315,9 +315,9 @@ spawn.set_node_position(600, 0)
 **Steps:**
 
 1. **Create spline in viewport:**
-   - Modeling mode → Draw Spline → Draw closed loop → Click "Loop" to close
+   - Modeling mode -> Draw Spline -> Draw closed loop -> Click "Loop" to close
    - Name: SplineActor (or any name)
-   - Add Tag: In Outliner → Select spline → Details → Tags → Add "ExclusionZone"
+   - Add Tag: In Outliner -> Select spline -> Details -> Tags -> Add "ExclusionZone"
 
 2. **Add spline data node:**
    ```python
@@ -361,8 +361,8 @@ spawn.set_node_position(600, 0)
 
 6. **Connect flow:**
    ```python
-   # Main point flow (e.g., Surface Sampler) → Difference
-   # Spline points → Difference "Source" input
+   # Main point flow (e.g., Surface Sampler) -> Difference
+   # Spline points -> Difference "Source" input
    # Difference removes main points where spline points exist
    ```
 
@@ -387,7 +387,7 @@ spawn.set_node_position(600, 0)
 **Use Case:** Car commercial environments, city streets, highways, forest roads
 
 **Prerequisites:**
-- Landscape with Landscape Spline created (Landscape Mode → Spline Tool)
+- Landscape with Landscape Spline created (Landscape Mode -> Spline Tool)
 - Landscape spline can sculpt terrain automatically
 - Road mesh assigned to landscape spline (see tutorial reference)
 
@@ -429,7 +429,7 @@ spawn.set_node_position(600, 0)
    actor_selector.actor_selection = unreal.PCGActorSelection.BY_CLASS
    actor_selector.actor_selection_class = unreal.Landscape
 
-   # ⚠️ VERIFY settings were applied (see Property Verification Workflow)
+   # [WARN] VERIFY settings were applied (see Property Verification Workflow)
    # Re-load graph and check if properties stuck
    ```
 
@@ -452,7 +452,7 @@ spawn.set_node_position(600, 0)
    left_settings.offset_max = unreal.Vector(0, -900, 0)
    left_settings.absolute_scale = True  # Prevents mesh deformation
 
-   # Right side: offset +9m, rotate 180°
+   # Right side: offset +9m, rotate 180 deg
    right_settings = transform_right.get_settings()
    right_settings.offset_min = unreal.Vector(0, 900, 0)
    right_settings.offset_max = unreal.Vector(0, 900, 0)
@@ -467,13 +467,13 @@ spawn.set_node_position(600, 0)
    o = graph.get_output_node()
    n = graph.nodes
 
-   # Input → Get Spline → Spline Sampler → Split to both transforms → Merge at spawner → Output
+   # Input -> Get Spline -> Spline Sampler -> Split to both transforms -> Merge at spawner -> Output
    graph.add_edge(i, unreal.Name("In"), n[0], unreal.Name("In"))
    graph.add_edge(n[0], unreal.Name("Out"), n[1], unreal.Name("Spline"))
    graph.add_edge(n[1], unreal.Name("Out"), n[2], unreal.Name("In"))  # Left transform
    graph.add_edge(n[1], unreal.Name("Out"), n[3], unreal.Name("In"))  # Right transform
-   graph.add_edge(n[2], unreal.Name("Out"), n[4], unreal.Name("In"))  # Left → Spawner
-   graph.add_edge(n[3], unreal.Name("Out"), n[4], unreal.Name("In"))  # Right → Spawner
+   graph.add_edge(n[2], unreal.Name("Out"), n[4], unreal.Name("In"))  # Left -> Spawner
+   graph.add_edge(n[3], unreal.Name("Out"), n[4], unreal.Name("In"))  # Right -> Spawner
    graph.add_edge(n[4], unreal.Name("Out"), o, unreal.Name("Out"))
    # NO CODE AFTER
    ```
@@ -492,8 +492,8 @@ spawn.set_node_position(600, 0)
    - Open `/Game/PCG/PCG_RoadEnvironment` in Unreal
    - Verify Get Spline Data node: Actor Selection = "By Class", Class = "Landscape"
    - Select Static Mesh Spawner node
-   - Details panel → Mesh Entries → Add mesh (street lamp, sign, etc.)
-   - Drag graph into level → Should auto-detect landscape spline!
+   - Details panel -> Mesh Entries -> Add mesh (street lamp, sign, etc.)
+   - Drag graph into level -> Should auto-detect landscape spline!
 
 **Key Settings:**
 - **Actor Selection:** `BY_CLASS` (not ALL_WORLD_ACTORS for landscape splines)

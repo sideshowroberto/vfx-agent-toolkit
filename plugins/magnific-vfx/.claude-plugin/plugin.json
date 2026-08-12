@@ -1,7 +1,7 @@
 {
   "name": "magnific-vfx",
   "description": "Magnific AI generation via MCP: image generation with model selection and references, local file upload/download pipelines, and video generation.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": {
     "name": "Rob Williams"
   }

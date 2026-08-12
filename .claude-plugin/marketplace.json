@@ -5,67 +5,67 @@
   },
   "metadata": {
     "description": "VFX pipeline plugins for Claude Code - Nuke, Houdini, Unreal, Blender, ComfyUI, Maya, Magnific, and Seedance. Skills, agents, and MCP connectors for AI-assisted VFX production.",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "pluginRoot": "./plugins"
   },
   "plugins": [
     {
       "name": "vfx-core",
-      "version": "2.1.1",
+      "version": "2.1.2",
       "description": "Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).",
       "source": "./plugins/vfx-core"
     },
     {
       "name": "nuke-vfx",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "description": "Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, batch shot setup, and Magnific-in-Nuke.",
       "source": "./plugins/nuke-vfx"
     },
     {
       "name": "houdini-vfx",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "description": "Houdini VFX pipeline: procedural generation, USD/Solaris, VEX, Python automation, HDA creation.",
       "source": "./plugins/houdini-vfx"
     },
     {
       "name": "unreal-vfx",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "description": "Unreal Engine 5.8 VFX pipeline via the native UE MCP (ModelContextProtocol plugin + VibeUE toolsets): Blueprint automation, PCG, actor operations, Sequencer, Python scripting.",
       "source": "./plugins/unreal-vfx"
     },
     {
       "name": "blender-vfx",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "description": "Blender VFX pipeline via the official Blender MCP (blender.org): modeling, animation, materials, geometry nodes, physics, rendering, sculpting, grease pencil, and ControlNet pass rendering for AI generation.",
       "source": "./plugins/blender-vfx"
     },
     {
       "name": "comfyui-vfx",
-      "version": "2.2.2",
+      "version": "2.2.3",
       "description": "ComfyUI pipeline via the ComfyUI MCP and Comfy CLI, with optional ComfyUI_FL-MCP for live canvas operations: workflow analysis, node/model requirements mapping, and headless generation guidance, plus the previs-to-photoreal anchor keyframe recipe for reference-guided video generation.",
       "source": "./plugins/comfyui-vfx"
     },
     {
       "name": "comfyui-node-dev",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "description": "ComfyUI custom node development: V3 API node structure, schemas, datatypes, inputs/outputs, execution lifecycle, frontend extensions, V1-to-V3 migration, and packaging/publishing.",
       "source": "./plugins/comfyui-node-dev"
     },
     {
       "name": "maya-vfx",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "description": "Maya pipeline via MCP: scene control, geometry creation, materials (Arnold/USD), transforms, and FBX import/export.",
       "source": "./plugins/maya-vfx"
     },
     {
       "name": "magnific-vfx",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "description": "Magnific AI generation via MCP: image generation with model selection and references, local file upload/download pipelines, and video generation.",
       "source": "./plugins/magnific-vfx"
     },
     {
       "name": "seedance-vfx",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "description": "Seedance 2.0 video generation direction: prompt writing, camera, lighting, motion, characters, style, VFX, troubleshooting, and production recipes.",
       "source": "./plugins/seedance-vfx"
     }

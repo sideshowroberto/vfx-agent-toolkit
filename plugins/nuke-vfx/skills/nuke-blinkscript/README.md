@@ -18,10 +18,10 @@ BlinkScript kernel development skill for Nuke, covering GPU-accelerated custom e
 
 ```
 .claude/skills/nuke-blinkscript/
-├── SKILL.md                              # Main skill (495 lines, <500 limit)
-├── README.md                             # This file
-└── examples/
-    └── simple_overlay_template.blink    # Starter template
++-- SKILL.md                              # Main skill (495 lines, <500 limit)
++-- README.md                             # This file
++-- examples/
+    +-- simple_overlay_template.blink    # Starter template
 ```
 
 ---
@@ -99,27 +99,27 @@ The skill auto-loads when you mention:
 
 ## Constitutional Compliance
 
-**Article I (General Purpose):** ✅
+**Article I (General Purpose):** [OK]
 - All kernels are parameterized
 - Work on any image size/project
 
-**Article III (Progressive Disclosure):** ✅
+**Article III (Progressive Disclosure):** [OK]
 - SKILL.md: 495 lines (<500 limit)
 - Reference docs loaded on-demand
 
-**Article IV (Independent Testing):** ✅
+**Article IV (Independent Testing):** [OK]
 - Tested in Nuke 15.0v5
 - Validated at 1080p, 4K, 8K
 
-**Article V (Official Patterns):** ✅
+**Article V (Official Patterns):** [OK]
 - Uses official BlinkScript API
 - Follows Foundry documentation
 
-**Article VI (Context Efficiency):** ✅
+**Article VI (Context Efficiency):** [OK]
 - Progressive disclosure
 - Links to reference docs
 
-**Article VIII (Documentation):** ✅
+**Article VIII (Documentation):** [OK]
 - YAML frontmatter complete
 - All sections present
 
@@ -148,7 +148,7 @@ The skill auto-loads when you mention:
 
 **Testing:**
 - GPU acceleration verified
-- 4K resolution (2160×3840) real-time
+- 4K resolution (2160x3840) real-time
 - All 7 grids working simultaneously
 - No performance issues
 

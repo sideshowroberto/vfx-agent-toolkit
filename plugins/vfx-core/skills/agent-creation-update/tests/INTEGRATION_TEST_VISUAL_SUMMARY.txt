@@ -8,17 +8,17 @@ TEST 1: COMPLETE AGENT LIFECYCLE
 ================================================================
 
     [CREATE]          [VALIDATE]         [UPDATE]
-    v1.0.0      →     ✅ PASS      →     v1.1.0
-       ↓                                    ↓
+    v1.0.0      ->     [OK] PASS      ->     v1.1.0
+       v                                    v
     agent.md                           agent.md
-                                           ↓
+                                           v
                                       [ARCHIVE]
-                                           ↓
+                                           v
                                    archive/agent-v1.0.0.md
-                                           ↓
+                                           v
                                        [DELETE]
-                                           ↓
-                                      ✅ CLEANUP
+                                           v
+                                      [OK] CLEANUP
 
 Checks: 6
 Scripts: create, validate, update, archive
@@ -28,12 +28,12 @@ TEST 2: CREATE FROM ALL TEMPLATES
 ================================================================
 
     [TOOL-SPECIALIST]     [CROSS-TOOL]     [GENERAL-HELPER]
-           ↓                    ↓                  ↓
+           v                    v                  v
        CREATE               CREATE             CREATE
-           ↓                    ↓                  ↓
+           v                    v                  v
       VALIDATE             VALIDATE           VALIDATE
-           ↓                    ↓                  ↓
-       ✅ PASS              ✅ PASS            ✅ PASS
+           v                    v                  v
+       [OK] PASS              [OK] PASS            [OK] PASS
 
 Checks: 6
 Scripts: create, validate
@@ -43,16 +43,16 @@ TEST 3: VERSION INCREMENTS
 ================================================================
 
     v1.0.0
-       ↓
-    [MAJOR]  →  v2.0.0  →  archive/agent-v1.0.0.md
-       ↓
-    [MINOR]  →  v2.1.0  →  archive/agent-v2.0.0.md
-       ↓
-    [PATCH]  →  v2.1.1  →  archive/agent-v2.1.0.md
-       ↓
+       v
+    [MAJOR]  ->  v2.0.0  ->  archive/agent-v1.0.0.md
+       v
+    [MINOR]  ->  v2.1.0  ->  archive/agent-v2.0.0.md
+       v
+    [PATCH]  ->  v2.1.1  ->  archive/agent-v2.1.0.md
+       v
     [VALIDATE]
-       ↓
-    ✅ PASS
+       v
+    [OK] PASS
 
 Archives Created: 3
 Final Version: v2.1.1
@@ -62,125 +62,125 @@ Checks: 6
 TEST 4: VALIDATION PREVENTS INVALID AGENTS
 ================================================================
 
-    [CREATE "agent-v2"]  →  ❌ INVALID NAME (rejected)
-           ↓
-    No file created ✅
+    [CREATE "agent-v2"]  ->  [FAIL] INVALID NAME (rejected)
+           v
+    No file created [OK]
 
-    [CREATE INVALID]  →  agent.md (missing metadata)
-           ↓
-    [VALIDATE]  →  ❌ FAIL (correct)
-           ↓
-    [UPDATE]  →  ❌ BLOCKED (correct)
+    [CREATE INVALID]  ->  agent.md (missing metadata)
+           v
+    [VALIDATE]  ->  [FAIL] FAIL (correct)
+           v
+    [UPDATE]  ->  [FAIL] BLOCKED (correct)
 
 Checks: 3
-Safeguards Working: ✅
+Safeguards Working: [OK]
 
 ================================================================
 TEST 5: ARCHIVE RESTORATION WORKFLOW
 ================================================================
 
     [CREATE v1.0.0]
-           ↓
+           v
        agent.md
-           ↓
-    [UPDATE → v2.0.0]
-           ↓
+           v
+    [UPDATE -> v2.0.0]
+           v
     agent.md (v2.0.0) + archive/agent-v1.0.0.md
-           ↓
+           v
     [DELETE v2.0.0] (rollback scenario)
-           ↓
+           v
     (agent.md deleted)
-           ↓
+           v
     [RESTORE from archive]
-           ↓
-    copy archive/agent-v1.0.0.md → agent.md
-           ↓
+           v
+    copy archive/agent-v1.0.0.md -> agent.md
+           v
     [VALIDATE]
-           ↓
-    ✅ PASS (v1.0.0 restored successfully)
+           v
+    [OK] PASS (v1.0.0 restored successfully)
 
 Checks: 6
-Rollback Capability: ✅
+Rollback Capability: [OK]
 
 ================================================================
 TEST 6: FORCE OVERWRITE WORKFLOW
 ================================================================
 
     [CREATE agent]
-           ↓
+           v
        agent.md (v1.0.0)
-           ↓
+           v
     [CREATE agent] (duplicate, no --force)
-           ↓
-    ❌ BLOCKED (correct)
-           ↓
+           v
+    [FAIL] BLOCKED (correct)
+           v
     [CREATE agent --force]
-           ↓
-    ✅ OVERWRITE SUCCESS
-           ↓
-    [UPDATE → v2.0.0]
-           ↓
+           v
+    [OK] OVERWRITE SUCCESS
+           v
+    [UPDATE -> v2.0.0]
+           v
     archive/agent-v1.0.0.md created
-           ↓
+           v
     [RESTORE v1.0.0] (archive exists)
-           ↓
+           v
     [ARCHIVE] (duplicate, no --force)
-           ↓
-    ❌ BLOCKED (correct)
-           ↓
+           v
+    [FAIL] BLOCKED (correct)
+           v
     [ARCHIVE --force]
-           ↓
-    ✅ OVERWRITE SUCCESS
+           v
+    [OK] OVERWRITE SUCCESS
 
 Checks: 6
-Force Overwrite: ✅
+Force Overwrite: [OK]
 
 ================================================================
 EXECUTION FLOW
 ================================================================
 
     Test Runner (run_all_tests.py)
-           ↓
-    ┌──────────────┬──────────────────┐
-    ↓              ↓                  ↓
+           v
+    +--------------+------------------+
+    v              v                  v
 UNIT TESTS   INTEGRATION TESTS   COMBINED REPORT
 (pytest)     (subprocess)        (statistics)
-    ↓              ↓                  ↓
+    v              v                  v
 ~20 tests      6 scenarios        Total: ~26 tests
-    ↓              ↓                  ↓
-✅ PASS        ✅ PASS             ✅ ALL PASS
+    v              v                  v
+[OK] PASS        [OK] PASS             [OK] ALL PASS
 
 ================================================================
 TEST INFRASTRUCTURE
 ================================================================
 
 Each Test:
-    ┌────────────────┐
-    │ setup()        │  Create temp_dir/agents/
-    │                │  Create temp_dir/agents/archive/
-    └────────────────┘
-           ↓
-    ┌────────────────┐
-    │ run_script()   │  Execute create_agent.py
-    │                │  Execute update_agent.py
-    │                │  Execute validate_agent.py
-    │                │  Execute archive_agent.py
-    └────────────────┘
-           ↓
-    ┌────────────────┐
-    │ verify_*()     │  Check file exists
-    │                │  Check version correct
-    │                │  Check content valid
-    └────────────────┘
-           ↓
-    ┌────────────────┐
-    │ teardown()     │  Remove temp_dir
-    │                │  Clean all test files
-    └────────────────┘
+    +----------------+
+    | setup()        |  Create temp_dir/agents/
+    |                |  Create temp_dir/agents/archive/
+    +----------------+
+           v
+    +----------------+
+    | run_script()   |  Execute create_agent.py
+    |                |  Execute update_agent.py
+    |                |  Execute validate_agent.py
+    |                |  Execute archive_agent.py
+    +----------------+
+           v
+    +----------------+
+    | verify_*()     |  Check file exists
+    |                |  Check version correct
+    |                |  Check content valid
+    +----------------+
+           v
+    +----------------+
+    | teardown()     |  Remove temp_dir
+    |                |  Clean all test files
+    +----------------+
 
-Isolation: ✅ Each test uses separate temp directory
-Cleanup:   ✅ Automatic removal even on failure
-Real Code: ✅ Subprocess execution, not mocks
+Isolation: [OK] Each test uses separate temp directory
+Cleanup:   [OK] Automatic removal even on failure
+Real Code: [OK] Subprocess execution, not mocks
 
 ================================================================
 EXPECTED OUTPUT
@@ -191,44 +191,44 @@ AGENT-CREATION-UPDATE INTEGRATION TEST SUITE
 ======================================================================
 
 Test 1: Complete Agent Lifecycle
-  ✅ Create agent (v1.0.0)
-  ✅ Validate agent (PASS)
-  ✅ Update agent to v1.1.0
-  ✅ Validate updated agent (PASS)
-  ✅ Archive created (v1.0.0)
-  ✅ Cleanup successful
+  [OK] Create agent (v1.0.0)
+  [OK] Validate agent (PASS)
+  [OK] Update agent to v1.1.0
+  [OK] Validate updated agent (PASS)
+  [OK] Archive created (v1.0.0)
+  [OK] Cleanup successful
 
 Test 2: Create From All Templates
-  ✅ tool-specialist created
-  ✅ tool-specialist validated (PASS)
-  ✅ cross-tool created
-  ✅ cross-tool validated (PASS)
-  ✅ general-helper created
-  ✅ general-helper validated (PASS)
+  [OK] tool-specialist created
+  [OK] tool-specialist validated (PASS)
+  [OK] cross-tool created
+  [OK] cross-tool validated (PASS)
+  [OK] general-helper created
+  [OK] general-helper validated (PASS)
 
 Test 3: Version Increments
-  ✅ Create agent (v1.0.0)
-  ✅ Major increment (1.0.0 → 2.0.0)
-  ✅ Minor increment (2.0.0 → 2.1.0)
-  ✅ Patch increment (2.1.0 → 2.1.1)
-  ✅ All archives created
-  ✅ Validate final agent (PASS)
+  [OK] Create agent (v1.0.0)
+  [OK] Major increment (1.0.0 -> 2.0.0)
+  [OK] Minor increment (2.0.0 -> 2.1.0)
+  [OK] Patch increment (2.1.0 -> 2.1.1)
+  [OK] All archives created
+  [OK] Validate final agent (PASS)
 
 Test 4: Validation Prevents Invalid Agents
-  ✅ Invalid name rejected
-  ✅ Invalid agent validation fails
-  ✅ Update blocked on invalid agent
+  [OK] Invalid name rejected
+  [OK] Invalid agent validation fails
+  [OK] Update blocked on invalid agent
 
 Test 5: Archive Restoration Workflow
-  ✅ Original created and updated
-  ✅ Archive v1.0.0 exists
-  ✅ Restoration successful
-  ✅ Restored agent validates
+  [OK] Original created and updated
+  [OK] Archive v1.0.0 exists
+  [OK] Restoration successful
+  [OK] Restored agent validates
 
 Test 6: Force Overwrite Workflow
-  ✅ Duplicate creation blocked
-  ✅ Force overwrite succeeds
-  ✅ Archive force overwrite succeeds
+  [OK] Duplicate creation blocked
+  [OK] Force overwrite succeeds
+  [OK] Archive force overwrite succeeds
 
 ======================================================================
 TEST SUMMARY
@@ -237,7 +237,7 @@ Total Tests: 6
 Passed: 6
 Failed: 0
 
-🎉 All integration tests passed!
+ All integration tests passed!
 ======================================================================
 
 ================================================================
@@ -269,16 +269,16 @@ Cleanup:               Automatic, 100%
 QUALITY METRICS
 ================================================================
 
-✅ Test Isolation     - Each test uses temp directory
-✅ Cleanup            - Automatic teardown
-✅ Exit Codes         - Correct codes (0=pass, 1=fail)
-✅ Subprocess Exec    - Real scripts, not mocks
-✅ File Verification  - Existence + content checks
-✅ Version Validation - Semantic version parsing
-✅ Realistic Scenarios- Real-world workflows
-✅ Comprehensive      - All scripts, all workflows
-✅ Documented         - 500+ lines of test docs
-✅ Production-Ready   - No external dependencies
+[OK] Test Isolation     - Each test uses temp directory
+[OK] Cleanup            - Automatic teardown
+[OK] Exit Codes         - Correct codes (0=pass, 1=fail)
+[OK] Subprocess Exec    - Real scripts, not mocks
+[OK] File Verification  - Existence + content checks
+[OK] Version Validation - Semantic version parsing
+[OK] Realistic Scenarios- Real-world workflows
+[OK] Comprehensive      - All scripts, all workflows
+[OK] Documented         - 500+ lines of test docs
+[OK] Production-Ready   - No external dependencies
 
 ================================================================
 FILES CREATED
@@ -317,7 +317,7 @@ INTEGRATION_TEST_IMPLEMENTATION_SUMMARY.md  (600+ lines)
 PRODUCTION STATUS
 ================================================================
 
-Status:               ✅ PRODUCTION-READY
+Status:               [OK] PRODUCTION-READY
 Scripts Tested:       4/4 (100%)
 Workflows Covered:    8/8 (100%)
 Edge Cases Covered:   12/12 (100%)

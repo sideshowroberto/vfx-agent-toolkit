@@ -8,7 +8,7 @@ Extracted from unreal-pcg-automation skill for on-demand reference.
 
 ---
 
-## Critical Lesson: Timeout ≠ Success!
+## Critical Lesson: Timeout != Success!
 
 When setting properties via Python API, Silent Execution timeouts only mean "async operation started" - **NOT** "operation succeeded". Always verify critical settings.
 
@@ -17,7 +17,7 @@ When setting properties via Python API, Silent Execution timeouts only mean "asy
 ## The Problem
 
 ```python
-# ❌ WRONG: Assume timeout = success
+# [FAIL] WRONG: Assume timeout = success
 spline_settings = graph.nodes[0].get_settings()
 actor_selector = spline_settings.actor_selector
 
@@ -25,7 +25,7 @@ actor_selector = spline_settings.actor_selector
 actor_selector.actor_selection = unreal.PCGActorSelection.BY_CLASS
 actor_selector.actor_selection_class = unreal.Landscape
 
-# Got timeout → assumed it worked → WRONG!
+# Got timeout -> assumed it worked -> WRONG!
 # Properties may not have been set correctly!
 ```
 
@@ -44,7 +44,7 @@ actor_selector.actor_selection_class = unreal.Landscape
 ## The Solution: Always Verify
 
 ```python
-# ✅ CORRECT: Set → Verify → Confirm
+# [OK] CORRECT: Set -> Verify -> Confirm
 
 # Phase 1: Set properties
 actor_selector.actor_selection = unreal.PCGActorSelection.BY_CLASS
@@ -67,8 +67,8 @@ with open(latest_log, 'r', encoding='utf-8') as f:
 graph = unreal.load_asset('/Game/PCG/MyGraph')
 actor_selector = graph.nodes[0].get_settings().actor_selector
 
-print(f"✓ Verified actor_selection: {actor_selector.actor_selection}")
-print(f"✓ Verified actor_selection_class: {actor_selector.actor_selection_class}")
+print(f"[OK] Verified actor_selection: {actor_selector.actor_selection}")
+print(f"[OK] Verified actor_selection_class: {actor_selector.actor_selection_class}")
 ```
 
 ---
@@ -134,13 +134,13 @@ graph = unreal.load_asset('/Game/PCG/RoadGraph')
 settings = graph.nodes[0].get_settings()
 
 if settings.actor_selector.actor_selection == unreal.PCGActorSelection.BY_CLASS:
-    print("✓ Actor selection correctly set")
+    print("[OK] Actor selection correctly set")
 else:
-    print("✗ Actor selection NOT set - need to configure in UI")
+    print("[FAIL] Actor selection NOT set - need to configure in UI")
 
 # 3. If verification fails, configure manually in UI
-# Open graph → Select Get Spline Data node → Details panel
-# Actor Selector → Actor Selection: By Class
+# Open graph -> Select Get Spline Data node -> Details panel
+# Actor Selector -> Actor Selection: By Class
 # Actor Selection Class: Landscape
 ```
 

@@ -93,9 +93,9 @@ python update_agent.py <agent-name> <increment> \
 ```
 
 **Increment Types:**
-- `major` - Breaking changes (1.2.3 → 2.0.0)
-- `minor` - New features, backward compatible (1.2.3 → 1.3.0)
-- `patch` - Bug fixes only (1.2.3 → 1.2.4)
+- `major` - Breaking changes (1.2.3 -> 2.0.0)
+- `minor` - New features, backward compatible (1.2.3 -> 1.3.0)
+- `patch` - Bug fixes only (1.2.3 -> 1.2.4)
 
 **Optional Flags:**
 - `--no-archive` - Skip archiving old version (not recommended)
@@ -112,7 +112,7 @@ python update_agent.py <agent-name> <increment> \
 
 **Expected Output:**
 ```
-Version: 1.0.0 → 1.1.0
+Version: 1.0.0 -> 1.1.0
 Archived: .claude\agents\archive\documentation-specialist-v1.0.0.md
 Validation: PASSED (6/6)
 ```
@@ -143,7 +143,7 @@ python validate_agent.py <agent-name>
 - Valid status: active | deprecated | experimental
 
 **3. Name Matches Filename (Article IX, Section 9.1)**
-- Filename: `agent-name.md` → Internal name: `agent-name`
+- Filename: `agent-name.md` -> Internal name: `agent-name`
 - Exact case-sensitive match
 
 **4. Version Format (Article IX, Section 9.4)**
@@ -172,9 +172,9 @@ Constitutional compliance: Article IX verified
 **Expected Output (Fail):**
 ```
 Validation: FAILED (3/6 checks)
-❌ Filename Format: Contains version suffix
-❌ Name Matches Filename: my-agent != my-agent-v2
-❌ Description Quality: Too vague, missing triggers
+[FAIL] Filename Format: Contains version suffix
+[FAIL] Name Matches Filename: my-agent != my-agent-v2
+[FAIL] Description Quality: Too vague, missing triggers
 ```
 
 **Success Criteria:** All 6 checks pass, agent ready for commit
@@ -331,7 +331,7 @@ This skill enforces VFX_SKILL_CONSTITUTION.md requirements:
 - Constitutional compliance automation
 
 **Validated With:**
-- documentation-specialist agent (v1.0.0 → v2.0.0)
+- documentation-specialist agent (v1.0.0 -> v2.0.0)
 - blender-specialist agent (consolidation use case)
 - 10+ test agents during development
 

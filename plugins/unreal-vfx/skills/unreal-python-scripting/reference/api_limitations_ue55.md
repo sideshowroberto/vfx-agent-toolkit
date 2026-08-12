@@ -84,12 +84,12 @@ component = unreal.new_object(unreal.ImagePlateComponent)
 
 **Example:**
 ```python
-# ❌ DOESN'T WORK
+# [FAIL] DOESN'T WORK
 actor = unreal.EditorLevelLibrary.spawn_actor_from_class(...)
 component = unreal.new_object(unreal.ImagePlateComponent)
 # component.register_component()  # AttributeError: no such method
 
-# ✅ WORKS
+# [OK] WORKS
 bp = unreal.load_class(None, "/Game/BP_WithComponent.BP_WithComponent_C")
 actor = unreal.EditorLevelLibrary.spawn_actor_from_class(bp, ...)
 # Component already registered in Blueprint
@@ -135,7 +135,7 @@ image_plate = unreal.new_object(unreal.ImagePlateComponent)
 Blueprint Editor:
 1. Add CineCameraComponent (root)
 2. Add ImagePlateComponent
-3. Right-click ImagePlateComponent → Attach to → CineCameraComponent
+3. Right-click ImagePlateComponent -> Attach to -> CineCameraComponent
 4. Save Blueprint
 
 Python:
@@ -180,7 +180,7 @@ child_comp = actor2.root_component
 
 **Actor Attachment (Works):**
 ```python
-# ✅ Actor-level attachment works
+# [OK] Actor-level attachment works
 child_actor.attach_to_actor(
     parent_actor,
     unreal.AttachmentRule.SNAP_TO_TARGET,
@@ -190,7 +190,7 @@ child_actor.attach_to_actor(
 
 **Component Attachment (Doesn't Work):**
 ```python
-# ❌ Component-level attachment doesn't work
+# [FAIL] Component-level attachment doesn't work
 # Must be defined in Blueprint
 ```
 
@@ -270,10 +270,10 @@ actor.set_editor_property('some_variable', new_value)
 
 **Partially Available:**
 ```python
-# ✅ Can create basic material
+# [OK] Can create basic material
 material = unreal.AssetToolsHelpers.get_asset_tools().create_asset(...)
 
-# ❌ Cannot build graph
+# [FAIL] Cannot build graph
 # node1 = unreal.MaterialExpressionTextureSample(...)  # Limited API
 # node2 = unreal.MaterialExpressionMultiply(...)
 # node1.connect_to(node2)  # No such method
@@ -317,7 +317,7 @@ unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(
 # Create texture sample node (limited support)
 tex_node = material.Expressions.add(unreal.MaterialExpressionTextureSample)
 
-# ❌ Cannot set properties reliably
+# [FAIL] Cannot set properties reliably
 # tex_node.Texture = my_texture  # May not work
 # tex_node.SamplerType = ...     # May not work
 ```
@@ -341,19 +341,19 @@ tex_node = material.Expressions.add(unreal.MaterialExpressionTextureSample)
 
 **What Works:**
 ```python
-# ✅ Can create object
+# [OK] Can create object
 component = unreal.new_object(unreal.ImagePlateComponent)
 ```
 
 **What Doesn't Work:**
 ```python
-# ❌ Cannot register
+# [FAIL] Cannot register
 component.register_component()  # AttributeError
 
-# ❌ Cannot attach
+# [FAIL] Cannot attach
 component.setup_attachment(parent)  # AttributeError
 
-# ❌ Result: Component exists but completely non-functional
+# [FAIL] Result: Component exists but completely non-functional
 ```
 
 **Workaround:**
@@ -439,13 +439,13 @@ frustum = actor.get_components_by_class(unreal.ImagePlateFrustumComponent)[0]
 
 **Example:**
 ```python
-# ❌ Cannot enable plugins programmatically
+# [FAIL] Cannot enable plugins programmatically
 # unreal.PluginManager.enable_plugin("ImagePlate")  # No such API
 ```
 
 **Workaround:**
 - Enable plugins manually in editor
-- Or: Project settings → Plugins → Enable by default
+- Or: Project settings -> Plugins -> Enable by default
 - Python assumes plugins already enabled
 
 **Status:** No Python API for plugin management.

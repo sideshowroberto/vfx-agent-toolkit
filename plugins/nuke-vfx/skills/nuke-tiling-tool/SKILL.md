@@ -38,31 +38,31 @@ Automatically tiles large images for processing through ML nodes (ViTMatte, etc.
 
 ```
 Input Image (e.g., 5760x5760)
-    ↓
+    v
 Dot distribution (horizontal row)
-    ↓
+    v
 Auto-calculate grid (e.g., 3x3 for 2K tiles)
-    ↓
+    v
 For each tile (vertical stack):
     Transform (translate to position)
-    → Reformat (crop to tile size)
-    → NoOp Placeholder (orange - swap for ML node)
-    → Expression (gradient mask → mask channel)
-    → Premult (multiply by mask.a)
-    → InverseTransform (restore position)
-    ↓
+    -> Reformat (crop to tile size)
+    -> NoOp Placeholder (orange - swap for ML node)
+    -> Expression (gradient mask -> mask channel)
+    -> Premult (multiply by mask.a)
+    -> InverseTransform (restore position)
+    v
 Merge all tiles (plus operation, rgba output)
-    ↓
+    v
 Final Reformat (back to original dimensions)
-    ↓
+    v
 Output (full resolution, seamless blending)
 ```
 
 ### Key Features
 
 1. **Auto-calculates grid dimensions**
-   - 5760x5760 with 2K tiles → 3x3 grid
-   - 8192x8192 with 2K tiles → 5x5 grid
+   - 5760x5760 with 2K tiles -> 3x3 grid
+   - 8192x8192 with 2K tiles -> 5x5 grid
    - Non-square images supported
 
 2. **Expression-based gradient masks**
@@ -160,7 +160,7 @@ The script creates:
    - Transform node (translate to tile position)
    - Reformat node (crop to tile size using "to box")
    - NoOp placeholder (orange, replace with ML node)
-   - Expression node (gradient mask → mask channel)
+   - Expression node (gradient mask -> mask channel)
    - Premult node (multiply by mask.a to apply blending)
    - InverseTransform node (restore to original position)
 
@@ -239,9 +239,9 @@ else:                              # Middle rows
 - **Tile (2,2) bottom-right**: `smoothstep(2048, 1920, x) * smoothstep(2048, 1920, y)` - only interior edges fade
 
 **Result:**
-- Frame boundaries: Sharp (no fade) ✓
-- Interior tile boundaries: Smooth gradient blend ✓
-- Works for any aspect ratio (grid auto-adjusts) ✓
+- Frame boundaries: Sharp (no fade) [OK]
+- Interior tile boundaries: Smooth gradient blend [OK]
+- Works for any aspect ratio (grid auto-adjusts) [OK]
 
 ### Blending Strategy
 
@@ -249,8 +249,8 @@ else:                              # Middle rows
 
 | Approach | Alpha Quality | Blend Quality | Efficiency |
 |----------|---------------|---------------|------------|
-| Blur alpha | ❌ Destroys detail | ✅ Smooth | ⚠️ Per-frame |
-| Expression masks | ✅ Sharp detail | ✅ Smooth | ✅ Single eval, cached |
+| Blur alpha | [FAIL] Destroys detail | [OK] Smooth | [WARN] Per-frame |
+| Expression masks | [OK] Sharp detail | [OK] Smooth | [OK] Single eval, cached |
 
 **Key insight:** Blend the tile CONTRIBUTIONS (with masks), not the alpha VALUES (with blur).
 
@@ -313,15 +313,15 @@ Each tile is processed independently, so peak memory = single tile processing me
 
 ### Test Cases
 
-1. **5760x5760 → 2K tiles**
+1. **5760x5760 -> 2K tiles**
    - Expected: 3x3 grid (9 tiles)
    - Verify: No visible seams in output
 
-2. **8192x8192 → 2K tiles**
+2. **8192x8192 -> 2K tiles**
    - Expected: 5x5 grid (25 tiles)
    - Verify: Grid calculation correct
 
-3. **Non-square: 7680x4320 → 2K tiles**
+3. **Non-square: 7680x4320 -> 2K tiles**
    - Expected: 4x3 grid (12 tiles)
    - Verify: Non-square grids handled correctly
 

@@ -282,16 +282,16 @@ Definition file: /path/to/project/hda/my_tool.hda
 ```bash
 # Create HDA library structure
 project_root/
-├── hda/
-│   ├── geometry/
-│   │   ├── scatter_tools.hda
-│   │   └── deform_tools.hda
-│   ├── dynamics/
-│   │   ├── particle_systems.hda
-│   │   └── rigid_body_tools.hda
-│   └── utility/
-│       ├── file_export.hda
-│       └── attribute_tools.hda
++-- hda/
+|   +-- geometry/
+|   |   +-- scatter_tools.hda
+|   |   +-- deform_tools.hda
+|   +-- dynamics/
+|   |   +-- particle_systems.hda
+|   |   +-- rigid_body_tools.hda
+|   +-- utility/
+|       +-- file_export.hda
+|       +-- attribute_tools.hda
 ```
 
 ```python

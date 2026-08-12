@@ -180,25 +180,25 @@ def test_load_assets(mock_load, sample_assets):
 ## Critical Rules
 
 **DO:**
-- ✅ Follow template patterns exactly
-- ✅ Preserve working functionality
-- ✅ Create parameterized, reusable scripts
-- ✅ Add type hints to all public APIs
-- ✅ Use async for I/O, concurrent for CPU
-- ✅ Vectorize with pandas/numpy where possible
-- ✅ Write tests with 90%+ coverage
-- ✅ Document any deviations from template
-- ✅ Report ambiguities immediately
+- [OK] Follow template patterns exactly
+- [OK] Preserve working functionality
+- [OK] Create parameterized, reusable scripts
+- [OK] Add type hints to all public APIs
+- [OK] Use async for I/O, concurrent for CPU
+- [OK] Vectorize with pandas/numpy where possible
+- [OK] Write tests with 90%+ coverage
+- [OK] Document any deviations from template
+- [OK] Report ambiguities immediately
 
 **DON'T:**
-- ❌ Make architectural decisions (escalate to main Claude)
-- ❌ Add features beyond template scope
-- ❌ Create per-asset specific scripts
-- ❌ Skip type annotations
-- ❌ Use blocking I/O in async code
-- ❌ Use loops when vectorization is possible
-- ❌ Skip validation steps
-- ❌ Assume - ask if unclear
+- [FAIL] Make architectural decisions (escalate to main Claude)
+- [FAIL] Add features beyond template scope
+- [FAIL] Create per-asset specific scripts
+- [FAIL] Skip type annotations
+- [FAIL] Use blocking I/O in async code
+- [FAIL] Use loops when vectorization is possible
+- [FAIL] Skip validation steps
+- [FAIL] Assume - ask if unclear
 
 ## Output Format
 
@@ -214,7 +214,7 @@ For each refactoring task, provide:
 - test_file.py - Added pytest fixtures and parameterized tests
 
 **Changes Made:**
-1. Template application: Replaced {{SKILL_NAME}} → "Alert Intelligence"
+1. Template application: Replaced {{SKILL_NAME}} -> "Alert Intelligence"
 2. Type Safety: Added type hints to 45 functions, mypy strict mode passing
 3. Performance: Converted 3 I/O calls to async, 2x speedup
 4. Data Science: Vectorized 5 pandas operations, 10x speedup
@@ -224,7 +224,7 @@ For each refactoring task, provide:
 - Type Coverage: 100% (mypy strict mode)
 - Test Coverage: 94% (pytest-cov)
 - Performance: 5.2x faster (profiled with cProfile)
-- Lines of Code: 450 → 380 (Pythonic refactoring)
+- Lines of Code: 450 -> 380 (Pythonic refactoring)
 
 **Verification:**
 - [x] Scripts run independently

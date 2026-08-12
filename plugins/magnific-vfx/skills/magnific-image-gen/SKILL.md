@@ -1,6 +1,6 @@
 ---
 name: magnific-image-gen
-description: "Magnific MCP image generation skill. Use when generating ANY images, concept art, product shots, reference images, or visual assets — Magnific is the default image generation tool. Also use for selecting models, resolution/aspect ratio, adding references, browsing/creating folders, upscaling, or generating variations. Triggers on: \"generate image\", \"generate images\", \"generate refs\", \"generate reference\", \"reference images\", \"image refs\", \"generate concept\", \"product shot\", \"concept art\", \"make me an image\", \"make references\", \"generate with magnific\", \"magnific image\", \"nb2\", \"nano banana\", \"magnific folder\", \"upscale\", \"magnific variations\", \"render me\", \"create an image\", \"hero shots\"."
+description: "Magnific MCP image generation skill. Use when generating ANY images, concept art, product shots, reference images, or visual assets - Magnific is the default image generation tool. Also use for selecting models, resolution/aspect ratio, adding references, browsing/creating folders, upscaling, or generating variations. Triggers on: \"generate image\", \"generate images\", \"generate refs\", \"generate reference\", \"reference images\", \"image refs\", \"generate concept\", \"product shot\", \"concept art\", \"make me an image\", \"make references\", \"generate with magnific\", \"magnific image\", \"nb2\", \"nano banana\", \"magnific folder\", \"upscale\", \"magnific variations\", \"render me\", \"create an image\", \"hero shots\"."
 allowed-tools: mcp__magnific__images_generate,mcp__magnific__images_models_list,mcp__magnific__images_models_show,mcp__magnific__creations_show,mcp__magnific__creations_wait,mcp__magnific__creations_search,mcp__magnific__creations_get,mcp__magnific__folders_list,mcp__magnific__folders_create,mcp__magnific__images_upscale,mcp__magnific__images_variations,mcp__magnific__account_balance,mcp__magnific__library_list,mcp__magnific__library_show,mcp__magnific__creations_upload_image
 ---
 
@@ -8,13 +8,13 @@ allowed-tools: mcp__magnific__images_generate,mcp__magnific__images_models_list,
 
 ## Account Context
 
-- **Preferred models:** Nano Banana 2 Pro and Flash — use these by default for concept work
+- **Preferred models:** Nano Banana 2 Pro and Flash - use these by default for concept work
 - Check balance and plan coverage with `account_balance` if the user asks or before heavy batch runs (Pro unlimited plans cover NB2 at 1K/2K with no credit burn; 4K costs credits)
 
 ## Two Rules Before Any Generation
 
-1. **Confirm the destination folder.** Team workspaces often have multiple similarly-named project folders (several people may each have created one for the same show). Before a batch run, state which folder you are generating into and confirm it — including the right subfolder (e.g. a per-artist subfolder). Never generate into the workspace root.
-2. **On an auth/re-authorization error, stop — do not retry.** Magnific MCP sessions expire mid-task. The error is not transient: tell the user to run `/mcp` and re-authenticate, then resume from where you left off (re-request any presigned upload URLs, which go stale).
+1. **Confirm the destination folder.** Team workspaces often have multiple similarly-named project folders (several people may each have created one for the same show). Before a batch run, state which folder you are generating into and confirm it - including the right subfolder (e.g. a per-artist subfolder). Never generate into the workspace root.
+2. **On an auth/re-authorization error, stop - do not retry.** Magnific MCP sessions expire mid-task. The error is not transient: tell the user to run `/mcp` and re-authenticate, then resume from where you left off (re-request any presigned upload URLs, which go stale).
 
 ---
 
@@ -35,17 +35,17 @@ allowed-tools: mcp__magnific__images_generate,mcp__magnific__images_models_list,
 
 | Model | Slug | Speed | Best For |
 |-------|------|-------|----------|
-| **Nano Banana 2 Pro** ✅ DEFAULT | `imagen-nano-banana-2` | ~50s | All concept and final work — default choice |
+| **Nano Banana 2 Pro** [OK] DEFAULT | `imagen-nano-banana-2` | ~50s | All concept and final work - default choice |
 | Nano Banana 2 Flash | `imagen-nano-banana-2-flash` | ~34s | When user wants faster iteration or batch drafts |
 | Cinematic | `cinematic` | ~46s | Cinematic stills, when 4k quality is the priority |
 | GPT 2 | `gpt-2` | ~69s | Text/typography/infographics (not photorealistic) |
 | Flux.1 Kontext Max | `flux-kontext-high` | ~13s | Quick edits with image refs when speed matters |
 
-**Never use `auto` mode** — it picks random models (e.g. Seedream) instead of NB2. Always specify a slug explicitly.
+**Never use `auto` mode** - it picks random models (e.g. Seedream) instead of NB2. Always specify a slug explicitly.
 
 ---
 
-## Nano Banana 2 — Capabilities Reference
+## Nano Banana 2 - Capabilities Reference
 
 ### Resolutions
 `1k` | `2k` | `4k`
@@ -65,7 +65,7 @@ Common VFX ratios:
 ### Reference Types (NB2 Pro and Flash both support all 5)
 | Type | What it does | Source |
 |------|-------------|--------|
-| `image` | Carries composition, mood, and color palette from source — confirmed strong influence | creation identifier |
+| `image` | Carries composition, mood, and color palette from source - confirmed strong influence | creation identifier |
 | `style` | Style/look transfer | creation identifier or library style LoRA id |
 | `character` | Character consistency across generations | library asset numeric `id` |
 | `product` | Product/object consistency | library asset numeric `id` |
@@ -73,9 +73,9 @@ Common VFX ratios:
 
 **Important:** `character`, `product`, and `locations` use the numeric `id` from `library_list`, NOT a creation identifier. `image`, `style`, and `composition` use creation identifiers.
 
-**Model support varies:** not every model accepts every reference type — NB2 has rejected `composition` references with "The selected references.N.type is invalid". When passing structural refs (depth maps, layout frames) to NB2, send them as plain `image` type instead.
+**Model support varies:** not every model accepts every reference type - NB2 has rejected `composition` references with "The selected references.N.type is invalid". When passing structural refs (depth maps, layout frames) to NB2, send them as plain `image` type instead.
 
-**Confirmed workflow:** You can use any prior generation as an `image` reference in the next pass — even cross-model (e.g. Seedream output → NB2 Pro). NB2 Pro picks up composition and mood well from the reference.
+**Confirmed workflow:** You can use any prior generation as an `image` reference in the next pass - even cross-model (e.g. Seedream output -> NB2 Pro). NB2 Pro picks up composition and mood well from the reference.
 
 ---
 
@@ -117,7 +117,7 @@ images_generate(
 ## Folder Navigation
 
 ### Discovering Projects
-Call `folders_list(onlyProjects=true)` to list projects — folder references are stable UUIDs, so once discovered for an account they can be reused. Keep a per-account project→reference map in memory (a `reference` memory file) rather than re-listing every session, and refresh it when a lookup misses.
+Call `folders_list(onlyProjects=true)` to list projects - folder references are stable UUIDs, so once discovered for an account they can be reused. Keep a per-account project->reference map in memory (a `reference` memory file) rather than re-listing every session, and refresh it when a lookup misses.
 
 ### List contents of a folder
 ```python
@@ -154,7 +154,7 @@ Use `creations_wait` first if the generation is still in progress.
 images_variations(
     creationIdentifier="<id>",
     variationMode="custom",    # angles|demographics|expressions|age|storyboard|custom
-    prompt="Vary lighting mood, camera angle, atmosphere — keep same location",
+    prompt="Vary lighting mood, camera angle, atmosphere - keep same location",
     gridRows=2,
     gridCols=2,
     resolution="2k"
@@ -163,8 +163,8 @@ images_variations(
 - `storyboard` and `custom` modes require a `prompt`
 - Max 9 tiles (rows x cols must be <= 9)
 - **`custom` mode confirmed reliable** for environment/look exploration
-- The grid is one image — download it, pick a tile visually, then use that as an `image` reference in the next generation pass
-- Download with `creations_wait` → URL → `urllib.request.urlretrieve` (same as any generation)
+- The grid is one image - download it, pick a tile visually, then use that as an `image` reference in the next generation pass
+- Download with `creations_wait` -> URL -> `urllib.request.urlretrieve` (same as any generation)
 
 ### Search existing creations
 ```python
@@ -190,22 +190,22 @@ Pass the numeric `id` (not the string `identifier`) in `references[]` for `chara
 To use a local or web-hosted image as a reference:
 ```python
 creations_upload_image(url="<image_url>")
-# Returns a creation identifier — use that in references[]
+# Returns a creation identifier - use that in references[]
 ```
 
 ---
 
-## NSFW Filter — Action/Violence Style References
+## NSFW Filter - Action/Violence Style References
 
 The NSFW filter triggers on **`style` references** containing fighting, combat, weapons, or crowd violence (e.g. combat-sports stills, post-apocalyptic action scenes). The filter is stricter on style refs than on `image` refs.
 
-**Workaround:** Use action/violence content as `image` type (composition lock) only — never `style`. Use calm photographic refs for style.
+**Workaround:** Use action/violence content as `image` type (composition lock) only - never `style`. Use calm photographic refs for style.
 
 ---
 
 ## Technical Notes (from MagnificAI Nuke node internals)
 
-### Resolution — Constant-Area Formula
+### Resolution - Constant-Area Formula
 Magnific uses constant-area math, not simple pixel multiplication. Dimensions are floored to 64px:
 ```python
 area     = res * res           # e.g. 2048*2048 for 2K
@@ -214,21 +214,21 @@ short_raw = area / long_raw
 long_px  = int(long_raw  / 64) * 64
 short_px = int(short_raw / 64) * 64
 ```
-Example: 9:16 at 2K → `width=1536, height=2688` (not 2048×2048)
+Example: 9:16 at 2K -> `width=1536, height=2688` (not 2048x2048)
 
-### Thumbnail URLs lie about aspect ratio — check the real file first
-The CDN serves two thumbnail formats: `render.png?preview=1` **crops to square**, while `render-preview.jpg` preserves the true aspect ratio. If generations "look like the wrong aspect ratio," download the actual render (via `creations_wait` URL) and check its real dimensions BEFORE debugging prompts or parameters — the renders are almost always correct and only the preview is cropped.
+### Thumbnail URLs lie about aspect ratio - check the real file first
+The CDN serves two thumbnail formats: `render.png?preview=1` **crops to square**, while `render-preview.jpg` preserves the true aspect ratio. If generations "look like the wrong aspect ratio," download the actual render (via `creations_wait` URL) and check its real dimensions BEFORE debugging prompts or parameters - the renders are almost always correct and only the preview is cropped.
 
 ### The `resolution` API field is required
 The `resolution` string (`"1k"`, `"2k"`, `"3k"`, `"4k"`) must be sent alongside pixel `width`/`height`.
 Without it, the API ignores dimensions and returns wrong output size. The MCP handles this automatically.
 
-### Unlimited (∞) vs Credit-burning
-- NB2 Pro at 1K, 2K: unlimited (∞) — no credit cost
+### Unlimited (inf) vs Credit-burning
+- NB2 Pro at 1K, 2K: unlimited (inf) - no credit cost
 - NB2 Pro at 4K: costs credits
-- `∞` suffix in the Nuke node confirms Pro plan covers 2K as unlimited — matches our account
+- `inf` suffix in the Nuke node confirms Pro plan covers 2K as unlimited - matches our account
 
-### WebP Output — Nuke Pipeline Warning
+### WebP Output - Nuke Pipeline Warning
 Magnific CDN sometimes serves WebP even when the URL ends in `.jpg`. **Nuke 16 and 17 do not support WebP natively.** If pulling Magnific outputs directly into Nuke (bypassing the MCP), you must detect and convert:
 ```python
 if data[:4] == b'RIFF' and data[8:12] == b'WEBP':
@@ -246,9 +246,9 @@ ToolSet installed at: `~/.nuke/ToolSets/MagnificAI.nk`
 
 ## VFX Concept Round Workflow
 
-1. **Pick model** — NB2 Flash for speed, NB2 Pro for finals. Never use `auto`.
-2. **Generate batch** — `count=4`, save to relevant project folder
-3. **Show results** — `creations_show(identifiers=[...])`
-4. **Iterate** — add references from picked results, tighten prompt, regenerate
-5. **Upscale hero** — `images_upscale(scale="4x")` on the winner
-6. **Export/share** — `webUrl` for review or pass asset URL to downstream tools (Nuke, ComfyUI)
+1. **Pick model** - NB2 Flash for speed, NB2 Pro for finals. Never use `auto`.
+2. **Generate batch** - `count=4`, save to relevant project folder
+3. **Show results** - `creations_show(identifiers=[...])`
+4. **Iterate** - add references from picked results, tighten prompt, regenerate
+5. **Upscale hero** - `images_upscale(scale="4x")` on the winner
+6. **Export/share** - `webUrl` for review or pass asset URL to downstream tools (Nuke, ComfyUI)

@@ -176,7 +176,7 @@ Even distribution (due to relax iterations)
 1. **Create Source Geometry as Packed Primitive**
    ```
    [Source Geometry - Box/Custom Mesh]
-   ↓
+   v
    Pack SOP
    - Pack Geometry: ON
    - Transfer Attributes: Cd, N, uv (if needed)
@@ -185,7 +185,7 @@ Even distribution (due to relax iterations)
 
 2. **Scatter Points**
    ```
-   Grid → Scatter SOP 2.0
+   Grid -> Scatter SOP 2.0
    - Total Count: 10,000+
    - Generate Normals: ON
    ```
@@ -218,7 +218,7 @@ Even distribution (due to relax iterations)
 
 **Performance Benefits:**
 ```
-Regular copies: 10k boxes = 10k × geometry memory
+Regular copies: 10k boxes = 10k x geometry memory
 Packed instances: 10k boxes = 1 geometry + 10k transforms
 Memory reduction: ~95% for simple geometry
 ```
@@ -243,9 +243,9 @@ Memory reduction: ~95% for simple geometry
    - Draw curve in viewport
 
    // Method 2: Procedural curve
-   Line SOP → Resample SOP
+   Line SOP -> Resample SOP
    - Points: 20
-   ↓
+   v
    Point Wrangle
    // Add noise for organic shape
    @P += curlnoise(@P * 0.5 + {0, @ptnum * 0.1, 0}) * 0.5;
@@ -293,7 +293,7 @@ Memory reduction: ~95% for simple geometry
 5. **Alternative: Skin SOP for Multi-Curve Surfaces**
    ```
    [Multiple parallel curves]
-   ↓
+   v
    Skin SOP
    - Skinning Method: Rows or Columns
    - Preserve Shape: ON
@@ -317,16 +317,16 @@ Memory reduction: ~95% for simple geometry
 **Implementation:**
 ```
 [Input Geometry with connectivity/piece attribute]
-↓
+v
 Connectivity SOP (create i@class attribute grouping pieces)
-↓
+v
 For-Each Connected Piece Block Begin
-↓
+v
 [Operations on each piece individually]
   - Transform (random position/rotation per piece)
   - Scatter (different density per piece)
   - Material assignment (i@shop_materialpath per piece)
-↓
+v
 For-Each Block End (merges all pieces back)
 ```
 
@@ -387,12 +387,12 @@ Output: Tree-like branching structure
 
 **Convert to Tubes:**
 ```
-L-System SOP → PolyPath SOP (convert to polylines)
-↓
+L-System SOP -> PolyPath SOP (convert to polylines)
+v
 Resample SOP (add resolution)
-↓
+v
 Sweep SOP (add thickness with Circle profile)
-↓
+v
 Point Wrangle (taper branches based on hierarchy)
 ```
 
@@ -471,16 +471,16 @@ Input geometry has no surface area (curves, points only, or zero-area primitives
 3. Check "Input 0" primitives type
 
 // If input is curves (not surfaces):
-[Curve] → Skin SOP (create surface from curves)
-        → Scatter SOP
+[Curve] -> Skin SOP (create surface from curves)
+        -> Scatter SOP
 
 // If input is points only:
-[Points] → Add SOP (create polygons)
-         → Scatter SOP
+[Points] -> Add SOP (create polygons)
+         -> Scatter SOP
 
 // If surface but zero area (flattened):
-[Flat Geo] → Mountain SOP (add height variation)
-           → Scatter SOP
+[Flat Geo] -> Mountain SOP (add height variation)
+           -> Scatter SOP
 ```
 
 **Verification:**
@@ -524,7 +524,7 @@ foreach (int pt; int pts[] = nearpoints(0, @P, min_dist)) {
 
 **Alternative: Delete by Distance**
 ```
-Scatter → Delete SOP
+Scatter -> Delete SOP
 - Operation: Delete Points by Expression
 - Expression: `distance(vtorigin(".", 0, @ptnum), vtorigin(".", 0, (@ptnum+1) % @numpt)) < ch("min_dist")`
 ```
@@ -589,14 +589,14 @@ Using full geometry copies instead of packed instances.
 ```
 // Enable instancing in Copy to Points
 Copy to Points SOP
-- Pack and Instance: ENABLED ✅
+- Pack and Instance: ENABLED [OK]
 
 // Or manually pack before copying
 [Source Geometry]
-↓
+v
 Pack SOP
 - Pack Geometry: ON
-↓
+v
 Copy to Points (input 2)
 - Pack and Instance: ON
 ```
@@ -610,7 +610,7 @@ Copy to Points (input 2)
 
 **Alternative: Use Instance Object for Render Only**
 ```
-Copy to Points → Instance Object (for Mantra/Karma rendering)
+Copy to Points -> Instance Object (for Mantra/Karma rendering)
 Instances only created at render time, not in viewport
 ```
 

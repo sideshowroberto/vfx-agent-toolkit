@@ -34,7 +34,7 @@
 
 **Common Tasks:**
 - Create addon with MCP integration
-- Debug API breaking changes (4.2 → 4.5+)
+- Debug API breaking changes (4.2 -> 4.5+)
 - Set up Geometry Nodes
 - Export to game engine
 - Fix EEVEE_NEXT issues
@@ -67,19 +67,19 @@ For VFX pipelines spanning multiple applications:
 
 ```
 VFX_Pipeline/
-├── MASTER_DOCUMENTATION_INDEX.md        ← Links all apps
-├── UnrealEngine/
-│   └── unreal-mcp-main/
-│       └── DEVELOPMENT_DOCUMENTATION_INDEX.md
-├── Nuke/
-│   └── nuke-scripts/
-│       └── DEVELOPMENT_DOCUMENTATION_INDEX.md
-├── Houdini/
-│   └── hda-library/
-│       └── DEVELOPMENT_DOCUMENTATION_INDEX.md
-└── Blender/
-    └── pipeline-tools/
-        └── DEVELOPMENT_DOCUMENTATION_INDEX.md
++-- MASTER_DOCUMENTATION_INDEX.md        <- Links all apps
++-- UnrealEngine/
+|   +-- unreal-mcp-main/
+|       +-- DEVELOPMENT_DOCUMENTATION_INDEX.md
++-- Nuke/
+|   +-- nuke-scripts/
+|       +-- DEVELOPMENT_DOCUMENTATION_INDEX.md
++-- Houdini/
+|   +-- hda-library/
+|       +-- DEVELOPMENT_DOCUMENTATION_INDEX.md
++-- Blender/
+    +-- pipeline-tools/
+        +-- DEVELOPMENT_DOCUMENTATION_INDEX.md
 ```
 
 ### Master Index Contents

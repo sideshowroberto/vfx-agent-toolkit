@@ -280,7 +280,7 @@ unreal.MaterialEditingLibrary.set_material_instance_vector_parameter_value(
 ### Wrong Approach
 
 ```python
-# ❌ WRONG: Doesn't work for parameters
+# [FAIL] WRONG: Doesn't work for parameters
 instance.set_editor_property('BaseColor', texture)
 instance.set_editor_property('Opacity', 1.0)
 instance.set_editor_property('TintColor', color)
@@ -293,7 +293,7 @@ instance.set_editor_property('TintColor', color)
 ### Correct Approach
 
 ```python
-# ✅ CORRECT: Use MaterialEditingLibrary
+# [OK] CORRECT: Use MaterialEditingLibrary
 unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(
     instance, 'BaseColor', texture
 )
@@ -311,13 +311,13 @@ unreal.MaterialEditingLibrary.set_material_instance_vector_parameter_value(
 
 **Use for material instance properties (not parameters):**
 ```python
-# ✅ Parent assignment
+# [OK] Parent assignment
 instance.set_editor_property('parent', master)
 
-# ✅ Physical material
+# [OK] Physical material
 instance.set_editor_property('phys_material', phys_mat)
 
-# ✅ Blend mode override (if enabled)
+# [OK] Blend mode override (if enabled)
 instance.set_editor_property('override_blend_mode', True)
 instance.set_editor_property('blend_mode', unreal.BlendMode.BLEND_MASKED)
 ```
@@ -369,8 +369,8 @@ instance.set_editor_property('blend_mode', unreal.BlendMode.BLEND_MASKED)
 **Material Graph:**
 ```
 PlateTexture (Texture2D Parameter)
-├─ RGB → Multiply (EmissiveMultiplier) → Emissive Color
-└─ Alpha → Multiply (OpacityMultiplier) → Opacity Mask
++- RGB -> Multiply (EmissiveMultiplier) -> Emissive Color
++- Alpha -> Multiply (OpacityMultiplier) -> Opacity Mask
 ```
 
 **Save:** `/Game/Materials/M_ForegroundPlate_Master`
@@ -731,7 +731,7 @@ unreal.MaterialEditingLibrary.set_material_instance_scalar_parameter_value(
 4. Save asset after setting parameter
 
 ```python
-# ✅ CORRECT
+# [OK] CORRECT
 unreal.MaterialEditingLibrary.set_material_instance_scalar_parameter_value(...)
 unreal.EditorAssetLibrary.save_loaded_asset(instance)
 ```
@@ -785,7 +785,7 @@ if 'BaseColor' not in params:
 ### 2. Always Set Parent First
 
 ```python
-# ✅ CORRECT order
+# [OK] CORRECT order
 instance = tools.create_asset(...)
 instance.set_editor_property('parent', master)  # Parent first
 unreal.MaterialEditingLibrary.set_material_instance_scalar_parameter_value(...)  # Then parameters

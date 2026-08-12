@@ -15,7 +15,7 @@ Symbols are also accessible via `window.comfyAPI.<module>.<export>`.
 
 ---
 
-## scripts/api — ComfyApi
+## scripts/api - ComfyApi
 
 ```javascript
 import { api, ComfyApi } from "../../scripts/api.js";
@@ -24,27 +24,27 @@ import { api, ComfyApi } from "../../scripts/api.js";
 ### ComfyApi Class (extends EventTarget)
 
 **Properties:**
-- `api_host` / `api_base` — server host and base path
-- `initialClientId` / `clientId` — session identifiers
-- `user` — current user ID
-- `socket` — WebSocket instance
-- `authToken` / `apiKey` — authentication credentials
+- `api_host` / `api_base` - server host and base path
+- `initialClientId` / `clientId` - session identifiers
+- `user` - current user ID
+- `socket` - WebSocket instance
+- `authToken` / `apiKey` - authentication credentials
 
 **URL builders:**
-- `internalURL(route)` — internal API URL
-- `apiURL(route)` — public API URL
-- `fileURL(route)` — file access URL
+- `internalURL(route)` - internal API URL
+- `apiURL(route)` - public API URL
+- `fileURL(route)` - file access URL
 
 **Fetch:**
-- `fetchApi(route, options?)` — authenticated `fetch` wrapper (adds auth headers)
+- `fetchApi(route, options?)` - authenticated `fetch` wrapper (adds auth headers)
 
 **Node definitions:**
-- `getNodeDefs()` — fetch all node definitions from `/object_info`
-- `getExtensions()` — list extension JS URLs
+- `getNodeDefs()` - fetch all node definitions from `/object_info`
+- `getExtensions()` - list extension JS URLs
 
 **Prompt execution:**
-- `queuePrompt(number, data, options?)` — queue a prompt
-- `interrupt(runningJobId)` — interrupt execution
+- `queuePrompt(number, data, options?)` - queue a prompt
+- `interrupt(runningJobId)` - interrupt execution
 
 **Queue / History:**
 - `getQueue()` / `getHistory()` / `getJobDetail(jobId)`
@@ -63,14 +63,14 @@ import { api, ComfyApi } from "../../scripts/api.js";
 - `moveUserData(source, dest)` / `listUserDataFullInfo(dir)`
 
 **System:**
-- `getSystemStats()` — GPU/CPU stats
-- `freeMemory(options)` — free execution cache
+- `getSystemStats()` - GPU/CPU stats
+- `freeMemory(options)` - free execution cache
 - `getLogs()` / `getRawLogs()` / `subscribeLogs(enabled)`
-- `getFolderPaths()` — server folder paths
+- `getFolderPaths()` - server folder paths
 
 **Feature flags:**
-- `serverSupportsFeature(name)` — boolean check
-- `getServerFeature(name, defaultValue?)` — get feature value
+- `serverSupportsFeature(name)` - boolean check
+- `getServerFeature(name, defaultValue?)` - get feature value
 - `getServerFeatures()` / `getClientFeatureFlags()`
 
 **Workflow templates:**
@@ -80,7 +80,7 @@ import { api, ComfyApi } from "../../scripts/api.js";
 - `getGlobalSubgraphData(id)` / `getGlobalSubgraphs()`
 
 **i18n:**
-- `getCustomNodesI18n()` — custom node translations
+- `getCustomNodesI18n()` - custom node translations
 
 ### Events
 
@@ -126,7 +126,7 @@ api.dispatchCustomEvent("my_extension.event", detailData);
 
 ---
 
-## scripts/app — ComfyApp
+## scripts/app - ComfyApp
 
 ```javascript
 import { app, ComfyApp } from "../../scripts/app.js";
@@ -154,28 +154,28 @@ import { app, ComfyApp } from "../../scripts/app.js";
 ### `app` Methods
 
 **Registration:**
-- `registerExtension(extension)` — register a `ComfyExtension`
+- `registerExtension(extension)` - register a `ComfyExtension`
 - `registerNodes()` / `registerNodeDef(nodeId, nodeDef)` / `registerNodesFromDefs(defs)`
 
 **Graph operations:**
-- `loadGraphData(graphData?, clean?, restore_view?, workflow?, options?)` — load workflow
-- `graphToPrompt(graph?)` — serialize graph to API prompt format
-- `queuePrompt(number, batchCount?, queueNodeIds?)` — queue execution
-- `refreshComboInNodes()` — refresh all combo widget options
-- `clean()` — reset state
-- `getNodeDefs()` — fetch node definitions
+- `loadGraphData(graphData?, clean?, restore_view?, workflow?, options?)` - load workflow
+- `graphToPrompt(graph?)` - serialize graph to API prompt format
+- `queuePrompt(number, batchCount?, queueNodeIds?)` - queue execution
+- `refreshComboInNodes()` - refresh all combo widget options
+- `clean()` - reset state
+- `getNodeDefs()` - fetch node definitions
 
 **File handling:**
 - `handleFile(file, source)` / `handleFileList(fileList)`
 - `handleAudioFileList(fileList)` / `handleVideoFileList(fileList)`
 
 **Coordinate conversion:**
-- `clientPosToCanvasPos(pos)` — screen → canvas coordinates
-- `canvasPosToClientPos(pos)` — canvas → screen coordinates
+- `clientPosToCanvasPos(pos)` - screen -> canvas coordinates
+- `canvasPosToClientPos(pos)` - canvas -> screen coordinates
 
 **Context menus:**
-- `collectCanvasMenuItems(canvas)` — gather canvas context menu items
-- `collectNodeMenuItems(node)` — gather node context menu items
+- `collectCanvasMenuItems(canvas)` - gather canvas context menu items
+- `collectNodeMenuItems(node)` - gather node context menu items
 
 **Node layout:**
 - `positionNodes(nodes)` / `positionBatchNodes(nodes, batchNode)`
@@ -187,7 +187,7 @@ import { app, ComfyApp } from "../../scripts/app.js";
 
 ---
 
-## scripts/widgets — Widget Constructors
+## scripts/widgets - Widget Constructors
 
 ```javascript
 import { ComfyWidgets, addValueControlWidgets } from "../../scripts/widgets.js";
@@ -226,7 +226,7 @@ if (widget[IS_CONTROL_WIDGET]) { /* ... */ }
 
 ---
 
-## scripts/domWidget — DOM-Based Widgets
+## scripts/domWidget - DOM-Based Widgets
 
 ```javascript
 import { addWidget, DOMWidgetImpl } from "../../scripts/domWidget.js";
@@ -241,12 +241,12 @@ node.addDOMWidget(name, type, element, options);
 ```
 
 **DOMWidgetOptions:**
-- `serialize` — boolean, include in API workflow
-- `getValue()` / `setValue(v)` — custom get/set
-- `onHide()` — called when widget hidden
-- `hideOnZoom` — hide when zoomed out
-- `selectOn` — event array for selection (e.g., `["focus", "click"]`)
-- `beforeResize()` / `afterResize()` — resize hooks
+- `serialize` - boolean, include in API workflow
+- `getValue()` / `setValue(v)` - custom get/set
+- `onHide()` - called when widget hidden
+- `hideOnZoom` - hide when zoomed out
+- `selectOn` - event array for selection (e.g., `["focus", "click"]`)
+- `beforeResize()` / `afterResize()` - resize hooks
 
 ### ComponentWidgetImpl
 
@@ -265,7 +265,7 @@ addWidget(node, widget);
 
 ---
 
-## scripts/utils — Utility Functions
+## scripts/utils - Utility Functions
 
 ```javascript
 import { addStylesheet, uploadFile, clone } from "../../scripts/utils.js";
@@ -285,7 +285,7 @@ import { addStylesheet, uploadFile, clone } from "../../scripts/utils.js";
 
 ---
 
-## scripts/pnginfo — Metadata Extraction
+## scripts/pnginfo - Metadata Extraction
 
 ```javascript
 import { getPngMetadata, getWebpMetadata, importA1111 } from "../../scripts/pnginfo.js";
@@ -304,7 +304,7 @@ import { getPngMetadata, getWebpMetadata, importA1111 } from "../../scripts/pngi
 
 ---
 
-## scripts/ui — Legacy UI (Deprecated)
+## scripts/ui - Legacy UI (Deprecated)
 
 ```javascript
 import { $el, ComfyDialog } from "../../scripts/ui.js";
@@ -320,7 +320,7 @@ import { $el, ComfyDialog } from "../../scripts/ui.js";
 
 ---
 
-## scripts/changeTracker — Undo/Redo
+## scripts/changeTracker - Undo/Redo
 
 ```javascript
 import { ChangeTracker } from "../../scripts/changeTracker.js";
@@ -338,7 +338,7 @@ import { ChangeTracker } from "../../scripts/changeTracker.js";
 
 ---
 
-## scripts/metadata/ — File Format Parsers
+## scripts/metadata/ - File Format Parsers
 
 Low-level metadata extraction for various file formats:
 
@@ -359,7 +359,7 @@ Low-level metadata extraction for various file formats:
 
 ---
 
-## scripts/ui/ — Legacy UI Components
+## scripts/ui/ - Legacy UI Components
 
 | Module | Exports |
 |---|---|

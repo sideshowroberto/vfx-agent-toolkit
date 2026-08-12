@@ -43,7 +43,7 @@ from ForegroundPlateSetup import create_foreground_plate
 
 ```python
 # Method A: Check MediaPlayer via Content Browser
-# 1. Content Browser → Search for MP_{plate_name}
+# 1. Content Browser -> Search for MP_{plate_name}
 # 2. Double-click to open MediaPlayer editor
 # 3. Check playback status (should show "Playing")
 # 4. Verify first frame appears in preview
@@ -83,9 +83,9 @@ inspect_camera_components()
 
 # Expected output:
 # Camera: Cam_Shot001_FG
-#   - CineCameraComponent
-#   - ImagePlateComponent (✓)
-#   - ImagePlateFrustumComponent (✓)
+# - CineCameraComponent
+# - ImagePlateComponent ([OK])
+# - ImagePlateFrustumComponent ([OK])
 ```
 
 **Expected:**
@@ -97,9 +97,9 @@ inspect_camera_components()
 
 ```
 Manual Check:
-1. Outliner → Select Cam_{plate_name}
-2. Right-click → "Pilot Camera Actor"
-3. Viewport → Should show camera's view
+1. Outliner -> Select Cam_{plate_name}
+2. Right-click -> "Pilot Camera Actor"
+3. Viewport -> Should show camera's view
 4. Verify you're looking THROUGH the camera, not AT it
 ```
 
@@ -171,8 +171,8 @@ create_foreground_plate(
 
 **Fix:**
 ```
-1. Outliner → Select Cam_{plate_name}
-2. Right-click → "Pilot Camera Actor"
+1. Outliner -> Select Cam_{plate_name}
+2. Right-click -> "Pilot Camera Actor"
 3. Viewport updates to camera view
 4. ImagePlate should now be visible
 ```
@@ -258,7 +258,7 @@ media_texture = unreal.load_asset(media_texture_path)
 
 **Manual Check:**
 ```
-1. Content Browser → MS_{plate_name} (ImgMediaSource)
+1. Content Browser -> MS_{plate_name} (ImgMediaSource)
 2. Double-click to open
 3. Check "Sequence Path" points to correct format
 4. Supported formats:
@@ -274,19 +274,19 @@ media_texture = unreal.load_asset(media_texture_path)
 
 ```
 Manual Check (Material Editor):
-1. Content Browser → M_{plate_name} or M_ForegroundPlate_Master
+1. Content Browser -> M_{plate_name} or M_ForegroundPlate_Master
 2. Double-click to open Material Editor
 3. Verify material graph:
-   - PlateTexture → Texture Sample node
-   - Alpha output (pin 4) → Opacity Mask input
+   - PlateTexture -> Texture Sample node
+   - Alpha output (pin 4) -> Opacity Mask input
    - Should see connection line from Alpha pin to Opacity Mask
 ```
 
 **Expected Material Graph:**
 ```
 [Texture Sample: PlateTexture]
-├── RGB (pin 1-3) → EmissiveColor
-└── Alpha (pin 4) → OpacityMask (× OpacityMultiplier)
++-- RGB (pin 1-3) -> EmissiveColor
++-- Alpha (pin 4) -> OpacityMask (x OpacityMultiplier)
 ```
 
 **Step 4: Check Opacity Multiplier Parameter**
@@ -390,8 +390,8 @@ unreal.EditorAssetLibrary.save_loaded_asset(material_instance)
 ```
 1. Place colored cube behind ImagePlate
 2. Transparent areas of plate should reveal cube
-3. If cube not visible → alpha still broken
-4. If black fringing → check premultiplication
+3. If cube not visible -> alpha still broken
+4. If black fringing -> check premultiplication
 ```
 
 ---
@@ -571,15 +571,15 @@ if master_material is None:
 1. Load Shot002 material instance
 2. Change PlateTexture parameter to different MediaTexture
 3. Verify Shot003 still shows original texture
-4. If Shot003 changed → material instances not set up correctly
+4. If Shot003 changed -> material instances not set up correctly
 ```
 
 **Expected Hierarchy:**
 ```
 M_ForegroundPlate_Master (master material)
-├── MI_Shot001_FG (PlateTexture = MT_Shot001_FG)
-├── MI_Shot002_FG (PlateTexture = MT_Shot002_FG)
-└── MI_Shot003_FG (PlateTexture = MT_Shot003_FG)
++-- MI_Shot001_FG (PlateTexture = MT_Shot001_FG)
++-- MI_Shot002_FG (PlateTexture = MT_Shot002_FG)
++-- MI_Shot003_FG (PlateTexture = MT_Shot003_FG)
 ```
 
 ---
@@ -606,7 +606,7 @@ create_foreground_plate(
 )
 
 # If auto_play_media was False or omitted:
-# → MediaPlayer won't auto-play
+# -> MediaPlayer won't auto-play
 ```
 
 **Step 2: Validate ImgMediaSource Path**
@@ -640,14 +640,14 @@ media_player = unreal.load_asset("/Game/Media/MP_Shot001_FG")
 media_source = media_player.get_editor_property("media_source")
 print(f"Media Source: {media_source}")
 
-# If None → MediaPlayer not connected to ImgMediaSource
+# If None -> MediaPlayer not connected to ImgMediaSource
 
 # Attempt to open source manually
 img_media_source = unreal.load_asset("/Game/Media/MS_Shot001_FG")
 success = media_player.open_source(img_media_source)
 print(f"OpenSource Success: {success}")
 
-# If False → path or format issue
+# If False -> path or format issue
 ```
 
 **Step 4: Verify File System Access**
@@ -759,7 +759,7 @@ foreach ($file in $files) {
 
 **Test Procedure:**
 ```
-1. Content Browser → MP_{plate_name}
+1. Content Browser -> MP_{plate_name}
 2. Double-click to open MediaPlayer editor
 3. Verify:
    - Source shows MS_{plate_name}
@@ -803,9 +803,9 @@ if os.path.exists(first_frame):
     print(f"Frame Count: {len(files)}")
 
 # Performance thresholds:
-# <5MB per frame → Good performance
-# 5-20MB per frame → Moderate (proxy recommended)
-# >20MB per frame → Poor (proxy required)
+# <5MB per frame -> Good performance
+# 5-20MB per frame -> Moderate (proxy recommended)
+# >20MB per frame -> Poor (proxy required)
 ```
 
 **Step 2: Check Image Resolution**
@@ -820,26 +820,26 @@ media_texture = unreal.load_asset("/Game/Media/MT_Shot001_FG")
 
 **Manual Check:**
 ```
-1. Content Browser → MT_{plate_name}
-2. Right-click → Asset Actions → Show in Explorer
+1. Content Browser -> MT_{plate_name}
+2. Right-click -> Asset Actions -> Show in Explorer
 3. Check source image resolution
-   - 1920x1080 (HD) → Good performance
-   - 3840x2160 (4K) → Moderate performance
-   - 7680x4320 (8K) → Poor performance (proxy required)
+   - 1920x1080 (HD) -> Good performance
+   - 3840x2160 (4K) -> Moderate performance
+   - 7680x4320 (8K) -> Poor performance (proxy required)
 ```
 
 **Step 3: Monitor Memory Usage**
 
 ```
-Task Manager → Performance Tab → Memory
+Task Manager -> Performance Tab -> Memory
 - Before loading ImagePlate: Note usage
 - After loading ImagePlate: Note usage
 - Difference = memory used by sequence
 
 Warning Signs:
-- >4GB memory used by sequence → Too large
-- Memory usage climbing during playback → Memory leak
-- Available memory <2GB → System under pressure
+- >4GB memory used by sequence -> Too large
+- Memory usage climbing during playback -> Memory leak
+- Available memory <2GB -> System under pressure
 ```
 
 **Step 4: Check Disk Speed**
@@ -865,9 +865,9 @@ print(f"Read Time: {elapsed:.2f} seconds")
 print(f"Read Speed: {speed_mbps:.2f} MB/s")
 
 # Performance targets:
-# >100 MB/s → SSD (good)
-# 50-100 MB/s → SATA SSD (acceptable)
-# <50 MB/s → HDD (slow, proxy recommended)
+# >100 MB/s -> SSD (good)
+# 50-100 MB/s -> SATA SSD (acceptable)
+# <50 MB/s -> HDD (slow, proxy recommended)
 ```
 
 ### Solutions
@@ -878,9 +878,9 @@ print(f"Read Speed: {speed_mbps:.2f} MB/s")
 # Create lowres proxy sequence (via Nuke, FFmpeg, etc.)
 # Example structure:
 # D:/Plates/Shot001/
-# ├── Shot001_0001.exr (4K - 20MB per frame)
-# └── lowres/
-#     └── Shot001_0001.exr (1080p - 2MB per frame)
+# +-- Shot001_0001.exr (4K - 20MB per frame)
+# +-- lowres/
+# +-- Shot001_0001.exr (1080p - 2MB per frame)
 
 # Set up with proxy
 create_foreground_plate(
@@ -1006,7 +1006,7 @@ Steps:
 2. Verify lowres sequence loads
 3. Test playback (should be smooth)
 4. Switch to full-res for final render:
-   - Content Browser → MS_{plate_name}
+   - Content Browser -> MS_{plate_name}
    - Change Sequence Path to parent directory
    - Verify full-res loads
 ```
@@ -1058,9 +1058,9 @@ if blueprint:
     image_plate = test_camera.get_component_by_class(unreal.ImagePlateComponent)
 
     if image_plate:
-        print("✓ ImagePlate component found")
+        print("[OK] ImagePlate component found")
     else:
-        print("✗ ImagePlate component MISSING")
+        print("[FAIL] ImagePlate component MISSING")
         print("Blueprint needs ImagePlate component added")
 
     # Cleanup
@@ -1073,12 +1073,12 @@ if blueprint:
 
 **Manual Creation (Unreal Editor):**
 ```
-1. Content Browser → Right-click → Blueprint Class
+1. Content Browser -> Right-click -> Blueprint Class
 2. Pick Parent Class: CineCameraActor
 3. Name: cam_example_Blueprint
 4. Location: /Game/ (root content folder)
 5. Open Blueprint Editor (double-click)
-6. Components Panel → Add Component → ImagePlate
+6. Components Panel -> Add Component -> ImagePlate
 7. Attach ImagePlate to CineCameraComponent
 8. Compile and Save
 ```
@@ -1148,9 +1148,9 @@ else:
 ```
 If Blueprint exists but class won't load:
 
-1. Content Browser → cam_example_Blueprint
+1. Content Browser -> cam_example_Blueprint
 2. Double-click to open Blueprint Editor
-3. Toolbar → Compile button
+3. Toolbar -> Compile button
 4. Verify "Compile Successful" message
 5. Save and close
 6. Retry create_foreground_plate()
@@ -1194,7 +1194,7 @@ assert image_plate is not None, "ImagePlate component missing"
 # 5. Cleanup
 unreal.EditorLevelLibrary.destroy_actor(test_camera)
 
-print("✓ Blueprint validation PASSED")
+print("[OK] Blueprint validation PASSED")
 ```
 
 ---
@@ -1213,11 +1213,11 @@ print("✓ Blueprint validation PASSED")
 
 ```
 Manual Check:
-1. Edit → Plugins
+1. Edit -> Plugins
 2. Search: "ImagePlate"
 3. Check status:
-   - Enabled (✓) → Plugin active
-   - Disabled → Plugin inactive
+   - Enabled ([OK]) -> Plugin active
+   - Disabled -> Plugin inactive
 ```
 
 **Python Check:**
@@ -1225,10 +1225,10 @@ Manual Check:
 # Attempt to access ImagePlate class
 try:
     image_plate_class = unreal.ImagePlateComponent
-    print("✓ ImagePlate plugin is enabled")
+    print("[OK] ImagePlate plugin is enabled")
 except AttributeError:
-    print("✗ ImagePlate plugin is NOT enabled")
-    print("Enable plugin: Edit → Plugins → ImagePlate")
+    print("[FAIL] ImagePlate plugin is NOT enabled")
+    print("Enable plugin: Edit -> Plugins -> ImagePlate")
 ```
 
 **Step 2: Verify Plugin Installation**
@@ -1248,7 +1248,7 @@ Check:
 **Solution 1: Enable Plugin**
 
 ```
-1. Unreal Editor → Edit → Plugins
+1. Unreal Editor -> Edit -> Plugins
 2. Search: "ImagePlate"
 3. Check "Enabled" checkbox
 4. Click "Restart Now" button
@@ -1275,7 +1275,7 @@ Check:
 **After editing:**
 ```
 1. Save .uproject file
-2. Right-click .uproject → Generate Visual Studio project files
+2. Right-click .uproject -> Generate Visual Studio project files
 3. Launch Unreal Editor
 4. Verify plugin enabled
 ```
@@ -1314,21 +1314,21 @@ import unreal
 # 1. Check class exists
 try:
     image_plate_class = unreal.ImagePlateComponent
-    print("✓ ImagePlateComponent class available")
+    print("[OK] ImagePlateComponent class available")
 except AttributeError:
-    print("✗ ImagePlateComponent class NOT available")
-    print("Enable ImagePlate plugin: Edit → Plugins")
+    print("[FAIL] ImagePlateComponent class NOT available")
+    print("Enable ImagePlate plugin: Edit -> Plugins")
     exit()
 
 # 2. Test component creation
 try:
     test_component = unreal.new_object(unreal.ImagePlateComponent)
-    print("✓ ImagePlateComponent can be instantiated")
+    print("[OK] ImagePlateComponent can be instantiated")
 except Exception as e:
-    print(f"✗ Failed to create ImagePlateComponent: {e}")
+    print(f"[FAIL] Failed to create ImagePlateComponent: {e}")
     exit()
 
-print("✓ ImagePlate plugin validation PASSED")
+print("[OK] ImagePlate plugin validation PASSED")
 ```
 
 ---
@@ -1369,8 +1369,8 @@ if files:
     print(f"Total Size: {total_size_gb:.2f} GB")
 
     # Estimate loaded memory (uncompressed in RAM)
-    # EXR 16-bit RGBA = width × height × 8 bytes
-    # Assume 4K (3840×2160)
+    # EXR 16-bit RGBA = width x height x 8 bytes
+    # Assume 4K (3840x2160)
     uncompressed_mb = (3840 * 2160 * 8) / (1024 * 1024)
     total_uncompressed_gb = (uncompressed_mb * total_frames) / 1024
 
@@ -1410,8 +1410,8 @@ if percent_used > 80:
 **Step 3: Monitor Unreal Memory Usage**
 
 ```
-Task Manager → Details Tab → UnrealEditor.exe
-Right-click columns → Select columns:
+Task Manager -> Details Tab -> UnrealEditor.exe
+Right-click columns -> Select columns:
 - Memory (Private Working Set)
 - Commit Size
 
@@ -1420,9 +1420,9 @@ After loading ImagePlate: Note values
 Difference = memory used by sequence
 
 Red Flags:
-- >16GB memory used → Too large for 32GB system
-- Memory climbing during playback → Memory leak
-- Commit Size >> Physical RAM → Heavy paging (slow)
+- >16GB memory used -> Too large for 32GB system
+- Memory climbing during playback -> Memory leak
+- Commit Size >> Physical RAM -> Heavy paging (slow)
 ```
 
 ### Solutions
@@ -1431,8 +1431,8 @@ Red Flags:
 
 ```python
 # Create lowres proxy (1/4 resolution)
-# Original: 4K (3840×2160) = 8.3 megapixels
-# Proxy: 1080p (1920×1080) = 2.1 megapixels
+# Original: 4K (3840x2160) = 8.3 megapixels
+# Proxy: 1080p (1920x1080) = 2.1 megapixels
 # Memory reduction: 75%
 
 # Set up with proxy
@@ -1509,9 +1509,9 @@ Nuke Write Node:
 
 ```
 Windows Settings:
-1. System → About → Advanced system settings
-2. Advanced tab → Performance → Settings
-3. Advanced tab → Virtual memory → Change
+1. System -> About -> Advanced system settings
+2. Advanced tab -> Performance -> Settings
+3. Advanced tab -> Virtual memory -> Change
 4. Uncheck "Automatically manage paging file"
 5. Set custom size:
    - Initial: 16384 MB (16GB)
@@ -1530,9 +1530,9 @@ Better solution: Use proxy workflow or add more RAM
 
 # Original: Shot001 (500 frames) = 10GB RAM
 # Split:
-#   Shot001A (150 frames) = 3GB RAM
-#   Shot001B (150 frames) = 3GB RAM
-#   Shot001C (200 frames) = 4GB RAM
+# Shot001A (150 frames) = 3GB RAM
+# Shot001B (150 frames) = 3GB RAM
+# Shot001C (200 frames) = 4GB RAM
 
 # Each shot loaded independently
 # Memory usage reduced per shot
@@ -1553,7 +1553,7 @@ Better solution: Use proxy workflow or add more RAM
 1. Close all other applications
 2. Restart Unreal Editor (fresh memory state)
 3. Note memory usage before loading:
-   - Task Manager → UnrealEditor.exe → Memory
+   - Task Manager -> UnrealEditor.exe -> Memory
 4. Load foreground plate
 5. Note memory usage after loading
 6. Play sequence for 30 seconds
@@ -1571,7 +1571,7 @@ Better solution: Use proxy workflow or add more RAM
 3. Verify lowres loads and plays smoothly
 4. Note memory usage (should be ~25% of full-res)
 5. For final render:
-   - Content Browser → MS_{plate_name}
+   - Content Browser -> MS_{plate_name}
    - Change Sequence Path to full-res
    - Verify full-res loads (memory usage increases)
 ```
@@ -1604,9 +1604,9 @@ def diagnose_foreground_plate(plate_name):
     # 1. Check ImagePlate plugin
     try:
         image_plate_class = unreal.ImagePlateComponent
-        results["info"].append("✓ ImagePlate plugin enabled")
+        results["info"].append("[OK] ImagePlate plugin enabled")
     except AttributeError:
-        results["errors"].append("✗ ImagePlate plugin NOT enabled")
+        results["errors"].append("[FAIL] ImagePlate plugin NOT enabled")
         results["status"] = "FAIL"
         return results
 
@@ -1614,64 +1614,64 @@ def diagnose_foreground_plate(plate_name):
     blueprint_path = "/Game/cam_example_Blueprint"
     blueprint = unreal.load_asset(blueprint_path)
     if blueprint is None:
-        results["errors"].append(f"✗ Blueprint not found: {blueprint_path}")
+        results["errors"].append(f"[FAIL] Blueprint not found: {blueprint_path}")
         results["status"] = "FAIL"
         return results
     else:
-        results["info"].append(f"✓ Blueprint found: {blueprint_path}")
+        results["info"].append(f"[OK] Blueprint found: {blueprint_path}")
 
     # 3. Check camera exists
     camera_name = f"Cam_{plate_name}"
     camera = unreal.EditorLevelLibrary.get_actor_reference(camera_name)
     if camera is None:
-        results["errors"].append(f"✗ Camera not found: {camera_name}")
+        results["errors"].append(f"[FAIL] Camera not found: {camera_name}")
         results["status"] = "FAIL"
         return results
     else:
-        results["info"].append(f"✓ Camera found: {camera_name}")
+        results["info"].append(f"[OK] Camera found: {camera_name}")
 
     # 4. Check ImagePlate component
     image_plate = camera.get_component_by_class(unreal.ImagePlateComponent)
     if image_plate is None:
-        results["errors"].append("✗ ImagePlate component missing")
+        results["errors"].append("[FAIL] ImagePlate component missing")
         results["status"] = "FAIL"
         return results
     else:
-        results["info"].append("✓ ImagePlate component found")
+        results["info"].append("[OK] ImagePlate component found")
 
     # 5. Check MediaPlayer
     media_player_path = f"/Game/Media/MP_{plate_name}"
     media_player = unreal.load_asset(media_player_path)
     if media_player is None:
-        results["errors"].append(f"✗ MediaPlayer not found: {media_player_path}")
+        results["errors"].append(f"[FAIL] MediaPlayer not found: {media_player_path}")
         results["status"] = "FAIL"
     else:
-        results["info"].append(f"✓ MediaPlayer found: {media_player_path}")
+        results["info"].append(f"[OK] MediaPlayer found: {media_player_path}")
 
         # Check playing status
         is_playing = media_player.is_playing()
         if is_playing:
-            results["info"].append("✓ MediaPlayer is playing")
+            results["info"].append("[OK] MediaPlayer is playing")
         else:
-            results["warnings"].append("⚠ MediaPlayer is NOT playing")
+            results["warnings"].append("[WARN] MediaPlayer is NOT playing")
             results["warnings"].append("  Fix: media_player.play()")
 
         # Check duration
         duration = media_player.get_duration()
         if duration > 0:
-            results["info"].append(f"✓ Duration: {duration:.2f} seconds")
+            results["info"].append(f"[OK] Duration: {duration:.2f} seconds")
         else:
-            results["errors"].append("✗ Duration is 0 (media not loaded)")
+            results["errors"].append("[FAIL] Duration is 0 (media not loaded)")
             results["status"] = "FAIL"
 
     # 6. Check ImgMediaSource
     img_media_source_path = f"/Game/Media/MS_{plate_name}"
     img_media_source = unreal.load_asset(img_media_source_path)
     if img_media_source is None:
-        results["errors"].append(f"✗ ImgMediaSource not found: {img_media_source_path}")
+        results["errors"].append(f"[FAIL] ImgMediaSource not found: {img_media_source_path}")
         results["status"] = "FAIL"
     else:
-        results["info"].append(f"✓ ImgMediaSource found: {img_media_source_path}")
+        results["info"].append(f"[OK] ImgMediaSource found: {img_media_source_path}")
 
         # Check sequence path
         sequence_path = img_media_source.get_editor_property("sequence_path")
@@ -1690,18 +1690,18 @@ def diagnose_foreground_plate(plate_name):
         material = unreal.load_asset(material_path)
 
     if material is None:
-        results["errors"].append(f"✗ Material not found: M_{plate_name} or MI_{plate_name}")
+        results["errors"].append(f"[FAIL] Material not found: M_{plate_name} or MI_{plate_name}")
         results["status"] = "FAIL"
     else:
-        results["info"].append(f"✓ Material found: {material.get_name()}")
+        results["info"].append(f"[OK] Material found: {material.get_name()}")
 
         # Check blend mode (if regular material)
         if isinstance(material, unreal.Material):
             blend_mode = material.get_editor_property("blend_mode")
             if blend_mode in [unreal.BlendMode.BLEND_MASKED, unreal.BlendMode.BLEND_TRANSLUCENT]:
-                results["info"].append(f"✓ Blend Mode: {blend_mode}")
+                results["info"].append(f"[OK] Blend Mode: {blend_mode}")
             else:
-                results["warnings"].append(f"⚠ Blend Mode: {blend_mode} (should be Masked or Translucent)")
+                results["warnings"].append(f"[WARN] Blend Mode: {blend_mode} (should be Masked or Translucent)")
 
     # Summary
     if len(results["errors"]) == 0 and len(results["warnings"]) == 0:
@@ -1761,7 +1761,7 @@ If issues persist after following this guide:
    ```
 
 4. **Check Unreal Output Log:**
-   - Window → Developer Tools → Output Log
+   - Window -> Developer Tools -> Output Log
    - Filter: "ImagePlate" or "MediaPlayer"
    - Look for errors or warnings
 

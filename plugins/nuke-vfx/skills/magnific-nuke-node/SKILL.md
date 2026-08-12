@@ -1,6 +1,6 @@
 ---
 name: magnific-nuke-node
-description: "MagnificAI Nuke Group node — complete reference for building, modifying, debugging, or extending the MagnificAI.nk ToolSet. Node sends prompts and Nuke input images to Magnific AI and returns results as a Read node inside the group. Uses Chrome browser cookies (no API key). Installed at ~/.nuke/ToolSets/MagnificAI.nk. Use when asked about: MagnificAI node, Magnific inside Nuke, ExportWrite, GeneratedResult, postage stamp refresh, cookie extraction, Windows DPAPI, install_deps, refresh_cookies, Magnific API flow, WebP conversion, resolution knob, model list, cancel pattern, or thumbnail arrows."
+description: "MagnificAI Nuke Group node - complete reference for building, modifying, debugging, or extending the MagnificAI.nk ToolSet. Node sends prompts and Nuke input images to Magnific AI and returns results as a Read node inside the group. Uses Chrome browser cookies (no API key). Installed at ~/.nuke/ToolSets/MagnificAI.nk. Use when asked about: MagnificAI node, Magnific inside Nuke, ExportWrite, GeneratedResult, postage stamp refresh, cookie extraction, Windows DPAPI, install_deps, refresh_cookies, Magnific API flow, WebP conversion, resolution knob, model list, cancel pattern, or thumbnail arrows."
 allowed-tools: Read,Write,Edit,Bash
 ---
 
@@ -9,7 +9,7 @@ allowed-tools: Read,Write,Edit,Bash
 - **Dependencies:** `~/.nuke/Python/site-packages/py{major}{minor}/` (run `install_deps` once per Nuke version)
 - **Cookie refresh:** Click "Login / Refresh Session" in the Setup tab after Chrome session expires
 
-# MagnificAI Nuke Node — Complete Reference
+# MagnificAI Nuke Node - Complete Reference
 
 ## Overview
 
@@ -24,9 +24,9 @@ A Nuke **Group node** that:
 **Toolset file location (Windows):** `C:/Users/vcerquei/.nuke/ToolSets/MagnificAI.nk`
 **Toolset file location (macOS):** `~/.nuke/ToolSets/MagnificAI.nk`
 
-**Dependencies path (version-specific):** `~/.nuke/Python/site-packages/py{major}{minor}/`  
-- e.g. Nuke 17 (Python 3.11) → `py311/`, Nuke 16 (Python 3.10) → `py310/`  
-- Prevents compiled-extension conflicts when multiple Nuke versions share a machine  
+**Dependencies path (version-specific):** `~/.nuke/Python/site-packages/py{major}{minor}/`
+- e.g. Nuke 17 (Python 3.11) -> `py311/`, Nuke 16 (Python 3.10) -> `py310/`
+- Prevents compiled-extension conflicts when multiple Nuke versions share a machine
 - Each Nuke version installs into its own isolated dir; run `install_deps` once per version
 
 ---
@@ -34,10 +34,10 @@ A Nuke **Group node** that:
 ## Internal Node Structure
 
 Inside the group:
-- **`Input`** nodes — Nuke inputs (Input 0 = main image optional, Input 1+ = image references)
-- **`ExportWrite`** — Write node (JPEG, 85% quality)
-- **`GeneratedResult`** — Read node (JPEG) displaying AI output
-- **`Output`** — passes GeneratedResult downstream
+- **`Input`** nodes - Nuke inputs (Input 0 = main image optional, Input 1+ = image references)
+- **`ExportWrite`** - Write node (JPEG, 85% quality)
+- **`GeneratedResult`** - Read node (JPEG) displaying AI output
+- **`Output`** - passes GeneratedResult downstream
 
 ---
 
@@ -49,9 +49,9 @@ Inside the group:
 | `icon_data` | String (hidden) | Base64-encoded Magnific favicon PNG |
 | `add_input` | PyScript_Knob | Add an image reference input |
 | `remove_input` | PyScript_Knob | Remove last image reference input |
-| `div_ref_hint` | Label | " " (space label for alignment) + hint text about @img1, @img2… |
+| `div_ref_hint` | Label | " " (space label for alignment) + hint text about @img1, @img2... |
 | `prompt` | Multiline_Eval_String_Knob | Text prompt |
-| `model` | Enumeration | **Same row**: Model → Aspect Ratio → Size (no labels on AR/Size) |
+| `model` | Enumeration | **Same row**: Model -> Aspect Ratio -> Size (no labels on AR/Size) |
 | `aspect_ratio` | Enumeration | `-STARTLINE`, no label. Options: 1:1, 16:9, 9:16, 4:3, 3:4 |
 | `size` | Enumeration | `-STARTLINE`, no label. Options change per model (see Size Knob section) |
 | `smart_prompt` | Boolean | Enable Magnific's smart prompt enhancement |
@@ -61,18 +61,18 @@ Inside the group:
 | `gen_count` | Int_Knob | Number of generations to queue (same row as generate) |
 | `status` | Label (HTML) | Status message. Default: "Ready". Resets to Ready 4s after completion |
 | `progress` | String_Knob | e.g. "42%" |
-| `cancel_btn` | PyScript_Knob | Cancel — sets `_cancel` True |
-| `export_colorspace` | **Link_Knob** → `ExportWrite.colorspace` | Colorspace for input export |
+| `cancel_btn` | PyScript_Knob | Cancel - sets `_cancel` True |
+| `export_colorspace` | **Link_Knob** -> `ExportWrite.colorspace` | Colorspace for input export |
 | `output_path` | File_Knob | Where to save generated images |
 | `open_folder` | PyScript_Knob | Opens output folder in Explorer/Finder |
 | `thumb_img` | Label (HTML) | Thumbnail of current result, or placeholder if no image yet |
 | `thumb_counter` | String_Knob (hidden) | e.g. "3 / 7" |
-| `thumb_prev` | PyScript_Knob | ◀ — go to previous result |
-| `thumb_next` | PyScript_Knob | ▶ — go to next result |
+| `thumb_prev` | PyScript_Knob | < - go to previous result |
+| `thumb_next` | PyScript_Knob | > - go to next result |
 | `thumb_read` | PyScript_Knob | Add current thumbnail as Read node to graph |
 | `setup_group` | Tab_Knob | **Collapsible group** (`TABBEGINCLOSEDGROUP`, closed by default, no title) |
 | `install_deps` | PyScript_Knob | Install cryptography + Chrome registry fix + opens Chrome for login (Windows only chains into login) |
-| `refresh_cookies` | PyScript_Knob | "Login / Refresh Session" — closes Chrome, reads cookies, reopens Chrome |
+| `refresh_cookies` | PyScript_Knob | "Login / Refresh Session" - closes Chrome, reads cookies, reopens Chrome |
 | `setup_group_end` | Tab_Knob | `TABENDGROUP` |
 | `_cancel` | Boolean_Knob (hidden) | Cancel flag for background thread |
 | `_result_file` | EvalString_Knob (INVISIBLE) | Current output path |
@@ -96,7 +96,7 @@ _MODEL_MAP = {
 }
 ```
 
-Other models (Nano Banana 2 Flash, Mystic, Seedream 4.5, etc.) are accessible via **Auto** — Magnific
+Other models (Nano Banana 2 Flash, Mystic, Seedream 4.5, etc.) are accessible via **Auto** - Magnific
 selects them automatically. When Auto is used, the actual model is captured from
 `_s['metadata']['mode']` at completion and shown in:
 - The output **filename**: `output_v001_seedream-4-5.jpg`
@@ -104,20 +104,20 @@ selects them automatically. When Auto is used, the actual model is captured from
 
 ---
 
-## Size Knob — Per-Model Options
+## Size Knob - Per-Model Options
 
 The `size` dropdown updates automatically when the user changes the `model` knob (via `knobChanged`).
-If the current size is invalid for the new model, it snaps to `2K ∞`.
+If the current size is invalid for the new model, it snaps to `2K inf`.
 
 | Model | Size options |
 |---|---|
-| **Auto** | `1K ∞`, `2K ∞`, `3K ∞`, `4K` |
-| **Nano Banana 2** | `1K ∞`, `2K ∞`, `4K` |
-| **Seedream 5 Lite** | `2K ∞`, `3K ∞`, `4K ∞` |
+| **Auto** | `1K inf`, `2K inf`, `3K inf`, `4K` |
+| **Nano Banana 2** | `1K inf`, `2K inf`, `4K` |
+| **Seedream 5 Lite** | `2K inf`, `3K inf`, `4K inf` |
 
-∞ = unlimited (no credits). `4K` without ∞ = costs credits.
+inf = unlimited (no credits). `4K` without inf = costs credits.
 
-### knobChanged model→size logic
+### knobChanged model->size logic
 
 ```python
 if _nk.thisKnob().name() == 'model':
@@ -136,7 +136,7 @@ if _nk.thisKnob().name() == 'model':
 
 ### Resolution calculation (in generate script)
 
-Uses **constant-area formula** — same as the Magnific website. Dimensions floored to nearest 64px.
+Uses **constant-area formula** - same as the Magnific website. Dimensions floored to nearest 64px.
 
 ```python
 _size_val   = node['size'].value() if node.knob('size') else '1K'
@@ -156,19 +156,19 @@ _width      = _long_px  if _arw >= _arh else _short_px
 _height     = _short_px if _arw >= _arh else _long_px
 ```
 
-Example — 9:16 at 2K: `_long_px=2688, _short_px=1536` → `width=1536, height=2688` ✓
+Example - 9:16 at 2K: `_long_px=2688, _short_px=1536` -> `width=1536, height=2688` [OK]
 
 The `resolution` string (`"2k"`, `"3k"`, `"4k"`, `"1k"`) is sent as a separate field in the render body
 alongside the actual pixel `width`/`height`. Both are required.
 
 ---
 
-## Auth Strategy — No API Key, No Browser Tab Required
+## Auth Strategy - No API Key, No Browser Tab Required
 
 Both platforms read Chrome cookies directly from disk. The user only needs to be logged into
 `magnific.com` in Chrome at least once. When the session expires, click **Login / Refresh Session**.
 
-### macOS — Direct Cookie Extraction
+### macOS - Direct Cookie Extraction
 
 ```python
 def _get_cookies_mac():
@@ -187,9 +187,9 @@ def _get_cookies_mac():
             return raw[:-raw[-1]].decode('utf-8', errors='replace')
 ```
 
-**Key insight:** Chrome prepends a 32-byte random prefix → strip `raw[32:]` after AES-CBC.
+**Key insight:** Chrome prepends a 32-byte random prefix -> strip `raw[32:]` after AES-CBC.
 
-### Windows — DPAPI + AES-GCM (ctypes, no pywin32)
+### Windows - DPAPI + AES-GCM (ctypes, no pywin32)
 
 ```python
 def _get_cookies_windows():
@@ -231,12 +231,12 @@ def _check_auth_error(e):
 ## Setup Buttons
 
 ### `install_deps` (Windows flow)
-1. `pip install cryptography` → `~/.nuke/Python/site-packages/py{major}{minor}/`
-2. `pip install Pillow` → same path (enables WebP→JPEG conversion; non-fatal if it fails)
-3. Applies Chrome registry fix — **skipped** if `ApplicationBoundEncryptionEnabled=0` already set
+1. `pip install cryptography` -> `~/.nuke/Python/site-packages/py{major}{minor}/`
+2. `pip install Pillow` -> same path (enables WebP->JPEG conversion; non-fatal if it fails)
+3. Applies Chrome registry fix - **skipped** if `ApplicationBoundEncryptionEnabled=0` already set
 4. Opens Chrome at `magnific.com`
 5. Shows dialog: "Log in then click OK"
-6. On OK → automatically executes `refresh_cookies` button
+6. On OK -> automatically executes `refresh_cookies` button
 
 ### `refresh_cookies` ("Login / Refresh Session")
 1. Closes Chrome gracefully (taskkill, waits up to 15s)
@@ -269,7 +269,7 @@ Without `sec-ch-ua` / `sec-fetch-*`, Magnific's Akamai WAF returns 403.
 
 ## Magnific API Flow
 
-### Step 1 — Start (`POST start-tti-v2`)
+### Step 1 - Start (`POST start-tti-v2`)
 ```
 POST https://www.magnific.com/app/api/start-tti-v2?lang=en_US&user_id={uid}
 Body: { aspect_ratio, color_palette: null, force_credits: false, mode, num_images: 1,
@@ -277,15 +277,15 @@ Body: { aspect_ratio, color_palette: null, force_credits: false, mode, num_image
 Returns: { family, request_tokens: [...] }
 ```
 
-### Step 2 — Render (`POST render/v4`)
+### Step 2 - Render (`POST render/v4`)
 ```
 POST https://ak-data.magnific.com/app/api/render/v4
 Body:
 {
   tool: "text-to-image",  mode,  family,
   prompt,  negative_prompt: null,
-  width,  height,                          ← actual pixels (constant-area formula)
-  seed,  aspect_ratio,  resolution,        ← "1k"/"2k"/"3k"/"4k" — REQUIRED field
+  width,  height,                          <- actual pixels (constant-area formula)
+  seed,  aspect_ratio,  resolution,        <- "1k"/"2k"/"3k"/"4k" - REQUIRED field
   thinking_level: "minimal",  use_google_search_tool: false,
   request_token,  force_credits: false,
   metadata: { aspectRatio, inputPrompt, mode, unlimited: true, smartPrompt },
@@ -297,12 +297,12 @@ Returns: { creation: { id } }
 **Critical:** `resolution` field is required. Without it the API ignores width/height and returns
 wrong dimensions.
 
-### Step 3 — Poll (`GET creation/{id}`)
+### Step 3 - Poll (`GET creation/{id}`)
 ```
 GET https://www.magnific.com/app/api/creation/{id}?lang=en_US&user_id={uid}
 ```
 Poll every 2s until `status == "completed"`.
-Returns `{ url: "https://..." }` — CDN URL, publicly downloadable (no auth needed).
+Returns `{ url: "https://..." }` - CDN URL, publicly downloadable (no auth needed).
 
 **Auto model detection:**
 ```python
@@ -336,7 +336,7 @@ and shown in the filename and status bar:
 _model_suffix = ''
 if node['model'].value() == 'Auto' and _actual_model not in ('auto', 'Auto', ''):
     _model_suffix = '_' + _actual_model
-# → output_v001_seedream-4-5.jpg
+# -> output_v001_seedream-4-5.jpg
 
 _done_msg = 'Done: ' + os.path.basename(_out_file)
 if node['model'].value() == 'Auto' and _actual_model not in ('auto', 'Auto', ''):
@@ -358,7 +358,7 @@ _node_name = node.name()
 def _reset_status():
     import time as _t; _t.sleep(4)
     def _do():
-        _n = nuke.toNode(_node_name)   # re-fetch — node reference stale after repaste
+        _n = nuke.toNode(_node_name)   # re-fetch - node reference stale after repaste
         if _n:
             _n['status'].setValue('Ready')
             _n['progress'].setValue('')
@@ -376,7 +376,7 @@ Set in `knobChanged` on `showPanel`:
 ```python
 if _nk.thisKnob().name() == 'showPanel':
     if not _n['_result_file'].value().strip():
-        _n['thumb_img'].setValue('<div style="background:#111;...">✦ No image generated yet</div>')
+        _n['thumb_img'].setValue('<div style="background:#111;..."> No image generated yet</div>')
 ```
 
 **Critical:** In `.nk` knobChanged strings, `[` must be `\[` or TCL parser silently breaks it.
@@ -462,12 +462,12 @@ if _fmt == 'webp':
         _img_data = _buf.getvalue()
         _fmt = 'jpg'
     except ImportError:
-        pass  # PIL not available — file saved as .webp, Nuke will error on it
+        pass  # PIL not available - file saved as .webp, Nuke will error on it
 _base, _ext = os.path.splitext(_out)
 _ext = ('.' + _fmt) if _fmt else (_ext or '.jpg')
 ```
 
-**Install Pillow** via the `install_deps` button — it pip-installs into the version-specific
+**Install Pillow** via the `install_deps` button - it pip-installs into the version-specific
 site-packages path so Nuke can import it. Pillow install failures are non-fatal (warn only).
 
 ## Known Issues & Fixes
@@ -475,9 +475,9 @@ site-packages path so Nuke can import it. Pillow install failures are non-fatal 
 | Issue | Cause | Fix |
 |---|---|---|
 | 4K square output | Missing `resolution` field in API body | Add `resolution: "4k"` alongside pixel `width`/`height` |
-| Wrong output dimensions | Sending equal `width=height=res` regardless of aspect ratio | Use constant-area formula: `long = sqrt(res² × long_ratio/short_ratio)`, floor to 64 |
+| Wrong output dimensions | Sending equal `width=height=res` regardless of aspect ratio | Use constant-area formula: `long = sqrt(res^2 x long_ratio/short_ratio)`, floor to 64 |
 | 403 on API call | Akamai WAF blocking | Add `sec-ch-ua`, `sec-fetch-*` headers |
-| Session expired | 401/403 response | `_check_auth_error()` → friendly message |
+| Session expired | 401/403 response | `_check_auth_error()` -> friendly message |
 | Windows cookie decrypt fails | Chrome Application-Bound Encryption | Registry fix: `ApplicationBoundEncryptionEnabled=0` |
 | Placeholder not showing | `[` not escaped in knobChanged | Use `\[` and `\]` in all `.nk` knobChanged strings |
 | Status stuck on "Done" | Node reference stale after postage stamp repaste | Re-fetch node by name with `nuke.toNode(_node_name)` |
@@ -489,5 +489,5 @@ site-packages path so Nuke can import it. Pillow install failures are non-fatal 
 
 ## Icon
 
-Magnific favicon PNG, stored base64 in `icon_data` knob. Always use `data:image/png;base64,` URI —
+Magnific favicon PNG, stored base64 in `icon_data` knob. Always use `data:image/png;base64,` URI -
 never a file path (breaks on macOS / shared drives).

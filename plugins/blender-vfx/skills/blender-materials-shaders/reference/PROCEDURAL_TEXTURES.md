@@ -505,7 +505,7 @@ voronoi.inputs['Scale'].default_value = 20.0
 
 # Mapping to rotate scratches
 mapping = nodes.new('ShaderNodeMapping')
-mapping.inputs['Rotation'].default_value = (0, 0, 0.785)  # 45° rotation
+mapping.inputs['Rotation'].default_value = (0, 0, 0.785)  # 45 deg rotation
 
 links.new(texcoord.outputs['Generated'], mapping.inputs['Vector'])
 links.new(mapping.outputs['Vector'], voronoi.inputs['Vector'])
@@ -615,7 +615,7 @@ links.new(bsdf.outputs['BSDF'], output.inputs['Surface'])
 - **LINEAR:** Straight gradient
 - **QUADRATIC:** Parabolic falloff
 - **EASING:** Smooth S-curve
-- **DIAGONAL:** 45° gradient
+- **DIAGONAL:** 45 deg gradient
 - **SPHERICAL:** Radial from center
 - **QUADRATIC_SPHERE:** Soft radial
 - **RADIAL:** Circular gradient
@@ -684,7 +684,7 @@ texcoord = nodes.new('ShaderNodeTexCoord')
 
 # Mapping for wood direction
 mapping = nodes.new('ShaderNodeMapping')
-mapping.inputs['Rotation'].default_value = (1.5708, 0, 0)  # 90° X rotation
+mapping.inputs['Rotation'].default_value = (1.5708, 0, 0)  # 90 deg X rotation
 mapping.inputs['Scale'].default_value = (1, 1, 3)  # Stretch along grain
 
 links.new(texcoord.outputs['Generated'], mapping.inputs['Vector'])
@@ -883,7 +883,7 @@ texcoord = nodes.new('ShaderNodeTexCoord')
 
 # Mapping for brush direction
 mapping = nodes.new('ShaderNodeMapping')
-mapping.inputs['Rotation'].default_value = (0, 0, 0.785)  # 45° rotation
+mapping.inputs['Rotation'].default_value = (0, 0, 0.785)  # 45 deg rotation
 mapping.inputs['Scale'].default_value = (50, 1, 1)  # Stretch for brush lines
 
 links.new(texcoord.outputs['Generated'], mapping.inputs['Vector'])

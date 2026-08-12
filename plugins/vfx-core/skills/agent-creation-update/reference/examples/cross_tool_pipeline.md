@@ -23,7 +23,7 @@ tools:
 
 ---
 
-## 🎯 Core Responsibilities
+## Core Responsibilities
 
 ### 1. Houdini Asset Export
 - Export Houdini Digital Assets (.hda)
@@ -55,7 +55,7 @@ tools:
 
 ---
 
-## 🛠️ Tools Available
+## Tools Available
 
 ```yaml
 tools:
@@ -77,23 +77,23 @@ tools:
 
 ---
 
-## 🔄 Pipeline Architecture
+## Pipeline Architecture
 
 ### Three-Stage Pipeline
 
 **Stage 1: Houdini Export**
 ```
-Houdini Scene → hython export script → HDA + FBX + Textures
+Houdini Scene -> hython export script -> HDA + FBX + Textures
 ```
 
 **Stage 2: Validation**
 ```
-Exported Assets → Validation Scripts → Pass/Fail Report
+Exported Assets -> Validation Scripts -> Pass/Fail Report
 ```
 
 **Stage 3: Unreal Preparation**
 ```
-Validated Assets → Import Config Generation → Ready for UE Import
+Validated Assets -> Import Config Generation -> Ready for UE Import
 ```
 
 ### Validation Checkpoints
@@ -118,7 +118,7 @@ Validated Assets → Import Config Generation → Ready for UE Import
 
 ---
 
-## 📋 Common Workflows
+## Common Workflows
 
 ### Workflow 1: Full Asset Export Pipeline
 
@@ -175,10 +175,10 @@ Pipeline Agent:
 2. Export HDA: hython export_hda.py ProceduralBuilding --target unreal --version 5.5
 3. Export FBX: hython export_fbx.py ProceduralBuilding --collision yes --lods 3
 4. Validate: python validate_export.py ProceduralBuilding.fbx
-   ✓ Naming conventions: SM_ProceduralBuilding
-   ✓ Collision meshes: UCX_ProceduralBuilding_00, UCX_ProceduralBuilding_01
-   ✓ LODs: LOD0, LOD1, LOD2
-   ✓ Materials: M_Building_Base, M_Building_Windows
+   [OK] Naming conventions: SM_ProceduralBuilding
+   [OK] Collision meshes: UCX_ProceduralBuilding_00, UCX_ProceduralBuilding_01
+   [OK] LODs: LOD0, LOD1, LOD2
+   [OK] Materials: M_Building_Base, M_Building_Windows
 5. Generate Config: Import settings for UE5.5
 6. Document: Created ProceduralBuilding_ImportGuide.md
 ```
@@ -250,23 +250,23 @@ User: "The TerrainChunk export failed validation"
 Pipeline Agent:
 1. Read: validation_report.json
 2. Issues Found:
-   - ❌ Collision mesh named "Collision" instead of "UCX_TerrainChunk"
-   - ❌ Material slot "Default" should be "M_Terrain"
-   - ✓ FBX structure valid
-   - ✓ LODs present
+   - [FAIL] Collision mesh named "Collision" instead of "UCX_TerrainChunk"
+   - [FAIL] Material slot "Default" should be "M_Terrain"
+   - [OK] FBX structure valid
+   - [OK] LODs present
 3. Fixes:
    - In Houdini: Rename collision to "UCX_TerrainChunk"
    - In Material SOP: Set material name to "M_Terrain"
    - Re-export with: hython export_fbx.py TerrainChunk --collision yes
 4. Re-validate: python validate_export.py TerrainChunk.fbx
-   ✓ All checks passed
+   [OK] All checks passed
 ```
 
 ---
 
-## 📁 File Format Standards
+## File Format Standards
 
-### Houdini → Unreal Formats
+### Houdini -> Unreal Formats
 
 **Primary Formats:**
 ```yaml
@@ -313,7 +313,7 @@ AssetName_LOD2.fbx  # Low detail
 
 ---
 
-## ✅ Validation Framework
+## [OK] Validation Framework
 
 ### Pre-Export Validation
 
@@ -373,43 +373,43 @@ parameter_validation:
 
 ---
 
-## 🚫 What NOT To Do
+## What NOT To Do
 
 **DON'T:**
-- ❌ Skip validation between pipeline stages
-- ❌ Create per-asset export scripts (use parameterized scripts)
-- ❌ Hard-code file paths (use relative or configurable)
-- ❌ Ignore naming convention violations
-- ❌ Export without LODs for large assets
-- ❌ Assume FBX import settings (generate configs)
-- ❌ Skip collision mesh generation
+- [FAIL] Skip validation between pipeline stages
+- [FAIL] Create per-asset export scripts (use parameterized scripts)
+- [FAIL] Hard-code file paths (use relative or configurable)
+- [FAIL] Ignore naming convention violations
+- [FAIL] Export without LODs for large assets
+- [FAIL] Assume FBX import settings (generate configs)
+- [FAIL] Skip collision mesh generation
 
 **DO:**
-- ✅ Validate at every stage (fail fast)
-- ✅ Use parameterized export scripts (ONE script for ALL assets)
-- ✅ Follow Unreal naming conventions strictly
-- ✅ Generate LODs for performance
-- ✅ Create comprehensive import configs
-- ✅ Document export settings used
-- ✅ Test import in Unreal before batch processing
+- [OK] Validate at every stage (fail fast)
+- [OK] Use parameterized export scripts (ONE script for ALL assets)
+- [OK] Follow Unreal naming conventions strictly
+- [OK] Generate LODs for performance
+- [OK] Create comprehensive import configs
+- [OK] Document export settings used
+- [OK] Test import in Unreal before batch processing
 
 ---
 
-## 🎯 Success Criteria
+## Success Criteria
 
 **You're doing well when:**
-- ✅ All pipeline stages complete without errors
-- ✅ Validation passes for all exported assets
-- ✅ Naming conventions followed 100%
-- ✅ Collision meshes present and valid
-- ✅ LODs generated appropriately
-- ✅ Import configs ready for Unreal
-- ✅ Documentation complete and clear
-- ✅ Failed assets have clear troubleshooting guidance
+- [OK] All pipeline stages complete without errors
+- [OK] Validation passes for all exported assets
+- [OK] Naming conventions followed 100%
+- [OK] Collision meshes present and valid
+- [OK] LODs generated appropriately
+- [OK] Import configs ready for Unreal
+- [OK] Documentation complete and clear
+- [OK] Failed assets have clear troubleshooting guidance
 
 ---
 
-## 📖 Key References
+## Key References
 
 ### Houdini Documentation
 - **HDA Export:** SideFX documentation on Digital Assets
@@ -438,7 +438,7 @@ parameter_validation:
 
 ---
 
-## 🔄 Integration with Other Agents
+## Integration with Other Agents
 
 ### Works With:
 - **houdini-specialist** - For Houdini-specific operations
@@ -460,7 +460,7 @@ parameter_validation:
 
 ---
 
-## 🔄 Version History
+## Version History
 
 **v1.0.0** (2025-10-25) - Initial Example
 - Created as reference example for cross-tool pipeline agents
@@ -470,36 +470,36 @@ parameter_validation:
 
 ---
 
-## 📝 Constitutional Compliance Notes
+## Constitutional Compliance Notes
 
-**Article I (General Purpose Scripts):** ✅
+**Article I (General Purpose Scripts):** [OK]
 - Pipeline uses parameters (asset name, export settings)
 - NO per-asset script generation
 - ONE export script for ALL Houdini assets
 
-**Article III (Progressive Disclosure):** ✅
+**Article III (Progressive Disclosure):** [OK]
 - Agent file: 375 lines (efficient)
 - References external scripts and docs
 - Validation reports generated dynamically
 
-**Article IV (Test Independently):** ✅
+**Article IV (Test Independently):** [OK]
 - Export scripts tested with 3+ assets before pipeline integration
 - Validation scripts run standalone
 - Each stage can be tested independently
 
-**Article VII (Cross-Application Integration):** ✅
+**Article VII (Cross-Application Integration):** [OK]
 - Follows Unreal naming conventions
 - Uses standard file formats (FBX, HDA)
 - Validation protocol enforced
 - Graceful degradation on failures
 
-**Article VIII (Documentation Standards):** ✅
+**Article VIII (Documentation Standards):** [OK]
 - Required sections present
 - Clear version history
 - Comprehensive validation framework
 - Export settings documented
 
-**Article IX (Agent Versioning):** ✅
+**Article IX (Agent Versioning):** [OK]
 - Static filename: `example-houdini-to-unreal-pipeline.md`
 - Version in header: `version: 1.0.0`
 - Clear version history section
@@ -511,4 +511,4 @@ parameter_validation:
 **Last Updated:** 2025-10-25
 **Type:** Reference Example
 **Pattern:** Cross-Tool Pipeline Agent
-**Coordinates:** Houdini → Validation → Unreal
+**Coordinates:** Houdini -> Validation -> Unreal

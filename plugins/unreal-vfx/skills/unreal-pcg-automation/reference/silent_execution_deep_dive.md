@@ -12,7 +12,7 @@ PCG graph `add_edge()` operations would timeout when followed by ANY Python code
 ```python
 # THIS TIMES OUT
 graph.add_edge(node1, unreal.Name("Out"), node2, unreal.Name("In"))
-print("Done!")  # ← Hangs here for 30 seconds, then timeout
+print("Done!")  # <- Hangs here for 30 seconds, then timeout
 ```
 
 **Error:** `Timeout receiving Unreal response`
@@ -41,7 +41,7 @@ When `add_edge()` is called:
 4. Python API waits for "operation complete" signal
 5. **PROBLEM:** Async validation locks the graph data structure
 6. Any subsequent Python access to graph = deadlock
-7. MCP timeout (30s) expires → timeout error
+7. MCP timeout (30s) expires -> timeout error
 
 **Key Insight:** The graph is updating itself in the background. If Python tries to read it during this update, it waits forever.
 
@@ -52,7 +52,7 @@ When `add_edge()` is called:
 **Pattern:** Execute all `add_edge()` calls, then **immediately exit script** with no further code.
 
 ```python
-# ✅ THIS WORKS
+# [OK] THIS WORKS
 graph.add_edge(node1, unreal.Name("Out"), node2, unreal.Name("In"))
 graph.add_edge(node2, unreal.Name("Out"), node3, unreal.Name("In"))
 # Script ends here - no print, no verify, no access
@@ -73,7 +73,7 @@ graph.add_edge(node2, unreal.Name("Out"), node3, unreal.Name("In"))
 
 ## Tested Patterns
 
-### ✅ WORKS: Sequential Connections
+### [OK] WORKS: Sequential Connections
 ```python
 g = unreal.load_asset('/Game/PCG/MyGraph')
 n = g.nodes
@@ -88,7 +88,7 @@ g.add_edge(n[2], unreal.Name("Out"), o, unreal.Name("Out"))
 # Script exits - perfect execution
 ```
 
-### ✅ WORKS: Multiple add_edge() Calls
+### [OK] WORKS: Multiple add_edge() Calls
 ```python
 # 8 connections in 1.5ms
 graph.add_edge(...)  # 1
@@ -102,22 +102,22 @@ graph.add_edge(...)  # 8
 # Exit immediately
 ```
 
-### ❌ FAILS: Any Output After
+### [FAIL] FAILS: Any Output After
 ```python
 graph.add_edge(node1, unreal.Name("Out"), node2, unreal.Name("In"))
-print("Connected!")  # ← TIMEOUT! Don't do this!
+print("Connected!")  # <- TIMEOUT! Don't do this!
 ```
 
-### ❌ FAILS: Graph Access After
+### [FAIL] FAILS: Graph Access After
 ```python
 graph.add_edge(node1, unreal.Name("Out"), node2, unreal.Name("In"))
-nodes = graph.nodes  # ← TIMEOUT! Graph is locked!
+nodes = graph.nodes  # <- TIMEOUT! Graph is locked!
 ```
 
-### ❌ FAILS: Verification After
+### [FAIL] FAILS: Verification After
 ```python
 graph.add_edge(node1, unreal.Name("Out"), node2, unreal.Name("In"))
-if some_condition:  # ← Even conditional code causes issue
+if some_condition:  # <- Even conditional code causes issue
     print("ok")
 ```
 
@@ -127,7 +127,7 @@ if some_condition:  # ← Even conditional code causes issue
 
 ### Pre-Load All Data
 ```python
-# ✅ DO: Load everything BEFORE connections
+# [OK] DO: Load everything BEFORE connections
 graph = unreal.load_asset('/Game/PCG/MyGraph')
 input_node = graph.get_input_node()
 output_node = graph.get_output_node()
@@ -142,15 +142,15 @@ graph.add_edge(node1, unreal.Name("Out"), node2, unreal.Name("Spline"))
 
 ### Use Separate Scripts for Phases
 ```python
-# ✅ DO: Phase 1 - Create nodes (separate script)
+# [OK] DO: Phase 1 - Create nodes (separate script)
 node1, settings1 = graph.add_node_of_type(unreal.PCGGetSplineSettings)
 node2, settings2 = graph.add_node_of_type(unreal.PCGSplineSamplerSettings)
 
-# ✅ DO: Phase 2 - Configure (separate script)
+# [OK] DO: Phase 2 - Configure (separate script)
 g = unreal.load_asset('/Game/PCG/MyGraph')
 g.nodes[1].get_settings().sampler_params.distance_increment = 100.0
 
-# ✅ DO: Phase 3 - Connect (separate script, Silent Execution)
+# [OK] DO: Phase 3 - Connect (separate script, Silent Execution)
 g = unreal.load_asset('/Game/PCG/MyGraph')
 n = g.nodes
 g.add_edge(n[0], unreal.Name("Out"), n[1], unreal.Name("Spline"))
@@ -158,11 +158,11 @@ g.add_edge(n[0], unreal.Name("Out"), n[1], unreal.Name("Spline"))
 
 ### Verification Strategy
 ```python
-# ❌ DON'T: Programmatic verification
+# [FAIL] DON'T: Programmatic verification
 graph.add_edge(...)
 success = verify_connection()  # TIMEOUT!
 
-# ✅ DO: Check Unreal Output Log after script
+# [OK] DO: Check Unreal Output Log after script
 # Run script, then check log for:
 # - No "LogPCG: Error" messages = success
 # - Or open graph in UI to visually verify
@@ -196,8 +196,8 @@ success = verify_connection()  # TIMEOUT!
 **Answer:** Doesn't matter! Connections work even with graph editor open.
 
 Tested scenarios:
-- Graph closed: ✅ Works
-- Graph open in editor: ✅ Works
+- Graph closed: [OK] Works
+- Graph open in editor: [OK] Works
 
 The issue is NOT UI locking, it's async validation locking.
 
@@ -205,11 +205,11 @@ The issue is NOT UI locking, it's async validation locking.
 **Answer:** No! Graph auto-saves when validation completes.
 
 ```python
-# ❌ DON'T: Manual save
+# [FAIL] DON'T: Manual save
 graph.add_edge(...)
 unreal.EditorAssetLibrary.save_loaded_asset(graph)  # TIMEOUT!
 
-# ✅ DO: Silent Execution
+# [OK] DO: Silent Execution
 graph.add_edge(...)
 # Exits - auto-saves in background
 ```
@@ -252,7 +252,7 @@ A: No! `add_node_of_type()` doesn't trigger async validation. You can print/veri
 1. Check for ANY code after add_edge():
    ```python
    graph.add_edge(...)
-   # ← Make sure NOTHING here, not even comments!
+   # <- Make sure NOTHING here, not even comments!
    ```
 
 2. Verify pin labels use unreal.Name():

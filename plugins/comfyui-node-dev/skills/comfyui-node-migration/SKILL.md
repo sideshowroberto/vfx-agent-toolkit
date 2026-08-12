@@ -3,7 +3,7 @@ name: comfyui-node-migration
 description: ComfyUI V1 to V3 node migration - converting legacy nodes to the V3 API. Use when migrating existing custom nodes from V1 to V3, understanding differences between API versions, or modernizing node code.
 ---
 
-# ComfyUI V1 → V3 Migration Guide
+# ComfyUI V1 -> V3 Migration Guide
 
 Migrate existing V1 nodes to the modern V3 API. V3 uses classmethods, typed inputs/outputs, and `ComfyExtension` registration.
 
@@ -236,7 +236,7 @@ class V3Node(io.ComfyNode):
         return io.NodeOutput(result)
 ```
 
-### IS_CHANGED → fingerprint_inputs
+### IS_CHANGED -> fingerprint_inputs
 
 ```python
 # V1
@@ -251,7 +251,7 @@ def fingerprint_inputs(cls, **kwargs):
     return time.time()  # always re-execute
 ```
 
-### VALIDATE_INPUTS → validate_inputs
+### VALIDATE_INPUTS -> validate_inputs
 
 ```python
 # V1

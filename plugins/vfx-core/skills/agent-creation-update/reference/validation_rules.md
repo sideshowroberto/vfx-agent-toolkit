@@ -217,7 +217,7 @@ name: documentation-specialist
 **Function:** `check_name_matches_filename(filename: str, metadata_name: str)`
 
 **What It Does:**
-- Extracts base name from filename: `agent-name.md` → `agent-name`
+- Extracts base name from filename: `agent-name.md` -> `agent-name`
 - Compares with `name` field from YAML frontmatter
 - Requires exact case-sensitive match
 
@@ -266,16 +266,16 @@ name: documentation-specialist  # All lowercase
 # GOOD (passes validation):
 filename = "documentation-specialist.md"
 metadata = {"name": "documentation-specialist"}
-# Extracted: "documentation-specialist" == "documentation-specialist" ✅
+# Extracted: "documentation-specialist" == "documentation-specialist" [OK]
 
 # BAD (fails validation):
 filename = "documentation-specialist.md"
 metadata = {"name": "documentation_specialist"}
-# Extracted: "documentation-specialist" != "documentation_specialist" ❌
+# Extracted: "documentation-specialist" != "documentation_specialist" [FAIL]
 
 filename = "blender-specialist.md"
 metadata = {"name": "blender-specialist-v2"}
-# Extracted: "blender-specialist" != "blender-specialist-v2" ❌
+# Extracted: "blender-specialist" != "blender-specialist-v2" [FAIL]
 ```
 
 ---
@@ -767,8 +767,8 @@ Fix: Condense to essential information:
 ```
 Cause: Using vague phrases instead of specific actions
 Fix: Replace vague language:
-     "helps with" → "compiles", "creates", "updates"
-     "handles" → "manages", "processes", "executes"
+     "helps with" -> "compiles", "creates", "updates"
+     "handles" -> "manages", "processes", "executes"
      Be specific about what the agent does
 ```
 
@@ -814,7 +814,7 @@ status: experimental
 2. Document all known limitations
 3. Create validation checklist
 4. Bump to 1.0.0
-5. Change status: experimental → active
+5. Change status: experimental -> active
 6. Add initial changelog entry
 ```
 
@@ -939,7 +939,7 @@ breaking_changes: true  # Optional but recommended
 
 **Documentation Requirements:**
 ```markdown
-## Migration Guide (v1.x → v2.0)
+## Migration Guide (v1.x -> v2.0)
 
 **Breaking Changes:**
 1. **Change 1:** What changed and why
@@ -1086,7 +1086,7 @@ mv .claude/agents/documentation-specialist-v2.md \
 
 # Step 4: Validate
 python validate_agent.py documentation-specialist
-# Should pass: ✅ Filename Format
+# Should pass: [OK] Filename Format
 ```
 
 ---
@@ -1232,7 +1232,7 @@ OR rename file to: python-specialist-agent.md
 python validate_agent.py agent-name
 
 # Should see:
-# ✅ Name Matches Filename: agent-name == agent-name
+# [OK] Name Matches Filename: agent-name == agent-name
 ```
 
 ---

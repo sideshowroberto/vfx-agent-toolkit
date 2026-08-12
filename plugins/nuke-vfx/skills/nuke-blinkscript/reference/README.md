@@ -20,11 +20,11 @@ This directory contains organized BlinkScript kernel documentation extracted fro
 ## Usage with nuke-blinkscript Skill
 
 The nuke-blinkscript skill references these files automatically:
-- **Basic kernels** → Load 01, 05
-- **Parameter setup** → Load 02
-- **Blur/convolution** → Load 03
-- **Complex math** → Load 04
-- **Quick lookup** → Load 05 only
+- **Basic kernels** -> Load 01, 05
+- **Parameter setup** -> Load 02
+- **Blur/convolution** -> Load 03
+- **Complex math** -> Load 04
+- **Quick lookup** -> Load 05 only
 
 ## Search Examples
 
@@ -41,15 +41,15 @@ grep -r "dot\|cross\|length\|normalize" reference/04-built-in-functions.md
 
 ## Benefits Over Original PDF
 
-✅ **No "PDF too large" errors** - Files under 200 lines each  
-✅ **Faster search** - Grep through markdown faster than PDF  
-✅ **Progressive disclosure** - Load only relevant sections  
-✅ **Context-efficient** - ~75% reduction vs loading full 316-page PDF  
-✅ **Always available** - No web dependency  
+[OK] **No "PDF too large" errors** - Files under 200 lines each
+[OK] **Faster search** - Grep through markdown faster than PDF
+[OK] **Progressive disclosure** - Load only relevant sections
+[OK] **Context-efficient** - ~75% reduction vs loading full 316-page PDF
+[OK] **Always available** - No web dependency
 
 ## Source
 
-Extracted from: `Nuke/documentation/blinkscript/docs-to-pdf-crawler/BlinkScript_Kernels_Complete.pdf`  
+Extracted from: `Nuke/documentation/blinkscript/docs-to-pdf-crawler/BlinkScript_Kernels_Complete.pdf`
 Original source: https://learn.foundry.com/nuke/developers/80/BlinkKernels/
 
 ## Maintenance
@@ -60,6 +60,6 @@ When Foundry updates BlinkScript documentation:
 3. Update version date below
 4. Keep file sizes < 500 lines (Article III compliance)
 
-**Last Updated:** 2026-02-04  
-**BlinkScript Version:** Nuke 14.0+  
+**Last Updated:** 2026-02-04
+**BlinkScript Version:** Nuke 14.0+
 **Documentation Source:** Foundry Learn Portal

@@ -119,11 +119,11 @@ For each test, verify:
 **Environment:** [API keys, packages] | **Tests:** X total, Y passed, Z failed (YY% success)
 
 ### Test Results
-✅ **PASSED:** `python script.py CharacterRig` - Valid JSON, 145 meshes, 2.3s
-✅ **PASSED:** `python script.py EnvironmentProp 7` - Valid JSON, correct filtering, 1.8s
-❌ **FAILED:** `python script.py` - Stack trace (expected: usage message)
+[OK] **PASSED:** `python script.py CharacterRig` - Valid JSON, 145 meshes, 2.3s
+[OK] **PASSED:** `python script.py EnvironmentProp 7` - Valid JSON, correct filtering, 1.8s
+[FAIL] **FAILED:** `python script.py` - Stack trace (expected: usage message)
 
-### Issues (Critical → Low)
+### Issues (Critical -> Low)
 1. **Critical:** Missing parameter validation (line X) - Add argparse
 2. **Medium:** No timeout handling - Add 30s default
 3. **Low:** Missing type hints - Optional enhancement
@@ -137,19 +137,19 @@ For each test, verify:
 ## Critical Testing Rules
 
 **DO:**
-- ✅ Test multiple assets (variety of types/sizes)
-- ✅ Test all parameter combinations
-- ✅ Verify JSON is valid (not just parseable)
-- ✅ Check error messages are user-friendly
-- ✅ Time script execution (performance baseline)
-- ✅ Save sample outputs for reference
+- [OK] Test multiple assets (variety of types/sizes)
+- [OK] Test all parameter combinations
+- [OK] Verify JSON is valid (not just parseable)
+- [OK] Check error messages are user-friendly
+- [OK] Time script execution (performance baseline)
+- [OK] Save sample outputs for reference
 
 **DON'T:**
-- ❌ Skip edge cases
-- ❌ Assume success without verification
-- ❌ Test only one asset type (need diversity)
-- ❌ Ignore warnings or non-critical issues
-- ❌ Modify scripts during testing (test as-is)
+- [FAIL] Skip edge cases
+- [FAIL] Assume success without verification
+- [FAIL] Test only one asset type (need diversity)
+- [FAIL] Ignore warnings or non-critical issues
+- [FAIL] Modify scripts during testing (test as-is)
 
 ## Special Test Cases
 
@@ -185,11 +185,11 @@ For each test, verify:
 - Test Duration: X minutes
 
 **Results by Category:**
-✅ Happy Path: X/Y passed
-❌ Error Handling: X/Y passed
-⚠️  Edge Cases: X/Y passed
+[OK] Happy Path: X/Y passed
+[FAIL] Error Handling: X/Y passed
+[WARN]  Edge Cases: X/Y passed
 
-**Issues Discovered (Critical → Low):**
+**Issues Discovered (Critical -> Low):**
 1. [Issue with location and fix suggestion]
 2. [Issue with location and fix suggestion]
 

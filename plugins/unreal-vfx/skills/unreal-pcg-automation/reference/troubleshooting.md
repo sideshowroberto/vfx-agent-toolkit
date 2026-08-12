@@ -16,7 +16,7 @@ Extended troubleshooting issues extracted from unreal-pcg-automation skill.
 | Timeout on add_edge | Silent Execution (normal) | Proceed to next phase |
 | AttributeError: tuple | Not unpacking add_node_of_type() | Unpack: `node, settings =` |
 | Property not found | Nested in parameter struct | Check for `_params` properties |
-| Property verification fails | Timeout ≠ success | Always verify critical properties |
+| Property verification fails | Timeout != success | Always verify critical properties |
 
 ---
 
@@ -34,10 +34,10 @@ For the most common issues, see SKILL.md. The issues below are less common but s
 
 **Fix:**
 ```python
-# ❌ WRONG - Direct property access
+# [FAIL] WRONG - Direct property access
 sampler_settings.distance_increment = 100.0  # Doesn't exist!
 
-# ✅ CORRECT - Nested in sampler_params
+# [OK] CORRECT - Nested in sampler_params
 sampler_settings.sampler_params.distance_increment = 100.0  # Works!
 ```
 
@@ -93,10 +93,10 @@ unreal.EditorAssetLibrary.save_asset('/Game/PCG/MyGraph')
 
 **Fix:**
 ```python
-# ❌ WRONG - Wrong case
+# [FAIL] WRONG - Wrong case
 g.add_edge(node1, unreal.Name("out"), node2, unreal.Name("in"))  # Fails!
 
-# ✅ CORRECT - Exact case match
+# [OK] CORRECT - Exact case match
 g.add_edge(node1, unreal.Name("Out"), node2, unreal.Name("In"))  # Works!
 ```
 
@@ -119,11 +119,11 @@ for pin in node.output_pins:
 
 **Fix:**
 ```python
-# ❌ WRONG - Set position immediately after creation
+# [FAIL] WRONG - Set position immediately after creation
 node, settings = graph.add_node_of_type(unreal.PCGSplineSamplerSettings)
 node.set_node_position(300, 0)  # May not stick!
 
-# ✅ CORRECT - Set position in separate phase
+# [OK] CORRECT - Set position in separate phase
 # Phase 1: Add all nodes
 node1, _ = graph.add_node_of_type(unreal.PCGSplineSamplerSettings)
 node2, _ = graph.add_node_of_type(unreal.PCGTransformPointsSettings)
@@ -152,7 +152,7 @@ graph.nodes[1].set_node_position(600, 0)
 spawner, _ = graph.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
 
 # Step 2: Configure meshes manually in UI (REQUIRED)
-# Open graph → Select spawner → Details → Mesh Entries → Add mesh
+# Open graph -> Select spawner -> Details -> Mesh Entries -> Add mesh
 ```
 
 **See Also:** [api_limitations.md](api_limitations.md) for full explanation
@@ -167,10 +167,10 @@ spawner, _ = graph.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
 
 **Fix:**
 ```python
-# ❌ WRONG - Property path incorrect
+# [FAIL] WRONG - Property path incorrect
 sampler_settings.unbounded = True  # Doesn't exist at this level!
 
-# ✅ CORRECT - Nested in sampler_params
+# [OK] CORRECT - Nested in sampler_params
 sampler_settings.sampler_params.unbounded = True  # Works!
 ```
 
@@ -192,10 +192,10 @@ print(f"Unbounded: {settings.sampler_params.unbounded}")
 
 **Fix:**
 ```python
-# ❌ WRONG - MINIMUM mode (default) doesn't exclude
+# [FAIL] WRONG - MINIMUM mode (default) doesn't exclude
 diff_settings.set_editor_property('density_mode', unreal.PCGDifferenceMode.MINIMUM)
 
-# ✅ CORRECT - BINARY mode for exclusion
+# [OK] CORRECT - BINARY mode for exclusion
 diff_settings.set_editor_property('density_mode', unreal.PCGDifferenceMode.BINARY)
 ```
 
@@ -224,7 +224,7 @@ actor_selector = get_spline_settings.actor_selector
 actor_selector.actor_selection = unreal.PCGActorSelection.BY_CLASS
 actor_selector.actor_selection_class = unreal.Landscape  # Not LandscapeSplineActor!
 
-# ⚠️ Verify settings stuck (see property_verification.md)
+# [WARN] Verify settings stuck (see property_verification.md)
 ```
 
 **For REGULAR SPLINE ACTORS:**
@@ -248,16 +248,16 @@ spline_settings.set_editor_property('actor_selection_tag', "YourTag")
 
 **Optimization 1: Reduce surface sampler density**
 ```python
-# Before: 5.0 pts/m² (very dense)
+# Before: 5.0 pts/m^2 (very dense)
 sampler_settings.points_per_squared_meter = 5.0  # Slow!
 
-# After: 0.5 pts/m² (optimized)
+# After: 0.5 pts/m^2 (optimized)
 sampler_settings.points_per_squared_meter = 0.5  # Faster!
 ```
 
 **Optimization 2: Use Density Filter**
 ```python
-# Single dense source → filtered variations (34% faster)
+# Single dense source -> filtered variations (34% faster)
 sampler_settings.points_per_squared_meter = 2.0
 # Then use PCGDensityFilterSettings to thin out
 ```
@@ -270,9 +270,9 @@ cull_s.max_distance = 10000.0  # 100m
 ```
 
 **Benchmark:**
-- 0.1 pts/m² = ~10ms execution (sparse)
-- 1.0 pts/m² = ~50ms execution (medium)
-- 5.0 pts/m² = ~250ms execution (dense)
+- 0.1 pts/m^2 = ~10ms execution (sparse)
+- 1.0 pts/m^2 = ~50ms execution (medium)
+- 5.0 pts/m^2 = ~250ms execution (dense)
 
 ---
 
@@ -322,7 +322,7 @@ for prop in props:
 for node in graph.nodes:
     for out_pin in node.output_pins:
         for edge in out_pin.edges:
-            print(f"{node} → {edge.input_pin.node}")
+            print(f"{node} -> {edge.input_pin.node}")
 ```
 
 ---

@@ -26,12 +26,12 @@ EXPECTED OUTPUT:
     ======================================================================
 
     Test 1: Complete Agent Lifecycle
-      ✅ Create agent (v1.0.0)
-      ✅ Validate agent (PASS)
-      ✅ Update agent to v1.1.0
-      ✅ Validate updated agent (PASS)
-      ✅ Archive created (v1.0.0)
-      ✅ Cleanup successful
+      [OK] Create agent (v1.0.0)
+      [OK] Validate agent (PASS)
+      [OK] Update agent to v1.1.0
+      [OK] Validate updated agent (PASS)
+      [OK] Archive created (v1.0.0)
+      [OK] Cleanup successful
 
     ... [5 more tests]
 
@@ -42,7 +42,7 @@ EXPECTED OUTPUT:
     Passed: 6
     Failed: 0
 
-    🎉 All integration tests passed!
+     All integration tests passed!
     ======================================================================
 
 EXIT CODES:
@@ -53,15 +53,15 @@ EXIT CODES:
 WHAT GETS TESTED:
 
     Test 1: Complete Agent Lifecycle
-        - Create → Validate → Update → Archive → Delete
+        - Create -> Validate -> Update -> Archive -> Delete
 
     Test 2: Create From All Templates
         - tool-specialist, cross-tool, general-helper
 
     Test 3: Version Increments
-        - major (1.0.0 → 2.0.0)
-        - minor (2.0.0 → 2.1.0)
-        - patch (2.1.0 → 2.1.1)
+        - major (1.0.0 -> 2.0.0)
+        - minor (2.0.0 -> 2.1.0)
+        - patch (2.1.0 -> 2.1.1)
 
     Test 4: Validation Prevents Invalid Agents
         - Invalid names rejected
@@ -78,18 +78,18 @@ WHAT GETS TESTED:
 TROUBLESHOOTING:
 
     "Script not found" error:
-        → Ensure you're in the tests/ directory
-        → Check scripts/ directory exists
+        -> Ensure you're in the tests/ directory
+        -> Check scripts/ directory exists
 
     "Template not found" error:
-        → Check reference/agent_template.md exists
+        -> Check reference/agent_template.md exists
 
     All tests fail:
-        → Check Python version (need 3.8+)
-        → Verify file permissions
+        -> Check Python version (need 3.8+)
+        -> Verify file permissions
 
     Tests pass but temp directories remain:
-        → Manual cleanup:
+        -> Manual cleanup:
           Windows: del /s /q %TEMP%\agent_test_*
           Linux:   rm -rf /tmp/agent_test_*
 

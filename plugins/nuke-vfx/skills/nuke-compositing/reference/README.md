@@ -21,21 +21,21 @@ Organized node reference extracted from the official **Nuke 15.0v4 Reference Gui
 ## Quick Node Finder
 
 ### Most Common Nodes
-- **Read/Write** → 01-essential-nodes.md
-- **Grade/ColorCorrect** → 02-color-nodes.md
-- **Primatte/Keylight** → 03-keyer-nodes.md
-- **Transform/Crop** → 04-transform-nodes.md
-- **Blur/Defocus** → 05-filter-nodes.md
-- **Roto/RotoPaint** → 06-draw-paint-nodes.md
-- **Merge** → 07-merge-composite-nodes.md
+- **Read/Write** -> 01-essential-nodes.md
+- **Grade/ColorCorrect** -> 02-color-nodes.md
+- **Primatte/Keylight** -> 03-keyer-nodes.md
+- **Transform/Crop** -> 04-transform-nodes.md
+- **Blur/Defocus** -> 05-filter-nodes.md
+- **Roto/RotoPaint** -> 06-draw-paint-nodes.md
+- **Merge** -> 07-merge-composite-nodes.md
 
 ### By Workflow
-- **Green screen keying** → 03-keyer-nodes.md (Keylight, Primatte)
-- **Color grading** → 02-color-nodes.md (Grade, ColorCorrect)
-- **Motion blur** → 05-filter-nodes.md (MotionBlur, VectorBlur)
-- **Retiming** → 08-time-nodes.md (Retime, OFlow, Kronos)
-- **Rotoscoping** → 06-draw-paint-nodes.md (Roto, RotoPaint)
-- **3D camera projection** → 10-3d-nodes.md (Camera, Project3D)
+- **Green screen keying** -> 03-keyer-nodes.md (Keylight, Primatte)
+- **Color grading** -> 02-color-nodes.md (Grade, ColorCorrect)
+- **Motion blur** -> 05-filter-nodes.md (MotionBlur, VectorBlur)
+- **Retiming** -> 08-time-nodes.md (Retime, OFlow, Kronos)
+- **Rotoscoping** -> 06-draw-paint-nodes.md (Roto, RotoPaint)
+- **3D camera projection** -> 10-3d-nodes.md (Camera, Project3D)
 
 ## Search Examples
 
@@ -63,9 +63,9 @@ grep -r "despill\|screen\|matte" reference/03-keyer-nodes.md
 
 ## Source
 
-Extracted from: `Nuke/documentation/referenceGuide/Nuke15.0v4_ReferenceGuide.pdf`  
-**Version:** Nuke 15.0v4  
-**Pages:** 1371  
+Extracted from: `Nuke/documentation/referenceGuide/Nuke15.0v4_ReferenceGuide.pdf`
+**Version:** Nuke 15.0v4
+**Pages:** 1371
 **Last Updated:** 2026-02-04
 
 ## Maintenance

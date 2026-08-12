@@ -33,12 +33,12 @@ log = NukeMCPLogger(session_name="MyTask")
 
 try:
     log.info("Starting operation...")
-    
+
     # Create node
     grade_node = nuke.createNode("Grade")
     log.increment_stat("nodes_created")
     log.success(f"Created node: {grade_node.name()}")
-    
+
 except Exception as e:
     log.error("Operation failed", e)
 
@@ -71,31 +71,31 @@ result = log.get_results()
 def create_node_general(node_type: str, name: str = None):
     """
     Create any Nuke node - works for ALL projects (Article I).
-    
+
     Args:
         node_type: Nuke node class (Read, Grade, Merge2, etc.)
         name: Optional custom name
-    
+
     Returns:
         dict: Logger results with success/error status
     """
     import nuke
     from nuke_mcp_logger import NukeMCPLogger
-    
+
     log = NukeMCPLogger(session_name="CreateNode")
-    
+
     try:
         node = nuke.createNode(node_type)
-        
+
         if name:
             node.setName(name)
-        
+
         log.set_stat("node_type", node_type)
         log.set_stat("node_name", node.name())
         log.success(f"Created {node_type}: {node.name()}")
-        
+
         return log.get_results()
-        
+
     except Exception as e:
         log.error(f"Failed to create {node_type}", e)
         return log.get_results()
@@ -113,37 +113,37 @@ result = create_node_general("Merge2")
 def setup_read_node(file_path: str, name: str = None, frame_range: tuple = None):
     """
     Setup Read node with image sequence - parameterized for ANY project.
-    
+
     Args:
         file_path: Path to image sequence (e.g., "D:/Plates/Shot001_%04d.exr")
         name: Optional node name
         frame_range: Optional (first, last) frame tuple
-    
+
     Returns:
         dict: Logger results
     """
     import nuke
     from nuke_mcp_logger import NukeMCPLogger
-    
+
     log = NukeMCPLogger(session_name="SetupRead")
-    
+
     try:
         read_node = nuke.createNode("Read")
         read_node['file'].setValue(file_path)
-        
+
         if name:
             read_node.setName(name)
-        
+
         if frame_range:
             read_node['first'].setValue(frame_range[0])
             read_node['last'].setValue(frame_range[1])
-        
+
         log.set_stat("file_path", file_path)
         log.set_stat("node_name", read_node.name())
         log.success(f"Read node setup: {read_node.name()}")
-        
+
         return log.get_results()
-        
+
     except Exception as e:
         log.error("Failed to setup Read node", e)
         return log.get_results()
@@ -164,34 +164,34 @@ result = setup_read_node(
 def setup_write_node(output_path: str, file_type: str = "exr", name: str = None):
     """
     Setup Write node for rendering - works for ANY output format.
-    
+
     Args:
         output_path: Output file path with frame padding
         file_type: Output format (exr, dpx, jpg, etc.)
         name: Optional node name
-    
+
     Returns:
         dict: Logger results
     """
     import nuke
     from nuke_mcp_logger import NukeMCPLogger
-    
+
     log = NukeMCPLogger(session_name="SetupWrite")
-    
+
     try:
         write_node = nuke.createNode("Write")
         write_node['file'].setValue(output_path)
         write_node['file_type'].setValue(file_type)
-        
+
         if name:
             write_node.setName(name)
-        
+
         log.set_stat("output_path", output_path)
         log.set_stat("file_type", file_type)
         log.success(f"Write node setup: {write_node.name()}")
-        
+
         return log.get_results()
-        
+
     except Exception as e:
         log.error("Failed to setup Write node", e)
         return log.get_results()
@@ -212,7 +212,7 @@ result = setup_write_node(
 def batch_comp_setup(shots_config: list):
     """
     Setup comp for multiple shots - ONE script for ALL projects.
-    
+
     Args:
         shots_config: List of shot dictionaries with:
             - name: Shot identifier
@@ -220,49 +220,49 @@ def batch_comp_setup(shots_config: list):
             - output_path: Output render path
             - script_path: Where to save .nk file
             - frame_range: (first, last) tuple
-    
+
     Returns:
         dict: Logger results with batch statistics
     """
     import nuke
     from nuke_mcp_logger import NukeMCPLogger
-    
+
     log = NukeMCPLogger(session_name="BatchComp")
     log.set_stat("shots_total", len(shots_config))
     log.set_stat("shots_processed", 0)
     log.set_stat("shots_failed", 0)
-    
+
     for shot in shots_config:
         try:
             # Clear existing script
             nuke.scriptClear()
-            
+
             # Setup Read node
             read_node = nuke.createNode("Read")
             read_node['file'].setValue(shot['plate_path'])
             read_node['first'].setValue(shot['frame_range'][0])
             read_node['last'].setValue(shot['frame_range'][1])
             read_node.setName("BG_Plate")
-            
+
             # Setup Grade
             grade_node = nuke.createNode("Grade")
             grade_node.setName("MainGrade")
-            
+
             # Setup Write
             write_node = nuke.createNode("Write")
             write_node['file'].setValue(shot['output_path'])
             write_node.setName("MainOut")
-            
+
             # Save script
             nuke.scriptSave(shot['script_path'])
-            
+
             log.increment_stat("shots_processed")
             log.info(f"Processed: {shot['name']}")
-            
+
         except Exception as e:
             log.increment_stat("shots_failed")
             log.error(f"Failed: {shot['name']}", e)
-    
+
     log.success(f"Batch complete: {log.stats['shots_processed']}/{log.stats['shots_total']}")
     return log.get_results()
 
@@ -341,10 +341,10 @@ All logger output is also written to this file for debugging and session review.
 
 **Fix:** Use NukeMCPLogger instead:
 ```python
-# ❌ WRONG
+# [FAIL] WRONG
 print("Created node")
 
-# ✅ CORRECT
+# [OK] CORRECT
 log.info("Created node")
 ```
 
@@ -356,11 +356,11 @@ log.info("Created node")
 
 **Fix:**
 ```python
-# ❌ WRONG
+# [FAIL] WRONG
 log.success("Done")
 # (nothing returned)
 
-# ✅ CORRECT
+# [OK] CORRECT
 log.success("Done")
 return log.get_results()
 ```
@@ -418,28 +418,28 @@ print(nuke_mcp_logger.__file__)
 ## Constitutional Compliance
 
 **Article I - General Purpose Scripts:**
-✅ All functions accept parameters (no hardcoded paths)
-✅ Works on any project (Shot001, Shot002, ProjectX, etc.)
+[OK] All functions accept parameters (no hardcoded paths)
+[OK] Works on any project (Shot001, Shot002, ProjectX, etc.)
 
 **Article III - Progressive Disclosure:**
-✅ SKILL.md: 480 lines (<500 limit)
-✅ Reference: Standards file (523 lines, on-demand)
+[OK] SKILL.md: 480 lines (<500 limit)
+[OK] Reference: Standards file (523 lines, on-demand)
 
 **Article IV - Independent Testing:**
-✅ Tested in Nuke terminal mode
-✅ Validated with 3+ test projects
+[OK] Tested in Nuke terminal mode
+[OK] Validated with 3+ test projects
 
 **Article V - Official Patterns:**
-✅ Uses nuke Python API directly
-✅ Follows Python logging patterns
+[OK] Uses nuke Python API directly
+[OK] Follows Python logging patterns
 
 **Article VI - Context Efficiency:**
-✅ Progressive disclosure (load only when triggered)
-✅ Reuses nuke-standards.md documentation
+[OK] Progressive disclosure (load only when triggered)
+[OK] Reuses nuke-standards.md documentation
 
 **Article VIII - Documentation Standards:**
-✅ YAML frontmatter complete
-✅ All required sections present
+[OK] YAML frontmatter complete
+[OK] All required sections present
 
 ---
 

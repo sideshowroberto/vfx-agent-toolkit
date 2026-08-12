@@ -138,7 +138,7 @@ class ImageProcessor(io.ComfyNode):
 ```python
 from PIL import ImageOps
 
-# Load from file → tensor
+# Load from file -> tensor
 def load_image(path):
     img = PILImage.open(path)
     img = ImageOps.exif_transpose(img)   # fix rotation from camera EXIF
@@ -147,7 +147,7 @@ def load_image(path):
     img = img.convert("RGB")
     return torch.from_numpy(np.array(img).astype(np.float32) / 255.0).unsqueeze(0)
 
-# Tensor → save to file
+# Tensor -> save to file
 def save_image(tensor, path):
     if tensor.dim() == 4:
         tensor = tensor[0]
@@ -167,7 +167,7 @@ single_batch = image.unsqueeze(0)          # add batch dim [1,H,W,C]
 # Invert mask
 inverted = 1.0 - mask
 
-# Mask ↔ Image conversion
+# Mask <-> Image conversion
 alpha = mask.unsqueeze(0).unsqueeze(-1)                   # [1,H,W,1]
 gray_mask = 0.299*img[:,:,:,0] + 0.587*img[:,:,:,1] + 0.114*img[:,:,:,2]
 image_from_mask = mask.unsqueeze(-1).repeat(1, 1, 1, 3)  # [B,H,W,3]
@@ -189,9 +189,9 @@ class LatentDict(TypedDict):
     type: NotRequired[str]      # only for "audio", "hunyuan3dv2"
 ```
 
-**Image models** (SD1.5, SDXL, SD3, Flux): 4D `[B, C, H, W]` — SD1.5/SDXL = 4 channels, SD3/Flux = 16 channels. Latent dimensions are 1/8 of pixel dims.
+**Image models** (SD1.5, SDXL, SD3, Flux): 4D `[B, C, H, W]` - SD1.5/SDXL = 4 channels, SD3/Flux = 16 channels. Latent dimensions are 1/8 of pixel dims.
 
-**Video models** (Hunyuan Video, Wan, Cosmos, LTX Video, Mochi): 5D `[B, C, T, H, W]` — T is the temporal (frame) dimension.
+**Video models** (Hunyuan Video, Wan, Cosmos, LTX Video, Mochi): 5D `[B, C, T, H, W]` - T is the temporal (frame) dimension.
 
 ```python
 samples = latent["samples"]
@@ -208,7 +208,7 @@ result["samples"] = modified_samples
 
 ## CONDITIONING Type
 
-`list[tuple[Tensor, PooledDict]]` — a list of (cond_tensor, metadata_dict) pairs.
+`list[tuple[Tensor, PooledDict]]` - a list of (cond_tensor, metadata_dict) pairs.
 
 The `PooledDict` contains many optional keys for different models:
 
@@ -392,7 +392,7 @@ When checking if a tensor exists, always use `is not None` instead of truthiness
 if image is not None:
     process(image)
 
-# WRONG — multi-element tensors don't support bool()
+# WRONG - multi-element tensors don't support bool()
 if image:       # raises RuntimeError
     process(image)
 
@@ -404,10 +404,10 @@ if (mask > 0.5).all():
 ## Type Conversion Patterns
 
 ```python
-# IMAGE [B,H,W,C] → MASK [B,H,W]
+# IMAGE [B,H,W,C] -> MASK [B,H,W]
 mask = 0.299 * image[:,:,:,0] + 0.587 * image[:,:,:,1] + 0.114 * image[:,:,:,2]
 
-# MASK [B,H,W] → IMAGE [B,H,W,C]
+# MASK [B,H,W] -> IMAGE [B,H,W,C]
 image = mask.unsqueeze(-1).repeat(1, 1, 1, 3)
 
 # Resize image tensor

@@ -10,7 +10,7 @@ tools: Read,Write,Bash,mcp__maya__execute_python,mcp__maya__get_scene_info,mcp__
 
 # Maya Specialist Agent
 
-Expert in Maya scene control via the MCP commandPort bridge (port 7001). Uses `maya.cmds` and OpenMaya API 2.0 — never PyMEL (deprecated in Maya 2023+).
+Expert in Maya scene control via the MCP commandPort bridge (port 7001). Uses `maya.cmds` and OpenMaya API 2.0 - never PyMEL (deprecated in Maya 2023+).
 
 ## When You Are Invoked
 
@@ -21,8 +21,8 @@ Expert in Maya scene control via the MCP commandPort bridge (port 7001). Uses `m
 ## Maya MCP Bridge Architecture
 
 ```
-Claude Code ←→ MCP server (uv run python src/maya_mcp_server.py)
-                    ↓ TCP socket
+Claude Code <--> MCP server (uv run python src/maya_mcp_server.py)
+                    v TCP socket
               Maya commandPort (localhost:7001, -sourceType python)
 ```
 
@@ -30,10 +30,10 @@ Claude Code ←→ MCP server (uv run python src/maya_mcp_server.py)
 
 ## Key Rules
 
-1. **Use `maya.cmds` only** — PyMEL is dead in Maya 2023+. For complex API work, use `import maya.api.OpenMaya as om2`.
-2. **Check Maya is open** before running commands — if socket fails, prompt user to open Maya.
-3. **Multi-line results** — the two-connection pattern in PatrickPalmer's server handles return values; trust it.
-4. **First connection** — Maya may show an "Allow incoming connections" dialog on first use. User must click Allow.
+1. **Use `maya.cmds` only** - PyMEL is dead in Maya 2023+. For complex API work, use `import maya.api.OpenMaya as om2`.
+2. **Check Maya is open** before running commands - if socket fails, prompt user to open Maya.
+3. **Multi-line results** - the two-connection pattern in PatrickPalmer's server handles return values; trust it.
+4. **First connection** - Maya may show an "Allow incoming connections" dialog on first use. User must click Allow.
 
 ## Common Patterns
 

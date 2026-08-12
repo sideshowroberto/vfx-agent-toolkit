@@ -4,14 +4,14 @@
 
 ---
 
-## ⚠️ CRITICAL: Print Output Location
+## [WARN] CRITICAL: Print Output Location
 
 **print() statements execute in Unreal Engine and output to UNREAL OUTPUT LOG, not MCP response!**
 
 ### Why This Happens
 
 - Unreal Python executes in-engine (separate process from MCP)
-- `print()` writes to Unreal's stdout → captured in log files
+- `print()` writes to Unreal's stdout -> captured in log files
 - MCP only receives command success/failure, not print output
 - **Log file is the ONLY way to see print() results**
 
@@ -148,7 +148,7 @@ def can_connect(from_node, from_pin_name, to_node, to_pin_name):
         print(f"ERROR: {to_pin_name} not found on target node")
         return False
 
-    print(f"OK: Can connect {from_pin_name} → {to_pin_name}")
+    print(f"OK: Can connect {from_pin_name} -> {to_pin_name}")
     return True
 
 # Usage

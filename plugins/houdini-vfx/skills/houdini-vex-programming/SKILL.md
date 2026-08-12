@@ -524,24 +524,24 @@ VEX syntax error (missing semicolon, mismatched braces, wrong type).
 
 **Solution:**
 ```vex
-// ❌ WRONG: Missing semicolon
+// [FAIL] WRONG: Missing semicolon
 @P.y = @P.x * 2.0
 
-// ✅ CORRECT
+// [OK] CORRECT
 @P.y = @P.x * 2.0;
 
-// ❌ WRONG: Type mismatch
+// [FAIL] WRONG: Type mismatch
 @P = 5.0;  // @P is vector, can't assign float
 
-// ✅ CORRECT
+// [OK] CORRECT
 @P = {5.0, 5.0, 5.0};
 // Or
 @P.y = 5.0;  // Assign to component
 
-// ❌ WRONG: Wrong vector syntax
+// [FAIL] WRONG: Wrong vector syntax
 vector v = (1, 2, 3);
 
-// ✅ CORRECT
+// [OK] CORRECT
 vector v = {1, 2, 3};
 ```
 
@@ -561,19 +561,19 @@ Not writing to attributes, or wrong wrangle type for operation.
 
 **Solution:**
 ```vex
-// ❌ WRONG: Local variable doesn't affect geometry
+// [FAIL] WRONG: Local variable doesn't affect geometry
 float height = @P.y + 5.0;  // Only in memory, not written
 
-// ✅ CORRECT: Write back to attribute
+// [OK] CORRECT: Write back to attribute
 @P.y += 5.0;  // Modifies actual geometry
 
 // Or create new attribute
 f@height = @P.y + 5.0;
 
-// ❌ WRONG: Point Wrangle trying to modify primitives
+// [FAIL] WRONG: Point Wrangle trying to modify primitives
 // (Point wrangle operates on points, not primitives)
 
-// ✅ CORRECT: Use Primitive Wrangle
+// [OK] CORRECT: Use Primitive Wrangle
 // Context: Primitive Wrangle
 @Cd = {1, 0, 0};  // Sets primitive color
 ```
@@ -595,26 +595,26 @@ Inefficient VEX code (expensive operations in loops, unnecessary queries).
 
 **Solution:**
 ```vex
-// ❌ SLOW: Repeated expensive operations
+// [FAIL] SLOW: Repeated expensive operations
 for (int i = 0; i < 1000; i++) {
     int pts[] = nearpoints(0, @P, 5.0);  // Query every iteration
 }
 
-// ✅ FAST: Query once
+// [OK] FAST: Query once
 int pts[] = nearpoints(0, @P, 5.0);
 for (int i = 0; i < len(pts); i++) {
     // Use pts array
 }
 
-// ❌ SLOW: Detail wrangle when point wrangle would work
+// [FAIL] SLOW: Detail wrangle when point wrangle would work
 // (Detail wrangle processes ALL geometry in one thread)
 
-// ✅ FAST: Use point wrangle (parallelized per point)
+// [OK] FAST: Use point wrangle (parallelized per point)
 
-// ❌ SLOW: Large search radius in nearpoints
+// [FAIL] SLOW: Large search radius in nearpoints
 int pts[] = nearpoints(0, @P, 1000.0);  // Checks too many points
 
-// ✅ FAST: Reasonable search radius
+// [OK] FAST: Reasonable search radius
 int pts[] = nearpoints(0, @P, 5.0);
 ```
 
@@ -637,10 +637,10 @@ Trying to read attribute that doesn't exist on geometry.
 
 **Solution:**
 ```vex
-// ❌ WRONG: Assume attribute exists
+// [FAIL] WRONG: Assume attribute exists
 vector vel = v@velocity;  // Error if velocity doesn't exist
 
-// ✅ CORRECT: Check first
+// [OK] CORRECT: Check first
 if (hasattrib(0, "point", "velocity")) {
     vector vel = v@velocity;
     @P += vel * @TimeInc;

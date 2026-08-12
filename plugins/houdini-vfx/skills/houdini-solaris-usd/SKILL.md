@@ -46,14 +46,14 @@ else:
 **Step 1: Create SOP Geometry**
 ```
 [SOP Network]
-- Grid → Mountain → Scatter → Copy to Points
+- Grid -> Mountain -> Scatter -> Copy to Points
 - Create geometry in /obj/geo1
 ```
 
 **Step 2: Create Stage and Import**
 ```
 [/stage Context]
-↓
+v
 SOP Import LOP
 - SOP Path: /obj/geo1/copytopoints1
 - Import Path Prefix: /World/geometry
@@ -66,7 +66,7 @@ Material Library LOP
 - Create Material: usdpreviewsurface1
   - Base Color: 0.7, 0.5, 0.3
   - Roughness: 0.8
-↓
+v
 Assign Material LOP
 - Primitives: /World/geometry/*
 - Material: /mtl/usdpreviewsurface1
@@ -77,7 +77,7 @@ Assign Material LOP
 Configure Layer LOP
 - Set Default Prim: /World
 - Set Layer Comment: "Procedural scatter geometry"
-↓
+v
 Add Variant LOP (optional)
 - Primitive Path: /World/geometry
 - Variant Set Name: "detail_level"
@@ -112,10 +112,10 @@ Can be loaded in USD-compatible software (Houdini, Unreal, Maya, etc.)
 **Steps:**
 1. **Create Base Layer (Asset Definition)**
    ```
-   SOP Import LOP → Configure Layer LOP
+   SOP Import LOP -> Configure Layer LOP
    - Import geometry as /assets/tree
    - Set Default Prim: /assets/tree
-   ↓
+   v
    USD ROP (write to disk)
    - Output: $HIP/usd/assets/tree_base.usd
    ```
@@ -126,7 +126,7 @@ Can be loaded in USD-compatible software (Houdini, Unreal, Maya, etc.)
    Reference LOP
    - Reference File: $HIP/usd/assets/tree_base.usd
    - Primitive Path: /World/forest/tree_001
-   ↓
+   v
    Transform LOP
    - Primitive: /World/forest/tree_001
    - Translate: 5, 0, 3
@@ -137,7 +137,7 @@ Can be loaded in USD-compatible software (Houdini, Unreal, Maya, etc.)
 3. **Layer Stack Visualization**
    ```
    [Scene Graph Tree panel]
-   - Right-click prim → Composition
+   - Right-click prim -> Composition
    - Shows layer stack: strongest opinion (top) to weakest (bottom)
 
    Example stack for /World/forest/tree_001:
@@ -151,7 +151,7 @@ Can be loaded in USD-compatible software (Houdini, Unreal, Maya, etc.)
    Sublayer LOP
    - Sublayer File: $HIP/usd/shots/shot_010_anim.usd
    - Layer Position: Stronger (overrides below layers)
-   ↓
+   v
    Edit Properties LOP (in sublayer context)
    - Primitive: /World/forest/tree_001
    - Add attribute: visibility = invisible (hide in this shot)
@@ -161,7 +161,7 @@ Can be loaded in USD-compatible software (Houdini, Unreal, Maya, etc.)
 - [x] Base layer defines asset structure
 - [x] Override layers modify without destroying original
 - [x] Layer stack shows proper composition
-- [x] Changes propagate correctly (strong → weak)
+- [x] Changes propagate correctly (strong -> weak)
 
 ---
 
@@ -206,9 +206,9 @@ Can be loaded in USD-compatible software (Houdini, Unreal, Maya, etc.)
    - Primitive Path: /assets/tree
    - Variant Set Name: "lod"
    - Variants:
-     - high → source: /temp/high
-     - medium → source: /temp/medium
-     - low → source: /temp/low
+     - high -> source: /temp/high
+     - medium -> source: /temp/medium
+     - low -> source: /temp/low
    - Default Variant: high
    ```
 
@@ -231,8 +231,8 @@ Can be loaded in USD-compatible software (Houdini, Unreal, Maya, etc.)
 
    Or use GUI:
    ```
-   Scene Graph Tree → Select prim → Variants panel
-   Select "lod" variant set → Choose "low"
+   Scene Graph Tree -> Select prim -> Variants panel
+   Select "lod" variant set -> Choose "low"
    ```
 
 5. **Nested Variants (LOD + Material)**
@@ -267,19 +267,19 @@ Can be loaded in USD-compatible software (Houdini, Unreal, Maya, etc.)
 1. **Create Asset Library Structure**
    ```
    $HIP/usd/
-   ├── assets/
-   │   ├── vegetation/
-   │   │   ├── tree_oak.usd
-   │   │   ├── tree_pine.usd
-   │   │   └── bush_generic.usd
-   │   ├── architecture/
-   │   │   ├── building_house.usd
-   │   │   └── building_skyscraper.usd
-   │   └── props/
-   │       ├── bench.usd
-   │       └── street_lamp.usd
-   └── scenes/
-       └── city_block_01.usd
+   +-- assets/
+   |   +-- vegetation/
+   |   |   +-- tree_oak.usd
+   |   |   +-- tree_pine.usd
+   |   |   +-- bush_generic.usd
+   |   +-- architecture/
+   |   |   +-- building_house.usd
+   |   |   +-- building_skyscraper.usd
+   |   +-- props/
+   |       +-- bench.usd
+   |       +-- street_lamp.usd
+   +-- scenes/
+       +-- city_block_01.usd
    ```
 
 2. **Reference Assets into Scene**
@@ -287,7 +287,7 @@ Can be loaded in USD-compatible software (Houdini, Unreal, Maya, etc.)
    Reference LOP (for each asset instance)
    - Reference File: $HIP/usd/assets/vegetation/tree_oak.usd
    - Primitive Path: /World/vegetation/tree_oak_001
-   ↓
+   v
    Transform LOP
    - Translate: X, Y, Z
    - Rotate: 0, random_angle, 0
@@ -354,7 +354,7 @@ Can be loaded in USD-compatible software (Houdini, Unreal, Maya, etc.)
 5. **Payloads for Large Scenes**
    ```
    // Convert references to payloads for better performance
-   Reference LOP → Configure Primitives LOP
+   Reference LOP -> Configure Primitives LOP
    - Change to use Payloads instead of References
 
    // Payloads can be loaded/unloaded dynamically
@@ -414,7 +414,7 @@ specialized_prim.GetSpecializes().AddSpecialize("/_class_tree")
 # Use: Rare, for advanced variant workflows
 ```
 
-**Composition Strength (strongest → weakest):**
+**Composition Strength (strongest -> weakest):**
 ```
 1. Direct opinions (local edits)
 2. Sublayers
@@ -586,7 +586,7 @@ Editing in wrong layer or layer not saved to disk.
 **Solution:**
 ```
 // Check active layer
-Scene Graph Tree → Select prim → Right-click → "Show in Composition"
+Scene Graph Tree -> Select prim -> Right-click -> "Show in Composition"
 - Verify you're editing the correct layer in stack
 
 // Save layer to disk

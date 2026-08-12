@@ -4,7 +4,7 @@
 
 param([string]$ServerPath = "")
 
-Write-Host "=== Nuke MCP — Register ===" -ForegroundColor Cyan
+Write-Host "=== Nuke MCP - Register ===" -ForegroundColor Cyan
 
 function Test-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
 if (-not (Test-Command "node")) { Write-Error "Node.js not found."; exit 1 }

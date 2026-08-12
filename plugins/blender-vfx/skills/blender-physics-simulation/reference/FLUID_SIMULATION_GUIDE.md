@@ -51,7 +51,7 @@ Blender's Mantaflow system (introduced in 2.82) provides unified fluid simulatio
 
 **Cannot bake via a scripted call - these are long-running, blocking operators:**
 ```python
-# ❌ ALL require interactive Blender (blocking, frame-stepped simulation)
+# [FAIL] ALL require interactive Blender (blocking, frame-stepped simulation)
 bpy.ops.fluid.bake_all()
 bpy.ops.fluid.free_all()
 bpy.ops.fluid.bake_data()
@@ -111,11 +111,11 @@ print(f"Frames: {settings.cache_frame_start} - {settings.cache_frame_end}")
 
 ```
 Flow Object (Emitter)
-        ↓
+        v
     Domain (Simulation Container)
-        ↓
+        v
     Cache Files (Baked Data)
-        ↓
+        v
     Render (Volume/Mesh)
 ```
 
@@ -715,18 +715,18 @@ else:
 
 ```
 //cache/fluid/
-├── config/
-│   └── config_0001.uni
-├── data/
-│   ├── fluid_data_0001.vdb
-│   ├── fluid_data_0002.vdb
-│   └── ...
-├── mesh/
-│   ├── mesh_0001.vdb
-│   └── ...
-└── particles/
-    ├── particles_0001.uni
-    └── ...
++-- config/
+|   +-- config_0001.uni
++-- data/
+|   +-- fluid_data_0001.vdb
+|   +-- fluid_data_0002.vdb
+|   +-- ...
++-- mesh/
+|   +-- mesh_0001.vdb
+|   +-- ...
++-- particles/
+    +-- particles_0001.uni
+    +-- ...
 ```
 
 ### Free Cache (Manual)

@@ -13,7 +13,7 @@ allowed-tools: Read,Write,Edit
 
 **Purpose:** Specification-Driven Development workflows using spec-kit methodology adapted for VFX pipeline
 
-**Framework:** Spec-kit SDD (Specification → Plan → Tasks → Implementation)
+**Framework:** Spec-kit SDD (Specification -> Plan -> Tasks -> Implementation)
 
 **For VFX Tools:** Unreal Engine, Blender, Houdini, Nuke, ComfyUI, Python
 
@@ -48,9 +48,9 @@ allowed-tools: Read,Write,Edit
 ### "Audit agents for skill creation"
 
 **Workflow:**
-1. **List agent files** → `.claude/agents/*.md`
-2. **Read all agent files** → Analyze tool usage, dependencies
-3. **Analyze against criteria** → Skill readiness, constitutional compliance
+1. **List agent files** -> `.claude/agents/*.md`
+2. **Read all agent files** -> Analyze tool usage, dependencies
+3. **Analyze against criteria** -> Skill readiness, constitutional compliance
 4. **Generate documents:**
    - Spec: `ClaudeCode/development/specs/SKILL_CREATION_SPEC.md`
    - Plan: `ClaudeCode/development/roadmaps/SKILL_CREATION_PLAN.md`
@@ -276,7 +276,7 @@ python3 ClaudeCode/development/scripts/check_constitutional_compliance.py
 
 **Patterns:**
 - **Parallel (Single Message):** Launch independent agents simultaneously (max 5/batch)
-- **Sequential (Wait Between):** Create → Test → Document (wait for completion between phases)
+- **Sequential (Wait Between):** Create -> Test -> Document (wait for completion between phases)
 
 **Rules:** Max 5 agents/batch, wait for completion, use TodoWrite, no dependent tasks in parallel
 
@@ -304,19 +304,19 @@ python3 ClaudeCode/development/scripts/check_constitutional_compliance.py
 ```markdown
 # Active Roadmap
 
-## ✅ COMPLETED - [Phase Name]
+## [OK] COMPLETED - [Phase Name]
 **Scope:** Brief description
 **Effort:** Time estimate
 **Outcome:** Results achieved
 **Next:** Link to next phase
 
-## 🏗️ IN PROGRESS - [Current Phase]
+## IN PROGRESS - [Current Phase]
 **Scope:** What we're building
 **Status:** Current step
 **Blockers:** Issues if any
 **ETA:** Estimated completion
 
-## 📋 PLANNED - [Future Phase]
+## PLANNED - [Future Phase]
 **Priority:** High/Medium/Low
 **Dependencies:** What must complete first
 **Effort:** Time estimate
@@ -385,7 +385,7 @@ python3 ClaudeCode/development/scripts/check_constitutional_compliance.py
 
 ## Common Workflows
 
-**All follow Spec-Kit SDD:** Specify → Plan → Tasks → Implement → Validate
+**All follow Spec-Kit SDD:** Specify -> Plan -> Tasks -> Implement -> Validate
 
 **Three Patterns:**
 1. **Create New VFX Skill** - Copy template, create scripts, write SKILL.md (<500 lines), test 3+ projects
@@ -465,26 +465,26 @@ python3 ClaudeCode/development/scripts/check_constitutional_compliance.py
 **Version:** VFX_SKILL_CONSTITUTION.md v2.0.0
 
 **Article I - General Purpose Scripts:**
-- ✅ All templates and workflows are project-agnostic
-- ✅ Spec-kit SDD works across all VFX tools
+- [OK] All templates and workflows are project-agnostic
+- [OK] Spec-kit SDD works across all VFX tools
 
 **Article III - Progressive Disclosure:**
-- ✅ SKILL.md: 490 lines (2% buffer)
-- ✅ Reference file: detailed-reference.md for patterns/templates/validation
+- [OK] SKILL.md: 490 lines (2% buffer)
+- [OK] Reference file: detailed-reference.md for patterns/templates/validation
 
 **Article VI - Context Efficiency:**
-- ✅ Context reduction: 31% (713 → 490 lines)
-- ✅ Progressive disclosure through reference files
+- [OK] Context reduction: 31% (713 -> 490 lines)
+- [OK] Progressive disclosure through reference files
 
 **Article VII - Cross-App Integration:**
-- ✅ Works with all VFX applications (Unreal, Blender, Houdini, Nuke)
-- ✅ Cross-tool pipeline patterns documented
+- [OK] Works with all VFX applications (Unreal, Blender, Houdini, Nuke)
+- [OK] Cross-tool pipeline patterns documented
 
 **Article VIII - Documentation Standards:**
-- ✅ Complete YAML frontmatter
-- ✅ Version, Status, Dependencies documented
-- ✅ Troubleshooting section present
-- ✅ Constitutional compliance section present
+- [OK] Complete YAML frontmatter
+- [OK] Version, Status, Dependencies documented
+- [OK] Troubleshooting section present
+- [OK] Constitutional compliance section present
 
 ---
 

@@ -222,27 +222,27 @@ User: "[Example user request]"
 ### Success Criteria
 
 **You're doing well when:**
-- ✅ [Success indicator 1]
-- ✅ [Success indicator 2]
-- ✅ [Success indicator 3]
-- ✅ [Success indicator 4]
-- ✅ [Success indicator 5]
+- [OK] [Success indicator 1]
+- [OK] [Success indicator 2]
+- [OK] [Success indicator 3]
+- [OK] [Success indicator 4]
+- [OK] [Success indicator 5]
 
 ### Critical Rules
 
 **DO:**
-- ✅ [Best practice 1]
-- ✅ [Best practice 2]
-- ✅ [Best practice 3]
-- ✅ [Best practice 4]
-- ✅ [Best practice 5]
+- [OK] [Best practice 1]
+- [OK] [Best practice 2]
+- [OK] [Best practice 3]
+- [OK] [Best practice 4]
+- [OK] [Best practice 5]
 
 **DON'T:**
-- ❌ [Anti-pattern 1]
-- ❌ [Anti-pattern 2]
-- ❌ [Anti-pattern 3]
-- ❌ [Anti-pattern 4]
-- ❌ [Anti-pattern 5]
+- [FAIL] [Anti-pattern 1]
+- [FAIL] [Anti-pattern 2]
+- [FAIL] [Anti-pattern 3]
+- [FAIL] [Anti-pattern 4]
+- [FAIL] [Anti-pattern 5]
 
 ---
 
@@ -329,14 +329,14 @@ This template includes all required sections per VFX_SKILL_CONSTITUTION.md Artic
 - `{{TOOLS}}` - Comma-separated tool list (Read, Write, Edit, Grep, Glob, Bash, etc.)
 
 **Required Sections (All Present):**
-1. ✅ YAML frontmatter with all required fields
-2. ✅ Agent name header
-3. ✅ When to Use (trigger scenarios)
-4. ✅ Capabilities (what it does)
-5. ✅ Workflow (step-by-step)
-6. ✅ Examples (usage patterns)
-7. ✅ Limitations (what it doesn't do)
-8. ✅ Version History (v1.0.0 entry)
+1. [OK] YAML frontmatter with all required fields
+2. [OK] Agent name header
+3. [OK] When to Use (trigger scenarios)
+4. [OK] Capabilities (what it does)
+5. [OK] Workflow (step-by-step)
+6. [OK] Examples (usage patterns)
+7. [OK] Limitations (what it doesn't do)
+8. [OK] Version History (v1.0.0 entry)
 
 **Optional but Recommended:**
 - Quality Standards section

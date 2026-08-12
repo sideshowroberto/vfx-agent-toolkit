@@ -1,6 +1,6 @@
 # Blender Grease Pencil: Detailed Workflows
 
-## 🔧 STANDARD WORKFLOWS
+## STANDARD WORKFLOWS
 
 ### **Workflow 1: Frame-by-Frame Animation**
 

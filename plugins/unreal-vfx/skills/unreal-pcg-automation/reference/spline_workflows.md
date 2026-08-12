@@ -29,11 +29,11 @@ Complete workflows for using splines with PCG for exclusion zones, paths, roads,
 ### Step 1: Create Tagged Spline
 
 **In Viewport:**
-1. Modeling Mode → Draw Spline
+1. Modeling Mode -> Draw Spline
 2. Draw closed loop around clearing area
 3. Click **"Loop"** button to close spline
 4. Select spline in Outliner
-5. Details panel → **Tags** section → Click **"+"**
+5. Details panel -> **Tags** section -> Click **"+"**
 6. Add tag: `"Clearing"`
 
 ### Step 2: Python - Create Graph Structure
@@ -127,14 +127,14 @@ g = unreal.load_asset('/Game/PCG/PCG_ForestClearing')
 o = g.get_output_node()
 n = g.nodes
 
-# Main forest flow: Landscape → Sampler → Difference → Transform → Spawner → Output
+# Main forest flow: Landscape -> Sampler -> Difference -> Transform -> Spawner -> Output
 g.add_edge(n[0], unreal.Name("Out"), n[1], unreal.Name("Surface"))
 g.add_edge(n[1], unreal.Name("Out"), n[2], unreal.Name("In"))
 g.add_edge(n[2], unreal.Name("Out"), n[5], unreal.Name("In"))
 g.add_edge(n[5], unreal.Name("Out"), n[6], unreal.Name("In"))
 g.add_edge(n[6], unreal.Name("Out"), o, unreal.Name("Out"))
 
-# Clearing exclusion: Spline → Sampler → Difference "Source"
+# Clearing exclusion: Spline -> Sampler -> Difference "Source"
 g.add_edge(n[3], unreal.Name("Out"), n[4], unreal.Name("Spline"))
 g.add_edge(n[4], unreal.Name("Out"), n[2], unreal.Name("Source"))
 # NO CODE AFTER
@@ -153,10 +153,10 @@ Dense forest with spline-shaped clearing. Trees removed where spline interior is
 ### Step 1: Create Non-Closed Spline Path
 
 **In Viewport:**
-1. Modeling Mode → Draw Spline
+1. Modeling Mode -> Draw Spline
 2. Draw path (do NOT close loop)
 3. Select spline in Outliner
-4. Details panel → Tags → Add `"Road"`
+4. Details panel -> Tags -> Add `"Road"`
 
 ### Step 2: Python - Create Road Graph
 
@@ -252,14 +252,14 @@ g = unreal.load_asset('/Game/PCG/PCG_ForestRoad')
 o = g.get_output_node()
 n = g.nodes
 
-# Forest flow: Landscape → Sampler → Difference → Transform → Tree Spawner → Output
+# Forest flow: Landscape -> Sampler -> Difference -> Transform -> Tree Spawner -> Output
 g.add_edge(n[0], unreal.Name("Out"), n[1], unreal.Name("Surface"))
 g.add_edge(n[1], unreal.Name("Out"), n[6], unreal.Name("In"))
 g.add_edge(n[6], unreal.Name("Out"), n[7], unreal.Name("In"))
 g.add_edge(n[7], unreal.Name("Out"), n[8], unreal.Name("In"))
 g.add_edge(n[8], unreal.Name("Out"), o, unreal.Name("Out"))
 
-# Road flow: Spline → Sampler → Bounds → Projection → Difference "Source"
+# Road flow: Spline -> Sampler -> Bounds -> Projection -> Difference "Source"
 g.add_edge(n[2], unreal.Name("Out"), n[3], unreal.Name("Spline"))
 g.add_edge(n[3], unreal.Name("Out"), n[4], unreal.Name("In"))
 g.add_edge(n[4], unreal.Name("Out"), n[5], unreal.Name("In"))
@@ -289,9 +289,9 @@ Forest with 4m wide road carved through. Road follows landscape terrain via Proj
 
 ### Hierarchy
 
-1. **Trees** (0.1/m²) - Sparse, largest objects
-2. **Rocks** (2.0/m²) - Dense, exclude trees
-3. **Grass** (10.0/m²) - Very dense, exclude trees + rocks
+1. **Trees** (0.1/m^2) - Sparse, largest objects
+2. **Rocks** (2.0/m^2) - Dense, exclude trees
+3. **Grass** (10.0/m^2) - Very dense, exclude trees + rocks
 
 ### Python Setup
 
@@ -343,28 +343,28 @@ o = g.get_output_node()
 n = g.nodes
 
 # Tree layer (straightforward)
-g.add_edge(n[0], unreal.Name("Out"), n[1], unreal.Name("Surface"))  # Landscape → Tree Sampler
-g.add_edge(n[1], unreal.Name("Out"), n[2], unreal.Name("In"))        # Tree Sampler → Transform
-g.add_edge(n[2], unreal.Name("Out"), n[3], unreal.Name("In"))        # Transform → Spawner
-g.add_edge(n[3], unreal.Name("Out"), o, unreal.Name("Out"))          # Spawner → Output
+g.add_edge(n[0], unreal.Name("Out"), n[1], unreal.Name("Surface"))  # Landscape -> Tree Sampler
+g.add_edge(n[1], unreal.Name("Out"), n[2], unreal.Name("In"))        # Tree Sampler -> Transform
+g.add_edge(n[2], unreal.Name("Out"), n[3], unreal.Name("In"))        # Transform -> Spawner
+g.add_edge(n[3], unreal.Name("Out"), o, unreal.Name("Out"))          # Spawner -> Output
 
 # Rock layer (exclude trees)
-g.add_edge(n[0], unreal.Name("Out"), n[4], unreal.Name("Surface"))  # Landscape → Rock Sampler
-g.add_edge(n[4], unreal.Name("Out"), n[5], unreal.Name("In"))        # Rock Sampler → Difference
-g.add_edge(n[2], unreal.Name("Out"), n[5], unreal.Name("Source"))    # Tree Transform → Difference (exclusion)
-g.add_edge(n[5], unreal.Name("Out"), n[6], unreal.Name("In"))        # Difference → Transform
-g.add_edge(n[6], unreal.Name("Out"), n[7], unreal.Name("In"))        # Transform → Spawner
-g.add_edge(n[7], unreal.Name("Out"), o, unreal.Name("Out"))          # Spawner → Output
+g.add_edge(n[0], unreal.Name("Out"), n[4], unreal.Name("Surface"))  # Landscape -> Rock Sampler
+g.add_edge(n[4], unreal.Name("Out"), n[5], unreal.Name("In"))        # Rock Sampler -> Difference
+g.add_edge(n[2], unreal.Name("Out"), n[5], unreal.Name("Source"))    # Tree Transform -> Difference (exclusion)
+g.add_edge(n[5], unreal.Name("Out"), n[6], unreal.Name("In"))        # Difference -> Transform
+g.add_edge(n[6], unreal.Name("Out"), n[7], unreal.Name("In"))        # Transform -> Spawner
+g.add_edge(n[7], unreal.Name("Out"), o, unreal.Name("Out"))          # Spawner -> Output
 
 # Grass layer (exclude trees AND rocks)
-g.add_edge(n[0], unreal.Name("Out"), n[8], unreal.Name("Surface"))  # Landscape → Grass Sampler
-g.add_edge(n[8], unreal.Name("Out"), n[9], unreal.Name("In"))        # Grass Sampler → Difference (trees)
-g.add_edge(n[2], unreal.Name("Out"), n[9], unreal.Name("Source"))    # Tree Transform → Difference
-g.add_edge(n[9], unreal.Name("Out"), n[10], unreal.Name("In"))       # Difference → Difference (rocks)
-g.add_edge(n[6], unreal.Name("Out"), n[10], unreal.Name("Source"))   # Rock Transform → Difference
-g.add_edge(n[10], unreal.Name("Out"), n[11], unreal.Name("In"))      # Difference → Transform
-g.add_edge(n[11], unreal.Name("Out"), n[12], unreal.Name("In"))      # Transform → Spawner
-g.add_edge(n[12], unreal.Name("Out"), o, unreal.Name("Out"))         # Spawner → Output
+g.add_edge(n[0], unreal.Name("Out"), n[8], unreal.Name("Surface"))  # Landscape -> Grass Sampler
+g.add_edge(n[8], unreal.Name("Out"), n[9], unreal.Name("In"))        # Grass Sampler -> Difference (trees)
+g.add_edge(n[2], unreal.Name("Out"), n[9], unreal.Name("Source"))    # Tree Transform -> Difference
+g.add_edge(n[9], unreal.Name("Out"), n[10], unreal.Name("In"))       # Difference -> Difference (rocks)
+g.add_edge(n[6], unreal.Name("Out"), n[10], unreal.Name("Source"))   # Rock Transform -> Difference
+g.add_edge(n[10], unreal.Name("Out"), n[11], unreal.Name("In"))      # Difference -> Transform
+g.add_edge(n[11], unreal.Name("Out"), n[12], unreal.Name("In"))      # Transform -> Spawner
+g.add_edge(n[12], unreal.Name("Out"), o, unreal.Name("Out"))         # Spawner -> Output
 # NO CODE AFTER
 ```
 
@@ -410,7 +410,7 @@ Required for tag-based spline selection to work.
 
 **From transcript:** "we need to do something similar and so I'm going to go ahead and type projection"
 
-Road/path splines need Projection → Landscape to follow terrain properly.
+Road/path splines need Projection -> Landscape to follow terrain properly.
 
 ---
 

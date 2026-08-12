@@ -9,7 +9,7 @@
 ## Overview
 
 Large-scale terrain creation, heightmap workflows, erosion simulation, and vegetation placement. Use this reference when working on:
-- Large terrain systems (>1km²)
+- Large terrain systems (>1km^2)
 - Heightmap import/export workflows
 - Realistic erosion patterns
 - Terrain texture blending

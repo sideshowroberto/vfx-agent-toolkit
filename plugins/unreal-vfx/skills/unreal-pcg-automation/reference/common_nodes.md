@@ -32,7 +32,7 @@ node, settings = graph.add_node_of_type(unreal.PCGGetSplineSettings)
 ### PCGGetLandscapeSettings
 **Purpose:** Get landscape data for surface sampling (REQUIRED in UE 5.4+)
 
-**🚨 UE 5.4+ BREAKING CHANGE:** Input node no longer provides landscape output. Must use this node instead.
+** UE 5.4+ BREAKING CHANGE:** Input node no longer provides landscape output. Must use this node instead.
 
 **Input Pins:**
 - Overrides
@@ -130,7 +130,7 @@ settings.use_seed = True  # Deterministic generation
 
 **UE 5.4+ Connection:**
 ```python
-# Get landscape data → Surface Sampler
+# Get landscape data -> Surface Sampler
 graph.add_edge(get_landscape, unreal.Name("Out"), surface_sampler, unreal.Name("Surface"))
 ```
 
@@ -152,7 +152,7 @@ graph.add_edge(get_landscape, unreal.Name("Out"), surface_sampler, unreal.Name("
 **Configuration:**
 ```python
 node, settings = graph.add_node_of_type(unreal.PCGProjectionSettings)
-# Connects: Sampler → "In", Landscape → "Projection Target"
+# Connects: Sampler -> "In", Landscape -> "Projection Target"
 ```
 
 ### PCGTransformPointsSettings
@@ -217,20 +217,20 @@ settings.option = unreal.EPCGSpawnActorOption.COLLAPSEACTOR
 **Output Pins:**
 - Out
 
-**⚠️ PYTHON API LIMITATION (UE 5.4+):**
+**[WARN] PYTHON API LIMITATION (UE 5.4+):**
 
 Mesh entries CANNOT be configured via Python. Must use UI.
 
 **Removed in UE 5.4:**
 ```python
-# ❌ PCGStaticMeshSpawnerEntry - Class doesn't exist
-# ❌ settings.meshes - Property doesn't exist
+# [FAIL] PCGStaticMeshSpawnerEntry - Class doesn't exist
+# [FAIL] settings.meshes - Property doesn't exist
 ```
 
 **Read-Only Properties:**
 ```python
-settings.mesh_selector_type          # Read-Write ✅
-settings.mesh_selector_parameters    # Read-Only ❌ (mesh entries live here)
+settings.mesh_selector_type          # Read-Write [OK]
+settings.mesh_selector_parameters    # Read-Only [FAIL] (mesh entries live here)
 ```
 
 **Python Configuration (Limited):**
@@ -243,7 +243,7 @@ settings.set_instance_packer_type(unreal.PCGInstancePackerType.NAIVE)
 **UI Configuration (REQUIRED for mesh entries):**
 1. Open PCG graph in Unreal Editor
 2. Select Static Mesh Spawner node
-3. Details panel → Mesh Entries section
+3. Details panel -> Mesh Entries section
 4. Click "+" to add mesh entry
 5. Select mesh and set weight
 
@@ -252,9 +252,9 @@ settings.set_instance_packer_type(unreal.PCGInstancePackerType.NAIVE)
 - Weight: 100 (or distribute across multiple meshes)
 
 **Multiple Meshes:**
-- Entry 1: Rock (60 weight) → 60% probability
-- Entry 2: Boulder (30 weight) → 30% probability
-- Entry 3: Pebble (10 weight) → 10% probability
+- Entry 1: Rock (60 weight) -> 60% probability
+- Entry 2: Boulder (30 weight) -> 30% probability
+- Entry 3: Pebble (10 weight) -> 10% probability
 
 **Workaround:** Create template graphs with pre-configured mesh lists, then reference from Python.
 
@@ -275,7 +275,7 @@ settings.set_instance_packer_type(unreal.PCGInstancePackerType.NAIVE)
 **Output Pins:**
 - Out
 
-**⚠️ CRITICAL: Difference Mode Settings**
+**[WARN] CRITICAL: Difference Mode Settings**
 
 **Density Mode Property:**
 ```python
@@ -303,8 +303,8 @@ settings.set_editor_property('density_mode', unreal.PCGDifferenceMode.BINARY)
 
 **Connection Pattern:**
 ```python
-# Main points (e.g., rocks) → Difference → Continue
-# Exclusion points (e.g., trees) → Difference "Source" input
+# Main points (e.g., rocks) -> Difference -> Continue
+# Exclusion points (e.g., trees) -> Difference "Source" input
 
 graph.add_edge(rock_sampler, unreal.Name("Out"), difference, unreal.Name("In"))
 graph.add_edge(tree_transform, unreal.Name("Out"), difference, unreal.Name("Source"))
@@ -313,8 +313,8 @@ graph.add_edge(difference, unreal.Name("Out"), rock_transform, unreal.Name("In")
 
 **Common Use Cases:**
 1. **Point-to-Point Exclusion (Trees vs Rocks):**
-   - Generate sparse trees (0.1/m²)
-   - Generate dense rocks (2.0/m²)
+   - Generate sparse trees (0.1/m^2)
+   - Generate dense rocks (2.0/m^2)
    - Use Difference to remove rocks where trees are
 
 2. **Spline-Based Exclusion (Forest Clearings):**
@@ -357,7 +357,7 @@ settings.set_editor_property('bounds_max', unreal.Vector(100, 100, 0))    # Righ
 
 **Connection Pattern:**
 ```python
-# Spline Data → Spline Sampler → Bounds Modifier → Continue
+# Spline Data -> Spline Sampler -> Bounds Modifier -> Continue
 # Creates wider area around spline line
 ```
 
@@ -513,24 +513,24 @@ target_pin = next((p for p in node.input_pins if p.properties.label == "Spline")
 
 ### Spline Sampling Workflow
 ```
-Input → Get Spline Data → Spline Sampler → Transform → Spawn Actor → Output
+Input -> Get Spline Data -> Spline Sampler -> Transform -> Spawn Actor -> Output
 ```
 
 ### Landscape Projection Workflow
 ```
-Spline Sampler → Projection ← Get Landscape Data
-                      ↓
+Spline Sampler -> Projection <- Get Landscape Data
+                      v
                 Transform Points
 ```
 
 ### Full Deformation Workflow
 ```
-Get Spline → Sampler → Projection ← Get Landscape
-                            ↓
+Get Spline -> Sampler -> Projection <- Get Landscape
+                            v
                       Transform Points
-                            ↓
+                            v
                        Spawn Actor
-                            ↓
+                            v
                           Output
 ```
 
@@ -539,8 +539,8 @@ Get Spline → Sampler → Projection ← Get Landscape
 ## Node Type Reference
 
 **Find node class names:**
-- Unreal Editor → PCG Graph → Add Node
-- Python: `dir(unreal)` → search for `PCG*Settings`
+- Unreal Editor -> PCG Graph -> Add Node
+- Python: `dir(unreal)` -> search for `PCG*Settings`
 
 **Common patterns:**
 - `PCGGet*Settings`: Data source nodes

@@ -37,11 +37,11 @@ TYPICAL WORKFLOWS
 OUTPUT
 ------
 Success:
-  ✅ Archived: C:\...\archive\documentation-specialist-v2.0.0.md
+  [OK] Archived: C:\...\archive\documentation-specialist-v2.0.0.md
   Version: 2.0.0
 
 Error:
-  ❌ Error: Agent file not found: C:\...\nonexistent-agent.md
+  [FAIL] Error: Agent file not found: C:\...\nonexistent-agent.md
 
 
 REQUIREMENTS
@@ -57,27 +57,27 @@ REQUIREMENTS
 ERROR HANDLING
 --------------
 Agent not found:
-  → Check agent name (without .md extension)
-  → Verify agents directory path
+  -> Check agent name (without .md extension)
+  -> Verify agents directory path
 
 No version found:
-  → Add 'version: X.Y.Z' to YAML frontmatter
+  -> Add 'version: X.Y.Z' to YAML frontmatter
 
 Invalid version:
-  → Use semantic version format (X.Y.Z)
-  → Examples: 1.0.0, 2.1.0, 10.20.30
+  -> Use semantic version format (X.Y.Z)
+  -> Examples: 1.0.0, 2.1.0, 10.20.30
 
 Archive exists:
-  → Use --force to overwrite
-  → Or update version in agent file first
+  -> Use --force to overwrite
+  -> Or update version in agent file first
 
 
 DIRECTORY STRUCTURE
 -------------------
 .claude/agents/
-├── documentation-specialist.md           (active)
-└── archive/                              (created automatically)
-    └── documentation-specialist-v2.0.0.md  (archived)
++-- documentation-specialist.md           (active)
++-- archive/                              (created automatically)
+    +-- documentation-specialist-v2.0.0.md  (archived)
 
 
 TESTING

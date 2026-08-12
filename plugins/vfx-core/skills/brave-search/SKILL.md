@@ -4,7 +4,7 @@ description: "VFX-focused web research using Brave Search API. Two modes: MCP we
 allowed-tools: Read,Bash
 ---
 
-# Brave Search Skill — VFX Research Intelligence
+# Brave Search Skill - VFX Research Intelligence
 
 **Version:** 2.1.0 | **Updated:** 2026-07-08
 
@@ -21,7 +21,7 @@ allowed-tools: Read,Bash
 
 ---
 
-## Tool 1 — MCP Web Search
+## Tool 1 - MCP Web Search
 
 ```
 mcp__brave-search__brave_web_search(query, count, result_filter, freshness, extra_snippets)
@@ -31,13 +31,13 @@ mcp__brave-search__brave_web_search(query, count, result_filter, freshness, extr
 
 | Param | Values | Default | Notes |
 |-------|--------|---------|-------|
-| `query` | string | — | Required. Max 400 chars / 50 words |
-| `count` | 1–20 | 10 | 20 for comprehensive research |
+| `query` | string | - | Required. Max 400 chars / 50 words |
+| `count` | 1-20 | 10 | 20 for comprehensive research |
 | `result_filter` | `web` `news` `videos` `discussions` `images` | web | |
-| `freshness` | `pd` `pw` `pm` `py` or date range | — | pm = past 31 days |
+| `freshness` | `pd` `pw` `pm` `py` or date range | - | pm = past 31 days |
 | `extra_snippets` | boolean | false | Up to 5 extra excerpts per result |
 | `spellcheck` | boolean | true | Set false for exact error messages |
-| `offset` | 0–9 | 0 | Pagination |
+| `offset` | 0-9 | 0 | Pagination |
 
 ### VFX Query Formula
 ```
@@ -48,7 +48,7 @@ mcp__brave-search__brave_web_search(query, count, result_filter, freshness, extr
 "Blender 4.5 geometry nodes array instances procedural"
 ```
 
-### Goggles — Domain Filtering
+### Goggles - Domain Filtering
 Pin results to authoritative VFX sources. Pass as `goggles` parameter string:
 
 ```
@@ -64,11 +64,11 @@ $site=sidefx.com,boost=10\n$site=odforce.net,boost=8\n$site=cgwiki.com,boost=6\n
 
 ---
 
-## Tool 2 — LLM Context (Deep Research)
+## Tool 2 - LLM Context (Deep Research)
 
-Calls `/llm/context` directly via Python. Returns actual extracted page content — no scraping needed.
+Calls `/llm/context` directly via Python. Returns actual extracted page content - no scraping needed.
 
-**Script:** bundled with this skill at `scripts/brave_llm_context.py` — resolve the path against this skill's own directory. Output is forced to UTF-8, so extracted web content prints safely on Windows (cp1252) consoles.
+**Script:** bundled with this skill at `scripts/brave_llm_context.py` - resolve the path against this skill's own directory. Output is forced to UTF-8, so extracted web content prints safely on Windows (cp1252) consoles.
 
 **Requires:** `BRAVE_API_KEY` environment variable (same key the brave-search MCP server uses).
 
@@ -89,12 +89,12 @@ python <skill-dir>/scripts/brave_llm_context.py "USD Solaris render settings" \
 
 | Flag | Default | Range | Notes |
 |------|---------|-------|-------|
-| `--tokens` | 8192 | 1024–32768 | Increase for complex research |
-| `--count` | 20 | 1–50 | Search results to evaluate |
-| `--urls` | 20 | 1–50 | Max pages to extract from |
+| `--tokens` | 8192 | 1024-32768 | Increase for complex research |
+| `--count` | 20 | 1-50 | Search results to evaluate |
+| `--urls` | 20 | 1-50 | Max pages to extract from |
 | `--freshness` | none | pd/pw/pm/py | Filter by age |
 | `--threshold` | balanced | strict/balanced/lenient/disabled | strict = authoritative only |
-| `--json` | false | — | Raw JSON output |
+| `--json` | false | - | Raw JSON output |
 
 ### Token budget guidance
 - Quick answer: `--tokens 4096`
@@ -108,7 +108,7 @@ python <skill-dir>/scripts/brave_llm_context.py "USD Solaris render settings" \
 
 ### 1. Tutorial Discovery
 ```python
-# Web search — find video tutorials
+# Web search - find video tutorials
 mcp__brave-search__brave_web_search(
     query="Houdini 20.5 procedural terrain VEX tutorial",
     count=20, result_filter="videos", freshness="py"
@@ -126,7 +126,7 @@ mcp__brave-search__brave_web_search(
 
 ### 3. Documentation Deep Dive
 ```bash
-# LLM Context — get actual doc content
+# LLM Context - get actual doc content
 python <skill-dir>/scripts/brave_llm_context.py \
   "Unreal Engine 5.5 PCG API documentation" \
   --tokens 16384 --threshold strict
@@ -161,9 +161,9 @@ mcp__brave-search__brave_web_search(
 ## Multi-Search Stacks
 
 ### Deep Research (LLM Context + Web Search)
-1. LLM Context → extract actual docs/tutorials content
-2. Web Search (discussions) → community experience
-3. Context7 → structured API reference if library-based
+1. LLM Context -> extract actual docs/tutorials content
+2. Web Search (discussions) -> community experience
+3. Context7 -> structured API reference if library-based
 
 ### Quick Debugging
 1. Web Search (discussions, exact error, spellcheck=false)
@@ -172,7 +172,7 @@ mcp__brave-search__brave_web_search(
 ### Plugin Evaluation
 1. Web Search (web, discovery, count=20)
 2. Web Search (discussions, reviews)
-3. LLM Context → extract full docs for top candidate
+3. LLM Context -> extract full docs for top candidate
 
 ---
 
@@ -196,13 +196,13 @@ Use Context7 for Python packages and frameworks. Use LLM Context for general web
 
 ## Large Output Handling
 
-LLM Context can return large responses (8K–32K tokens). Use the file-redirect pattern to keep context clean:
+LLM Context can return large responses (8K-32K tokens). Use the file-redirect pattern to keep context clean:
 
 ```
-1. Run brave_llm_context.py — output prints to stdout, captured by desktop-commander
+1. Run brave_llm_context.py - output prints to stdout, captured by desktop-commander
 2. Write full result to tmp/brave_context_output.md
 3. Grep for the specific terms, functions, or patterns needed
-4. Work from grep results — don't re-quote the full output in your response
+4. Work from grep results - don't re-quote the full output in your response
 5. Delete tmp/brave_context_output.md when done
 ```
 
@@ -215,4 +215,4 @@ Higher token budgets (`--tokens 16384` or `--tokens 32768`) are now practical si
 Brave Search is a paid API ($5/month credit, pay-as-you-go beyond).
 - Web Search: no hard per-second limit on paid plans, but space requests ~1 second apart as good practice
 - LLM Context: allow 30-second timeout (page extraction takes time)
-- No parallel execution — run searches sequentially
+- No parallel execution - run searches sequentially

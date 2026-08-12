@@ -13,12 +13,12 @@ Complete workflow for creating landscape scatter PCG graphs using **UE 5.4+ patt
 
 **Graph Structure:**
 ```
-Get Landscape Data → Surface Sampler → Transform Points → Static Mesh Spawner → Output
+Get Landscape Data -> Surface Sampler -> Transform Points -> Static Mesh Spawner -> Output
 ```
 
 **Workflow Phases:**
-1. ✅ **Python Phase:** Graph creation, node connections, Transform configuration
-2. ❌ **UI Phase:** Surface Sampler density, Mesh Spawner entries (required)
+1. [OK] **Python Phase:** Graph creation, node connections, Transform configuration
+2. [FAIL] **UI Phase:** Surface Sampler density, Mesh Spawner entries (required)
 
 ---
 
@@ -98,7 +98,7 @@ transform_settings = g.nodes[2].get_settings()
 transform_settings.set_editor_property('scale_min', unreal.Vector(0.18, 0.18, 0.18))
 transform_settings.set_editor_property('scale_max', unreal.Vector(1.55, 1.55, 1.55))
 
-# Random Z rotation (0-360° for natural scatter)
+# Random Z rotation (0-360 deg for natural scatter)
 # CRITICAL: Use Rotator not Vector!
 transform_settings.set_editor_property('rotation_min', unreal.Rotator(0, 0, 0))
 transform_settings.set_editor_property('rotation_max', unreal.Rotator(0, 0, 360))
@@ -156,7 +156,7 @@ print("Phase 3 complete: Transform Points configured")
 2. In Details panel, find **Mesh Entries** section
 3. Click **"+"** button to add new mesh entry
 4. Configure entry:
-   - **Mesh:** Click dropdown → Navigate to `/Engine/BasicShapes/Cube` (or your mesh)
+   - **Mesh:** Click dropdown -> Navigate to `/Engine/BasicShapes/Cube` (or your mesh)
    - **Weight:** `100` (or distribute weights across multiple meshes)
 5. (Optional) Add more mesh entries for variety
 
@@ -178,15 +178,15 @@ print("Phase 3 complete: Transform Points configured")
 
 **Option B: Manual Assignment**
 1. Select PCG Volume in viewport
-2. Details panel → PCG Component section
-3. **Graph** property → Select `PCG_LandscapeScatter`
+2. Details panel -> PCG Component section
+3. **Graph** property -> Select `PCG_LandscapeScatter`
 
 ---
 
 ### Step 5: Generate!
 
 1. Select PCG Volume in viewport
-2. Details panel → PCG Component section
+2. Details panel -> PCG Component section
 3. Click **"Generate"** button
 4. Wait for generation to complete
 5. Verify meshes scattered on landscape
@@ -244,7 +244,7 @@ filter_settings.set_editor_property('upper_bound', 1.0)  # Keep all bright areas
 **Possible Causes:**
 
 1. **No mesh entries configured**
-   - Solution: Check Static Mesh Spawner → Mesh Entries → Add at least one mesh
+   - Solution: Check Static Mesh Spawner -> Mesh Entries -> Add at least one mesh
 
 2. **Points Per Squared Meter too low**
    - Solution: Increase to 0.5+ in Surface Sampler settings
@@ -253,7 +253,7 @@ filter_settings.set_editor_property('upper_bound', 1.0)  # Keep all bright areas
    - Solution: Move PCG Volume to overlap landscape terrain
 
 4. **Debug visualization disabled**
-   - Solution: PCG Volume → Details → Show Debug → Enable
+   - Solution: PCG Volume -> Details -> Show Debug -> Enable
 
 5. **Transform offset pushing meshes underground**
    - Solution: Check Transform Points offset values (should be near zero or small positive Z)
@@ -324,7 +324,7 @@ surface_sampler, _ = graph.add_node_of_type(unreal.PCGSurfaceSamplerSettings)
 transform_points, _ = graph.add_node_of_type(unreal.PCGTransformPointsSettings)
 mesh_spawner, _ = graph.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
 
-# Connect: Sampler → Transform → Spawner → Output
+# Connect: Sampler -> Transform -> Spawner -> Output
 # Surface Sampler auto-detects landscape under PCG Volume
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: nuke-particle-blinkscript
-description: ParticleBlinkScript node development for NukeX 16+ — custom particle systems, GPU particle physics, and Foundry gadget templates. Also covers procedural BlinkScript atmospheric effects (snow, embers, dust) that bypass the particle system entirely. Use when user mentions particle blinkscript, ParticleBlinkScript node, custom particles nuke, blinkscript particles, GPU particles nuke, particle gadgets, procedural snow nuke, atmospheric blinkscript.
+description: ParticleBlinkScript node development for NukeX 16+ - custom particle systems, GPU particle physics, and Foundry gadget templates. Also covers procedural BlinkScript atmospheric effects (snow, embers, dust) that bypass the particle system entirely. Use when user mentions particle blinkscript, ParticleBlinkScript node, custom particles nuke, blinkscript particles, GPU particles nuke, particle gadgets, procedural snow nuke, atmospheric blinkscript.
 allowed-tools: Read,Write,Bash
 ---
 
@@ -12,17 +12,17 @@ allowed-tools: Read,Write,Bash
 
 ---
 
-## Two Approaches — Choose Based on What You Have
+## Two Approaches - Choose Based on What You Have
 
 | Approach | Nuke Version | Node Used | What You Get |
 |----------|-------------|-----------|--------------|
-| **Procedural BlinkScript** | Nuke 13+, any license | `BlinkScript` (ImageComputationKernel) | GPU math-only particles — no sim, no caching, real-time |
+| **Procedural BlinkScript** | Nuke 13+, any license | `BlinkScript` (ImageComputationKernel) | GPU math-only particles - no sim, no caching, real-time |
 | **ParticleBlinkScript node** | NukeX 16+ only | `ParticleBlinkScript` | Real particle physics, Foundry gadget library, Blink API |
 
 **Decision rule:**
-- Need real physics (gravity, collisions, inter-particle forces)? → ParticleBlinkScript node (NukeX 16+)
-- Need atmospheric effects (snow, embers, sparks, dust)? → Procedural BlinkScript (any Nuke, faster, easier)
-- Don't have NukeX 16+? → Procedural BlinkScript is your only option
+- Need real physics (gravity, collisions, inter-particle forces)? -> ParticleBlinkScript node (NukeX 16+)
+- Need atmospheric effects (snow, embers, sparks, dust)? -> Procedural BlinkScript (any Nuke, faster, easier)
+- Don't have NukeX 16+? -> Procedural BlinkScript is your only option
 
 ---
 
@@ -31,8 +31,8 @@ allowed-tools: Read,Write,Bash
 No particle node required. Mathematically generates particle positions per-frame using noise, sin/cos, and pseudo-random seeds. GPU-accelerated, zero caching, compositing-friendly.
 
 **Why this approach:**
-- No simulation time — renders immediately
-- No caching — always current frame
+- No simulation time - renders immediately
+- No caching - always current frame
 - Works in any Nuke license
 - Easily keyframable and art-directable
 
@@ -157,17 +157,17 @@ float alpha = flicker * color.w * (1.0f - dist / size);
 
 ## Approach 2: ParticleBlinkScript Node (NukeX 16+)
 
-A dedicated node type introduced in Nuke 16. Separate from the regular `BlinkScript` node — uses a different kernel declaration and is only available in NukeX.
+A dedicated node type introduced in Nuke 16. Separate from the regular `BlinkScript` node - uses a different kernel declaration and is only available in NukeX.
 
 ### Accessing the Node
 
-1. Tab menu → search "ParticleBlinkScript"
-2. Or: Particles menu → ParticleBlinkScript
+1. Tab menu -> search "ParticleBlinkScript"
+2. Or: Particles menu -> ParticleBlinkScript
 3. The node ships with 14 Foundry gadgets as starting templates
 
 ### Kernel Structure (Different from ImageComputationKernel)
 
-ParticleBlinkScript uses the Blink API directly — the kernel declaration syntax differs from regular BlinkScript:
+ParticleBlinkScript uses the Blink API directly - the kernel declaration syntax differs from regular BlinkScript:
 
 ```cpp
 // IMPORTANT: Do NOT use ImageComputationKernel here
@@ -196,32 +196,32 @@ kernel ParticleEffect : ParticleBlinkKernel<eParticleWise>
 - `eParticleWise` granularity
 - `process(int particleIndex)` instead of `process(int2 pos)`
 - Particle state accessed via built-in accessors (position, velocity, age, etc.)
-- No `Image<>` declarations — works on particle data, not pixels
+- No `Image<>` declarations - works on particle data, not pixels
 
 ### The 14 Foundry Gadgets
 
 NukeX 16 ships these ParticleBlinkScript starting templates (access via the node's gadget picker):
 
-1. **Snowfall** — Basic snow with gravity and drift
-2. **Rain** — Directional rain with streaks
-3. **Embers** — Rising fire embers with flicker
-4. **Dust** — Atmospheric dust suspension
-5. **BugSwarm** — Flocking/swarm behavior
-6. **Fireworks** — Burst and trail effects
-7. **Galaxy** — Orbital particle distribution
-8. **Vortex** — Rotating/spiraling particles
-9. **Smoke Puff** — Expanding smoke volumes
-10. **Confetti** — Tumbling flat particles
-11. **Bubbles** — Rising spherical particles with wobble
-12. **Lightning Particles** — Charged particle branching
-13. **Fluid Surface** — Water surface simulation
-14. **Attractor** — Particles drawn toward a point
+1. **Snowfall** - Basic snow with gravity and drift
+2. **Rain** - Directional rain with streaks
+3. **Embers** - Rising fire embers with flicker
+4. **Dust** - Atmospheric dust suspension
+5. **BugSwarm** - Flocking/swarm behavior
+6. **Fireworks** - Burst and trail effects
+7. **Galaxy** - Orbital particle distribution
+8. **Vortex** - Rotating/spiraling particles
+9. **Smoke Puff** - Expanding smoke volumes
+10. **Confetti** - Tumbling flat particles
+11. **Bubbles** - Rising spherical particles with wobble
+12. **Lightning Particles** - Charged particle branching
+13. **Fluid Surface** - Water surface simulation
+14. **Attractor** - Particles drawn toward a point
 
-These are starting points — modify and extend for your shot.
+These are starting points - modify and extend for your shot.
 
 ### Blink API (Advanced Extension)
 
-The ParticleBlinkScript node is built on the **Blink API** — a lower-level C++ interface that Foundry uses internally. Advanced users can extend via:
+The ParticleBlinkScript node is built on the **Blink API** - a lower-level C++ interface that Foundry uses internally. Advanced users can extend via:
 
 ```cpp
 // Foundry Blink API (lower level than BlinkScript node)
@@ -242,7 +242,7 @@ For custom Blink API development, see:
 ## Comparing Kernel Declarations
 
 ```cpp
-// Regular BlinkScript node — image processing
+// Regular BlinkScript node - image processing
 kernel MyEffect : ImageComputationKernel<ePixelWise>
 {
   Image<eRead, eAccessPoint, eEdgeClamped> src;
@@ -251,7 +251,7 @@ kernel MyEffect : ImageComputationKernel<ePixelWise>
   void process(int2 pos) { ... }
 };
 
-// ParticleBlinkScript node — particle simulation
+// ParticleBlinkScript node - particle simulation
 kernel MyParticles : ParticleBlinkKernel<eParticleWise>
 {
   // No Image<> declarations
@@ -316,9 +316,9 @@ def create_particle_blinkscript():
 
 ### Procedural BlinkScript
 - **Particle count:** Keep under 500 for real-time. 1000+ is slow per frame.
-- **Per-particle loop:** Runs for every pixel × every particle. O(pixels × count) complexity.
+- **Per-particle loop:** Runs for every pixel x every particle. O(pixels x count) complexity.
 - **Optimization:** Use `init()` for all expensive math (sin constants, image dimensions).
-- **GPU:** Runs fully on GPU — much faster than Nuke particle system for simple shapes.
+- **GPU:** Runs fully on GPU - much faster than Nuke particle system for simple shapes.
 
 ### ParticleBlinkScript
 - **Sim caching:** Unlike procedural approach, simulation results are cached.
@@ -343,8 +343,8 @@ def create_particle_blinkscript():
 
 ## Related Skills
 
-- **nuke-blinkscript** — Image processing kernels (ImageComputationKernel), composition overlays, GPU pixel effects. The foundation for understanding Blink syntax before tackling particles.
-- **nuke-compositing** — Integrating particle effects into comp trees.
+- **nuke-blinkscript** - Image processing kernels (ImageComputationKernel), composition overlays, GPU pixel effects. The foundation for understanding Blink syntax before tackling particles.
+- **nuke-compositing** - Integrating particle effects into comp trees.
 
 ---
 

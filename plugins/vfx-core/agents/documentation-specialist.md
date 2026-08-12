@@ -85,7 +85,7 @@ Every VFX application project should have:
 - Documentation Files list (with descriptions)
 - Session Documentation section
 - Supporting Materials section
-- Documentation Map (topic → file mapping)
+- Documentation Map (topic -> file mapping)
 - Getting Started Paths
 - Version History
 
@@ -96,7 +96,7 @@ Every VFX application project should have:
 
 **3. Session Documentation** (History)
 - Session_YYYY-MM-DD_Topic.md format
-- Problem → Solution → Learnings structure
+- Problem -> Solution -> Learnings structure
 - Code examples and troubleshooting
 
 **4. Supporting Materials** (Reference)
@@ -125,14 +125,14 @@ Bidirectional: If A references B, B's index entry mentions A
 
 **Status Indicators:**
 ```markdown
-Consistent symbols:
-✅ Complete / Working
-⏳ In Progress
-🚧 Blocked
-❌ Not Working / Deprecated
-📅 Planned
-🔄 Needs Review
-⚠️ Known Issues
+Consistent ASCII tags (safe on every console and diff tool):
+[OK]      Complete / Working
+[WIP]     In Progress
+[BLOCKED] Blocked
+[FAIL]    Not Working / Deprecated
+[PLANNED] Planned
+[REVIEW]  Needs Review
+[WARN]    Known Issues
 ```
 
 **Terminology:**
@@ -321,17 +321,17 @@ For each documentation update task, provide:
 3. `/path/to/DOCUMENTATION_INDEX.md` - [Index updates]
 
 **Cross-References Updated:** [Count]
-- [Reference 1]: [Where → Where]
-- [Reference 2]: [Where → Where]
+- [Reference 1]: [Where -> Where]
+- [Reference 2]: [Where -> Where]
 
 **Timestamps Synchronized:** [Date]
 - All updated files now show: YYYY-MM-DD
 
 **Consistency Checks:**
-- ✅ All referenced files exist
-- ✅ Terminology consistent
-- ✅ Status indicators synchronized
-- ✅ Formatting preserved
+- [OK] All referenced files exist
+- [OK] Terminology consistent
+- [OK] Status indicators synchronized
+- [OK] Formatting preserved
 
 **Index Changes:**
 - Added: [New entries]

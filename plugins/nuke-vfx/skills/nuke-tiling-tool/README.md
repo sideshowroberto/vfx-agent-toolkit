@@ -39,25 +39,25 @@ Connect your existing Viewer to the **`Reformat_Final`** node to see the final m
 
 ```
 Input Image (5760x5760)
-    ↓
+    v
 Horizontal Dot distribution
-    ↓     ↓     ↓
-    │     │     └─ Tile (2,2): Transform
-    │     │                    → Reformat (to 2K)
-    │     │                    → NoOp (orange - swap for ML node)
-    │     │                    → Expression (mask gradient)
-    │     │                    → Premult (apply mask.a)
-    │     │                    → InverseTransform
-    │     │                    ↓
-    │     └─ Tile (1,1): [same vertical stack]
-    │                    ↓
-    └─ Tile (0,0): [same vertical stack]
-                   ↓
-    ┌──────────────┴──────────────┐
-    Merge2 (plus, rgba) → Merge2 → Merge2 ...
-                                   ↓
+    v     v     v
+    |     |     +- Tile (2,2): Transform
+    |     |                    -> Reformat (to 2K)
+    |     |                    -> NoOp (orange - swap for ML node)
+    |     |                    -> Expression (mask gradient)
+    |     |                    -> Premult (apply mask.a)
+    |     |                    -> InverseTransform
+    |     |                    v
+    |     +- Tile (1,1): [same vertical stack]
+    |                    v
+    +- Tile (0,0): [same vertical stack]
+                   v
+    +--------------+--------------+
+    Merge2 (plus, rgba) -> Merge2 -> Merge2 ...
+                                   v
                           Reformat_Final (back to 5760x5760)
-                                   ↓
+                                   v
                           [Connect your Viewer here]
 ```
 
@@ -79,12 +79,12 @@ result = create_tiling_setup(input_node=read, tile_size='2K')
 
 # Output:
 # Creating tiling setup:
-#   Input: Read1 (5760x5760)
-#   Tile size: 2K (2048x2048)
-#   Overlap: 128px
-#   Grid: 3x3 (9 tiles)
-#   Created 9 tile branches
-#   Created merge tree
+# Input: Read1 (5760x5760)
+# Tile size: 2K (2048x2048)
+# Overlap: 128px
+# Grid: 3x3 (9 tiles)
+# Created 9 tile branches
+# Created merge tree
 
 # 3. Replace Group nodes with ViTMatte
 # Find nodes: MLNode_Tile_0_0, MLNode_Tile_0_1, ..., MLNode_Tile_2_2
@@ -113,7 +113,7 @@ result = create_tiling_setup(tile_size='1K', overlap=128)
 result = create_tiling_setup(tile_size='2K')
 
 # Grid: 4x3 (12 tiles)
-# Automatically calculates grid_x ≠ grid_y
+# Automatically calculates grid_x != grid_y
 ```
 
 ## Parameters Reference
@@ -145,13 +145,13 @@ Instead of blurring the alpha (which destroys detail), we create **gradient mask
 
 ```
 Tile Overlap Zone (128px):
-┌──────────────────┬──────────────────┐
-│  Tile A          │  Overlap         │  Tile B
-│  Mask = 1.0      │  Zone            │  Mask = 1.0
-│  (full strength) │  Tile A: 1.0→0.0 │  (full strength)
-│                  │  Tile B: 0.0→1.0 │
-└──────────────────┴──────────────────┘
-                   ↑
++------------------+------------------+
+|  Tile A          |  Overlap         |  Tile B
+|  Mask = 1.0      |  Zone            |  Mask = 1.0
+|  (full strength) |  Tile A: 1.0->0.0 |  (full strength)
+|                  |  Tile B: 0.0->1.0 |
++------------------+------------------+
+                   ^
             128px gradient falloff
 ```
 
@@ -177,9 +177,9 @@ else:                              # Middle columns
 - **Tile (2,2) bottom-right**: `smoothstep(2048, 1920, x) * smoothstep(2048, 1920, y)` - only interior edges
 
 **Result:**
-- Frame boundaries: Sharp (no fade at image edges) ✓
-- Interior tile boundaries: Smooth gradient blend ✓
-- Output to **mask** channel, applied via Premult node ✓
+- Frame boundaries: Sharp (no fade at image edges) [OK]
+- Interior tile boundaries: Smooth gradient blend [OK]
+- Output to **mask** channel, applied via Premult node [OK]
 
 **Why This Works:**
 - Preserves ML node output quality (no blur)
@@ -383,14 +383,14 @@ result = create_tiling_setup_with_logger(
 
 # Returns NukeMCPLogger formatted dict:
 # {
-#   'status': 'success',
-#   'session': 'AutoTileProcessor',
-#   'logs': [...],
-#   'stats': {'grid_size': '3x3', 'tile_count': 9},
-#   'grid': (3, 3),
-#   'tile_count': 9,
-#   'placeholders': [<node>, <node>, ...],
-#   'output': <viewer_node>
+# 'status': 'success',
+# 'session': 'AutoTileProcessor',
+# 'logs': [...],
+# 'stats': {'grid_size': '3x3', 'tile_count': 9},
+# 'grid': (3, 3),
+# 'tile_count': 9,
+# 'placeholders': [<node>, <node>, ...],
+# 'output': <viewer_node>
 # }
 ```
 
@@ -398,10 +398,10 @@ result = create_tiling_setup_with_logger(
 
 ```
 .claude/skills/nuke-tiling-tool/
-├── SKILL.md                          # Skill manifest (triggers, usage)
-├── README.md                          # This file
-└── scripts/
-    └── auto_tile_processor.py        # Main implementation (600 lines)
++-- SKILL.md                          # Skill manifest (triggers, usage)
++-- README.md                          # This file
++-- scripts/
+    +-- auto_tile_processor.py        # Main implementation (600 lines)
 ```
 
 ## Version History

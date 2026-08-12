@@ -161,7 +161,7 @@ grass_blade.inputs["Radius Bottom"].default_value = 0.02
 grass_blade.inputs["Depth"].default_value = 0.3
 
 # Configure distributions
-distribute_main.inputs["Density"].default_value = 10.0  # Clumps per m²
+distribute_main.inputs["Density"].default_value = 10.0  # Clumps per m^2
 distribute_grass.inputs["Density"].default_value = 100.0  # Blades per clump
 
 # Configure randomization

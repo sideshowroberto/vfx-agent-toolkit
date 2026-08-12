@@ -80,7 +80,7 @@ def configure_gtao():
 
 **Old SSR (4.2-4.4):**
 ```python
-# ❌ REMOVED in 4.5.0
+# [FAIL] REMOVED in 4.5.0
 # eevee.use_ssr = True
 # eevee.ssr_quality = 0.5
 ```
@@ -231,7 +231,7 @@ def configure_motion_blur():
     render.use_motion_blur = True
 
     # Shutter settings
-    render.motion_blur_shutter = 0.5      # 180° shutter (cinematic)
+    render.motion_blur_shutter = 0.5      # 180 deg shutter (cinematic)
     render.motion_blur_position = 'CENTER'  # or 'START', 'END'
 
     # EEVEE-specific
@@ -240,9 +240,9 @@ def configure_motion_blur():
 ```
 
 **Shutter Angle Guide:**
-- 0.5 = 180° (standard cinematic)
-- 1.0 = 360° (full rotation blur)
-- 0.25 = 90° (less blur, "Saving Private Ryan" look)
+- 0.5 = 180 deg (standard cinematic)
+- 1.0 = 360 deg (full rotation blur)
+- 0.25 = 90 deg (less blur, "Saving Private Ryan" look)
 
 ---
 

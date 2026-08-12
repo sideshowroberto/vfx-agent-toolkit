@@ -1,9 +1,9 @@
-# maya — MCP Connector
+# maya - MCP Connector
 
 Connects Claude Code to a live Maya session via Maya's built-in `commandPort`.
 
 **Port:** `7001`
-**Bridge:** [PatrickPalmer/MayaMCP](https://github.com/PatrickPalmer/MayaMCP) — no Maya plugin required
+**Bridge:** [PatrickPalmer/MayaMCP](https://github.com/PatrickPalmer/MayaMCP) - no Maya plugin required
 
 ---
 
@@ -28,12 +28,12 @@ Run this once on a new machine. It handles everything:
 ```
 
 What it does:
-1. Uses the bridge bundled with this connector (`maya\bridge\`, based on [PatrickPalmer/MayaMCP](https://github.com/PatrickPalmer/MayaMCP)) — pass `-BridgeDir` to use an external clone instead
+1. Uses the bridge bundled with this connector (`maya\bridge\`, based on [PatrickPalmer/MayaMCP](https://github.com/PatrickPalmer/MayaMCP)) - pass `-BridgeDir` to use an external clone instead
 2. Creates `%USERPROFILE%\Documents\maya\scripts\userSetup.mel` with an auto-start `commandPort` entry
 3. Sets `MAYA_MCP_SERVER_PATH`, `MAYA_HOST`, `MAYA_PORT` as user env vars
 4. Registers the `maya` MCP server with Claude Code (dependencies resolve via `uv run` on first launch)
 
-Then open (or restart) Maya. The commandPort opens automatically — no manual steps needed.
+Then open (or restart) Maya. The commandPort opens automatically - no manual steps needed.
 
 ### Custom paths
 
@@ -58,16 +58,16 @@ If the bridge is already cloned and `userSetup.mel` is already configured, just 
 
 ```
 Claude Code
-    ↕ stdio
-MCP server  (uv run python src/maya_mcp_server.py — spawned by Claude Code)
-    ↕ TCP socket
-Maya commandPort  (localhost:7001 — auto-opened by userSetup.mel on every Maya launch)
+    <-> stdio
+MCP server  (uv run python src/maya_mcp_server.py - spawned by Claude Code)
+    <-> TCP socket
+Maya commandPort  (localhost:7001 - auto-opened by userSetup.mel on every Maya launch)
 ```
 
 **Why this is the simplest bridge in the stack:**
-- `commandPort` is built into Maya — no plugin installs, no shelf buttons
+- `commandPort` is built into Maya - no plugin installs, no shelf buttons
 - Claude Code manages the MCP server process automatically
-- Once installed, both sides start themselves — nothing for the user to do
+- Once installed, both sides start themselves - nothing for the user to do
 
 ---
 
@@ -114,7 +114,7 @@ claude mcp list
 
 | Problem | Fix |
 |---------|-----|
-| `Connection refused` on port 7001 | Maya is not open, or `userSetup.mel` didn't run — check Script Editor for errors |
+| `Connection refused` on port 7001 | Maya is not open, or `userSetup.mel` didn't run - check Script Editor for errors |
 | `commandPort` error in Script Editor | Port already in use from a previous session; the `if (!commandPort -q ...)` guard handles this automatically |
 | `uv: command not found` | Install uv: `winget install astral-sh.uv` then restart terminal |
 | Maya not in `C:\Users\...\Documents\maya\scripts` | Run `install.ps1 -MayaScripts "your\scripts\path"` |

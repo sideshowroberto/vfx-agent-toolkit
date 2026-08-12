@@ -36,7 +36,7 @@ All `.js` files in `WEB_DIRECTORY` are loaded automatically when ComfyUI starts.
 
 ## Extension Hooks (Lifecycle Order)
 
-### init — After canvas created, before nodes
+### init - After canvas created, before nodes
 
 ```javascript
 app.registerExtension({
@@ -47,7 +47,7 @@ app.registerExtension({
 });
 ```
 
-### addCustomNodeDefs — Modify node definitions
+### addCustomNodeDefs - Modify node definitions
 
 ```javascript
 async addCustomNodeDefs(defs, app) {
@@ -64,7 +64,7 @@ async addCustomNodeDefs(defs, app) {
 },
 ```
 
-### getCustomWidgets — Register custom widget types
+### getCustomWidgets - Register custom widget types
 
 ```javascript
 getCustomWidgets(app) {
@@ -78,7 +78,7 @@ getCustomWidgets(app) {
 },
 ```
 
-### beforeRegisterNodeDef — Modify node prototype
+### beforeRegisterNodeDef - Modify node prototype
 
 ```javascript
 async beforeRegisterNodeDef(nodeType, nodeData, app) {
@@ -96,7 +96,7 @@ async beforeRegisterNodeDef(nodeType, nodeData, app) {
 },
 ```
 
-### nodeCreated — After node instance created
+### nodeCreated - After node instance created
 
 ```javascript
 nodeCreated(node, app) {
@@ -107,7 +107,7 @@ nodeCreated(node, app) {
 },
 ```
 
-### setup — After app fully loaded
+### setup - After app fully loaded
 
 ```javascript
 async setup(app) {
@@ -118,7 +118,7 @@ async setup(app) {
 },
 ```
 
-### loadedGraphNode — When loading saved graph
+### loadedGraphNode - When loading saved graph
 
 ```javascript
 loadedGraphNode(node, app) {
@@ -128,7 +128,7 @@ loadedGraphNode(node, app) {
 },
 ```
 
-### registerCustomNodes — Register additional node types
+### registerCustomNodes - Register additional node types
 
 ```javascript
 registerCustomNodes(app) {
@@ -136,7 +136,7 @@ registerCustomNodes(app) {
 },
 ```
 
-### beforeRegisterVueAppNodeDefs — Modify node defs before Vue registration
+### beforeRegisterVueAppNodeDefs - Modify node defs before Vue registration
 
 ```javascript
 beforeRegisterVueAppNodeDefs(defs, app) {
@@ -155,7 +155,7 @@ async afterConfigureGraph(missingNodeTypes, app) {
 },
 ```
 
-### getSelectionToolboxCommands — Add commands to selection toolbox
+### getSelectionToolboxCommands - Add commands to selection toolbox
 
 ```javascript
 getSelectionToolboxCommands(selectedItem) {
@@ -526,12 +526,12 @@ Symbols are also accessible via `window.comfyAPI.<module>.<export>`.
 
 ### Key Modules
 
-- **`scripts/api`** — `ComfyApi` class: `fetchApi()`, `queuePrompt()`, `getNodeDefs()`, WebSocket events, settings, user data, system stats
-- **`scripts/app`** — `ComfyApp` singleton (`app`): graph operations, `registerExtension()`, `extensionManager`, clipboard, coordinate conversion
-- **`scripts/widgets`** — `ComfyWidgets` registry (INT, FLOAT, STRING, BOOLEAN, COMBO, IMAGEUPLOAD, etc.), `addValueControlWidgets()`
-- **`scripts/domWidget`** — `addDOMWidget()`, `DOMWidgetImpl`, `ComponentWidgetImpl` (Vue component wrapper)
-- **`scripts/utils`** — `clone()`, `addStylesheet()`, `uploadFile()`, `downloadBlob()`, storage helpers
-- **`scripts/pnginfo`** — `getPngMetadata()`, `getWebpMetadata()`, `importA1111()`, format-specific extractors
+- **`scripts/api`** - `ComfyApi` class: `fetchApi()`, `queuePrompt()`, `getNodeDefs()`, WebSocket events, settings, user data, system stats
+- **`scripts/app`** - `ComfyApp` singleton (`app`): graph operations, `registerExtension()`, `extensionManager`, clipboard, coordinate conversion
+- **`scripts/widgets`** - `ComfyWidgets` registry (INT, FLOAT, STRING, BOOLEAN, COMBO, IMAGEUPLOAD, etc.), `addValueControlWidgets()`
+- **`scripts/domWidget`** - `addDOMWidget()`, `DOMWidgetImpl`, `ComponentWidgetImpl` (Vue component wrapper)
+- **`scripts/utils`** - `clone()`, `addStylesheet()`, `uploadFile()`, `downloadBlob()`, storage helpers
+- **`scripts/pnginfo`** - `getPngMetadata()`, `getWebpMetadata()`, `importA1111()`, format-specific extractors
 
 For full API details, see the [API Reference](api-reference.md).
 

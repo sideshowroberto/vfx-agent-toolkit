@@ -1,6 +1,6 @@
 ---
 name: blender-addon-development
-description: Blender addon development — operator design, UI panels, bpy.props, poll() methods, and registration systems. Use when creating addons, building operators, designing UI panels, or when user mentions "addon," "operator," "UI panel," or "Blender Python."
+description: Blender addon development - operator design, UI panels, bpy.props, poll() methods, and registration systems. Use when creating addons, building operators, designing UI panels, or when user mentions "addon," "operator," "UI panel," or "Blender Python."
 allowed-tools: Read,Write
 ---
 
@@ -348,7 +348,7 @@ class MY_OT_Operator(bpy.types.Operator):
 
     def execute(self, context):
         obj = context.active_object
-        # Direct data API — no operators needed
+        # Direct data API - no operators needed
         for poly in obj.data.polygons:
             poly.use_smooth = True
         obj.data.update()

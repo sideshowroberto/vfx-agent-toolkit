@@ -5,15 +5,15 @@ description: End-of-session wrap-up ritual before clearing context. Reviews the 
 
 # Wrap Session
 
-Execute this checklist decisively, in order. Do the work — don't ask permission for each step. Only pause to ask if something is genuinely ambiguous (e.g., unsure whether a temp script is still needed).
+Execute this checklist decisively, in order. Do the work - don't ask permission for each step. Only pause to ask if something is genuinely ambiguous (e.g., unsure whether a temp script is still needed).
 
 ## 1. Memory
 
 Review the full session for durable facts not yet saved to memory:
 
-- **Project facts** — fps, resolution, colorspace, drive layout, folder conventions, naming schemes, tool versions, decisions made
-- **Feedback and corrections** — anything the user corrected you on, preferences they stated, approaches they rejected
-- **Gotchas discovered** — API quirks, version incompatibilities, workarounds that took effort to find
+- **Project facts** - fps, resolution, colorspace, drive layout, folder conventions, naming schemes, tool versions, decisions made
+- **Feedback and corrections** - anything the user corrected you on, preferences they stated, approaches they rejected
+- **Gotchas discovered** - API quirks, version incompatibilities, workarounds that took effort to find
 
 Write or update the relevant memory files and keep the memory index current.
 
@@ -25,7 +25,7 @@ Did this session discover anything that belongs in an existing skill?
 
 - Gotchas or workarounds relevant to a skill's domain
 - API or version changes that make a skill's guidance stale
-- Trigger phrases the user said that *should* have fired a skill but didn't — add them to that skill's description
+- Trigger phrases the user said that *should* have fired a skill but didn't - add them to that skill's description
 
 If the edit is small, make it now. If it needs real rework, list the needed changes clearly so the user can act on them later.
 
@@ -51,15 +51,15 @@ Review `tmp/` and any scratch files created this session:
 
 Write a concise next-session plan file (e.g., `tmp/handoff_YYYY-MM-DD.md` or the project's development folder if it should persist). Cover:
 
-- **Completed** — what got done this session
-- **In flight** — what's partially done and its current state
-- **Next steps** — exact, actionable steps in order (not vague goals)
-- **Context needed** — the specific files/paths the next session should read first
+- **Completed** - what got done this session
+- **In flight** - what's partially done and its current state
+- **Next steps** - exact, actionable steps in order (not vague goals)
+- **Context needed** - the specific files/paths the next session should read first
 
 Tell the user exactly where the handoff file is.
 
 ## 6. Confirm
 
-Summarize in a short table or list: what was saved, and where — memory updates, skill edits, session log, promoted/deleted files, handoff plan location.
+Summarize in a short table or list: what was saved, and where - memory updates, skill edits, session log, promoted/deleted files, handoff plan location.
 
 Then confirm explicitly: **"Safe to /clear."** (Or state what's still unresolved if anything blocked a step.)

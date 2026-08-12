@@ -48,19 +48,19 @@ COMBINED TEST REPORT
 Unit Tests:
   Tests Run: 15
   Failures: 0
-  Status: ✅ PASS
+  Status: [OK] PASS
 
 Integration Tests:
   Tests Run: 6
   Failures: 0
-  Status: ✅ PASS
+  Status: [OK] PASS
 
 ----------------------------------------------------------------------
 Total Tests: 21
 Total Failures: 0
-Overall Status: ✅ PASS
+Overall Status: [OK] PASS
 
-🎉 All tests passed!
+ All tests passed!
 ======================================================================
 ```
 
@@ -77,20 +77,20 @@ AGENT-CREATION-UPDATE INTEGRATION TEST SUITE
 ======================================================================
 
 Test 1: Complete Agent Lifecycle
-  ✅ Create agent (v1.0.0)
-  ✅ Validate agent (PASS)
-  ✅ Update agent to v1.1.0
-  ✅ Validate updated agent (PASS)
-  ✅ Archive created (v1.0.0)
-  ✅ Cleanup successful
+  [OK] Create agent (v1.0.0)
+  [OK] Validate agent (PASS)
+  [OK] Update agent to v1.1.0
+  [OK] Validate updated agent (PASS)
+  [OK] Archive created (v1.0.0)
+  [OK] Cleanup successful
 
 Test 2: Create From All Templates
-  ✅ tool-specialist created
-  ✅ tool-specialist validated (PASS)
-  ✅ cross-tool created
-  ✅ cross-tool validated (PASS)
-  ✅ general-helper created
-  ✅ general-helper validated (PASS)
+  [OK] tool-specialist created
+  [OK] tool-specialist validated (PASS)
+  [OK] cross-tool created
+  [OK] cross-tool validated (PASS)
+  [OK] general-helper created
+  [OK] general-helper validated (PASS)
 
 ... [4 more tests]
 
@@ -101,7 +101,7 @@ Total Tests: 6
 Passed: 6
 Failed: 0
 
-🎉 All integration tests passed!
+ All integration tests passed!
 ======================================================================
 ```
 
@@ -139,12 +139,12 @@ python run_all_tests.py --verbose
 - Validates end-to-end process
 
 **Checks:**
-- ✅ Create agent (v1.0.0)
-- ✅ Validate agent (PASS)
-- ✅ Update agent to v1.1.0
-- ✅ Validate updated agent (PASS)
-- ✅ Archive created (v1.0.0)
-- ✅ Cleanup successful
+- [OK] Create agent (v1.0.0)
+- [OK] Validate agent (PASS)
+- [OK] Update agent to v1.1.0
+- [OK] Validate updated agent (PASS)
+- [OK] Archive created (v1.0.0)
+- [OK] Cleanup successful
 
 ---
 
@@ -163,12 +163,12 @@ python run_all_tests.py --verbose
 - Ensures template placeholders replaced correctly
 
 **Checks:**
-- ✅ tool-specialist created
-- ✅ tool-specialist validated (PASS)
-- ✅ cross-tool created
-- ✅ cross-tool validated (PASS)
-- ✅ general-helper created
-- ✅ general-helper validated (PASS)
+- [OK] tool-specialist created
+- [OK] tool-specialist validated (PASS)
+- [OK] cross-tool created
+- [OK] cross-tool validated (PASS)
+- [OK] general-helper created
+- [OK] general-helper validated (PASS)
 
 ---
 
@@ -176,9 +176,9 @@ python run_all_tests.py --verbose
 
 **What it tests:**
 - Create agent (v1.0.0)
-- Update major (v1.0.0 → v2.0.0)
-- Update minor (v2.0.0 → v2.1.0)
-- Update patch (v2.1.0 → v2.1.1)
+- Update major (v1.0.0 -> v2.0.0)
+- Update minor (v2.0.0 -> v2.1.0)
+- Update patch (v2.1.0 -> v2.1.1)
 - Verify 3 archives created (v1.0.0, v2.0.0, v2.1.0)
 - Validate final agent (should PASS)
 
@@ -188,12 +188,12 @@ python run_all_tests.py --verbose
 - Ensures version metadata stays consistent
 
 **Checks:**
-- ✅ Create agent (v1.0.0)
-- ✅ Major increment (1.0.0 → 2.0.0)
-- ✅ Minor increment (2.0.0 → 2.1.0)
-- ✅ Patch increment (2.1.0 → 2.1.1)
-- ✅ All archives created
-- ✅ Validate final agent (PASS)
+- [OK] Create agent (v1.0.0)
+- [OK] Major increment (1.0.0 -> 2.0.0)
+- [OK] Minor increment (2.0.0 -> 2.1.0)
+- [OK] Patch increment (2.1.0 -> 2.1.1)
+- [OK] All archives created
+- [OK] Validate final agent (PASS)
 
 ---
 
@@ -211,9 +211,9 @@ python run_all_tests.py --verbose
 - Prevents corruption of agent directory
 
 **Checks:**
-- ✅ Invalid name rejected
-- ✅ Invalid agent validation fails
-- ✅ Update blocked on invalid agent
+- [OK] Invalid name rejected
+- [OK] Invalid agent validation fails
+- [OK] Update blocked on invalid agent
 
 ---
 
@@ -233,10 +233,10 @@ python run_all_tests.py --verbose
 - Ensures archives are usable for restoration
 
 **Checks:**
-- ✅ Original created and updated
-- ✅ Archive v1.0.0 exists
-- ✅ Restoration successful
-- ✅ Restored agent validates
+- [OK] Original created and updated
+- [OK] Archive v1.0.0 exists
+- [OK] Restoration successful
+- [OK] Restored agent validates
 
 ---
 
@@ -256,9 +256,9 @@ python run_all_tests.py --verbose
 - Ensures --force flag works correctly
 
 **Checks:**
-- ✅ Duplicate creation blocked
-- ✅ Force overwrite succeeds
-- ✅ Archive force overwrite succeeds
+- [OK] Duplicate creation blocked
+- [OK] Force overwrite succeeds
+- [OK] Archive force overwrite succeeds
 
 ---
 
@@ -304,7 +304,7 @@ result = suite.run_script('create_agent.py', [
 
 ### Integration Test Fails
 
-**Symptom:** Test shows ❌ FAIL
+**Symptom:** Test shows [FAIL] FAIL
 
 **Steps:**
 1. Run integration test with verbose output:
@@ -314,9 +314,9 @@ result = suite.run_script('create_agent.py', [
 
 2. Check which specific check failed:
    ```
-   Test 1: Complete Agent Lifecycle - ❌ FAIL
-     ✅ Create agent (v1.0.0)
-     ❌ Validate agent (PASS)  <-- This check failed
+   Test 1: Complete Agent Lifecycle - [FAIL] FAIL
+     [OK] Create agent (v1.0.0)
+     [FAIL] Validate agent (PASS)  <-- This check failed
      ...
    ```
 
@@ -415,7 +415,7 @@ rm -rf /tmp/agent_test_*
 
 ### Validation Always Fails
 
-**Symptom:** Validation check always shows ❌ FAIL
+**Symptom:** Validation check always shows [FAIL] FAIL
 
 **Possible Causes:**
 1. **validate_agent.py has bugs** - Test script independently
@@ -453,26 +453,26 @@ rm -rf /tmp/agent_test_*
 ## Test Coverage
 
 **Scripts Covered:**
-- ✅ create_agent.py - Agent creation, template application
-- ✅ update_agent.py - Version increments, changelog
-- ✅ validate_agent.py - Article IX validation
-- ✅ archive_agent.py - Archive workflow
+- [OK] create_agent.py - Agent creation, template application
+- [OK] update_agent.py - Version increments, changelog
+- [OK] validate_agent.py - Article IX validation
+- [OK] archive_agent.py - Archive workflow
 
 **Workflows Covered:**
-- ✅ Complete agent lifecycle
-- ✅ Template application (all 3 types)
-- ✅ Semantic versioning (major, minor, patch)
-- ✅ Validation safeguards
-- ✅ Archive restoration
-- ✅ Force overwrite
+- [OK] Complete agent lifecycle
+- [OK] Template application (all 3 types)
+- [OK] Semantic versioning (major, minor, patch)
+- [OK] Validation safeguards
+- [OK] Archive restoration
+- [OK] Force overwrite
 
 **Edge Cases Covered:**
-- ✅ Invalid agent names
-- ✅ Duplicate creation attempts
-- ✅ Missing metadata
-- ✅ Archive conflicts
-- ✅ Rollback scenarios
-- ✅ Force overwrite behavior
+- [OK] Invalid agent names
+- [OK] Duplicate creation attempts
+- [OK] Missing metadata
+- [OK] Archive conflicts
+- [OK] Rollback scenarios
+- [OK] Force overwrite behavior
 
 ---
 
@@ -601,9 +601,9 @@ When adding new functionality:
 ## Support
 
 **Issues:**
-- Test failures → Check troubleshooting section above
-- Missing features → Add new test scenarios
-- Bug reports → Include test output
+- Test failures -> Check troubleshooting section above
+- Missing features -> Add new test scenarios
+- Bug reports -> Include test output
 
 **Contact:**
 - VFX Pipeline Team

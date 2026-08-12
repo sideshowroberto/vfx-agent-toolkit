@@ -2,17 +2,17 @@
 
 ## Current Limitations (MCP C++ Bug)
 
-**❌ CRASH RISK:** The following property types currently cause Blueprint corruption and crashes:
+**[FAIL] CRASH RISK:** The following property types currently cause Blueprint corruption and crashes:
 
 - **FColor:** `LightColor` on light components
 - **FLinearColor:** Color-related properties on various components
 - **Other StructProperty types:** Untested, may crash
 
-**Root Cause:** MCP C++ code (`UnrealMCPCommonUtils.cpp`) missing StructProperty serialization for color types. Failed property sets corrupt Blueprint → crash on compile.
+**Root Cause:** MCP C++ code (`UnrealMCPCommonUtils.cpp`) missing StructProperty serialization for color types. Failed property sets corrupt Blueprint -> crash on compile.
 
 **Status:** Bug documented in `Session_2025-10-26_BlueprintAutomation_Testing.md`, fix planned.
 
-## Safe Property Types ✅
+## Safe Property Types [OK]
 
 **These property types work reliably:**
 
@@ -47,15 +47,15 @@
 # Phase 1-3: Create Blueprint, add components, set SAFE properties only
 create_blueprint(...)
 add_component_to_blueprint(...)
-set_static_mesh_properties(...)  # ✅ Safe
-set_component_property("Intensity", "5000.0")  # ✅ Safe
-set_component_property("RelativeLocation", "[0,0,150]")  # ✅ Safe
+set_static_mesh_properties(...)  # [OK] Safe
+set_component_property("Intensity", "5000.0")  # [OK] Safe
+set_component_property("RelativeLocation", "[0,0,150]")  # [OK] Safe
 
 # SKIP color properties to avoid crash
-# set_component_property("LightColor", "...")  # ❌ DON'T DO THIS
+# set_component_property("LightColor", "...")  # [FAIL] DON'T DO THIS
 
 # Phase 4: Compile
-compile_blueprint(...)  # ✅ No crash (no failed property sets)
+compile_blueprint(...)  # [OK] No crash (no failed property sets)
 
 # Phase 5: Manual color setting (temporary)
 # Open Blueprint in Unreal Editor
@@ -90,7 +90,7 @@ result = get_blueprint_component_properties(
             "LightColor": {
                 "type": "StructProperty:FColor",
                 "value": "(R=255,G=255,B=255,A=255)",
-                "safe": false  # ← Indicates crash risk
+                "safe": false  # <- Indicates crash risk
             }
         }
     }

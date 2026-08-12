@@ -47,20 +47,20 @@ Blender's particle system is a complex framework for creating dynamic effects ra
 
 ```
 Object (Emitter)
-└── Modifiers
-    └── ParticleSystem Modifier
-        └── Particle System
-            ├── Settings (ParticleSettings)
-            │   ├── Emission properties
-            │   ├── Physics properties
-            │   ├── Render properties
-            │   ├── Field weights
-            │   └── Vertex groups
-            └── Particles (runtime data)
-                ├── Location
-                ├── Velocity
-                ├── Rotation
-                └── Lifetime
++-- Modifiers
+    +-- ParticleSystem Modifier
+        +-- Particle System
+            +-- Settings (ParticleSettings)
+            |   +-- Emission properties
+            |   +-- Physics properties
+            |   +-- Render properties
+            |   +-- Field weights
+            |   +-- Vertex groups
+            +-- Particles (runtime data)
+                +-- Location
+                +-- Velocity
+                +-- Rotation
+                +-- Lifetime
 ```
 
 ### Creating Particle System (Direct API)

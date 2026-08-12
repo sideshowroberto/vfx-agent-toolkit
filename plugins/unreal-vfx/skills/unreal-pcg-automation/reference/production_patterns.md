@@ -28,13 +28,13 @@ Production-validated patterns extracted from real-world PCG workflows.
 
 **Pattern:**
 ```
-Layer 1 (Large Trees): Self Pruning → Bounds Modifier → Spawner
-  ↓ (excludes Layer 1)
-Layer 2 (Medium Trees): Bounds Modifier → Difference → Spawner
-  ↓ (excludes Layers 1+2)
-Layer 3 (Ground Cover): Bounds Modifier → Difference → Spawner
-  ↓ (excludes Layers 1+2+3)
-Layer 4 (Undergrowth): Difference → Multiple Density Variations
+Layer 1 (Large Trees): Self Pruning -> Bounds Modifier -> Spawner
+  v (excludes Layer 1)
+Layer 2 (Medium Trees): Bounds Modifier -> Difference -> Spawner
+  v (excludes Layers 1+2)
+Layer 3 (Ground Cover): Bounds Modifier -> Difference -> Spawner
+  v (excludes Layers 1+2+3)
+Layer 4 (Undergrowth): Difference -> Multiple Density Variations
 ```
 
 ### Complete Python Example
@@ -53,7 +53,7 @@ graph = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
 # ============ LAYER 1: LARGE TREES ============
 get_landscape_1, _ = graph.add_node_of_type(unreal.PCGGetLandscapeSettings)
 sampler_1, sampler_s1 = graph.add_node_of_type(unreal.PCGSurfaceSamplerSettings)
-sampler_s1.points_per_squared_meter = 0.05  # Very sparse (1 tree per 20m²)
+sampler_s1.points_per_squared_meter = 0.05  # Very sparse (1 tree per 20m^2)
 
 transform_1, trans_s1 = graph.add_node_of_type(unreal.PCGTransformPointsSettings)
 
@@ -75,7 +75,7 @@ spawner_1, _ = graph.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
 # ============ LAYER 2: MEDIUM TREES ============
 get_landscape_2, _ = graph.add_node_of_type(unreal.PCGGetLandscapeSettings)
 sampler_2, sampler_s2 = graph.add_node_of_type(unreal.PCGSurfaceSamplerSettings)
-sampler_s2.points_per_squared_meter = 0.1  # Sparse (1 tree per 10m²)
+sampler_s2.points_per_squared_meter = 0.1  # Sparse (1 tree per 10m^2)
 
 transform_2, trans_s2 = graph.add_node_of_type(unreal.PCGTransformPointsSettings)
 
@@ -144,22 +144,22 @@ spawner_dense, _ = graph.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
 ### Key Settings
 
 **Layer 1 (Large Trees):**
-- Points per m²: 0.05 (very sparse)
+- Points per m^2: 0.05 (very sparse)
 - Self pruning: `radius_similarity_factor = 0.25`
 - Bounds: 800cm radius (16m exclusion zone)
 
 **Layer 2 (Medium Trees):**
-- Points per m²: 0.1 (sparse)
+- Points per m^2: 0.1 (sparse)
 - Bounds: 500cm radius (10m exclusion zone)
 - Difference: BINARY mode
 
 **Layer 3 (Ground Cover):**
-- Points per m²: 0.5 (medium)
+- Points per m^2: 0.5 (medium)
 - Bounds: 300cm radius (6m exclusion zone)
 - Difference: BINARY mode (excludes layers 1+2)
 
 **Layer 4 (Undergrowth):**
-- Points per m²: 2.0 (dense base)
+- Points per m^2: 2.0 (dense base)
 - Difference: BINARY mode (excludes all above)
 - Density variations:
   - Sparse: 20-40% of points
@@ -174,7 +174,7 @@ spawner_dense, _ = graph.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
 - Runtime FPS: 60 FPS stable
 - Hierarchical culling enabled
 
-**Optimization Insight:** Single source → 3 density variations is 3x faster than 3 separate surface samplers.
+**Optimization Insight:** Single source -> 3 density variations is 3x faster than 3 separate surface samplers.
 
 ### Production Validated
 
@@ -200,8 +200,8 @@ spawner_dense, _ = graph.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
 
 **Pattern:**
 ```
-Load Data Asset (scatter pattern) → Copy Points (Source) +
-Spline Points (Target) → Transform → Spawner
+Load Data Asset (scatter pattern) -> Copy Points (Source) +
+Spline Points (Target) -> Transform -> Spawner
 ```
 
 ### Complete Python Example
@@ -227,7 +227,7 @@ load_asset, asset_s = graph.add_node_of_type(unreal.PCGLoadDataAssetSettings)
 # CRITICAL: Set data asset path
 asset_s.data_asset = unreal.load_asset('/Game/PCG/ScatterPatterns/ForestPattern')
 
-# Copy points: External pattern → Spline path
+# Copy points: External pattern -> Spline path
 copy_points, copy_s = graph.add_node_of_type(unreal.PCGCopyPointsSettings)
 copy_s.rotation_inheritance = unreal.PCGCopyPointsInheritanceMode.RELATIVE
 copy_s.scale_inheritance = unreal.PCGCopyPointsInheritanceMode.RELATIVE
@@ -237,16 +237,16 @@ transform, trans_s = graph.add_node_of_type(unreal.PCGTransformPointsSettings)
 spawner, _ = graph.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
 
 # Connect (separate script for Silent Execution)
-# load_asset → copy_points(source)
-# spline_sampler → copy_points(target)
-# copy_points → transform → spawner
+# load_asset -> copy_points(source)
+# spline_sampler -> copy_points(target)
+# copy_points -> transform -> spawner
 ```
 
 ### Creating Reusable Data Asset
 
 **Step 1:** Create PCG Data Asset
 ```
-Content Browser → Right-click → Miscellaneous → Data Asset → PCGDataAsset
+Content Browser -> Right-click -> Miscellaneous -> Data Asset -> PCGDataAsset
 Name: ForestPattern
 ```
 
@@ -271,7 +271,7 @@ trans_s.rotation_max = unreal.Rotator(0, 360, 0)
 
 - **Consistency:** Same scatter pattern across all scenes
 - **Artist Control:** Visual authoring of distributions
-- **Version Control:** Update pattern → all graphs update
+- **Version Control:** Update pattern -> all graphs update
 - **Reusability:** One pattern, many applications
 
 ### Production Example
@@ -291,16 +291,16 @@ trans_s.rotation_max = unreal.Rotator(0, 360, 0)
 
 **Problem:** Create multiple density levels without duplicating expensive surface samplers
 
-**Solution:** Single source → Multiple Density Filter nodes
+**Solution:** Single source -> Multiple Density Filter nodes
 
 **Use Case:** Sparse/medium/dense vegetation, performance optimization, variety from single source
 
 **Pattern:**
 ```
-Collapse →
-  ├→ Density Filter (0.2-0.4) → Transform → Spawner  # Sparse
-  ├→ Density Filter (0.4-0.7) → Transform → Spawner  # Medium
-  └→ Density Filter (0.7-1.0) → Transform → Spawner  # Dense
+Collapse ->
+  +-> Density Filter (0.2-0.4) -> Transform -> Spawner  # Sparse
+  +-> Density Filter (0.4-0.7) -> Transform -> Spawner  # Medium
+  +-> Density Filter (0.7-1.0) -> Transform -> Spawner  # Dense
 ```
 
 ### Complete Python Example
@@ -360,18 +360,18 @@ spawner_dense, _ = graph.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
 
 **Traditional Approach (3 Surface Samplers):**
 ```
-Surface Sampler (0.4 pts/m²) → Spawner  # Sparse: 38ms
-Surface Sampler (1.0 pts/m²) → Spawner  # Medium: 52ms
-Surface Sampler (2.0 pts/m²) → Spawner  # Dense: 71ms
+Surface Sampler (0.4 pts/m^2) -> Spawner  # Sparse: 38ms
+Surface Sampler (1.0 pts/m^2) -> Spawner  # Medium: 52ms
+Surface Sampler (2.0 pts/m^2) -> Spawner  # Dense: 71ms
 Total: 161ms
 ```
 
 **Optimized Approach (1 Sampler + 3 Density Filters):**
 ```
-Surface Sampler (2.0 pts/m²) →
-  ├→ Density Filter (0.2-0.4) → Spawner  # Sparse: 8ms
-  ├→ Density Filter (0.4-0.7) → Spawner  # Medium: 12ms
-  └→ Density Filter (0.7-1.0) → Spawner  # Dense: 15ms
+Surface Sampler (2.0 pts/m^2) ->
+  +-> Density Filter (0.2-0.4) -> Spawner  # Sparse: 8ms
+  +-> Density Filter (0.4-0.7) -> Spawner  # Medium: 12ms
+  +-> Density Filter (0.7-1.0) -> Spawner  # Dense: 15ms
 Total: 106ms (34% faster!)
 ```
 
@@ -395,10 +395,10 @@ Total: 106ms (34% faster!)
 
 **Pattern:**
 ```
-Source → Named Reroute Declaration →
-  ├→ Named Reroute Usage → Branch 1
-  ├→ Named Reroute Usage → Branch 2
-  └→ Named Reroute Usage → Branch 3
+Source -> Named Reroute Declaration ->
+  +-> Named Reroute Usage -> Branch 1
+  +-> Named Reroute Usage -> Branch 2
+  +-> Named Reroute Usage -> Branch 3
 ```
 
 ### Complete Python Example
@@ -442,26 +442,26 @@ diff_grass, _ = graph.add_node_of_type(unreal.PCGDifferenceSettings)
 
 **Without Named Reroutes (60-node graph):**
 ```
-[Spline Sampler]────────┬──────────────→ [Filter Trees] → [Diff Trees]
-                        ├───────→ [Filter Rocks] → [Diff Rocks]
-                        └→ [Filter Grass] → [Diff Grass]
+[Spline Sampler]--------+---------------> [Filter Trees] -> [Diff Trees]
+                        +--------> [Filter Rocks] -> [Diff Rocks]
+                        +-> [Filter Grass] -> [Diff Grass]
 
-🔴 50+ crossing wires
-🔴 Hard to follow data flow
-🔴 Difficult to debug
+[FAIL] 50+ crossing wires
+[FAIL] Hard to follow data flow
+[FAIL] Difficult to debug
 ```
 
 **With Named Reroutes (60-node graph):**
 ```
-[Spline Sampler] → [Named Reroute Decl: "SplineExtents"]
+[Spline Sampler] -> [Named Reroute Decl: "SplineExtents"]
 
-[Named Reroute: "SplineExtents"] → [Filter Trees] → [Diff Trees]
-[Named Reroute: "SplineExtents"] → [Filter Rocks] → [Diff Rocks]
-[Named Reroute: "SplineExtents"] → [Filter Grass] → [Diff Grass]
+[Named Reroute: "SplineExtents"] -> [Filter Trees] -> [Diff Trees]
+[Named Reroute: "SplineExtents"] -> [Filter Rocks] -> [Diff Rocks]
+[Named Reroute: "SplineExtents"] -> [Filter Grass] -> [Diff Grass]
 
-✅ 0 crossing wires
-✅ Clear data flow
-✅ Easy to debug
+[OK] 0 crossing wires
+[OK] Clear data flow
+[OK] Easy to debug
 ```
 
 ### Benefits

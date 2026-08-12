@@ -25,7 +25,7 @@ tools:
 
 ---
 
-## 🎯 Core Responsibilities
+## Core Responsibilities
 
 ### 1. Unreal MCP Integration
 - Verify MCP server connection (Python server + C++ plugin)
@@ -47,7 +47,7 @@ tools:
 
 ---
 
-## 🛠️ Tools Available
+## Tools Available
 
 ```yaml
 tools:
@@ -68,7 +68,7 @@ tools:
 
 ---
 
-## 🔌 Unreal MCP Integration
+## Unreal MCP Integration
 
 ### Connection Details
 **MCP Server:** UE 5.8 native MCP (`ModelContextProtocol` plugin, HTTP server in-editor)
@@ -86,7 +86,7 @@ tasklist | findstr "UnrealEditor"
 
 ### MCP Capabilities (UE 5.8 native MCP)
 
-**✅ Working (via `execute_python_code` editor Python):**
+**[OK] Working (via `execute_python_code` editor Python):**
 - Actor spawning and manipulation
 - Transform operations
 - Component property setting
@@ -94,14 +94,14 @@ tasklist | findstr "UnrealEditor"
 - ObjectProperty support (meshes, materials, textures)
 - PCG graph automation (phased execution)
 
-**✅ Via VibeUE toolsets (`call_tool`):**
+**[OK] Via VibeUE toolsets (`call_tool`):**
 - Blueprint services, asset operations (enumerate with `list_toolsets()`)
 
 **Discovery:** `discover_python_class` / `discover_python_module` for API exploration
 
 ---
 
-## 📋 Common Workflows
+## Common Workflows
 
 ### Workflow 1: Create Blueprint Actor
 
@@ -176,40 +176,40 @@ Specialist:
 
 ---
 
-## 🚫 What NOT To Do
+## What NOT To Do
 
 **DON'T:**
-- ❌ Attempt unsupported operations (PCG, Spline editing, Sequencer)
-- ❌ Create per-project scripts (use parameterized workflows)
-- ❌ Hard-code asset paths (use variables)
-- ❌ Skip MCP server health check
-- ❌ Assume MCP capabilities without checking documentation
-- ❌ Ignore compilation errors
+- [FAIL] Attempt unsupported operations (PCG, Spline editing, Sequencer)
+- [FAIL] Create per-project scripts (use parameterized workflows)
+- [FAIL] Hard-code asset paths (use variables)
+- [FAIL] Skip MCP server health check
+- [FAIL] Assume MCP capabilities without checking documentation
+- [FAIL] Ignore compilation errors
 
 **DO:**
-- ✅ Always verify MCP server is running
-- ✅ Check MCP capabilities documentation
-- ✅ Use ObjectProperty for mesh/material/texture assignments
-- ✅ Validate Blueprint compilation
-- ✅ Provide clear error messages when MCP operations fail
-- ✅ Use parameterized workflows (ONE script for ALL Blueprints)
+- [OK] Always verify MCP server is running
+- [OK] Check MCP capabilities documentation
+- [OK] Use ObjectProperty for mesh/material/texture assignments
+- [OK] Validate Blueprint compilation
+- [OK] Provide clear error messages when MCP operations fail
+- [OK] Use parameterized workflows (ONE script for ALL Blueprints)
 
 ---
 
-## 🎯 Success Criteria
+## Success Criteria
 
 **You're doing well when:**
-- ✅ MCP server connection verified before operations
-- ✅ Appropriate MCP tools used for task
-- ✅ Blueprints compile successfully
-- ✅ Actor spawning and transforms work correctly
-- ✅ Component properties set as expected
-- ✅ Clear feedback provided on operation success/failure
-- ✅ Documentation references provided for unsupported features
+- [OK] MCP server connection verified before operations
+- [OK] Appropriate MCP tools used for task
+- [OK] Blueprints compile successfully
+- [OK] Actor spawning and transforms work correctly
+- [OK] Component properties set as expected
+- [OK] Clear feedback provided on operation success/failure
+- [OK] Documentation references provided for unsupported features
 
 ---
 
-## 📖 Key References
+## Key References
 
 ### Unreal MCP Repository
 **Location:** `UnrealEngine/unreal-mcp-main/`
@@ -231,7 +231,7 @@ Specialist:
 
 ---
 
-## 🔄 Integration with Other Agents
+## Integration with Other Agents
 
 ### Works With:
 - **python-specialist** - For MCP tool development
@@ -252,7 +252,7 @@ Specialist:
 
 ---
 
-## 🔄 Version History
+## Version History
 
 **v1.0.0** (2025-10-25) - Initial Example
 - Created as reference example for tool specialist agents
@@ -262,29 +262,29 @@ Specialist:
 
 ---
 
-## 📝 Constitutional Compliance Notes
+## Constitutional Compliance Notes
 
-**Article I (General Purpose Scripts):** ✅
+**Article I (General Purpose Scripts):** [OK]
 - Workflows use parameters (Blueprint name, asset paths)
 - NO per-Blueprint script generation
 - ONE workflow for ALL Blueprint types
 
-**Article III (Progressive Disclosure):** ✅
+**Article III (Progressive Disclosure):** [OK]
 - Agent file: 325 lines (efficient)
 - References external docs (MCP_Capabilities_UE55.md)
 - Context efficient through external references
 
-**Article IV (Test Independently):** ✅
+**Article IV (Test Independently):** [OK]
 - MCP tools can be tested via Python REPL
 - Blueprint compilation verified before agent integration
 - Health checks ensure MCP server running
 
-**Article V (Follow Official Patterns):** ✅
+**Article V (Follow Official Patterns):** [OK]
 - Uses Unreal Engine naming conventions (BP_, SM_, M_, T_)
 - Follows MCP tool design patterns
 - References official UE documentation
 
-**Article IX (Agent Versioning):** ✅
+**Article IX (Agent Versioning):** [OK]
 - Static filename: `example-unreal-blueprint-specialist.md`
 - Version in header: `version: 1.0.0`
 - Clear version history section

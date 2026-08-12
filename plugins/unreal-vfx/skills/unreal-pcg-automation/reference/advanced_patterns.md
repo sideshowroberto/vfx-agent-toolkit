@@ -79,16 +79,16 @@ graph.add_edge(
 ```python
 # Layer 3 only connects to Layer 2 Difference output
 # Layer 2 already contains Layer 1 exclusion
-diff_3.Differences ← diff_2.Out  # Single input, cascades exclusion
+diff_3.Differences <- diff_2.Out  # Single input, cascades exclusion
 ```
 
 **Option 2: Direct Multi-Input (more control)**
 ```python
 # Layer 3 connects to ALL previous layers directly
 # More explicit, easier to debug, better control
-diff_3.Differences ← bounds_1.Out  # Exclude Layer 1
-diff_3.Differences ← bounds_2.Out  # Exclude Layer 2
-diff_3.Differences ← diff_2.Out    # Also get cascaded exclusion
+diff_3.Differences <- bounds_1.Out  # Exclude Layer 1
+diff_3.Differences <- bounds_2.Out  # Exclude Layer 2
+diff_3.Differences <- diff_2.Out    # Also get cascaded exclusion
 ```
 
 **Production Recommendation:** Use multi-input for better debugging and explicit control.
@@ -106,7 +106,7 @@ Uniform density filtering creates grid-like patterns:
 
 ### The Solution
 
-**AttributeNoise → DensityFilter** workflow breaks up uniformity
+**AttributeNoise -> DensityFilter** workflow breaks up uniformity
 
 ```python
 # BEFORE density filtering, add noise to density attribute
@@ -122,7 +122,7 @@ density_filter, df_s = graph.add_node_of_type(unreal.PCGDensityFilterSettings)
 df_s.lower_bound = 0.2
 df_s.upper_bound = 0.4
 
-# Connect: collapse → noise → density_filter → transform → spawner
+# Connect: collapse -> noise -> density_filter -> transform -> spawner
 graph.add_edge(collapse, unreal.Name("Out"), noise, unreal.Name("In"))
 graph.add_edge(noise, unreal.Name("Out"), density_filter, unreal.Name("In"))
 ```
@@ -138,7 +138,7 @@ graph.add_edge(noise, unreal.Name("Out"), density_filter, unreal.Name("In"))
 
 Full undergrowth layer with noise:
 
-1. **Surface Sampler** (base density 2.0 points/m²)
+1. **Surface Sampler** (base density 2.0 points/m^2)
 2. **Difference** (exclude trees/rocks)
 3. **Collapse** (prepare for filtering)
 4. **AttributeNoise** (randomize density values)
@@ -153,14 +153,14 @@ Create 3 undergrowth types from single source:
 ```python
 # After collapse + noise, branch into 3 paths:
 
-# Path 1: Sparse (0.2-0.4) → large plants
-collapse → noise → density_sparse → transform_sparse → spawner_sparse
+# Path 1: Sparse (0.2-0.4) -> large plants
+collapse -> noise -> density_sparse -> transform_sparse -> spawner_sparse
 
-# Path 2: Medium (0.4-0.7) → medium plants
-collapse → noise → density_medium → transform_medium → spawner_medium
+# Path 2: Medium (0.4-0.7) -> medium plants
+collapse -> noise -> density_medium -> transform_medium -> spawner_medium
 
-# Path 3: Dense (0.7-1.0) → small plants
-collapse → noise → density_dense → transform_dense → spawner_dense
+# Path 3: Dense (0.7-1.0) -> small plants
+collapse -> noise -> density_dense -> transform_dense -> spawner_dense
 ```
 
 **Key:** All three paths use the SAME noise node output, ensuring cohesive distribution.
@@ -172,10 +172,10 @@ collapse → noise → density_dense → transform_dense → spawner_dense
 ### Without Advanced Patterns (Basic)
 
 ```
-Layer 1: Get Landscape → Sample → Transform → Self Prune → Bounds → Collapse → Spawn
-Layer 2: Get Landscape → Sample → Transform → Bounds → Difference(1 input) → Collapse → Spawn
-Layer 3: Get Landscape → Sample → Transform → Bounds → Difference(1 input) → Collapse → Spawn
-Undergrowth: Get Landscape → Sample → Difference(1 input) → Collapse → Density Filter → Transform → Spawn
+Layer 1: Get Landscape -> Sample -> Transform -> Self Prune -> Bounds -> Collapse -> Spawn
+Layer 2: Get Landscape -> Sample -> Transform -> Bounds -> Difference(1 input) -> Collapse -> Spawn
+Layer 3: Get Landscape -> Sample -> Transform -> Bounds -> Difference(1 input) -> Collapse -> Spawn
+Undergrowth: Get Landscape -> Sample -> Difference(1 input) -> Collapse -> Density Filter -> Transform -> Spawn
 ```
 
 **Result:** Works, but transitions can be abrupt, undergrowth looks uniform
@@ -183,18 +183,18 @@ Undergrowth: Get Landscape → Sample → Difference(1 input) → Collapse → D
 ### With Advanced Patterns (Production)
 
 ```
-Layer 1: Get Landscape → Sample → Transform → Self Prune → Bounds → Collapse → Spawn
+Layer 1: Get Landscape -> Sample -> Transform -> Self Prune -> Bounds -> Collapse -> Spawn
 
-Layer 2: Get Landscape → Sample → Transform → Bounds → Difference(1 input: bounds_1) → Collapse → Spawn
+Layer 2: Get Landscape -> Sample -> Transform -> Bounds -> Difference(1 input: bounds_1) -> Collapse -> Spawn
 
-Layer 3: Get Landscape → Sample → Transform → Bounds → Difference(3 inputs: bounds_1, bounds_2, diff_2) → Collapse → Spawn
+Layer 3: Get Landscape -> Sample -> Transform -> Bounds -> Difference(3 inputs: bounds_1, bounds_2, diff_2) -> Collapse -> Spawn
 
 Undergrowth:
-  Get Landscape → Sample → Difference(2+ inputs: all above layers) → Collapse → Noise
+  Get Landscape -> Sample -> Difference(2+ inputs: all above layers) -> Collapse -> Noise
 
-  Noise → Density Filter (sparse) → Transform → Spawn (large plants)
-  Noise → Density Filter (medium) → Transform → Spawn (medium plants)
-  Noise → Density Filter (dense) → Transform → Spawn (small plants)
+  Noise -> Density Filter (sparse) -> Transform -> Spawn (large plants)
+  Noise -> Density Filter (medium) -> Transform -> Spawn (medium plants)
+  Noise -> Density Filter (dense) -> Transform -> Spawn (small plants)
 ```
 
 **Result:** Natural boundaries, organic distribution, varied undergrowth

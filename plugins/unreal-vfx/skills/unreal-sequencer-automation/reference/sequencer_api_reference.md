@@ -24,7 +24,7 @@
 
 ### LevelSequenceFactoryNew()
 
-**Status:** ✅ Validated (UE 5.0+)
+**Status:** [OK] Validated (UE 5.0+)
 **Module:** `unreal.LevelSequenceFactoryNew`
 **Purpose:** Factory for creating LevelSequence assets
 
@@ -52,7 +52,7 @@ sequence = asset_tools.create_asset(
 
 ### AssetToolsHelpers.get_asset_tools()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.AssetToolsHelpers`
 **Signature:** `get_asset_tools() -> AssetTools`
 **Purpose:** Retrieves asset tools for asset creation operations
@@ -70,7 +70,7 @@ asset = asset_tools.create_asset(...)
 
 ### AssetTools.create_asset()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.AssetTools`
 **Purpose:** Creates assets in Content Browser
 
@@ -99,7 +99,7 @@ create_asset(
 
 ### add_possessable()
 
-**Status:** ✅ Validated (UE 5.0+)
+**Status:** [OK] Validated (UE 5.0+)
 **Module:** `unreal.MovieSceneSequenceExtensions`
 **Official Docs:** https://docs.unrealengine.com/5.3/en-US/PythonAPI/class/MovieSceneSequenceExtensions.html
 
@@ -126,7 +126,7 @@ binding = unreal.MovieSceneSequenceExtensions.add_possessable(
 
 ### get_possessables()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneSequenceExtensions`
 
 **Signature:**
@@ -149,7 +149,7 @@ for binding in possessables:
 
 ### find_binding_by_name()
 
-**Status:** ✅ Validated (UE 5.0+)
+**Status:** [OK] Validated (UE 5.0+)
 **Module:** `unreal.MovieSceneSequenceExtensions`
 
 **Signature:**
@@ -174,7 +174,7 @@ binding = unreal.MovieSceneSequenceExtensions.find_binding_by_name(
 
 ### get_bindings()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneSequenceExtensions`
 
 **Signature:**
@@ -191,7 +191,7 @@ get_bindings(sequence: MovieSceneSequence) -> Array[MovieSceneBindingProxy]
 
 ### binding.add_track()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneBindingProxy` / `MovieSceneBindingExtensions`
 
 **Signature:**
@@ -225,7 +225,7 @@ track = unreal.MovieSceneBindingExtensions.add_track(
 
 ### binding.get_tracks()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneBindingProxy`
 
 **Signature:**
@@ -246,7 +246,7 @@ for track in tracks:
 
 ### binding.binding_id
 
-**Status:** ✅ Validated - **PROPERTY ACCESS PATTERN**
+**Status:** [OK] Validated - **PROPERTY ACCESS PATTERN**
 **Module:** `unreal.MovieSceneBindingProxy`
 
 **CRITICAL DISCOVERY:**
@@ -254,12 +254,12 @@ This is a PROPERTY, not a method!
 
 **WRONG:**
 ```python
-guid = binding.get_binding_id()  # ❌ Method doesn't exist!
+guid = binding.get_binding_id()  # [FAIL] Method doesn't exist!
 ```
 
 **CORRECT:**
 ```python
-guid = binding.binding_id  # ✅ Property access
+guid = binding.binding_id  # [OK] Property access
 ```
 
 **Type:** `FGuid` (Globally Unique Identifier)
@@ -270,7 +270,7 @@ guid = binding.binding_id  # ✅ Property access
 
 ### binding.get_display_name()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneBindingProxy` / `MovieSceneBindingExtensions`
 
 **Signature:**
@@ -292,7 +292,7 @@ print(f"Binding name: {name}")
 
 ### set_property_name_and_path()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieScenePropertyTrack` / `MovieScenePropertyTrackExtensions`
 
 **Signature:**
@@ -314,14 +314,14 @@ track.set_property_name_and_path(
 - `property_name` (str) - Display name (e.g., "Location.Z")
 - `property_path` (str) - Property path for binding (e.g., "Location.Z")
 
-**Silent Execution:** **YES** ⚠️
+**Silent Execution:** **YES** [WARN]
 **Critical Pattern:** Often times out but WORKS - check results after execution
 
 ---
 
 ### track.add_section()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneTrack`
 
 **Signature:**
@@ -344,7 +344,7 @@ section.set_range(0, 300)  # Frames
 
 ### track.get_sections()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneTrack`
 
 **Signature:**
@@ -367,7 +367,7 @@ for section in sections:
 
 ### get_channels_by_type()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneSectionExtensions` / `MovieSceneSection`
 
 **Signature:**
@@ -401,7 +401,7 @@ channels = unreal.MovieSceneSectionExtensions.get_channels_by_type(
 
 ### section.get_all_channels()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneSection`
 
 **Signature:**
@@ -423,7 +423,7 @@ print(f"Total channels: {len(all_channels)}")
 
 ### section.set_range()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneSection` / `MovieSceneSectionExtensions`
 
 **Signature:**
@@ -450,7 +450,7 @@ section.set_range(0, 300)  # Frames 0-300
 
 ### MovieSceneScriptingFloatChannel
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneScriptingFloatChannel`
 **Purpose:** Python-accessible wrapper for FMovieSceneFloatChannel
 
@@ -466,7 +466,7 @@ section.set_range(0, 300)  # Frames 0-300
 
 ### channel.add_key()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneScriptingFloatChannel`
 
 **Signature:**
@@ -507,7 +507,7 @@ key = channel.add_key(
 
 ### channel.get_num_keys()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneScriptingFloatChannel`
 
 **Signature:**
@@ -527,7 +527,7 @@ print(f"Channel has {key_count} keys")
 
 ### channel.get_keys()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneScriptingFloatChannel`
 
 **Signature:**
@@ -550,7 +550,7 @@ for key in keys:
 
 ### channel.remove_key()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.MovieSceneScriptingFloatChannel`
 
 **Signature:**
@@ -572,7 +572,7 @@ channel.remove_key(keys[0])  # Remove first key
 
 ### FrameNumber()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.FrameNumber`
 **Purpose:** Represents frame-based time in Sequencer
 
@@ -589,7 +589,7 @@ key = channel.add_key(frame, 500.0)
 
 ### SequencerScriptingRange
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.SequencerScriptingRange`
 **Purpose:** Defines scripting range for sequences
 
@@ -614,7 +614,7 @@ end = range_obj.get_end_seconds()
 
 ### open_level_sequence()
 
-**Status:** ✅ Validated
+**Status:** [OK] Validated
 **Module:** `unreal.LevelSequenceEditorBlueprintLibrary`
 **Purpose:** Opens sequence in Sequencer editor UI
 
@@ -630,7 +630,7 @@ unreal.LevelSequenceEditorBlueprintLibrary.open_level_sequence(sequence)
 
 ### play() / stop()
 
-**Status:** ✅ Validated (implied)
+**Status:** [OK] Validated (implied)
 **Module:** `unreal.LevelSequenceEditorBlueprintLibrary`
 **Purpose:** Playback control
 
@@ -684,12 +684,12 @@ except TimeoutError:
 
 **WRONG (Method):**
 ```python
-guid = binding.get_binding_id()  # ❌ AttributeError!
+guid = binding.get_binding_id()  # [FAIL] AttributeError!
 ```
 
 **CORRECT (Property):**
 ```python
-guid = binding.binding_id  # ✅ Works!
+guid = binding.binding_id  # [OK] Works!
 ```
 
 **Why This Matters:**
@@ -764,7 +764,7 @@ try:
 except:
     pass
 
-print(f"✅ Created sequence with {z_channel.get_num_keys()} keyframes!")
+print(f"[OK] Created sequence with {z_channel.get_num_keys()} keyframes!")
 ```
 
 **Validation:** This exact code was tested on 2025-11-17 and WORKS in UE 5.5.
@@ -773,7 +773,7 @@ print(f"✅ Created sequence with {z_channel.get_num_keys()} keyframes!")
 
 ## Breaking Changes and Version Notes
 
-### UE 5.0 → 5.5 Stability
+### UE 5.0 -> 5.5 Stability
 
 **Good News:** Sequencer Python APIs are STABLE across UE 5.x versions.
 

@@ -19,8 +19,8 @@ tools: Read,Write,Grep,Bash,Skill
 ### 1. MCP Tool Execution
 - Use `mcp__blender__*` tools to interact with Blender directly
 - Blender must be running with the official MCP addon enabled
-- No HTTP bridge, no curl — MCP tools are first-class
-- Always begin code with `import bpy` — it is not auto-imported in the execution namespace
+- No HTTP bridge, no curl - MCP tools are first-class
+- Always begin code with `import bpy` - it is not auto-imported in the execution namespace
 
 ### 2. Skill Coordination
 - Invoke domain-specific skills as needed
@@ -28,7 +28,7 @@ tools: Read,Write,Grep,Bash,Skill
 - Manage skill dependencies and execution order
 
 ### 3. API Compatibility
-- Reference `Blender/blender-ai-compatibility/` for breaking changes (19+ documented, 4.2→4.5.0)
+- Reference `Blender/blender-ai-compatibility/` for breaking changes (19+ documented, 4.2->4.5.0)
 - Key changes still in effect regardless of connection method:
   - `BLENDER_EEVEE_NEXT` (not `BLENDER_EEVEE`)
   - `NODES` modifier type (not `GEOMETRY_NODES`)
@@ -73,7 +73,7 @@ tools: Read,Write,Grep,Bash,Skill
 
 ---
 
-## File Format Standards (Blender → Unreal)
+## File Format Standards (Blender -> Unreal)
 
 - `.fbx` with correct export settings
 - Material naming: `M_AssetName`
@@ -83,4 +83,4 @@ tools: Read,Write,Grep,Bash,Skill
 
 **Version:** 2.0.0
 **Last Updated:** 2026-06-10
-**Replaces:** HTTP Bridge (Claude Code Bridge V2.0) — retired in favor of official Blender MCP
+**Replaces:** HTTP Bridge (Claude Code Bridge V2.0) - retired in favor of official Blender MCP

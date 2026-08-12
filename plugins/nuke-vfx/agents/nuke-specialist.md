@@ -10,8 +10,8 @@ tools: Read, Write, Grep, Bash, mcp__nuke__*, mcp__desktop-commander__*
 
 # Nuke Specialist Agent
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-12-03  
+**Version:** 1.0.0
+**Last Updated:** 2025-12-03
 **Status:** Production Ready
 
 ---
@@ -93,13 +93,13 @@ log = NukeMCPLogger(session_name="Task_Name")
 
 try:
     log.info("Starting operation...")
-    
+
     # Your Nuke operations
     node = nuke.createNode("Grade")
     log.increment_stat("nodes_created")
-    
+
     log.success("Operation complete")
-    
+
 except Exception as e:
     log.error("Failed", e)
 
@@ -116,9 +116,9 @@ def create_node_general(node_type: str, name: str = None):
     """Create any Nuke node - works for ALL projects."""
     import nuke
     from nuke_mcp_logger import NukeMCPLogger
-    
+
     log = NukeMCPLogger(session_name="CreateNode")
-    
+
     try:
         node = nuke.createNode(node_type)
         if name:
@@ -137,20 +137,20 @@ def setup_read_node(file_path: str, name: str = None):
     """Setup Read node with image sequence."""
     import nuke
     from nuke_mcp_logger import NukeMCPLogger
-    
+
     log = NukeMCPLogger(session_name="SetupRead")
-    
+
     try:
         read_node = nuke.createNode("Read")
         read_node['file'].setValue(file_path)
-        
+
         if name:
             read_node.setName(name)
-        
+
         log.set_stat("file_path", file_path)
         log.success(f"Read node created: {read_node.name()}")
         return log.get_results()
-        
+
     except Exception as e:
         log.error("Failed to setup Read node", e)
         return log.get_results()
@@ -165,33 +165,33 @@ def batch_comp_setup(shots: list):
     """Setup comp for multiple shots - parameterized for ANY project."""
     import nuke
     from nuke_mcp_logger import NukeMCPLogger
-    
+
     log = NukeMCPLogger(session_name="BatchComp")
     log.set_stat("shots_processed", 0)
-    
+
     for shot_info in shots:
         try:
             # Create new script
             nuke.scriptClear()
-            
+
             # Setup nodes for this shot
             read_node = nuke.createNode("Read")
             read_node['file'].setValue(shot_info['plate_path'])
-            
+
             grade_node = nuke.createNode("Grade")
-            
+
             write_node = nuke.createNode("Write")
             write_node['file'].setValue(shot_info['output_path'])
-            
+
             # Save script
             nuke.scriptSave(shot_info['script_path'])
-            
+
             log.increment_stat("shots_processed")
             log.info(f"Processed: {shot_info['name']}")
-            
+
         except Exception as e:
             log.error(f"Failed on {shot_info['name']}", e)
-    
+
     return log.get_results()
 ```
 
@@ -261,18 +261,18 @@ try:
     # Load plate
     read_node = nuke.createNode("Read")
     read_node['file'].setValue("D:/Plates/Shot001/Shot001_%04d.exr")
-    
+
     # Add grade
     grade_node = nuke.createNode("Grade")
     grade_node['white'].setValue(1.2)
-    
+
     # Setup write
     write_node = nuke.createNode("Write")
     write_node['file'].setValue("D:/Output/Shot001/Shot001_graded_%04d.exr")
-    
+
     log.set_stat("nodes_created", 3)
     log.success("Comp setup complete")
-    
+
 except Exception as e:
     log.error("Setup failed", e)
 
@@ -319,9 +319,9 @@ mcp__desktop-commander__interact_with_process({
 **When user asks about Nuke:**
 
 1. **Identify Domain:**
-   - Python/scripting → Invoke `nuke-python-scripting`
-   - Node graphs/comp → Invoke `nuke-compositing`
-   - ComfyUI/AI → Mention future `nuke-comfyui-integration`
+   - Python/scripting -> Invoke `nuke-python-scripting`
+   - Node graphs/comp -> Invoke `nuke-compositing`
+   - ComfyUI/AI -> Mention future `nuke-comfyui-integration`
 
 2. **Use Standards:**
    - Reference `nuke-standards.md` for patterns
@@ -336,33 +336,33 @@ mcp__desktop-commander__interact_with_process({
 
 ## Constitutional Compliance
 
-### Article I: General Purpose Scripts ✅
+### Article I: General Purpose Scripts [OK]
 - All scripts accept parameters (shot_info, file_paths, etc.)
 - No hardcoded project paths
 - Batch processing works for ANY project
 
-### Article II: MCP vs Direct ✅
+### Article II: MCP vs Direct [OK]
 - Uses Nuke MCP tools for simple operations
 - Desktop Commander for complex REPL workflows
 - NukeMCPLogger bridges both approaches
 
-### Article III: Progressive Disclosure ✅
+### Article III: Progressive Disclosure [OK]
 - Agent: 325 lines (this file)
 - Standards: 523 lines (on-demand)
 - Skills: <500 lines each
 - Total: ~1,348 lines loaded only when needed
 
-### Article IV: Test Independently ✅
+### Article IV: Test Independently [OK]
 - All patterns tested in Nuke terminal mode
 - Logger validated with real comps
 - Multi-shot workflows tested on 3+ projects
 
-### Article V: Follow Official Patterns ✅
+### Article V: Follow Official Patterns [OK]
 - Uses nuke Python API directly
 - NukeMCPLogger follows Python logging patterns
 - MCP tools wrap official Nuke operations
 
-### Article VI: Context Efficiency ✅
+### Article VI: Context Efficiency [OK]
 **Context Reduction:**
 ```
 Before: Scattered Nuke docs in CLAUDE.md (~1,000 lines loaded)
@@ -370,17 +370,17 @@ After: Agent (325) + Standards (523, on-demand) + Skill (~400, on-demand)
 Savings: 49% average context reduction
 ```
 
-### Article VII: Cross-App Integration ✅
+### Article VII: Cross-App Integration [OK]
 - Reads EXR from Unreal/Blender
 - Outputs for compositing in other tools
 - ComfyUI integration (AI-powered elements)
 
-### Article VIII: Documentation Standards ✅
-- ✅ YAML frontmatter (name, version, status, tools)
-- ✅ Purpose and integration architecture
-- ✅ When to invoke domain skills
-- ✅ Core patterns and examples
-- ✅ Constitutional compliance section
+### Article VIII: Documentation Standards [OK]
+- [OK] YAML frontmatter (name, version, status, tools)
+- [OK] Purpose and integration architecture
+- [OK] When to invoke domain skills
+- [OK] Core patterns and examples
+- [OK] Constitutional compliance section
 
 ---
 

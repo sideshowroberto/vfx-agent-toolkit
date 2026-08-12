@@ -28,11 +28,11 @@ This skill provides battle-tested patterns for Nuke Python automation, learned f
 **Solution:** Use `nuke.nodes.X()` and manage connections explicitly.
 
 ```python
-# ❌ BAD: Auto-connects unpredictably
+# [FAIL] BAD: Auto-connects unpredictably
 transform = nuke.createNode('Transform', inpanel=False)
 transform.setInput(0, input_node)  # May already be connected!
 
-# ✅ GOOD: Explicit control
+# [OK] GOOD: Explicit control
 for node in nuke.allNodes():
     node.setSelected(False)  # Deselect all first
 
@@ -54,11 +54,11 @@ transform.setInput(0, input_node)   # Then connect explicitly
 **Solution:** Calculate positions relative to input node.
 
 ```python
-# ❌ BAD: Hardcoded positions
+# [FAIL] BAD: Hardcoded positions
 base_x = 0
 base_y = 0
 
-# ✅ GOOD: Dynamic from input
+# [OK] GOOD: Dynamic from input
 input_x = input_node.xpos()
 input_y = input_node.ypos()
 base_x = input_x + 200  # Offset to the right
@@ -209,11 +209,11 @@ premult.setInput(0, expression_node)
 **Chain:**
 ```
 ML Node output
-    ↓
+    v
 Expression (creates mask channel)
-    ↓
+    v
 Premult (multiply all by mask.a)
-    ↓
+    v
 Result: Blended contribution
 ```
 
@@ -244,10 +244,10 @@ merge.setInput(1, current_tile)
 **Solution:** Use 'to box' type with explicit dimensions.
 
 ```python
-# ❌ BAD: Format string may not exist
+# [FAIL] BAD: Format string may not exist
 reformat['format'].setValue('2048 2048 0 0 2048 2048 1')  # May default to root
 
-# ✅ GOOD: Explicit dimensions via "to box"
+# [OK] GOOD: Explicit dimensions via "to box"
 reformat = nuke.nodes.Reformat()
 reformat['type'].setValue('to box')
 reformat['box_width'].setValue(2048)
@@ -307,7 +307,7 @@ transform = create_node_safely(
 
 ## Common Pitfalls
 
-### ❌ Pitfall 1: Using createNode() with inpanel=False
+### [FAIL] Pitfall 1: Using createNode() with inpanel=False
 
 ```python
 # Still auto-connects!
@@ -316,7 +316,7 @@ node = nuke.createNode('Transform', inpanel=False)
 
 **Fix:** Use `nuke.nodes.Transform()` instead.
 
-### ❌ Pitfall 2: Connecting Before Positioning
+### [FAIL] Pitfall 2: Connecting Before Positioning
 
 ```python
 node.setInput(0, input_node)  # Connect first
@@ -325,7 +325,7 @@ node.setXYpos(100, 200)       # Position after
 
 **Fix:** Always position before connecting.
 
-### ❌ Pitfall 3: Forgetting to Deselect
+### [FAIL] Pitfall 3: Forgetting to Deselect
 
 ```python
 # If nodes are selected, createNode still connects
@@ -334,7 +334,7 @@ node = nuke.nodes.Transform()  # May still auto-connect!
 
 **Fix:** Always deselect all nodes first.
 
-### ❌ Pitfall 4: Expression Output to Wrong Channel
+### [FAIL] Pitfall 4: Expression Output to Wrong Channel
 
 ```python
 expr['channel3'].setValue('mask.a')  # Wrong!
@@ -342,7 +342,7 @@ expr['channel3'].setValue('mask.a')  # Wrong!
 
 **Fix:** Use `'mask'` not `'mask.a'`
 
-### ❌ Pitfall 5: Wrong Merge Operation
+### [FAIL] Pitfall 5: Wrong Merge Operation
 
 ```python
 merge['operation'].setValue('over')  # Doesn't work for masked tiles

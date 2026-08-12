@@ -7,9 +7,9 @@
 
 ---
 
-## 🎯 SCOPE
+## SCOPE
 
-This reference covers the **Non-Linear Animation (NLA) Editor**, Blender's system for layering, blending, and managing multiple animation actions on a single armature. All APIs are **100% STABLE** across Blender 4.2 → 4.5.0.
+This reference covers the **Non-Linear Animation (NLA) Editor**, Blender's system for layering, blending, and managing multiple animation actions on a single armature. All APIs are **100% STABLE** across Blender 4.2 -> 4.5.0.
 
 **Audience:** Animators familiar with keyframe animation who need to manage complex animation libraries, blend cycles, or create procedural animation systems.
 
@@ -24,7 +24,7 @@ This reference covers the **Non-Linear Animation (NLA) Editor**, Blender's syste
 
 ---
 
-## 🎯 API STABILITY
+## API STABILITY
 
 **100% STABLE API - NO VERSION CHECKING REQUIRED**
 
@@ -32,7 +32,7 @@ All NLA APIs documented here are validated stable (see `ANIMATION_SYSTEM_VALIDAT
 
 ---
 
-## 📚 TABLE OF CONTENTS
+## TABLE OF CONTENTS
 
 1. [NLA Fundamentals](#nla-fundamentals)
 2. [Creating NLA Tracks and Strips](#creating-nla-tracks-and-strips)
@@ -59,14 +59,14 @@ All NLA APIs documented here are validated stable (see `ANIMATION_SYSTEM_VALIDAT
 **Hierarchy:**
 ```
 Object (e.g., Armature)
-└── animation_data
-    ├── action (current/active action being edited)
-    └── nla_tracks (list of NLA tracks)
-        ├── Track 0 (e.g., "Locomotion")
-        │   ├── Strip 0 (e.g., "Walk Cycle", frames 1-50)
-        │   └── Strip 1 (e.g., "Run Cycle", frames 51-100)
-        └── Track 1 (e.g., "Upper Body")
-            └── Strip 0 (e.g., "Wave", frames 10-30)
++-- animation_data
+    +-- action (current/active action being edited)
+    +-- nla_tracks (list of NLA tracks)
+        +-- Track 0 (e.g., "Locomotion")
+        |   +-- Strip 0 (e.g., "Walk Cycle", frames 1-50)
+        |   +-- Strip 1 (e.g., "Run Cycle", frames 51-100)
+        +-- Track 1 (e.g., "Upper Body")
+            +-- Strip 0 (e.g., "Wave", frames 10-30)
 ```
 
 **Key Difference from Dopesheet:**
@@ -152,7 +152,7 @@ print(f"  Strip frames: {strip.frame_start} - {strip.frame_end}")
 
 ### Adding Multiple Strips to Track
 
-**Goal:** Sequence multiple actions on one track (e.g., walk → run → idle)
+**Goal:** Sequence multiple actions on one track (e.g., walk -> run -> idle)
 
 **Implementation:**
 ```python
@@ -415,9 +415,9 @@ Timeline frames = Action frames / Scale
 
 Example:
   Action = 24 frames
-  Scale = 2.0 → Timeline = 24 / 2.0 = 12 frames (2x faster)
-  Scale = 0.5 → Timeline = 24 / 0.5 = 48 frames (2x slower)
-  Scale = 1.0 → Timeline = 24 / 1.0 = 24 frames (normal)
+  Scale = 2.0 -> Timeline = 24 / 2.0 = 12 frames (2x faster)
+  Scale = 0.5 -> Timeline = 24 / 0.5 = 48 frames (2x slower)
+  Scale = 1.0 -> Timeline = 24 / 1.0 = 24 frames (normal)
 ```
 
 ---
@@ -476,9 +476,9 @@ strip.use_animated_time = True
 # Workaround: Use strip scale for uniform time changes (see above)
 
 # Manual time curve setup (conceptual):
-# Frame 1 (timeline) → Frame 1 (action) - normal speed
-# Frame 12 (timeline) → Frame 18 (action) - 1.5x speed (6 frames skipped)
-# Frame 24 (timeline) → Frame 24 (action) - 0.5x speed (slow ending)
+# Frame 1 (timeline) -> Frame 1 (action) - normal speed
+# Frame 12 (timeline) -> Frame 18 (action) - 1.5x speed (6 frames skipped)
+# Frame 24 (timeline) -> Frame 24 (action) - 0.5x speed (slow ending)
 
 print(f"Animated time enabled: {strip.use_animated_time}")
 ```
@@ -507,14 +507,14 @@ print(f"Strip '{strip.name}' reversed: {strip.use_reverse}")
 **Timeline Result:**
 ```
 Forward (use_reverse=False):
-  Frame 1 → Action frame 1
-  Frame 12 → Action frame 12
-  Frame 24 → Action frame 24
+  Frame 1 -> Action frame 1
+  Frame 12 -> Action frame 12
+  Frame 24 -> Action frame 24
 
 Reverse (use_reverse=True):
-  Frame 1 → Action frame 24
-  Frame 12 → Action frame 12
-  Frame 24 → Action frame 1
+  Frame 1 -> Action frame 24
+  Frame 12 -> Action frame 12
+  Frame 24 -> Action frame 1
 ```
 
 ---
@@ -623,7 +623,7 @@ Frame:   1        20   30        40   50
 Walk:    [=======100%======][Fade]
 Run:                    [Fade][==100%==]
 
-Frames 30-40: Walk influence 100%→0%, Run influence 0%→100%
+Frames 30-40: Walk influence 100%->0%, Run influence 0%->100%
 Result: Smooth transition from walk to run
 ```
 
@@ -658,7 +658,7 @@ action_contact_frame = 6
 timeline_target_frame = 10
 walk_strip.frame_start = timeline_target_frame - action_contact_frame
 
-print(f"Strip aligned: action frame {action_contact_frame} → timeline frame {timeline_target_frame}")
+print(f"Strip aligned: action frame {action_contact_frame} -> timeline frame {timeline_target_frame}")
 ```
 
 ---
@@ -805,7 +805,7 @@ import bpy
 armature_obj = bpy.data.objects["Armature"]
 
 # NOTE: Baking requires operator - run interactively in Blender UI
-# Use Blender UI: Select armature → Animation menu → Bake Action
+# Use Blender UI: Select armature -> Animation menu -> Bake Action
 # Settings: Visual Keying (enabled), Clear Constraints (disabled), Bake Data (Pose)
 
 # Workaround (conceptual): Sample each frame and insert keyframes
@@ -876,11 +876,11 @@ for state_name, (start, end) in animation_states.items():
     print(f"Action created: {action.name} ({start}-{end})")
 
 # FBX export (requires operator - use Blender UI)
-# File → Export → FBX
+# File -> Export -> FBX
 # Settings:
-#   - Bake Animation: Enabled
-#   - NLA Strips: Enabled (exports each action as separate animation)
-#   - All Actions: Enabled
+# - Bake Animation: Enabled
+# - NLA Strips: Enabled (exports each action as separate animation)
+# - All Actions: Enabled
 ```
 
 **Unreal Import:**
@@ -928,7 +928,7 @@ def export_strip_to_fbx(obj, track_name, strip_name, filepath):
     # Export FBX (requires operator - use Blender UI)
     # bpy.ops.export_scene.fbx(filepath=filepath, use_selection=True, bake_anim=True)
 
-    print(f"Configured export for '{strip_name}' ({strip.frame_start}-{strip.frame_end}) → {filepath}")
+    print(f"Configured export for '{strip_name}' ({strip.frame_start}-{strip.frame_end}) -> {filepath}")
 
 # Example
 export_strip_to_fbx(
@@ -1149,4 +1149,4 @@ https://docs.blender.org/api/current/bpy.types.NlaStrip.html
 **Maintainer:** VFX Pipeline Team
 **Last Updated:** 2025-10-25
 **Lines:** ~850
-**API Stability:** 100% STABLE (Blender 4.2 → 4.5.0)
+**API Stability:** 100% STABLE (Blender 4.2 -> 4.5.0)

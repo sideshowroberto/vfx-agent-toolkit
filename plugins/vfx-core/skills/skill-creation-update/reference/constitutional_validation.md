@@ -48,10 +48,10 @@ class ValidationResult:
 ```
 
 **Status Meanings:**
-- **PASS** (✅): Fully compliant, no issues
-- **FAIL** (❌): Constitutional violation, must fix
-- **WARN** (⚠️): Potential issue, recommend review
-- **SKIP** (⊘): Not applicable to this skill
+- **PASS** ([OK]): Fully compliant, no issues
+- **FAIL** ([FAIL]): Constitutional violation, must fix
+- **WARN** ([WARN]): Potential issue, recommend review
+- **SKIP** ([SKIP]): Not applicable to this skill
 
 ### Running Validation
 
@@ -102,28 +102,28 @@ hard_coded_patterns = [
 
 **Example Violations:**
 ```python
-# ❌ FAIL: Windows absolute path
+# [FAIL] FAIL: Windows absolute path
 project_path = "C:\\Users\\Me\\UnrealProjects\\MyProject"
 
-# ❌ FAIL: macOS user path
+# [FAIL] FAIL: macOS user path
 export_dir = "/Users/artist/Desktop/exports"
 
-# ❌ FAIL: Linux home path
+# [FAIL] FAIL: Linux home path
 output_path = "/home/developer/output"
 ```
 
 **Example Compliance:**
 ```python
-# ✅ PASS: Parameterized
+# [OK] PASS: Parameterized
 import argparse
 parser.add_argument("--project-path", required=True)
 project_path = args.project_path
 
-# ✅ PASS: Relative path
+# [OK] PASS: Relative path
 script_dir = os.path.dirname(__file__)
 project_path = os.path.join(script_dir, "..", "Projects", "MyProject")
 
-# ✅ PASS: Environment variable
+# [OK] PASS: Environment variable
 project_path = os.getenv("UNREAL_PROJECT_PATH", "/default/path")
 ```
 
@@ -146,21 +146,21 @@ project_patterns = [
 
 **Example Violations:**
 ```python
-# ❌ FAIL: Hard-coded project name
+# [FAIL] FAIL: Hard-coded project name
 project_name = "MyProject"
 uproject_file = "MyProject.uproject"
 
-# ❌ FAIL: Hard-coded in path
+# [FAIL] FAIL: Hard-coded in path
 build_command = f"Build.bat MyProjectEditor Win64 Development"
 ```
 
 **Example Compliance:**
 ```python
-# ✅ PASS: Parameterized
+# [OK] PASS: Parameterized
 project_name = args.project_name
 uproject_file = f"{project_name}.uproject"
 
-# ✅ PASS: Derived from path
+# [OK] PASS: Derived from path
 project_name = Path(args.uproject_path).stem
 ```
 
@@ -181,13 +181,13 @@ if 'argparse' in content or 'sys.argv' in content:
 
 **Example Compliance:**
 ```python
-# ✅ PASS: Using argparse
+# [OK] PASS: Using argparse
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("asset_name", help="Name of asset to export")
 args = parser.parse_args()
 
-# ✅ PASS: Using sys.argv
+# [OK] PASS: Using sys.argv
 import sys
 if len(sys.argv) < 2:
     print("Usage: export.py <asset_name>")
@@ -201,10 +201,10 @@ asset_name = sys.argv[1]
 
 | Condition | Status | Message |
 |-----------|--------|---------|
-| Hard-coded paths detected | ❌ FAIL | "Hard-coded paths or project names detected" |
-| No argparse/sys.argv | ⚠️ WARN | "No argparse/sys.argv found - verify parameterization" |
-| No scripts directory | ⊘ SKIP | "No scripts directory (documentation-only skill)" |
-| All checks pass | ✅ PASS | "Scripts are general-purpose" |
+| Hard-coded paths detected | [FAIL] FAIL | "Hard-coded paths or project names detected" |
+| No argparse/sys.argv | [WARN] WARN | "No argparse/sys.argv found - verify parameterization" |
+| No scripts directory | [SKIP] SKIP | "No scripts directory (documentation-only skill)" |
+| All checks pass | [OK] PASS | "Scripts are general-purpose" |
 
 ---
 
@@ -274,7 +274,7 @@ def validate_article_ii(self) -> None:
 
 **Use Direct Scripts if:**
 - [ ] Operation has 3+ parameters
-- [ ] Multi-step workflow (validation → processing → output)
+- [ ] Multi-step workflow (validation -> processing -> output)
 - [ ] Tool-specific logic (Houdini API, Blender Python)
 - [ ] Build system complexity
 
@@ -282,7 +282,7 @@ def validate_article_ii(self) -> None:
 Skill MUST document decision in Constitutional Compliance section:
 
 ```markdown
-### Article II: MCP vs Direct ✅
+### Article II: MCP vs Direct [OK]
 - Complex workflow (HDA export, validation, UE import)
 - Tool-specific logic (Houdini Python API, hou module)
 - 5+ parameters (asset, target, version, collisions, LODs)
@@ -332,23 +332,23 @@ wc -l SKILL.md
 
 | Line Count | Status | Action | Buffer |
 |------------|--------|--------|--------|
-| <450 lines | ✅ PASS | Healthy margin | >10% |
-| 450-500 lines | ⚠️ WARN | Monitor additions | 0-10% |
-| >500 lines | ❌ FAIL | MUST refactor | Violation |
+| <450 lines | [OK] PASS | Healthy margin | >10% |
+| 450-500 lines | [WARN] WARN | Monitor additions | 0-10% |
+| >500 lines | [FAIL] FAIL | MUST refactor | Violation |
 
 **Warning Calculation:**
 ```python
 elif line_count > 450:
     margin = 500 - line_count
     buffer_pct = margin / 500 * 100
-    details.append(f"⚠️ {line_count} lines (approaching 500 limit)")
+    details.append(f"[WARN] {line_count} lines (approaching 500 limit)")
     details.append(f"Margin: {margin} lines ({buffer_pct:.1f}% buffer)")
     return ValidationResult(status="WARN", ...)
 ```
 
 **Example Output:**
 ```
-⚠️ 475 lines (approaching 500 limit)
+[WARN] 475 lines (approaching 500 limit)
 Margin: 25 lines (5.0% buffer)
 Consider moving content to reference docs before adding more
 ```
@@ -362,9 +362,9 @@ Consider moving content to reference docs before adding more
 reference_dir = self.skill_dir / "reference"
 if reference_dir.exists():
     ref_files = list(reference_dir.glob("*.md"))
-    details.append(f"✅ Reference directory: {len(ref_files)} file(s)")
+    details.append(f"[OK] Reference directory: {len(ref_files)} file(s)")
 else:
-    details.append("⚠️ No reference/ directory (may not be needed)")
+    details.append("[WARN] No reference/ directory (may not be needed)")
 ```
 
 **Interpretation:**
@@ -378,16 +378,16 @@ else:
 
 | Condition | Status | Message |
 |-----------|--------|---------|
-| >500 lines | ❌ FAIL | "SKILL.md exceeds 500 line limit" |
-| 450-500 lines | ⚠️ WARN | "SKILL.md approaching 500 line limit" |
-| <450 lines | ✅ PASS | "Progressive disclosure compliant" |
+| >500 lines | [FAIL] FAIL | "SKILL.md exceeds 500 line limit" |
+| 450-500 lines | [WARN] WARN | "SKILL.md approaching 500 line limit" |
+| <450 lines | [OK] PASS | "Progressive disclosure compliant" |
 
 **Failure Details (>500 lines):**
 ```
-❌ 547 lines (>500 limit)
+[FAIL] 547 lines (>500 limit)
 Overage: 47 lines (9.4%)
 Fix: Move detailed content to reference/*.md
-Example: Troubleshooting (>100 lines) → reference/troubleshooting_guide.md
+Example: Troubleshooting (>100 lines) -> reference/troubleshooting_guide.md
 ```
 
 ---
@@ -400,7 +400,7 @@ Example: Troubleshooting (>100 lines) → reference/troubleshooting_guide.md
 - Example: skill-creation-update (364 lines)
 
 **Skills at Exactly 500 Lines:**
-- Status: FAIL (limit is <500, not ≤500)
+- Status: FAIL (limit is <500, not <=500)
 - Must reduce by at least 1 line
 
 **Skills with No Content (Template Only):**
@@ -425,7 +425,7 @@ for script in scripts:
         content = f.read()
     if 'if __name__ == "__main__"' in content:
         has_main_block = True
-        details.append(f"✅ {script.name}: Has __main__ block")
+        details.append(f"[OK] {script.name}: Has __main__ block")
 ```
 
 **Why This Matters:**
@@ -435,7 +435,7 @@ for script in scripts:
 
 **Example:**
 ```python
-# ✅ PASS: Script can be tested independently
+# [OK] PASS: Script can be tested independently
 def export_hda(asset_name, output_path):
     # ... implementation ...
     pass
@@ -470,9 +470,9 @@ test_files = (
 **Example:**
 ```
 scripts/
-├── export_hda.py          # Main script
-├── test_export_hda.py     # Test file (detected)
-└── validate_export.py     # Helper (not a test file)
++-- export_hda.py          # Main script
++-- test_export_hda.py     # Test file (detected)
++-- validate_export.py     # Helper (not a test file)
 ```
 
 ---
@@ -494,11 +494,11 @@ if (parent_dir / "development").exists():
 **Example:**
 ```
 UnrealEngine/unreal-mcp-main/
-├── development/
-│   ├── Session_2025-10-25_ImagePlate.md   # Documents testing
-│   └── Session_2025-10-24_PluginCompile.md
-└── .claude/skills/unreal-vfx-automation/
-    └── SKILL.md
++-- development/
+|   +-- Session_2025-10-25_ImagePlate.md   # Documents testing
+|   +-- Session_2025-10-24_PluginCompile.md
++-- .claude/skills/unreal-vfx-automation/
+    +-- SKILL.md
 ```
 
 ---
@@ -507,21 +507,21 @@ UnrealEngine/unreal-mcp-main/
 
 | Condition | Status | Message |
 |-----------|--------|---------|
-| Has `__main__` blocks OR test files | ✅ PASS | "Independent testing verified" |
-| No `__main__` blocks AND no test files | ⚠️ WARN | "No clear testing evidence" |
-| No scripts directory | ⊘ SKIP | "No scripts to test" |
+| Has `__main__` blocks OR test files | [OK] PASS | "Independent testing verified" |
+| No `__main__` blocks AND no test files | [WARN] WARN | "No clear testing evidence" |
+| No scripts directory | [SKIP] SKIP | "No scripts to test" |
 
 **Pass Example:**
 ```
-✅ export_hda.py: Has __main__ block
-✅ Independent testing possible (__main__ blocks present)
-✅ Test files: test_export_hda.py
-✅ Session docs available: 3 file(s)
+[OK] export_hda.py: Has __main__ block
+[OK] Independent testing possible (__main__ blocks present)
+[OK] Test files: test_export_hda.py
+[OK] Session docs available: 3 file(s)
 ```
 
 **Warning Example:**
 ```
-⚠️ No __main__ blocks found - add for independent testing
+[WARN] No __main__ blocks found - add for independent testing
 Recommendation: Add if __name__ == '__main__' blocks to scripts
 ```
 
@@ -570,7 +570,7 @@ def validate_article_v(self) -> None:
         status="SKIP",
         message="Manual verification required",
         details=[
-            "⚠️ Verify tool/engine documentation is referenced",
+            "[WARN] Verify tool/engine documentation is referenced",
             "Check: Quick Start and Workflows cite official docs",
             "Example: 'See Unreal Engine 5.5 documentation for...'",
             "Example: 'Follows Houdini 20.0 Python API patterns'"
@@ -600,7 +600,7 @@ def validate_article_v(self) -> None:
 
 **Documentation Requirement:**
 ```markdown
-### Article V: Follow Official Patterns ✅
+### Article V: Follow Official Patterns [OK]
 - Follows Unreal Build Tool conventions (Build.bat usage)
 - Plugin structure matches Epic Games samples
 - References: https://docs.unrealengine.com/5.5/en-US/plugins-in-unreal-engine/
@@ -622,7 +622,7 @@ def validate_article_v(self) -> None:
 has_context_metrics = False
 if "context reduction" in content.lower() or "context efficiency" in content.lower():
     has_context_metrics = True
-    details.append("✅ Context efficiency documented in SKILL.md")
+    details.append("[OK] Context efficiency documented in SKILL.md")
 ```
 
 **Why These Keywords:**
@@ -641,7 +641,7 @@ if metrics_match:
     pct = int(metrics_match.group(1))
     details.append(f"   Context reduction: {pct}%")
     if pct < 50:
-        details.append(f"   ⚠️ <50% reduction - consider more aggressive refactoring")
+        details.append(f"   [WARN] <50% reduction - consider more aggressive refactoring")
 ```
 
 **Pattern Breakdown:**
@@ -652,16 +652,16 @@ if metrics_match:
 
 **Example Matches:**
 ```markdown
-73% context reduction     ✅ Extracts: 73
-60% reduction             ✅ Extracts: 60
-Context savings: 45%      ✅ Extracts: 45
-70% context efficiency    ❌ Doesn't match (needs "reduction" or "savings")
+73% context reduction     [OK] Extracts: 73
+60% reduction             [OK] Extracts: 60
+Context savings: 45%      [OK] Extracts: 45
+70% context efficiency    [FAIL] Doesn't match (needs "reduction" or "savings")
 ```
 
 **Threshold:**
 - **<50% reduction:** Warning (minimal benefit)
-- **≥50% reduction:** Good (constitutional goal met)
-- **≥70% reduction:** Excellent (well-designed skill)
+- **>=50% reduction:** Good (constitutional goal met)
+- **>=70% reduction:** Excellent (well-designed skill)
 
 ---
 
@@ -672,20 +672,20 @@ Context savings: 45%      ✅ Extracts: 45
 reference_dir = self.skill_dir / "reference"
 if reference_dir.exists():
     ref_files = list(reference_dir.glob("*.md"))
-    details.append(f"✅ Progressive disclosure: {len(ref_files)} reference file(s)")
+    details.append(f"[OK] Progressive disclosure: {len(ref_files)} reference file(s)")
 else:
-    details.append("⚠️ No reference/ directory - consider for future content")
+    details.append("[WARN] No reference/ directory - consider for future content")
 ```
 
 **YAML Frontmatter Check:**
 ```python
 has_frontmatter = content.strip().startswith("---")
 if has_frontmatter:
-    details.append("✅ YAML frontmatter present (metadata layer)")
+    details.append("[OK] YAML frontmatter present (metadata layer)")
 ```
 
 **Interpretation:**
-- **Metadata (YAML) + SKILL.md + Reference docs:** Full progressive disclosure ✅
+- **Metadata (YAML) + SKILL.md + Reference docs:** Full progressive disclosure [OK]
 - **Metadata + SKILL.md only:** Acceptable if skill is simple
 - **No metadata:** Failure (Article VIII violation)
 
@@ -695,20 +695,20 @@ if has_frontmatter:
 
 | Condition | Status | Message |
 |-----------|--------|---------|
-| Has context metrics OR reference docs | ✅ PASS | "Context efficiency verified" |
-| No metrics AND no reference docs | ⚠️ WARN | "Context efficiency not documented" |
+| Has context metrics OR reference docs | [OK] PASS | "Context efficiency verified" |
+| No metrics AND no reference docs | [WARN] WARN | "Context efficiency not documented" |
 
 **Pass Example:**
 ```
-✅ Context efficiency documented in SKILL.md
+[OK] Context efficiency documented in SKILL.md
    Context reduction: 73%
-✅ Progressive disclosure: 2 reference file(s)
-✅ YAML frontmatter present (metadata layer)
+[OK] Progressive disclosure: 2 reference file(s)
+[OK] YAML frontmatter present (metadata layer)
 ```
 
 **Warning Example:**
 ```
-⚠️ No reference/ directory - consider for future content
+[WARN] No reference/ directory - consider for future content
 Recommendation: Document context savings in Constitutional Compliance
 ```
 
@@ -764,7 +764,7 @@ has_cross_app = any(keyword in content.lower() for keyword in cross_app_keywords
 2. Import .hda into Unreal Content Browser
 3. Configure material assignments
 
-→ Detected: "houdini", "unreal", "export", ".hda" ✅
+-> Detected: "houdini", "unreal", "export", ".hda" [OK]
 ```
 
 ---
@@ -778,9 +778,9 @@ has_file_format = any(fmt in content for fmt in file_format_keywords)
 ```
 
 **Why These Formats:**
-- `.fbx`: Universal 3D format (Blender → Unreal, Houdini → Unreal)
-- `.hda`: Houdini Digital Asset (Houdini → Unreal)
-- `.exr`: High dynamic range images (Nuke → Unreal)
+- `.fbx`: Universal 3D format (Blender -> Unreal, Houdini -> Unreal)
+- `.hda`: Houdini Digital Asset (Houdini -> Unreal)
+- `.exr`: High dynamic range images (Nuke -> Unreal)
 - `.abc`: Alembic (animation/geometry interchange)
 - `.uasset`: Unreal native format
 
@@ -789,11 +789,11 @@ has_file_format = any(fmt in content for fmt in file_format_keywords)
 ### File Formats
 
 **Supported:**
-- FBX 2020 (Blender → Unreal)
+- FBX 2020 (Blender -> Unreal)
 - HDA (Houdini Engine 20.0)
 - EXR sequences (ACES color space)
 
-→ Detected: ".fbx", ".hda", ".exr" ✅
+-> Detected: ".fbx", ".hda", ".exr" [OK]
 ```
 
 ---
@@ -822,7 +822,7 @@ Follow Unreal Engine conventions:
 - Materials: M_AssetName
 - Textures: T_AssetName_Type
 
-→ Detected: "SM_", "M_", "T_", "naming convention" ✅
+-> Detected: "SM_", "M_", "T_", "naming convention" [OK]
 ```
 
 ---
@@ -831,19 +831,19 @@ Follow Unreal Engine conventions:
 
 | Condition | Status | Message |
 |-----------|--------|---------|
-| No cross-app keywords | ⊘ SKIP | "Not applicable (no cross-app integration)" |
-| Has file formats AND naming conventions | ✅ PASS | "Cross-app integration documented" |
-| Missing file formats OR naming conventions | ⚠️ WARN | "Cross-app integration incomplete" |
+| No cross-app keywords | [SKIP] SKIP | "Not applicable (no cross-app integration)" |
+| Has file formats AND naming conventions | [OK] PASS | "Cross-app integration documented" |
+| Missing file formats OR naming conventions | [WARN] WARN | "Cross-app integration incomplete" |
 
 **Pass Example:**
 ```
-✅ File format standards documented
-✅ Asset naming conventions documented
+[OK] File format standards documented
+[OK] Asset naming conventions documented
 ```
 
 **Warning Example:**
 ```
-⚠️ Consider documenting:
+[WARN] Consider documenting:
    - File format standards (.fbx, .hda, etc.)
    - Asset naming conventions (SM_, M_, etc.)
 ```
@@ -863,7 +863,7 @@ Follow Unreal Engine conventions:
 - May trigger detection but SKIP is appropriate
 
 **Internal Workflows:**
-- Example: Unreal → Unreal (level streaming)
+- Example: Unreal -> Unreal (level streaming)
 - Not cross-application in constitutional sense
 - Outcome: SKIP or PASS (depending on interpretation)
 
@@ -881,7 +881,7 @@ Follow Unreal Engine conventions:
 **Detection:**
 ```python
 if not content.strip().startswith("---"):
-    issues.append("❌ Missing YAML frontmatter")
+    issues.append("[FAIL] Missing YAML frontmatter")
 else:
     parts = content.split("---", 2)
     if len(parts) >= 2:
@@ -889,7 +889,7 @@ else:
         required_fields = ["name:", "description:", "model:"]
         for field in required_fields:
             if field not in frontmatter:
-                issues.append(f"❌ Missing frontmatter field: {field}")
+                issues.append(f"[FAIL] Missing frontmatter field: {field}")
 ```
 
 **Required Fields:**
@@ -933,9 +933,9 @@ required_sections = [
 
 for section_name, pattern in required_sections:
     if re.search(pattern, content, re.IGNORECASE):
-        details.append(f"✅ {section_name} section present")
+        details.append(f"[OK] {section_name} section present")
     else:
-        issues.append(f"❌ Missing section: {section_name}")
+        issues.append(f"[FAIL] Missing section: {section_name}")
 ```
 
 **Section Explanations:**
@@ -964,9 +964,9 @@ for section_name, pattern in required_sections:
 ```python
 version_match = re.search(r'[Vv]ersion.*?(\d+\.\d+\.\d+)', content)
 if version_match:
-    details.append(f"✅ Semantic versioning: {version_match.group(1)}")
+    details.append(f"[OK] Semantic versioning: {version_match.group(1)}")
 else:
-    issues.append("❌ Version not in semantic format (X.Y.Z)")
+    issues.append("[FAIL] Version not in semantic format (X.Y.Z)")
 ```
 
 **Pattern Breakdown:**
@@ -976,11 +976,11 @@ else:
 
 **Example Matches:**
 ```markdown
-**Version:** 1.0.0       ✅ Extracts: 1.0.0
-Version: 2.1.3           ✅ Extracts: 2.1.3
-Skill Version: 1.2.0     ✅ Extracts: 1.2.0
-v1.5                     ❌ Doesn't match (needs PATCH number)
-Version 1                ❌ Doesn't match (needs MINOR.PATCH)
+**Version:** 1.0.0       [OK] Extracts: 1.0.0
+Version: 2.1.3           [OK] Extracts: 2.1.3
+Skill Version: 1.2.0     [OK] Extracts: 1.2.0
+v1.5                     [FAIL] Doesn't match (needs PATCH number)
+Version 1                [FAIL] Doesn't match (needs MINOR.PATCH)
 ```
 
 **SemVer Requirement:**
@@ -994,33 +994,33 @@ Version 1                ❌ Doesn't match (needs MINOR.PATCH)
 
 | Condition | Status | Message |
 |-----------|--------|---------|
-| Any required section missing OR invalid version | ❌ FAIL | "Documentation standards incomplete" |
-| All sections present AND valid version | ✅ PASS | "Documentation standards compliant" |
+| Any required section missing OR invalid version | [FAIL] FAIL | "Documentation standards incomplete" |
+| All sections present AND valid version | [OK] PASS | "Documentation standards compliant" |
 
 **Failure Example:**
 ```
-❌ Missing frontmatter field: description:
-❌ Missing section: Troubleshooting
-❌ Version not in semantic format (X.Y.Z)
-✅ Quick Start section present
-✅ Standard Workflows section present
+[FAIL] Missing frontmatter field: description:
+[FAIL] Missing section: Troubleshooting
+[FAIL] Version not in semantic format (X.Y.Z)
+[OK] Quick Start section present
+[OK] Standard Workflows section present
 ```
 
 **Pass Example:**
 ```
-✅ name:
-✅ description:
-✅ model:
-✅ Version section present
-✅ Last Updated section present
-✅ Dependencies section present
-✅ Quick Start section present
-✅ Standard Workflows section present
-✅ Troubleshooting section present
-✅ Reference Documentation section present
-✅ Constitutional Compliance section present
-✅ Version History section present
-✅ Semantic versioning: 1.0.0
+[OK] name:
+[OK] description:
+[OK] model:
+[OK] Version section present
+[OK] Last Updated section present
+[OK] Dependencies section present
+[OK] Quick Start section present
+[OK] Standard Workflows section present
+[OK] Troubleshooting section present
+[OK] Reference Documentation section present
+[OK] Constitutional Compliance section present
+[OK] Version History section present
+[OK] Semantic versioning: 1.0.0
 ```
 
 ---
@@ -1074,15 +1074,15 @@ def validate_article_ix(self) -> None:
 
 **Example:**
 ```
-# ✅ CORRECT: Skill versioning
+# [OK] CORRECT: Skill versioning
 .claude/skills/unreal-vfx-automation/SKILL.md
-  → Header: **Version:** 1.0.0
+  -> Header: **Version:** 1.0.0
 
-# ✅ CORRECT: Agent versioning
+# [OK] CORRECT: Agent versioning
 .claude/agents/documentation-specialist.md
-  → Header: version: 2.0.0
+  -> Header: version: 2.0.0
 
-# ❌ WRONG: Versioned skill directory
+# [FAIL] WRONG: Versioned skill directory
 .claude/skills/unreal-vfx-automation-v2/
 ```
 
@@ -1094,29 +1094,29 @@ def validate_article_ix(self) -> None:
 
 **Summary Format:**
 ```
-📋 Constitutional Compliance Report: skill-name
+ Constitutional Compliance Report: skill-name
 
-Article I: ✅ PASS
+Article I: [OK] PASS
   Scripts are general-purpose
-  ✅ No hard-coded paths detected in 3 script(s)
-  ✅ Parameterization verified (argparse/sys.argv)
+  [OK] No hard-coded paths detected in 3 script(s)
+  [OK] Parameterization verified (argparse/sys.argv)
 
-Article III: ✅ PASS
+Article III: [OK] PASS
   Progressive disclosure compliant
-  ✅ 470 lines (<500 limit)
+  [OK] 470 lines (<500 limit)
   Margin: 30 lines (6.0% buffer)
-  ✅ Reference directory: 2 file(s)
+  [OK] Reference directory: 2 file(s)
 
 [... all articles ...]
 
-Overall: ✅ PASS (7/7 automated checks, 2 manual verifications needed)
+Overall: [OK] PASS (7/7 automated checks, 2 manual verifications needed)
 ```
 
 **Status Icons:**
-- ✅ PASS
-- ❌ FAIL
-- ⚠️ WARN
-- ⊘ SKIP
+- [OK] PASS
+- [FAIL] FAIL
+- [WARN] WARN
+- [SKIP] SKIP
 
 ---
 
@@ -1140,19 +1140,19 @@ Overall: ✅ PASS (7/7 automated checks, 2 manual verifications needed)
 - **WARN:** 2
 - **SKIP:** 2
 
-**Overall Status:** ✅ PASS
+**Overall Status:** [OK] PASS
 
 ---
 
 ## Detailed Results
 
-### Article I: ✅ PASS
+### Article I: [OK] PASS
 
 **Result:** Scripts are general-purpose
 
 **Details:**
-- ✅ No hard-coded paths detected in 3 script(s)
-- ✅ Parameterization verified (argparse/sys.argv)
+- [OK] No hard-coded paths detected in 3 script(s)
+- [OK] Parameterization verified (argparse/sys.argv)
 
 ---
 
@@ -1217,7 +1217,7 @@ ClaudeCode/development/reports/SKILL_NAME_COMPLIANCE_REPORT.md
 
 ### Multi-Application Skills
 
-**Example:** Houdini → Unreal pipeline
+**Example:** Houdini -> Unreal pipeline
 
 **Characteristics:**
 - Involves 2+ VFX applications
@@ -1240,7 +1240,7 @@ ClaudeCode/development/reports/SKILL_NAME_COMPLIANCE_REPORT.md
 ```python
 # Example usage:
 # python export.py CharacterRig --output "C:\Exports\MyAsset"
-#                                           ^^^^^^^^^ False positive
+# ^^^^^^^^^ False positive
 ```
 
 **Current Behavior:**

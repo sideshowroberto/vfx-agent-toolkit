@@ -133,26 +133,26 @@ Image<ReadSpec, AccessPattern, EdgeMethod> imageName;
 - `eWrite` - Write-only output
 
 **AccessPattern:**
-- `eAccessPoint` - Current pixel only (fastest) ← Use this for overlays
-- `eAccessRandom` - Sample any pixel by absolute coord `src(x, y)` ← Use when radius is a runtime param
-- `eAccessRanged2D` - 2D range by relative offset `src(dx, dy)` ← Only when range is a compile-time constant
+- `eAccessPoint` - Current pixel only (fastest) <- Use this for overlays
+- `eAccessRandom` - Sample any pixel by absolute coord `src(x, y)` <- Use when radius is a runtime param
+- `eAccessRanged2D` - 2D range by relative offset `src(dx, dy)` <- Only when range is a compile-time constant
 
-**eAccessRandom vs eAccessRanged2D — when to use which:**
-If blur radius (or any sample offset) comes from a `param` or `local`, the compiler can't determine the range at compile time — use `eAccessRandom`. Only use `eAccessRanged2D` for fixed, hardcoded offsets (e.g. a 3x3 kernel with literal values).
+**eAccessRandom vs eAccessRanged2D - when to use which:**
+If blur radius (or any sample offset) comes from a `param` or `local`, the compiler can't determine the range at compile time - use `eAccessRandom`. Only use `eAccessRanged2D` for fixed, hardcoded offsets (e.g. a 3x3 kernel with literal values).
 
 **EdgeMethod:**
 - `eEdgeClamped` - Repeat edge values (safe)
 - `eEdgeNone` - Undefined outside (fastest if staying in bounds)
 
-**Standard Overlay Pattern** (current pixel only — overlays, color ops, no neighbor sampling):
+**Standard Overlay Pattern** (current pixel only - overlays, color ops, no neighbor sampling):
 ```cpp
 Image<eRead, eAccessPoint, eEdgeClamped> src;  // Input
 Image<eWrite, eAccessPoint> dst;                // Output
 ```
 
-**Standard Neighbor Access — Fixed Offsets** (Sobel, sharpen, convolution — offsets are hardcoded literals):
+**Standard Neighbor Access - Fixed Offsets** (Sobel, sharpen, convolution - offsets are hardcoded literals):
 ```cpp
-// eAccessRanged2D: compiler knows range at compile time (hardcoded ±1, ±2, etc.)
+// eAccessRanged2D: compiler knows range at compile time (hardcoded +/-1, +/-2, etc.)
 // Coords are RELATIVE to current pixel: src(dx, dy)
 Image<eRead, eAccessRanged2D, eEdgeClamped> src;
 Image<eWrite, eAccessPoint> dst;
@@ -170,9 +170,9 @@ void process(int2 pos) {
 }
 ```
 
-**Standard Neighbor Access — Runtime Radius** (Blur, dilation, any param-driven radius):
+**Standard Neighbor Access - Runtime Radius** (Blur, dilation, any param-driven radius):
 ```cpp
-// eAccessRandom: radius is a param/local — compiler can't determine range
+// eAccessRandom: radius is a param/local - compiler can't determine range
 // Coords are ABSOLUTE pixel positions: src(pos.x + dx, pos.y + dy)
 Image<eRead, eAccessRandom, eEdgeClamped> src;
 Image<eWrite, eAccessPoint> dst;
@@ -184,7 +184,7 @@ local:
     int radius;
 
 void init() {
-    radius = max(1, (int)blurRadius);  // Convert param → int for loop bounds
+    radius = max(1, (int)blurRadius);  // Convert param -> int for loop bounds
 }
 
 void process(int2 pos) {
@@ -201,20 +201,20 @@ void process(int2 pos) {
 }
 ```
 
-> **Common mistake #1:** Declaring `eAccessPoint` then calling `src(pos.x + dx, pos.y + dy)` — this is a compile error. Match access mode to usage: `eAccessPoint` → `src()` only, `eAccessRanged2D` → `src(dx, dy)` relative, `eAccessRandom` → `src(x, y)` absolute.
+> **Common mistake #1:** Declaring `eAccessPoint` then calling `src(pos.x + dx, pos.y + dy)` - this is a compile error. Match access mode to usage: `eAccessPoint` -> `src()` only, `eAccessRanged2D` -> `src(dx, dy)` relative, `eAccessRandom` -> `src(x, y)` absolute.
 
-> **Common mistake #2:** Using `eAccessRanged2D` when offsets come from a `param` or `local` — even if some accesses in the kernel use hardcoded offsets (e.g. Sobel neighbors). `eAccessRanged2D` requires ALL offsets to be compile-time constants (literal integers). If **any** sample in the kernel uses a runtime value, the entire image declaration must be `eAccessRandom`. Switch everything to absolute coords.
+> **Common mistake #2:** Using `eAccessRanged2D` when offsets come from a `param` or `local` - even if some accesses in the kernel use hardcoded offsets (e.g. Sobel neighbors). `eAccessRanged2D` requires ALL offsets to be compile-time constants (literal integers). If **any** sample in the kernel uses a runtime value, the entire image declaration must be `eAccessRandom`. Switch everything to absolute coords.
 >
 > ```cpp
-> // ❌ WRONG — redOffset is a param (runtime), so eAccessRanged2D will fail to compile
+> // [FAIL] WRONG - redOffset is a param (runtime), so eAccessRanged2D will fail to compile
 > Image<eRead, eAccessRanged2D, eEdgeClamped> src;
 > float4 red = src(-redOffset, 0);  // compile error: param is not a compile-time constant
 >
-> // ✅ CORRECT — use eAccessRandom, switch ALL accesses to absolute coords
+> // [OK] CORRECT - use eAccessRandom, switch ALL accesses to absolute coords
 > Image<eRead, eAccessRandom, eEdgeClamped> src;
-> // Fixed Sobel neighbors → absolute coords
+> // Fixed Sobel neighbors -> absolute coords
 > float tl = src(pos.x-1, pos.y-1).x;
-> // Param-driven offset → also absolute coords
+> // Param-driven offset -> also absolute coords
 > float4 red = src(pos.x - (int)redOffset, pos.y);
 > ```
 
@@ -228,7 +228,7 @@ void process(int2 pos) {
 
 ```cpp
 param:
-  float4 color;  // ← This creates a color picker!
+  float4 color;  // <- This creates a color picker!
 
 void define() {
   // Default: Red with 80% opacity
@@ -244,8 +244,8 @@ void process() {
 ```
 
 **Why Not float3?**
-- `float3` → XYZ numeric fields (confusing)
-- `float4` → Color picker + alpha (professional)
+- `float3` -> XYZ numeric fields (confusing)
+- `float4` -> Color picker + alpha (professional)
 
 **Pattern from Lines.gizmo:**
 ```cpp
@@ -259,12 +259,12 @@ defineParam(colour, "Colour", float4(1.0f, 1.0f, 1.0f, 1.0f));
 **Rule:** `src()` and `dst()` only work directly inside `process()`. BlinkScript does not give image accessors scope inside user-defined helper functions.
 
 ```cpp
-// ❌ WRONG — will not compile
+// [FAIL] WRONG - will not compile
 float4 myBlur(int2 pos) {
     return src(pos.x, pos.y);  // Error: no matching function for call to object of type 'Image'
 }
 
-// ✅ CORRECT — inline all image access inside process()
+// [OK] CORRECT - inline all image access inside process()
 void process(int2 pos) {
     float4 val = src(pos.x, pos.y);  // Works fine here
 }
@@ -277,12 +277,12 @@ void process(int2 pos) {
 **Rule:** Expensive operations in `init()`, simple checks in `process()`
 
 ```cpp
-// ❌ BAD: Division per pixel (millions of times)
+// [FAIL] BAD: Division per pixel (millions of times)
 void process(int2 pos) {
   float normalized = pos.x / dst.bounds.width();  // Division millions of times!
 }
 
-// ✅ GOOD: Division once in init()
+// [OK] GOOD: Division once in init()
 local:
   float invWidth;
 
@@ -305,28 +305,28 @@ void process(int2 pos) {
 
 ### Technique 3: Multi-Rotation Spiral (ADVANCED!)
 
-**Challenge:** Logarithmic spiral should continue for multiple rotations, but atan2() only returns -π to π.
+**Challenge:** Logarithmic spiral should continue for multiple rotations, but atan2() only returns -pi to pi.
 
 **WRONG Approach:**
 ```cpp
-float theta = atan2(y, x);  // Only 0-2π
+float theta = atan2(y, x);  // Only 0-2pi
 float expectedR = scale * exp(b * theta);  // Wrong for rotation > 1!
 ```
 
 **CORRECT Approach - Solve Backwards:**
 ```cpp
 // Given radius r, solve for what theta on spiral gives this radius
-// r = a * e^(b*θ)  →  θ = ln(r/a) / b
+// r = a * e^(b*theta)  ->  theta = ln(r/a) / b
 
 float r = sqrt(x*x + y*y);
-float rawTheta = atan2(y, x);  // Pixel angle (0-2π)
+float rawTheta = atan2(y, x);  // Pixel angle (0-2pi)
 
-// Solve for actual theta on spiral (can exceed 2π!)
+// Solve for actual theta on spiral (can exceed 2pi!)
 float spiralTheta = log(r / scale) / growthFactor;
 
 // Check if within desired rotations
-if (spiralTheta < spiralLength * 6.28318530718f) {  // spiralLength * 2π
-  // Reduce to 0-2π to get expected angle
+if (spiralTheta < spiralLength * 6.28318530718f) {  // spiralLength * 2pi
+  // Reduce to 0-2pi to get expected angle
   float spiralAngle = spiralTheta;
   while (spiralAngle > 6.28318530718f) {
     spiralAngle -= 6.28318530718f;
@@ -345,7 +345,7 @@ if (spiralTheta < spiralLength * 6.28318530718f) {  // spiralLength * 2π
 }
 ```
 
-**Why This Works:** `spiralTheta` can exceed 2π, allowing 5+ rotations seamlessly.
+**Why This Works:** `spiralTheta` can exceed 2pi, allowing 5+ rotations seamlessly.
 
 ---
 
@@ -431,10 +431,10 @@ result.z = input.z * (1.0f - alpha) + overlayColor.z * alpha;
 result.w = 1.0f;  // Full alpha
 ```
 
-### Pattern 5: Edge Detection with Sobel (eAccessRanged2D — fixed ±1 offsets)
+### Pattern 5: Edge Detection with Sobel (eAccessRanged2D - fixed +/-1 offsets)
 
 ```cpp
-// Sobel uses fixed ±1 offsets — use eAccessRanged2D (NOT eAccessPoint, NOT eAccessRandom)
+// Sobel uses fixed +/-1 offsets - use eAccessRanged2D (NOT eAccessPoint, NOT eAccessRandom)
 // Relative coords: src(dx, dy) where (0,0) is the current pixel
 kernel SobelEdgeDetection : ImageComputationKernel<ePixelWise>
 {
@@ -451,7 +451,7 @@ kernel SobelEdgeDetection : ImageComputationKernel<ePixelWise>
     }
 
     void process(int2 pos) {
-        // Grayscale of each neighbor — relative offsets (compile-time constants)
+        // Grayscale of each neighbor - relative offsets (compile-time constants)
         float tl = dot(float3(src(-1,-1).x, src(-1,-1).y, src(-1,-1).z), float3(0.299f, 0.587f, 0.114f));
         float tm = dot(float3(src( 0,-1).x, src( 0,-1).y, src( 0,-1).z), float3(0.299f, 0.587f, 0.114f));
         float tr = dot(float3(src( 1,-1).x, src( 1,-1).y, src( 1,-1).z), float3(0.299f, 0.587f, 0.114f));
@@ -471,10 +471,10 @@ kernel SobelEdgeDetection : ImageComputationKernel<ePixelWise>
 };
 ```
 
-### Pattern 6: Frequency Separation Blur (eAccessRandom — runtime radius param)
+### Pattern 6: Frequency Separation Blur (eAccessRandom - runtime radius param)
 
 ```cpp
-// Runtime blur radius param → compiler can't know range → must use eAccessRandom
+// Runtime blur radius param -> compiler can't know range -> must use eAccessRandom
 // Absolute coords: src(pos.x + dx, pos.y + dy)
 kernel FrequencyBlur : ImageComputationKernel<ePixelWise>
 {
@@ -482,7 +482,7 @@ kernel FrequencyBlur : ImageComputationKernel<ePixelWise>
     Image<eWrite, eAccessPoint> dst;
 
     param:
-        float blurRadius;   // Runtime param — this is why we need eAccessRandom
+        float blurRadius;   // Runtime param - this is why we need eAccessRandom
         float blurAmount;
 
     void define() {
@@ -500,7 +500,7 @@ kernel FrequencyBlur : ImageComputationKernel<ePixelWise>
     void process(int2 pos) {
         float4 original = src(pos.x, pos.y);   // Absolute coords required for eAccessRandom
 
-        // Box blur inlined — image access only valid inside process(), not helper functions
+        // Box blur inlined - image access only valid inside process(), not helper functions
         float4 sum = float4(0.0f, 0.0f, 0.0f, 0.0f);
         float count = 0.0f;
         for (int dy = -radius; dy <= radius; dy++) {
@@ -526,7 +526,7 @@ kernel FrequencyBlur : ImageComputationKernel<ePixelWise>
 
 **Features:**
 - 7 grid types (Rule of Thirds, Golden Ratio, Center Marker, Diagonals, Triangles, Fibonacci Spiral)
-- Professional UI (Enable → Colour → Thickness pattern)
+- Professional UI (Enable -> Colour -> Thickness pattern)
 - GPU accelerated (tested at 4K)
 - Multi-rotation spiral support
 
@@ -556,7 +556,7 @@ kernel CompositionGrids : ImageComputationKernel<ePixelWise>
     float spiralLength;      // Multi-rotation support
     float spiralCenterX;     // Normalized 0-1
     float spiralCenterY;
-    int spiralRotation;      // 0-3 (0°, 90°, 180°, 270°)
+    int spiralRotation;      // 0-3 (0 deg, 90 deg, 180 deg, 270 deg)
 
   local:
     int imgWidth;
@@ -701,29 +701,29 @@ normalize(vec)    // Unit vector
 ## Constitutional Compliance
 
 **Article I - General Purpose Scripts:**
-✅ Kernels are parameterized (no hardcoded values)
-✅ Works on any image size, any project
+[OK] Kernels are parameterized (no hardcoded values)
+[OK] Works on any image size, any project
 
 **Article III - Progressive Disclosure:**
-✅ SKILL.md: 495 lines (<500 limit)
-✅ Reference: BlinkScript_Learning_Notes.md (on-demand)
+[OK] SKILL.md: 495 lines (<500 limit)
+[OK] Reference: BlinkScript_Learning_Notes.md (on-demand)
 
 **Article IV - Independent Testing:**
-✅ Tested in Nuke 15.0v5
-✅ Validated at 1080p, 4K, 8K
-✅ GPU acceleration verified
+[OK] Tested in Nuke 15.0v5
+[OK] Validated at 1080p, 4K, 8K
+[OK] GPU acceleration verified
 
 **Article V - Official Patterns:**
-✅ Uses official BlinkScript API
-✅ Follows Foundry documentation
+[OK] Uses official BlinkScript API
+[OK] Follows Foundry documentation
 
 **Article VI - Context Efficiency:**
-✅ Progressive disclosure (load when triggered)
-✅ Links to comprehensive reference docs
+[OK] Progressive disclosure (load when triggered)
+[OK] Links to comprehensive reference docs
 
 **Article VIII - Documentation Standards:**
-✅ YAML frontmatter complete
-✅ All required sections present
+[OK] YAML frontmatter complete
+[OK] All required sections present
 
 ---
 

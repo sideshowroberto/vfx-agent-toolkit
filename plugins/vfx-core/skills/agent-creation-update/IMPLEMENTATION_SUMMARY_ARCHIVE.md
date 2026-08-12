@@ -92,9 +92,9 @@ def archive_agent(
 - `typing` - Type hints
 
 **No External Dependencies:**
-- ✅ No PyYAML (regex-based parsing)
-- ✅ No pytest for main script (only for tests)
-- ✅ Works with Python 3.8+
+- [OK] No PyYAML (regex-based parsing)
+- [OK] No pytest for main script (only for tests)
+- [OK] Works with Python 3.8+
 
 ### Error Handling
 
@@ -232,7 +232,7 @@ def archive_agent(
 python archive_agent.py documentation-specialist
 
 # Output:
-# ✅ Archived: <workspace>\.claude\agents\archive\documentation-specialist-v2.0.0.md
+# [OK] Archived: <workspace>\.claude\agents\archive\documentation-specialist-v2.0.0.md
 # Version: 2.0.0
 ```
 
@@ -290,18 +290,18 @@ python manual_test_archive.py
 
 # Expected output:
 # ============================================================
-#   archive_agent.py Manual Integration Tests
+# archive_agent.py Manual Integration Tests
 # ============================================================
 #
 # ============================================================
-#   Test 1: YAML Frontmatter Parsing
+# Test 1: YAML Frontmatter Parsing
 # ============================================================
 # Parsed metadata: {'name': 'test-agent', 'description': 'A test agent', 'version': '2.0.0', 'tools': 'Read, Write'}
-# ✅ YAML parsing works correctly
+# [OK] YAML parsing works correctly
 #
 # [... more test output ...]
 #
-# ✅ archive_agent.py is working correctly
+# [OK] archive_agent.py is working correctly
 ```
 
 **Unit Tests:**
@@ -324,7 +324,7 @@ cd .claude/skills/agent-creation-update/scripts
 python archive_agent.py test-agent-valid --agents-dir ../../..
 
 # Expected output:
-# ✅ Archived: <workspace>\.claude\agents\archive\test-agent-valid-v2.0.0.md
+# [OK] Archived: <workspace>\.claude\agents\archive\test-agent-valid-v2.0.0.md
 # Version: 2.0.0
 ```
 
@@ -367,10 +367,10 @@ python archive_agent.py test-agent-valid --agents-dir ../../..
 **Position:** Phase 3 (Archive before update)
 
 ```
-1. validate_agent.py   → Validate agent structure
-2. archive_agent.py    → Archive current version (THIS SCRIPT)
-3. update_agent.py     → Update agent to new version
-4. validate_agent.py   → Validate updated agent
+1. validate_agent.py   -> Validate agent structure
+2. archive_agent.py    -> Archive current version (THIS SCRIPT)
+3. update_agent.py     -> Update agent to new version
+4. validate_agent.py   -> Validate updated agent
 ```
 
 ### Blender Consolidation Example
@@ -512,16 +512,16 @@ python archive_agent.py blender-api-compatibility
 
 ### Production Readiness
 
-- ✅ **Type Safe:** Complete type hints
-- ✅ **Tested:** 90%+ coverage
-- ✅ **Documented:** Comprehensive docs
-- ✅ **Pythonic:** Modern best practices
-- ✅ **Cross-Platform:** Windows/Linux/macOS
-- ✅ **No Dependencies:** Stdlib only
-- ✅ **Error Handling:** Clear messages
-- ✅ **Performance:** < 1 second execution
+- [OK] **Type Safe:** Complete type hints
+- [OK] **Tested:** 90%+ coverage
+- [OK] **Documented:** Comprehensive docs
+- [OK] **Pythonic:** Modern best practices
+- [OK] **Cross-Platform:** Windows/Linux/macOS
+- [OK] **No Dependencies:** Stdlib only
+- [OK] **Error Handling:** Clear messages
+- [OK] **Performance:** < 1 second execution
 
-**Status:** Production Ready ✅
+**Status:** Production Ready [OK]
 
 ---
 
@@ -545,4 +545,4 @@ python archive_agent.py blender-api-compatibility
 **Total Time:** ~2 hours (implementation + testing + documentation)
 **Lines of Code:** 1,578 (script + tests + docs)
 **Test Coverage:** 90%+
-**Status:** Production Ready ✅
+**Status:** Production Ready [OK]

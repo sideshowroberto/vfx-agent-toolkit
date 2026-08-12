@@ -1,6 +1,6 @@
 ---
 name: vfx-plan
-description: VFX planning framework — guides selecting the right planning mode (Iterative, Spec-Driven, or Safety-First) for a given task, runs adversarial plan review, and structures the output as an actionable brief. Use when user says "help me plan", "let's plan this out", "vfx plan", "plan this task", or before any complex multi-file or multi-system build.
+description: VFX planning framework - guides selecting the right planning mode (Iterative, Spec-Driven, or Safety-First) for a given task, runs adversarial plan review, and structures the output as an actionable brief. Use when user says "help me plan", "let's plan this out", "vfx plan", "plan this task", or before any complex multi-file or multi-system build.
 allowed-tools: Read,Write,Bash,Glob,Grep,Agent
 ---
 
@@ -19,11 +19,11 @@ Invoke this skill when:
 - Getting it wrong means significant rework
 - You don't fully understand the solution space yet
 
-**Simple questions with clear answers don't need planning.** "What's the Python call to get selected objects in Blender?" — just ask.
+**Simple questions with clear answers don't need planning.** "What's the Python call to get selected objects in Blender?" - just ask.
 
 ---
 
-## Step 1 — Choose Your Mode
+## Step 1 - Choose Your Mode
 
 Answer: **how well do I understand what I'm building?**
 
@@ -33,9 +33,9 @@ Answer: **how well do I understand what I'm building?**
 Use when requirements will evolve as you build. Discovery is part of the process.
 
 **VFX signals:**
-- Building a Houdini terrain generator — node network constraints emerge as you build
-- Prototyping a ComfyUI workflow — which parameters matter reveals itself through iteration
-- Writing a new Blender addon — UX changes based on what you see working
+- Building a Houdini terrain generator - node network constraints emerge as you build
+- Prototyping a ComfyUI workflow - which parameters matter reveals itself through iteration
+- Writing a new Blender addon - UX changes based on what you see working
 - Any first-time exploration of an API or tool
 
 **Process:**
@@ -45,7 +45,7 @@ Use when requirements will evolve as you build. Discovery is part of the process
 4. Iterate toward stability
 5. Formalize as a skill when the pattern is proven
 
-Keep planning docs short — guides, not contracts. The plan will change.
+Keep planning docs short - guides, not contracts. The plan will change.
 
 ---
 
@@ -55,15 +55,15 @@ Keep planning docs short — guides, not contracts. The plan will change.
 Use when requirements are locked and you want zero gaps before writing code.
 
 **VFX signals:**
-- "Build a Nuke comp: Read → ACES → Grade → DeepMerge → Write, with these exact specs"
+- "Build a Nuke comp: Read -> ACES -> Grade -> DeepMerge -> Write, with these exact specs"
 - "Export these 12 shots to these exact paths via Sequencer"
 - "Batch render a folder of .blend files to EXR with these settings"
 - Delivering a tool to a client or another team member
 
 **Process:**
-1. Write the spec first — inputs, outputs, constraints, edge cases
+1. Write the spec first - inputs, outputs, constraints, edge cases
 2. Claude drafts against the spec
-3. Validate output matches spec — the spec is the test
+3. Validate output matches spec - the spec is the test
 4. Done
 
 The spec becomes your acceptance criteria. *Did we build what we planned?*
@@ -71,7 +71,7 @@ The spec becomes your acceptance criteria. *Did we build what we planned?*
 **Spec template:**
 ```
 ## What it does
-[One paragraph — inputs, outputs, purpose]
+[One paragraph - inputs, outputs, purpose]
 
 ## Constraints
 - [App version, API limitations]
@@ -106,14 +106,14 @@ Use when a mistake is hard to undo or has downstream consequences.
 4. Run `testing-specialist` agent before shipping
 
 **Required pre-checks:**
-- Dry run mode first (list what *would* be affected — don't act)
+- Dry run mode first (list what *would* be affected - don't act)
 - Confirm target paths explicitly before any write/delete
 - Log all operations with before/after state
 - Test on a single item before batch
 
 ---
 
-## Step 2 — Clarify Requirements (Optional but Recommended)
+## Step 2 - Clarify Requirements (Optional but Recommended)
 
 Before writing the plan, run `/grill-me` to stress-test your requirements.
 
@@ -127,7 +127,7 @@ The plan you produce after `/grill-me` will be substantially better than the pla
 
 ---
 
-## Step 3 — Adversarial Review
+## Step 3 - Adversarial Review
 
 After writing the plan, switch perspective:
 
@@ -149,16 +149,16 @@ The plan that survives review is significantly better than one that didn't go th
 
 ---
 
-## Step 4 — Output Format
+## Step 4 - Output Format
 
 After planning, produce a brief in this format:
 
 ```markdown
 ## Task
-[One sentence — what gets built]
+[One sentence - what gets built]
 
 ## Mode
-[Iterative / Spec-Driven / Safety-First — and why]
+[Iterative / Spec-Driven / Safety-First - and why]
 
 ## Inputs
 [What this takes as input]
@@ -189,7 +189,7 @@ An underrated benefit: planning sessions teach you the API surface as a byproduc
 
 Planning closes that gap. Describe the outcome, Claude explains the path. By the time you're done planning, you understand the territory well enough to direct the build and read what gets produced.
 
-The sessions building this pipeline taught more about Houdini's USD system, Nuke's BlinkScript model, and Unreal's Python API than any documentation would have — because the learning came from solving specific real problems, not reading reference material abstractly.
+The sessions building this pipeline taught more about Houdini's USD system, Nuke's BlinkScript model, and Unreal's Python API than any documentation would have - because the learning came from solving specific real problems, not reading reference material abstractly.
 
 That's not a side effect of planning. That's the point of it.
 

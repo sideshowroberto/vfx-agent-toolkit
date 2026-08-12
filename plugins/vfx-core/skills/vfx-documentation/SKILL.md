@@ -47,11 +47,11 @@ Create and maintain professional, navigable documentation across all VFX applica
 **Traditional VFX Documentation:**
 ```
 docs/
-├── old_setup_guide.md
-├── nuke_stuff.txt
-├── README.md
-├── some_notes.md
-└── api_reference_v2.md
++-- old_setup_guide.md
++-- nuke_stuff.txt
++-- README.md
++-- some_notes.md
++-- api_reference_v2.md
 
 Issues:
 - No entry point
@@ -66,21 +66,21 @@ Issues:
 
 **Index-Driven Documentation:**
 ```
-DEVELOPMENT_DOCUMENTATION_INDEX.md  ← Single Entry Point
-├── Quick Navigation ("I Need To...")
-├── Main Guides (links + descriptions)
-├── Session Documentation (history)
-├── Documentation Map (topic → location)
-├── Getting Started Paths (skill-based)
-└── Cross-References (validated)
+DEVELOPMENT_DOCUMENTATION_INDEX.md  <- Single Entry Point
++-- Quick Navigation ("I Need To...")
++-- Main Guides (links + descriptions)
++-- Session Documentation (history)
++-- Documentation Map (topic -> location)
++-- Getting Started Paths (skill-based)
++-- Cross-References (validated)
 
 Benefits:
-✅ Single source of truth
-✅ Clear navigation for all users
-✅ AI-friendly structure
-✅ Automatic cross-reference tracking
-✅ Consistent across all VFX apps
-✅ 70-80% faster onboarding
+[OK] Single source of truth
+[OK] Clear navigation for all users
+[OK] AI-friendly structure
+[OK] Automatic cross-reference tracking
+[OK] Consistent across all VFX apps
+[OK] 70-80% faster onboarding
 ```
 
 ---
@@ -101,9 +101,9 @@ Houdini/hda-library/DEVELOPMENT_DOCUMENTATION_INDEX.md
 ```
 
 ### Step 2: Replace Placeholders
-- `[Application Name]` → Your application (Nuke, Houdini, etc.)
-- `YYYY-MM-DD` → Today's date
-- `[path/to/file]` → Actual file paths
+- `[Application Name]` -> Your application (Nuke, Houdini, etc.)
+- `YYYY-MM-DD` -> Today's date
+- `[path/to/file]` -> Actual file paths
 
 ### Step 3: Fill "I Need To..." Section
 Add 5-7 most common tasks for your application with links to guides.
@@ -204,9 +204,9 @@ Categories:
 3-5 most-edited files:
 ```markdown
 [File Name]
-  └─ Location: [path]
-  └─ When: [edit trigger]
-  └─ Task: [what to do]
+  +- Location: [path]
+  +- When: [edit trigger]
+  +- Task: [what to do]
 ```
 
 #### 6. Common Q&A
@@ -274,7 +274,7 @@ Session_2025-10-23_HDACompilation.md
 ```
 
 **Why This Structure:**
-- Problem → Solution → Learnings (logical flow)
+- Problem -> Solution -> Learnings (logical flow)
 - Complete context for future debugging
 - AI-parseable for pattern recognition
 - Cross-referenced to guides
@@ -427,7 +427,7 @@ UnrealEngine/unreal-mcp-main/DEVELOPMENT_DOCUMENTATION_INDEX.md
 ### Full Workflow (60-90 minutes)
 
 **10-Step Process:**
-1. Copy template → Your project (5 min)
+1. Copy template -> Your project (5 min)
 2. Replace placeholders (10 min)
 3. Identify common tasks (15 min)
 4. List existing guides (10 min)
@@ -455,38 +455,38 @@ UnrealEngine/unreal-mcp-main/DEVELOPMENT_DOCUMENTATION_INDEX.md
 **Version:** VFX_SKILL_CONSTITUTION.md v2.0.0
 
 **Article I - General Purpose Scripts:**
-- ✅ Works across all VFX applications (Nuke, Houdini, Blender, Unreal)
-- ✅ No hardcoded paths or project-specific references
-- ✅ Templates are application-agnostic
+- [OK] Works across all VFX applications (Nuke, Houdini, Blender, Unreal)
+- [OK] No hardcoded paths or project-specific references
+- [OK] Templates are application-agnostic
 
 **Article III - Progressive Disclosure:**
-- ✅ SKILL.md: 487 lines (13-line buffer, 2.6%)
-- ✅ Reference files: 2 files (application-examples.md, agent-usage-examples.md)
-- ✅ Context efficiency: 80% reduction vs monolithic docs
+- [OK] SKILL.md: 487 lines (13-line buffer, 2.6%)
+- [OK] Reference files: 2 files (application-examples.md, agent-usage-examples.md)
+- [OK] Context efficiency: 80% reduction vs monolithic docs
 
 **Article IV - Test Independently:**
-- ✅ Templates tested in Unreal MCP implementation
-- ✅ Index structure validated across multiple projects
-- ✅ Production success metrics documented
+- [OK] Templates tested in Unreal MCP implementation
+- [OK] Index structure validated across multiple projects
+- [OK] Production success metrics documented
 
 **Article V - Follow Official Patterns:**
-- ✅ References official documentation standards
-- ✅ Follows established documentation best practices
-- ✅ Compatible with AI agent parsing
+- [OK] References official documentation standards
+- [OK] Follows established documentation best practices
+- [OK] Compatible with AI agent parsing
 
 **Article VI - Context Efficiency:**
-- ✅ Progressive disclosure through reference files
-- ✅ 80% context reduction (600 lines → 120 lines typical load)
-- ✅ Metadata-driven navigation
+- [OK] Progressive disclosure through reference files
+- [OK] 80% context reduction (600 lines -> 120 lines typical load)
+- [OK] Metadata-driven navigation
 
 **Article VII - Cross-App Integration:**
-- ✅ Works with all VFX applications
-- ✅ Master index pattern for multi-app pipelines
-- ✅ Consistent structure across tools
+- [OK] Works with all VFX applications
+- [OK] Master index pattern for multi-app pipelines
+- [OK] Consistent structure across tools
 
 **Article VIII - Documentation Standards:**
-- ✅ Complete YAML frontmatter with triggers
-- ✅ Version, Status, Dependencies documented
-- ✅ Constitutional compliance section present
-- ✅ Reference materials linked
+- [OK] Complete YAML frontmatter with triggers
+- [OK] Version, Status, Dependencies documented
+- [OK] Constitutional compliance section present
+- [OK] Reference materials linked
 

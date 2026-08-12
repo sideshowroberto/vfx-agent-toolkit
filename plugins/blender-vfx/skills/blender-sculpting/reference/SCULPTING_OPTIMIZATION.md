@@ -275,7 +275,7 @@ max_dim = max(width, height, depth)
 target_vertices = 500000  # 500k vertices
 
 # Calculate voxel size
-# Approximate: vertices ≈ (dimension / voxel_size)³
+# Approximate: vertices ~ (dimension / voxel_size)^3
 voxel_size = max_dim / (target_vertices ** (1/3))
 
 print(f'Object dimensions: {width:.2f} x {height:.2f} x {depth:.2f}')
@@ -377,17 +377,17 @@ for e in mesh.edges:
         non_manifold_edges.append(e.index)
 
 if non_manifold_verts or non_manifold_edges:
-    print(f'⚠️ Non-manifold geometry detected:')
+    print(f'[WARN] Non-manifold geometry detected:')
     print(f'  Vertices: {len(non_manifold_verts)}')
     print(f'  Edges: {len(non_manifold_edges)}')
     print(f'Fix in Blender: Mesh > Clean Up > Merge By Distance, then Fill Holes')
 else:
-    print(f'✅ Mesh is manifold - suitable for 3D printing')
+    print(f'[OK] Mesh is manifold - suitable for 3D printing')
 
 # Check for loose geometry
 loose_verts = [v.index for v in mesh.vertices if not any(v.index in e.vertices for e in mesh.edges)]
 if loose_verts:
-    print(f'⚠️ Loose vertices: {len(loose_verts)} (remove before export)')
+    print(f'[WARN] Loose vertices: {len(loose_verts)} (remove before export)')
 """
 
 # Run via the Blender MCP tool: execute_blender_code(code=code)
@@ -522,9 +522,9 @@ print(f'  Tris: {tri_count} ({tri_count/len(mesh.polygons)*100:.1f}%)')
 print(f'  N-gons: {ngon_count} ({ngon_count/len(mesh.polygons)*100:.1f}%)')
 
 if quad_count / len(mesh.polygons) > 0.95:
-    print('✅ Good quad topology for animation')
+    print('[OK] Good quad topology for animation')
 else:
-    print('⚠️ Consider converting to quads for better deformation')
+    print('[WARN] Consider converting to quads for better deformation')
 """
 
 # Run via the Blender MCP tool: execute_blender_code(code=code)
