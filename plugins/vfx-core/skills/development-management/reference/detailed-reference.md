@@ -159,7 +159,7 @@
 
 **Usage:**
 ```bash
-python3 ClaudeCode/development/scripts/validate_skill.py \
+python ClaudeCode/development/scripts/validate_skill.py \
   .claude/skills/unreal-plugin-compiler/
 
 # Output: PASS/FAIL with violations
@@ -180,7 +180,7 @@ python3 ClaudeCode/development/scripts/validate_skill.py \
 
 **Usage:**
 ```bash
-python3 ClaudeCode/development/scripts/check_constitutional_compliance.py
+python ClaudeCode/development/scripts/check_constitutional_compliance.py
 
 # Output: Compliance report by article
 ```
@@ -196,7 +196,7 @@ python3 ClaudeCode/development/scripts/check_constitutional_compliance.py
 
 **Usage:**
 ```bash
-python3 ClaudeCode/development/scripts/validate_cross_app_workflow.py \
+python ClaudeCode/development/scripts/validate_cross_app_workflow.py \
   .claude/skills/houdini-unreal-export/
 
 # Output: Workflow validation report

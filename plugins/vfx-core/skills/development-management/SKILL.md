@@ -61,8 +61,8 @@ allowed-tools: Read,Write,Edit
 
 **Run validation scripts:**
 ```bash
-python3 ClaudeCode/development/scripts/validate_skill.py .claude/skills/SKILL_NAME/
-python3 ClaudeCode/development/scripts/check_constitutional_compliance.py
+python ClaudeCode/development/scripts/validate_skill.py .claude/skills/SKILL_NAME/
+python ClaudeCode/development/scripts/check_constitutional_compliance.py
 ```
 
 **Manual checks:**
