@@ -35,7 +35,7 @@
     },
     {
       "name": "blender-vfx",
-      "version": "2.0.2",
+      "version": "2.0.3",
       "description": "Blender VFX pipeline via the official Blender MCP (blender.org): modeling, animation, materials, geometry nodes, physics, rendering, sculpting, grease pencil, and ControlNet pass rendering for AI generation.",
       "source": "./plugins/blender-vfx"
     },

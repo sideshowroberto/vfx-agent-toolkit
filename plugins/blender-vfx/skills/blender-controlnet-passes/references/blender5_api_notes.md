@@ -48,6 +48,28 @@ fo.file_output_items.new(socket_type='RGBA', name='Combined')   # FLOAT / RGBA /
   `scene.render.image_settings`.
 - Adding items crashed one interactive session historically; add them one
   at a time and save the file before large compositor edits.
+- **media_type trap (new, 5.1.2):** a freshly created `CompositorNodeOutputFile`
+  has `node.format.media_type == 'MULTI_LAYER_IMAGE'`, which locks
+  `node.format.file_format`'s enum to `OPEN_EXR_MULTILAYER` only -- setting
+  `file_format = 'PNG'` raises `TypeError: enum "PNG" not found in
+  ('OPEN_EXR_MULTILAYER')`. Setting `item.override_node_format = True` and
+  `item.format.file_format = 'PNG'` on an *item* looks like it works (no
+  error, the value sticks) but is silently ignored at render time -- the
+  file still writes as multilayer `.exr`. The real fix is on the **node**,
+  not the item: `node.format.media_type = 'IMAGE'` first, THEN
+  `node.format.file_format = 'PNG'` (now unlocked). After that, per-item
+  `override_node_format` is unnecessary for single-item nodes.
+- **No automatic frame number when items are named.** With a named
+  `file_output_items` entry, the written filename is
+  `{directory}{file_name}{item.name}.{ext}` -- no frame number is inserted
+  anywhere, even mid-animation. Confirmed by rendering frames 1 and 5 back
+  to back: both overwrote the same `clay_pass.Combined.png`. This
+  contradicts the trailing-dot behavior above, which applies to the
+  *unnamed-item* / classic file-slot path. For sequences, bake the frame
+  into `file_name` yourself (e.g. a `#### ` hash-padding token via the
+  path-template syntax, or set `file_name` per frame in a render-frame
+  callback) -- do not assume `file_name = "shot."` is enough once items
+  have names.
 
 ## Depth extraction
 
