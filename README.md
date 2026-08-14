@@ -4,8 +4,12 @@ Claude Code plugins and MCP connectors for VFX production. One clone gets you
 skills, agents, and app bridges for Nuke, Houdini, Unreal Engine, Blender,
 ComfyUI, Maya, Magnific, and Seedance.
 
-Built by a working VFX artist from day-to-day production use. Open-sourced so
-you can use it, fork it, and improve it. MIT licensed.
+**Skills teach the agent the craft; connectors give it hands in the running
+applications.** That split is the whole design.
+
+Built by [Rob Williams](https://github.com/sideshowroberto), a lead VFX
+artist working in production - every skill in here has shipped real work.
+Open-sourced so you can use it, fork it, and improve it. MIT licensed.
 
 ## What is this?
 
@@ -18,7 +22,20 @@ Two things in one repo:
   via MCP (Model Context Protocol), so Claude can create nodes in Nuke, drive
   Houdini, control Unreal, and so on.
 
-Skills tell Claude *how*; connectors give it *hands*.
+## What it looks like in use
+
+You say, in Claude Code with Nuke running:
+
+> "Set up comps for the 12 shots in this CSV - plates connected, our standard
+> grade/denoise front end, and give me a contact sheet of first frames."
+
+The agent parses the CSV, scans the plates on disk, builds a v001 comp per
+shot over the Nuke MCP (Read nodes, Stamp/Anchor wiring, the front-end
+template), renders first-frame thumbnails, and writes a tracker CSV back to
+disk. That workflow is `nuke-shot-setup`, one of 70+ skills in the toolkit -
+the same pattern (knowledge in the skill, hands via the connector) drives
+Houdini scatter setups, UE PCG graphs, ComfyUI generation batches, and
+Blender ControlNet pass renders.
 
 ## Quickstart
 
