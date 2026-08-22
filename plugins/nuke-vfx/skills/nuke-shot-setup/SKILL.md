@@ -1,15 +1,6 @@
 ---
 name: nuke-shot-setup
-description: >
-  Batch shot setup for Nuke comp projects. Parses a ShotGrid CSV export, reads plate metadata
-  from a plates CSV (or scans plates on disk), creates per-shot folder structures, generates
-  Nuke v001 visdev/comp files with plates auto-connected (Read + Stamp/Anchor with proper
-  ACES colorspace), and produces a Google Sheets-ready CSV shot tracker. Supports multiple
-  sequences at once, show-specific config (OCIO, LUT, compression), and configurable work
-  context (visdev, comp). Use when the user wants to set up shots, run a batch shot setup,
-  start a new sequence, onboard plates, build a shot tracker CSV, or create comps from a CSV.
-  Triggers on "set up shots", "batch shot setup", "new sequence", "onboard plates", "shot tracker
-  csv", "create comps from csv", "shot setup from ShotGrid", "visdev setup".
+description: Batch shot setup for Nuke comp projects. Parses a ShotGrid CSV export, reads plate metadata from a plates CSV (or scans plates on disk), creates per-shot folder structures, generates Nuke v001 visdev/comp files with plates auto-connected (Read + Stamp/Anchor with proper ACES colorspace), and produces a Google Sheets-ready CSV shot tracker. Supports multiple sequences at once, show-specific config (OCIO, LUT, compression), and configurable work context (visdev, comp). Use when the user wants to set up shots, run a batch shot setup, start a new sequence, onboard plates, build a shot tracker CSV, or create comps from a CSV. Triggers on "set up shots", "batch shot setup", "new sequence", "onboard plates", "shot tracker csv", "create comps from csv", "shot setup from ShotGrid", "visdev setup".
 allowed-tools: Read,Write,Edit,Bash,Glob,Grep,mcp__nuke__runPythonScript,mcp__nuke__loadScript,mcp__nuke__listNodes,mcp__nuke__getNode
 ---
 

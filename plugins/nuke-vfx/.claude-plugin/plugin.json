@@ -1,8 +1,8 @@
 {
-  "name": "nuke-vfx",
-  "description": "Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, batch shot setup, and Magnific-in-Nuke.",
-  "version": "1.1.1",
-  "author": {
-    "name": "Rob Williams"
-  }
+    "name":  "nuke-vfx",
+    "description":  "Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, and batch shot setup.",
+    "version":  "1.1.2",
+    "author":  {
+                   "name":  "Rob Williams"
+               }
 }

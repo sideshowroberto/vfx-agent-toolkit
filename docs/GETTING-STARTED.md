@@ -13,7 +13,7 @@ Install these before anything else:
 | Claude Code | Runs everything | https://claude.com/claude-code |
 | Node.js 18+ | Nuke MCP server, npx-based connectors | https://nodejs.org (LTS) |
 | Python 3.12+ | Bridge scripts, ComfyUI tooling | https://python.org (check "Add to PATH") |
-| uv | Python-based MCP servers (Houdini, Blender) | https://docs.astral.sh/uv/getting-started/installation/ |
+| uv | Python-based MCP servers (Houdini, Maya, Blender) | https://docs.astral.sh/uv/getting-started/installation/ |
 | Git | Cloning this repo for connector setup | https://git-scm.com |
 
 Verify from PowerShell:
@@ -96,6 +96,20 @@ Connectors need a local clone of the repo:
 git clone https://github.com/sideshowroberto/vfx-agent-toolkit.git
 cd vfx-agent-toolkit
 ```
+
+The bridges do not ship their third-party dependencies, so install those
+next - one pass covers every connector:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File connectors\setup-deps.ps1
+```
+
+This runs `npm install` for the Node bridges (Nuke) and pre-warms the
+uv-managed Python environments (Houdini, Maya). Skipping it is the number
+one cause of a bridge that registers fine but dies the moment it starts
+(ERR_MODULE_NOT_FOUND - see Troubleshooting). It matters double if you
+point another MCP client (not Claude Code) at these bridges, because only
+the scripts in this repo know to install the deps for you.
 
 Then run the section for each app you use. All connectors register the MCP
 server with Claude Code; some also copy bridge files into the application.
@@ -199,6 +213,14 @@ config, check this field.
 **`python3` is not recognized.** Windows has no `python3` command. Use
 `python`. If `python` is also missing, reinstall Python with "Add python.exe
 to PATH" checked.
+
+**Server registers but fails instantly (red status, ERR_MODULE_NOT_FOUND).**
+The bridge's dependencies were never installed - a fresh clone has no
+node_modules. Run `connectors\setup-deps.ps1` (or `npm install` inside
+`connectors\nuke\bridge`), then restart the MCP client. This applies to ANY
+MCP client using these bridges, not just Claude Code; some clients show the
+failure only as a red indicator with no error text - check the client's MCP
+logs for ERR_MODULE_NOT_FOUND to confirm.
 
 **App server shows disconnected.** The DCC bridges (Nuke, Houdini, Unreal,
 Maya, Blender) only connect while the application is running with the bridge

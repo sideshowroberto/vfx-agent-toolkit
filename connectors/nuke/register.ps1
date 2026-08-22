@@ -31,6 +31,30 @@ if (-not $ServerPath -or -not (Test-Path $ServerPath)) {
 }
 
 Write-Host "  [OK] Server: $ServerPath" -ForegroundColor Green
+
+# Ensure Node dependencies exist next to the server. A fresh clone has no
+# node_modules, and without it the server dies at startup with
+# ERR_MODULE_NOT_FOUND (@modelcontextprotocol/sdk) - in some MCP clients
+# that shows only as a red "failed" indicator with no error text.
+$bridgeDir = Split-Path (Split-Path $ServerPath -Parent) -Parent
+if ((Test-Path (Join-Path $bridgeDir "package.json")) -and
+    -not (Test-Path (Join-Path $bridgeDir "node_modules"))) {
+    if (-not (Test-Command "npm")) {
+        Write-Error "node_modules missing in $bridgeDir and npm not found. Install Node.js 18+ from https://nodejs.org, then re-run."
+        exit 1
+    }
+    Write-Host "  node_modules missing - running npm install in $bridgeDir ..." -ForegroundColor Yellow
+    Push-Location $bridgeDir
+    npm install --no-fund --no-audit
+    $npmExit = $LASTEXITCODE
+    Pop-Location
+    if ($npmExit -ne 0 -or -not (Test-Path (Join-Path $bridgeDir "node_modules"))) {
+        Write-Error "npm install failed in $bridgeDir (exit $npmExit). Fix and re-run."
+        exit 1
+    }
+    Write-Host "  [OK] Node dependencies installed" -ForegroundColor Green
+}
+
 [System.Environment]::SetEnvironmentVariable("NUKE_MCP_SERVER_PATH", $ServerPath, "User")
 
 claude mcp add --transport stdio nuke --scope user -- node $ServerPath

@@ -46,6 +46,18 @@ fo.file_output_items.new(socket_type='RGBA', name='Combined')   # FLOAT / RGBA /
 - Format is per node via `fo.format` (`file_format`, `color_depth`,
   `color_mode`, `exr_codec`). `OPEN_EXR_MULTILAYER` is valid here and on
   `scene.render.image_settings`.
+- **Multilayer EXRs are MULTI-PART files (5.x).** Every "multilayer" EXR
+  Blender 5.x writes - File Output node or main render output, EEVEE,
+  Cycles or Workbench - has ONE PART PER LAYER: part 0 = `Combined`, part 1
+  = `CryptoObject00`, ... The OpenEXR python module's `File.channels()` and
+  `File.header()` report **part 0 only**, so a complete file reads as
+  "Combined RGBA, nothing else". This produced a false "File Output writes
+  only its first item" bug report on 2026-08-21 (5.1.0 beta + 5.1.2, 312
+  production frames "hollow") - every file was intact. Nuke reads parts as
+  layers, no merge needed. Verify with
+  `python Blender/scripts/merge_exr_layers.py --inspect file.exr` (iterates
+  `File.parts`), never with `channels()` alone. Any EXR QC that reports
+  only Combined has almost certainly misread a multi-part file.
 - Adding items crashed one interactive session historically; add them one
   at a time and save the file before large compositor edits.
 - **media_type trap (new, 5.1.2):** a freshly created `CompositorNodeOutputFile`
@@ -100,7 +112,11 @@ vl.pass_cryptomatte_depth = 6            # layers written = ceil(depth / 2)
 ```
 
 Render Layers then exposes `CryptoObject00`, `CryptoObject01`, ... Route each
-into an OPEN_EXR_MULTILAYER File Output as RGBA items.
+into an OPEN_EXR_MULTILAYER File Output as RGBA items (one node, N items is
+correct - it writes one part per item, verified 2026-08-21 by reading every
+part back on 5.1.0 beta and 5.1.2). The Cryptomatte manifest
+(`cryptomatte/<id>/name|hash|conversion|manifest`) lands in the header of
+part 0, which is what Nuke's Cryptomatte gizmo reads.
 
 ## Layered Actions (keyframe queries)
 

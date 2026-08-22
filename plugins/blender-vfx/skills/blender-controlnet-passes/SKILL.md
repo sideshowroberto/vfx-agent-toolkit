@@ -5,7 +5,7 @@ description: "Set up and render ControlNet conditioning passes from a Blender sc
 
 # Blender ControlNet Passes
 
-**Version:** 1.0.0 | **Last Updated:** 2026-07-02 | **Blender:** 5.x
+**Version:** 1.1.0 | **Last Updated:** 2026-08-21 | **Blender:** 5.x
 
 One parameterized script replaces the per-project pass-render scripts:
 `Blender/scripts/setup_controlnet_passes.py`
@@ -78,6 +78,13 @@ does the full range.
    number to `file_name`. `name_0001` + frame 276 becomes `name_00010276`
    (the 960000-range frames bug). Always end `file_name` with `.` --
    `name_0001.` writes `name_0001.exr`. The script does this everywhere.
+
+   **This applies to `file_name` ONLY, and it still holds on 5.1.2** (verified
+   headless 2026-08-17: `shot_depth_0001.` round-trips unchanged). Do not
+   extend the trailing dot to `file_output_items` names -- those ARE sanitised,
+   so an item named `depth.` silently becomes `depth_`. The script names its
+   items `Depth` / `Combined` / crypto layer names, which is correct. If you
+   ever set an item name, read it back.
 3. **Blender 5.x compositor access.** `scene.node_tree` is gone. Use
    `scene.compositing_node_group`; create it with
    `bpy.data.node_groups.new(name, type='CompositorNodeTree')`. There is no
@@ -99,11 +106,28 @@ does the full range.
    path but Viewer images may not update in `blender -b`. The script
    auto-selects a File Output PNG node in background mode (`--depth-writer`
    overrides). If background depth PNGs come out empty, verify this first.
-9. **EEVEE temporal jitter.** TAA sub-pixel jitter shows up as noise in
+   **Fixed 2026-08-21:** this path crashed on every 5.1.x headless run
+   (`TypeError: enum "PNG" not found in ('OPEN_EXR_MULTILAYER')`) because a
+   fresh File Output node's `format.media_type` is `MULTI_LAYER_IMAGE`. The
+   script now sets `media_type = 'IMAGE'` first; in IMAGE mode the item name
+   is appended (`shot_depth_0001.Depth.png`) and the script renames to the
+   canonical `shot_depth_0001.png` after each frame. Verified headless on
+   5.1.2 (16-bit `I;16` PNGs, 1363 distinct values on the test scene).
+9. **Verify pixel CONTENT, never just file existence.** A render that wrote
+   4 KB of PNG is not a render that shows anything. Two traps caught a
+   headless run on 2026-08-16: a clay pass came out a single flat value
+   (uniform frame - and a uniform frame passes an "R=G=B within 1 LSB" grey
+   check trivially, so the check awards a free point), and the depth pass
+   came out uniformly 0.0 because the normalization range was INVENTED
+   (30-80 m) for objects actually sitting 2-15 m from camera. Measure the
+   real object distances (`(ob.location - cam.location).length`) and derive
+   the range from them; then assert the written frame has more than a
+   couple of distinct values before calling the pass good.
+10. **EEVEE temporal jitter.** TAA sub-pixel jitter shows up as noise in
    tracking curves; `taa_render_samples=1` kills jitter but looks aliased
    and was judged worse in production. Leave scene sampling alone unless
    testing deliberately (`--taa-samples`, `--motion-blur` exist for that).
-10. **Long MCP-driven render loops can hang Blender with runaway memory.**
+11. **Long MCP-driven render loops can hang Blender with runaway memory.**
     A 118-frame grey render through the MCP crept from 4.5s to 58s/frame
     and wedged Blender at 28 GB RAM on frame 116 (large arena crowd scene).
     Mitigations: chunk `render_sequence` calls (20-40 frames per call via
@@ -114,16 +138,28 @@ does the full range.
     beauty/pass renders with no subframe/speed tricks are safer via
     Blender's native animation render (`INVOKE_DEFAULT`), which held
     steady for 118-frame 4K renders in the same sessions.
-11. **Dark scenes render near-black clay.** The override preserves scene
+12. **Dark scenes render near-black clay.** The override preserves scene
     lighting; a dark stage/arena scene gives an unreadable conditioning
     frame. Temporarily set the world Background to flat grey
     (color 0.5 / strength 1.0), render, restore. Flat even light is ideal
     for geometry conditioning anyway (no baked-in light direction).
-12. **ffmpeg on Windows.** `encode_mp4` calls plain "ffmpeg"; if Blender's
+13. **ffmpeg on Windows.** `encode_mp4` calls plain "ffmpeg"; if Blender's
     environment lacks it the script warns and leaves PNGs. A working copy
     often hides at `C:\Program Files\ImageMagick-*\ffmpeg.exe`. Also
     ensure the `grey_mp4` directory exists before an external encode --
     ffmpeg does not create missing output directories.
+14. **Multilayer EXRs are multi-part - check ALL parts before calling one
+    hollow.** Blender 5.x writes one EXR part per layer. The OpenEXR python
+    module's `File.channels()` / `File.header()` show part 0 only, so an
+    intact crypto EXR reads as "Combined RGBA and nothing else". On
+    2026-08-21 this produced a confident, wrong "5.1.x File Output drops all
+    but the first item" diagnosis against 312 production frames (and a
+    merge-based rewrite of this script that was reverted). Instrument:
+    `python Blender/scripts/merge_exr_layers.py --inspect <file.exr>` lists
+    every part; the script's `verify_crypto_exr()` does the same on frame
+    0001 when the calling python has OpenEXR (Blender's bundled python does
+    not - it prints a skip notice, never a false PASS). Rule 8 in action:
+    a too-clean "only Combined" result is the instrument, not the file.
 
 ## References
 

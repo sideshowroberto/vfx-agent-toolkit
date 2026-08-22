@@ -30,6 +30,10 @@ if (-not $ServerPath -or -not (Test-Path $ServerPath)) {
 Write-Host "  [OK] Server: $ServerPath" -ForegroundColor Green
 [System.Environment]::SetEnvironmentVariable("HOUDINI_MCP_SERVER_PATH", $ServerPath, "User")
 
-claude mcp add --transport stdio houdini --scope user -- uv run python $ServerPath
+# --directory makes uv resolve dependencies from the bridge's own
+# pyproject.toml (installed next to the server script). Without it the
+# server dies with ModuleNotFoundError: mcp.
+$serverDir = Split-Path $ServerPath -Parent
+claude mcp add --transport stdio houdini --scope user -- uv run --directory $serverDir python $ServerPath
 Write-Host "  [OK] houdini registered" -ForegroundColor Green
 claude mcp list

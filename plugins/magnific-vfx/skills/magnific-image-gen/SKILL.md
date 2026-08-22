@@ -203,7 +203,7 @@ The NSFW filter triggers on **`style` references** containing fighting, combat, 
 
 ---
 
-## Technical Notes (from MagnificAI Nuke node internals)
+## Technical Notes (Magnific API behaviour)
 
 ### Resolution - Constant-Area Formula
 Magnific uses constant-area math, not simple pixel multiplication. Dimensions are floored to 64px:
@@ -226,7 +226,7 @@ Without it, the API ignores dimensions and returns wrong output size. The MCP ha
 ### Unlimited (inf) vs Credit-burning
 - NB2 Pro at 1K, 2K: unlimited (inf) - no credit cost
 - NB2 Pro at 4K: costs credits
-- `inf` suffix in the Nuke node confirms Pro plan covers 2K as unlimited - matches our account
+- The model list reports `inf` for sizes the plan covers as unlimited - check yours with `images_models_settings`
 
 ### WebP Output - Nuke Pipeline Warning
 Magnific CDN sometimes serves WebP even when the URL ends in `.jpg`. **Nuke 16 and 17 do not support WebP natively.** If pulling Magnific outputs directly into Nuke (bypassing the MCP), you must detect and convert:
@@ -236,11 +236,7 @@ if data[:4] == b'RIFF' and data[8:12] == b'WEBP':
     from PIL import Image
     Image.open(io.BytesIO(data)).convert('RGB').save(out_path, format='JPEG', quality=95)
 ```
-The MagnificAI Nuke node (`~/.nuke/ToolSets/MagnificAI.nk`) handles this automatically.
-
-### Related Tool
-For Magnific directly inside Nuke (no MCP): see `magnific-nuke-node` skill.
-ToolSet installed at: `~/.nuke/ToolSets/MagnificAI.nk`
+Build this check into any custom Read-side importer you write.
 
 ---
 

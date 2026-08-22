@@ -53,11 +53,10 @@ Write-Host "Houdini prefs: $houdiniPrefs" -ForegroundColor Green
 
 # --- 3. Copy MCP server files into Houdini prefs ------------------------------
 
-$sourceDir = Join-Path $PSScriptRoot "..\..\Houdini\houdini-mcp-main"
-$resolved  = Resolve-Path $sourceDir -ErrorAction SilentlyContinue
-if ($resolved) { $sourceDir = $resolved.Path }
+# Bridge files are bundled with this connector
+$sourceDir = Join-Path $PSScriptRoot "bridge"
 
-if (-not (Test-Path $sourceDir)) {
+if (-not (Test-Path (Join-Path $sourceDir "houdini_mcp_server.py"))) {
     Write-Error "Houdini MCP server source not found at: $sourceDir"
     exit 1
 }
@@ -77,8 +76,7 @@ $filesToCopy = @(
     "houdini_mcp_server.py",
     "HoudiniMCPRender.py",
     "main.py",
-    "pyproject.toml",
-    "urls.env"
+    "pyproject.toml"
 )
 
 foreach ($file in $filesToCopy) {
@@ -244,8 +242,12 @@ Write-Host "Set HOUDINI_MCP_SERVER_PATH = $installedServerPath" -ForegroundColor
 
 # --- 8. Register MCP server with Claude Code ----------------------------------
 
+# --directory makes uv resolve dependencies from the bridge's own
+# pyproject.toml (mcp[cli]). Without it, uv resolves from whatever
+# directory the MCP client happens to launch the server in, and the
+# server dies with ModuleNotFoundError: mcp.
 Write-Host "`nRegistering houdini MCP server..."
-claude mcp add --transport stdio houdini --scope user -- uv run python $installedServerPath
+claude mcp add --transport stdio houdini --scope user -- uv run --directory $targetDir python $installedServerPath
 
 # --- 9. Verify ----------------------------------------------------------------
 
