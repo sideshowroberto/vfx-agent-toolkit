@@ -49,8 +49,10 @@ Resolved by the helper script, never from the current working directory:
   checkpoints.log             append-only "no observations" acknowledgements
 ```
 
-**Helper:** `scripts/observe.sh {status|init|scan|next-id|archive}` next to
-this file. The SessionStart hook runs `status` and its first output line
+**Helper:** `scripts/observe.sh` (bash) and `scripts/observe.ps1` (PowerShell
+5.1 / 7) next to this file - same subcommands, same output:
+`{status|init|scan|next-id|archive}`. Use whichever shell the harness
+provides. The session-start hook runs `status` and its first output line
 prints the helper's full path - use that path for the other subcommands.
 Every field and rule: `references/log-format.md`.
 
@@ -254,8 +256,10 @@ observations with the session's other changes.
   instead of creating a fork.
 - Contributor / owner roles for plugin-distributed skill packs.
 - `type:` values are `public | internal`; an `author:` field was added.
-- Activation = an instruction in the harness config file plus a SessionStart
-  hook that injects `observe.sh status` (upstream's tier 3, the only
-  enforced tier).
+- Activation = an instruction in the harness config file plus a session-start
+  injection of `observe status` (upstream's tier 3, the only enforced tier):
+  Claude Code SessionStart hook, Qwen Code SessionStart hook with `-Json`,
+  OpenCode system-prompt plugin.
+- PowerShell port of the helper for harnesses without bash.
 - Scheduled autonomous reviews, migration, handoff-doc mode and
   Cowork-specific material dropped.
