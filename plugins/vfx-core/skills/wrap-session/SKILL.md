@@ -17,9 +17,15 @@ Review the full session for durable facts not yet saved to memory:
 
 Write or update the relevant memory files and keep the memory index current.
 
-**Explicit check:** Does the active project have a project-facts memory file? Is it current with what happened this session? If not, create or update it now.
+**Explicit check:** Does the active job have its loader skill (`project-<job>`) and is the canonical brief `...\sandbox\AGENT\PROJECT.md` current with what happened this session (decisions ledger, shot ledger, open obligations, hard rules)? If not, update them now. Job facts live THERE, not in a `project_<job>.md` memory file - memory keeps only a one-line pointer. If the JOB itself is finishing, run `/project-wrap` (`project-lifecycle` skill) before this wrap.
 
 ## 2. Skills
+
+**First, flush task-observer:** write any pending observations to the log
+(`observe.sh next-id`, one file each), run `observe.sh status`, and surface
+the grouped summary (ids + titles, per skill) FROM THE LOG - not from memory.
+They stay logged for the next review; do not apply them here unless the
+review is due and Rob opts in. If nothing was logged all session, say why.
 
 Did this session discover anything that belongs in an existing skill?
 

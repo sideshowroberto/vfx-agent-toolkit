@@ -90,6 +90,13 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py unreal-vfx-a
    ```bash
    python .claude\skills\skill-creation-update\scripts\validate_skill.py SKILL_NAME
    ```
+   **Pass the skill NAME, never a path.** Given a path it cannot find the
+   skill and still prints `[OK] PASS (0/0 automated checks)` - a vacuous
+   pass (2026-08-22). Also known: Article VIII enforces the retired
+   emoji-template section list (Quick Start, Dependencies, Last Updated...),
+   so current-style skills such as `wrap-session` FAIL it; treat an
+   Article VIII-only failure as instrument drift, not a defect, until the
+   validator is updated.
 2. **Review report:**
    - Article I: No hard-coded paths detected [OK]
    - Article III: 470 lines <500 [OK]
