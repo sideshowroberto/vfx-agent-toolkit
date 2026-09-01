@@ -1,8 +1,8 @@
 {
-  "name": "unreal-vfx",
-  "description": "Unreal Engine 5.8 VFX pipeline via the native UE MCP (ModelContextProtocol plugin + VibeUE toolsets): Blueprint automation, PCG, actor operations, Sequencer, Python scripting.",
-  "version": "2.0.2",
-  "author": {
-    "name": "Rob Williams"
-  }
+    "name":  "unreal-vfx",
+    "description":  "Unreal Engine 5.8 VFX pipeline via the native UE MCP (ModelContextProtocol plugin + VibeUE toolsets): Blueprint automation, PCG, actor operations, Sequencer, Python scripting.",
+    "version":  "2.0.2",
+    "author":  {
+                   "name":  "Rob Williams"
+               }
 }

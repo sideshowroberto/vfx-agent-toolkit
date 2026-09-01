@@ -1,0 +1,16 @@
+{
+  "description": "task-observer: inject the observation-log status at session start, resume and after compaction",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/task-observer/scripts/observe.sh\" status"
+          }
+        ]
+      }
+    ]
+  }
+}
