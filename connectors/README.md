@@ -46,6 +46,26 @@ you: run `setup-deps.ps1` yourself after cloning.
 | ComfyUI | `comfyui\install.ps1` | Registers the ComfyUI MCP (`npx comfyui-mcp`) | Local ComfyUI install, Node.js 18+; `COMFYUI_URL` defaults to `http://localhost:8188`; Comfy CLI (`pip install comfy-cli`) recommended for headless generation |
 | Magnific | `magnific\install.ps1` | Registers the hosted MCP at `https://mcp.magnific.com` | Magnific account; OAuth opens in your browser on first use |
 
+## Using the connectors from OpenCode, Qwen Code, or another harness
+
+Every script above takes a `-Harness` switch. The default, `claude`, is
+unchanged: it runs `claude mcp add`. Any other value skips Claude Code
+entirely (the `claude` command does not need to exist) and, after copying
+bridge files and installing dependencies as usual, prints the resolved MCP
+server definition - command, absolute paths, env vars, or URL - as a
+ready-to-paste snippet:
+
+```powershell
+connectors\nuke\install.ps1 -Harness opencode   # opencode.json "mcp" block
+connectors\nuke\install.ps1 -Harness qwen       # ~\.qwen\settings.json "mcpServers" block
+connectors\nuke\install.ps1 -NoRegister         # plain command + args for any other client
+```
+
+`-NoRegister` is shorthand for `-Harness none`. Paste the snippet into the
+harness config it names, restart that harness, and the server appears
+exactly as it would in Claude Code. The shared printer lives in
+`connectors\mcp-harness.ps1`.
+
 Step-by-step per-app instructions with expected output:
 [docs/GETTING-STARTED.md](../docs/GETTING-STARTED.md)
 

@@ -2,8 +2,17 @@
 # Installs Nuke MCP server for Claude Code
 
 param(
-    [string]$NukePrefs = ""
+    [string]$NukePrefs = "",
+    # Target harness. "claude" (default) registers with Claude Code. Any other
+    # value skips registration and prints the server definition to paste into
+    # that harness's config. -NoRegister is shorthand for -Harness none.
+    [ValidateSet("claude", "opencode", "qwen", "none")]
+    [string]$Harness = "claude",
+    [switch]$NoRegister
 )
+
+if ($NoRegister) { $Harness = "none" }
+. (Join-Path $PSScriptRoot "..\mcp-harness.ps1")
 
 Write-Host "=== Nuke VFX Plugin Setup ===" -ForegroundColor Cyan
 Write-Host "Connects Claude Code to Nuke via MCP.`n"
@@ -14,8 +23,8 @@ function Test-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
 
 # --- 1. Prerequisites ---------------------------------------------------------
 
-if (-not (Test-Command "claude")) {
-    Write-Error "Claude Code not found. Install from https://claude.ai/code and run plugins\vfx-core\install.ps1 first."
+if ($Harness -eq "claude" -and -not (Test-Command "claude")) {
+    Write-Error "Claude Code not found. Install from https://claude.ai/code and run plugins\vfx-core\install.ps1 first. (Using another harness? Pass -Harness opencode|qwen|none.)"
     exit 1
 }
 if (-not (Test-Command "node")) {
@@ -111,20 +120,29 @@ $serverScript = Join-Path $serverDir "src\index.js"
 [System.Environment]::SetEnvironmentVariable("NUKE_MCP_SERVER_PATH", $serverScript, "User")
 Write-Host "  Set NUKE_MCP_SERVER_PATH = $serverScript" -ForegroundColor Green
 
-Write-Host "`nRegistering nuke MCP server..."
-claude mcp add --transport stdio nuke --scope user -- node $serverScript
+if ($Harness -eq "claude") {
+    Write-Host "`nRegistering nuke MCP server..."
+    claude mcp add --transport stdio nuke --scope user -- node $serverScript
 
-# --- 7. Verify ----------------------------------------------------------------
+    # --- 7. Verify ------------------------------------------------------------
 
-Write-Host "`n=== Installed MCP Servers ===" -ForegroundColor Green
-claude mcp list
+    Write-Host "`n=== Installed MCP Servers ===" -ForegroundColor Green
+    claude mcp list
+} else {
+    Write-McpServerConfig -Harness $Harness -Name "nuke" -Command "node" -Arguments @($serverScript)
+}
 
 Write-Host "`n=== Nuke VFX Plugin Setup Complete ===" -ForegroundColor Cyan
 Write-Host "Next steps:"
 Write-Host "  1. Open Nuke (restart if already open)"
 Write-Host "     The MCP bridge starts automatically on port 8765 -- no extra steps needed."
-Write-Host "  2. In Claude Code run /mcp to verify nuke is connected"
-Write-Host "  3. Ask Claude: 'List all nodes in the current Nuke script'"
+if ($Harness -eq "claude") {
+    Write-Host "  2. In Claude Code run /mcp to verify nuke is connected"
+    Write-Host "  3. Ask Claude: 'List all nodes in the current Nuke script'"
+} else {
+    Write-Host "  2. Add the server definition printed above to your harness config and restart it"
+    Write-Host "  3. Ask the agent: 'List all nodes in the current Nuke script'"
+}
 Write-Host ""
 Write-Host "If the bridge did not start, run this in Nuke's Script Editor:" -ForegroundColor Yellow
 Write-Host "  exec(open(r'~/.nuke/nuke_bridge.py').read())" -ForegroundColor White

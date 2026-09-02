@@ -3,8 +3,17 @@
 
 param(
     [string]$ServerPath = "",
-    [string]$HoudiniVersion = ""
+    [string]$HoudiniVersion = "",
+    # Target harness. "claude" (default) registers with Claude Code. Any other
+    # value skips registration and prints the server definition to paste into
+    # that harness's config. -NoRegister is shorthand for -Harness none.
+    [ValidateSet("claude", "opencode", "qwen", "none")]
+    [string]$Harness = "claude",
+    [switch]$NoRegister
 )
+
+if ($NoRegister) { $Harness = "none" }
+. (Join-Path $PSScriptRoot "..\mcp-harness.ps1")
 
 Write-Host "=== Houdini VFX Plugin Setup ===" -ForegroundColor Cyan
 Write-Host "Connects Claude Code to Houdini via MCP.`n"
@@ -15,8 +24,8 @@ function Test-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
 
 # --- 1. Prerequisites ---------------------------------------------------------
 
-if (-not (Test-Command "claude")) {
-    Write-Error "Claude Code not found. Install vfx-base first: ..\vfx-base\install.bat"
+if ($Harness -eq "claude" -and -not (Test-Command "claude")) {
+    Write-Error "Claude Code not found. Install from https://claude.ai/code, or pass -Harness opencode|qwen|none for another harness."
     exit 1
 }
 if (-not (Test-Command "uv")) {
@@ -246,13 +255,18 @@ Write-Host "Set HOUDINI_MCP_SERVER_PATH = $installedServerPath" -ForegroundColor
 # pyproject.toml (mcp[cli]). Without it, uv resolves from whatever
 # directory the MCP client happens to launch the server in, and the
 # server dies with ModuleNotFoundError: mcp.
-Write-Host "`nRegistering houdini MCP server..."
-claude mcp add --transport stdio houdini --scope user -- uv run --directory $targetDir python $installedServerPath
+if ($Harness -eq "claude") {
+    Write-Host "`nRegistering houdini MCP server..."
+    claude mcp add --transport stdio houdini --scope user -- uv run --directory $targetDir python $installedServerPath
 
-# --- 9. Verify ----------------------------------------------------------------
+    # --- 9. Verify ------------------------------------------------------------
 
-Write-Host "`n=== Installed MCP Servers ===" -ForegroundColor Green
-claude mcp list
+    Write-Host "`n=== Installed MCP Servers ===" -ForegroundColor Green
+    claude mcp list
+} else {
+    Write-McpServerConfig -Harness $Harness -Name "houdini" -Command "uv" `
+        -Arguments @("run", "--directory", $targetDir, "python", $installedServerPath)
+}
 
 Write-Host "`n=== Houdini VFX Plugin Setup Complete ===" -ForegroundColor Green
 Write-Host "Next steps:"
@@ -260,5 +274,9 @@ Write-Host "  1. Restart Houdini"
 Write-Host "     - 'Claude MCP' shelf appears automatically (click MCP to start server)"
 Write-Host "     - Or: Windows -> Python Panels -> Claude MCP for a dockable panel"
 Write-Host "  2. Click 'Start MCP Server' (shelf or panel)"
-Write-Host "  3. In Claude Code: /mcp to verify houdini is connected"
-Write-Host "  4. Ask Claude: 'Show me the Houdini scene'"
+if ($Harness -eq "claude") {
+    Write-Host "  3. In Claude Code: /mcp to verify houdini is connected"
+} else {
+    Write-Host "  3. Add the server definition printed above to your harness config and restart it"
+}
+Write-Host "  4. Ask the agent: 'Show me the Houdini scene'"

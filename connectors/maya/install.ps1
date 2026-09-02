@@ -8,8 +8,16 @@
 param(
     # Bridge is bundled with this connector; override for an external clone
     [string]$BridgeDir = (Join-Path $PSScriptRoot "bridge"),
-    [string]$MayaScripts = ""
+    [string]$MayaScripts = "",
+    # Target harness, passed through to register.ps1. "claude" (default)
+    # registers with Claude Code; anything else prints the server definition
+    # for that harness instead. -NoRegister is shorthand for -Harness none.
+    [ValidateSet("claude", "opencode", "qwen", "none")]
+    [string]$Harness = "claude",
+    [switch]$NoRegister
 )
+
+if ($NoRegister) { $Harness = "none" }
 
 $ErrorActionPreference = "Stop"
 $scriptDir = Split-Path $MyInvocation.MyCommand.Path -Parent
@@ -25,7 +33,7 @@ if (-not (Test-Path (Join-Path $BridgeDir "maya_mcp_server.py"))) {
 
 $registerScript = Join-Path $scriptDir "register.ps1"
 if (Test-Path $registerScript) {
-    & $registerScript
+    & $registerScript -Harness $Harness
 } else {
     Write-Host "  register.ps1 not found next to this script - run it separately to register the MCP server." -ForegroundColor Yellow
 }

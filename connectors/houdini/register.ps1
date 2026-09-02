@@ -2,12 +2,26 @@
 # Registers the Houdini MCP server with Claude Code.
 # Assumes bridge is already installed in Houdini prefs.
 
-param([string]$ServerPath = "")
+param(
+    [string]$ServerPath = "",
+    # "claude" (default) registers with Claude Code; anything else prints the
+    # server definition for that harness instead. -NoRegister = -Harness none.
+    [ValidateSet("claude", "opencode", "qwen", "none")]
+    [string]$Harness = "claude",
+    [switch]$NoRegister
+)
+
+if ($NoRegister) { $Harness = "none" }
+. (Join-Path $PSScriptRoot "..\mcp-harness.ps1")
 
 Write-Host "=== Houdini MCP - Register ===" -ForegroundColor Cyan
 
 function Test-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
 if (-not (Test-Command "uv")) { Write-Error "uv not found. Run: pip install uv"; exit 1 }
+if ($Harness -eq "claude" -and -not (Test-Command "claude")) {
+    Write-Error "Claude Code not found. Install from https://claude.ai/code, or pass -Harness opencode|qwen|none."
+    exit 1
+}
 
 if (-not $ServerPath) { $ServerPath = $env:HOUDINI_MCP_SERVER_PATH }
 
@@ -34,6 +48,11 @@ Write-Host "  [OK] Server: $ServerPath" -ForegroundColor Green
 # pyproject.toml (installed next to the server script). Without it the
 # server dies with ModuleNotFoundError: mcp.
 $serverDir = Split-Path $ServerPath -Parent
-claude mcp add --transport stdio houdini --scope user -- uv run --directory $serverDir python $ServerPath
-Write-Host "  [OK] houdini registered" -ForegroundColor Green
-claude mcp list
+if ($Harness -eq "claude") {
+    claude mcp add --transport stdio houdini --scope user -- uv run --directory $serverDir python $ServerPath
+    Write-Host "  [OK] houdini registered" -ForegroundColor Green
+    claude mcp list
+} else {
+    Write-McpServerConfig -Harness $Harness -Name "houdini" -Command "uv" `
+        -Arguments @("run", "--directory", $serverDir, "python", $ServerPath)
+}

@@ -2,12 +2,26 @@
 # Registers the Nuke MCP server with Claude Code.
 # Assumes bridge files are already in ~/.nuke/ and server script exists.
 
-param([string]$ServerPath = "")
+param(
+    [string]$ServerPath = "",
+    # "claude" (default) registers with Claude Code; anything else prints the
+    # server definition for that harness instead. -NoRegister = -Harness none.
+    [ValidateSet("claude", "opencode", "qwen", "none")]
+    [string]$Harness = "claude",
+    [switch]$NoRegister
+)
+
+if ($NoRegister) { $Harness = "none" }
+. (Join-Path $PSScriptRoot "..\mcp-harness.ps1")
 
 Write-Host "=== Nuke MCP - Register ===" -ForegroundColor Cyan
 
 function Test-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
 if (-not (Test-Command "node")) { Write-Error "Node.js not found."; exit 1 }
+if ($Harness -eq "claude" -and -not (Test-Command "claude")) {
+    Write-Error "Claude Code not found. Install from https://claude.ai/code, or pass -Harness opencode|qwen|none."
+    exit 1
+}
 
 # Resolve server path
 if (-not $ServerPath) { $ServerPath = $env:NUKE_MCP_SERVER_PATH }
@@ -57,6 +71,10 @@ if ((Test-Path (Join-Path $bridgeDir "package.json")) -and
 
 [System.Environment]::SetEnvironmentVariable("NUKE_MCP_SERVER_PATH", $ServerPath, "User")
 
-claude mcp add --transport stdio nuke --scope user -- node $ServerPath
-Write-Host "  [OK] nuke registered" -ForegroundColor Green
-claude mcp list
+if ($Harness -eq "claude") {
+    claude mcp add --transport stdio nuke --scope user -- node $ServerPath
+    Write-Host "  [OK] nuke registered" -ForegroundColor Green
+    claude mcp list
+} else {
+    Write-McpServerConfig -Harness $Harness -Name "nuke" -Command "node" -Arguments @($ServerPath)
+}

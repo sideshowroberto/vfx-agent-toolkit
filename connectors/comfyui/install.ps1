@@ -3,7 +3,17 @@
 # Checks prerequisites (Node.js/npx, optional Comfy CLI), validates the ComfyUI
 # install path, then calls register.ps1 to do the actual registration.
 
-param([string]$ComfyUIPath = "")
+param(
+    [string]$ComfyUIPath = "",
+    # Target harness, passed through to register.ps1. "claude" (default)
+    # registers with Claude Code; anything else prints the server definition
+    # for that harness instead. -NoRegister is shorthand for -Harness none.
+    [ValidateSet("claude", "opencode", "qwen", "none")]
+    [string]$Harness = "claude",
+    [switch]$NoRegister
+)
+
+if ($NoRegister) { $Harness = "none" }
 
 Write-Host "=== ComfyUI MCP - Install ===" -ForegroundColor Cyan
 Write-Host "Registers the comfyui-mcp server (runs via npx, talks to a local ComfyUI on port 8188)."
@@ -11,8 +21,8 @@ Write-Host ""
 
 function Test-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
 
-if (-not (Test-Command "claude")) {
-    Write-Error "Claude Code not found. Install from https://claude.ai/code"
+if ($Harness -eq "claude" -and -not (Test-Command "claude")) {
+    Write-Error "Claude Code not found. Install from https://claude.ai/code, or pass -Harness opencode|qwen|none for another harness."
     exit 1
 }
 
@@ -53,11 +63,15 @@ if (-not (Test-Path (Join-Path $ComfyUIPath "main.py"))) {
 Write-Host "  [OK] ComfyUI: $ComfyUIPath" -ForegroundColor Green
 
 # Register the MCP server
-& (Join-Path $PSScriptRoot "register.ps1") -ComfyUIPath $ComfyUIPath
+& (Join-Path $PSScriptRoot "register.ps1") -ComfyUIPath $ComfyUIPath -Harness $Harness
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host ""
 Write-Host "=== ComfyUI MCP Ready ===" -ForegroundColor Green
 Write-Host "Next steps:"
 Write-Host "  1. Start ComfyUI (it must be listening on http://localhost:8188)"
-Write-Host "  2. In Claude Code: /mcp to verify comfyui is connected"
+if ($Harness -eq "claude") {
+    Write-Host "  2. In Claude Code: /mcp to verify comfyui is connected"
+} else {
+    Write-Host "  2. Add the server definition printed above to your harness config and restart it"
+}

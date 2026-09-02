@@ -189,6 +189,23 @@ Registers the hosted Magnific MCP at https://mcp.magnific.com. You need a
 Magnific account; the first time Claude uses a Magnific tool, an OAuth page
 opens in your browser to authorize.
 
+### Using another harness (OpenCode, Qwen Code)
+
+If your agent is OpenCode or Qwen Code rather than Claude Code, run the
+same connector scripts with `-Harness opencode` or `-Harness qwen`. The
+script still copies bridge files and installs dependencies, but instead of
+calling `claude mcp add` it prints a snippet with the resolved absolute
+paths for you to paste into `opencode.json` (the `"mcp"` block) or
+`~\.qwen\settings.json` (the `"mcpServers"` block):
+
+```powershell
+connectors\nuke\install.ps1 -Harness qwen
+```
+
+`-NoRegister` (same as `-Harness none`) prints a plain command and
+argument list for any other MCP client. Restart the harness after editing
+its config. Steps 1-3 above are Claude Code specific and can be skipped.
+
 ## Step 5: Verify
 
 Restart Claude Code (required - see troubleshooting), then:

@@ -12,13 +12,21 @@
 param(
     [string]$ComfyUIPath = "",
     [string]$ComfyUIUrl = "http://127.0.0.1:8188",
-    [string]$Scope = "project"
+    [string]$Scope = "project",
+    # "claude" (default) registers with Claude Code; anything else prints the
+    # server definition for that harness instead. -NoRegister = -Harness none.
+    [ValidateSet("claude", "opencode", "qwen", "none")]
+    [string]$Harness = "claude",
+    [switch]$NoRegister
 )
+
+if ($NoRegister) { $Harness = "none" }
+. (Join-Path $PSScriptRoot "..\mcp-harness.ps1")
 
 Write-Host "=== ComfyUI FL-MCP - Register (optional companion) ===" -ForegroundColor Cyan
 
 function Test-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
-if (-not (Test-Command "claude")) { Write-Error "Claude Code not found. Install from https://claude.ai/code"; exit 1 }
+if ($Harness -eq "claude" -and -not (Test-Command "claude")) { Write-Error "Claude Code not found. Install from https://claude.ai/code, or pass -Harness opencode|qwen|none."; exit 1 }
 if (-not (Test-Command "python")) { Write-Error "Python not found. Install from https://python.org (3.12+)"; exit 1 }
 
 if (-not $ComfyUIPath) {
@@ -30,7 +38,12 @@ if (-not (Test-Path $serverScript)) {
     exit 1
 }
 
-claude mcp add --transport stdio comfyui-fl --scope $Scope --env "COMFYUI_SERVER_URL=$ComfyUIUrl" -- python $serverScript
-Write-Host "  [OK] comfyui-fl registered (scope: $Scope)" -ForegroundColor Green
+if ($Harness -eq "claude") {
+    claude mcp add --transport stdio comfyui-fl --scope $Scope --env "COMFYUI_SERVER_URL=$ComfyUIUrl" -- python $serverScript
+    Write-Host "  [OK] comfyui-fl registered (scope: $Scope)" -ForegroundColor Green
+} else {
+    Write-McpServerConfig -Harness $Harness -Name "comfyui-fl" -Command "python" -Arguments @((Resolve-Path $serverScript).Path) `
+        -Environment @{ COMFYUI_SERVER_URL = $ComfyUIUrl }
+}
 Write-Host "  Note: ComfyUI must be running for the tools to work." -ForegroundColor Gray
-claude mcp list
+if ($Harness -eq "claude") { claude mcp list }
