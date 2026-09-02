@@ -22,7 +22,8 @@ Write or update the relevant memory files and keep the memory index current.
 ## 2. Skills
 
 **First, flush task-observer:** write any pending observations to the log
-(`observe.sh next-id`, one file each), run `observe.sh status`, and surface
+(`observe.sh next-id` or `observe.ps1 next-id`, one file each), run
+`observe status`, and surface
 the grouped summary (ids + titles, per skill) FROM THE LOG - not from memory.
 They stay logged for the next review; do not apply them here unless the
 review is due and Rob opts in. If nothing was logged all session, say why.

@@ -103,6 +103,12 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py unreal-vfx-a
    - Article IV: Independent testing documented [OK]
    - Article VI: 70% context reduction [OK]
    - Article VIII: All sections present [OK]
+   - **Bundled scripts (manual, not in the validator yet):** every flag shown in a
+     SKILL.md example (`python <skill-dir>/scripts/X.py --flag`) must appear in
+     that script's `--help`. Run the help and diff against the doc. A documented
+     flag argparse rejects is doc drift: qwen-delegate shipped a phantom `--file`
+     and a dead default port for weeks because nobody ran the script from the doc
+     (observation #4, 2026-09-01).
 3. **Address failures:**
    - Article I: Remove hard-coded paths, add params
    - Article III: Move details to reference docs

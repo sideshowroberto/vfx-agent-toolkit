@@ -11,7 +11,7 @@
     "plugins":  [
                     {
                         "name":  "vfx-core",
-                        "version":  "2.3.0",
+                        "version":  "2.3.1",
                         "description":  "Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).",
                         "source":  "./plugins/vfx-core"
                     },
