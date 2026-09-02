@@ -6,7 +6,7 @@ GENERATED 2026-09-02 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/re
 
 ## Skills, by plugin
 
-### vfx-core (v2.3.1, public)
+### vfx-core (v2.3.2, public)
 
 Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).
 
@@ -76,7 +76,7 @@ Requires: vfx-core
 - **agent: unreal-blueprint-specialist** - Expert in automating Unreal Engine Blueprint creation and compilation using Silent Execution pattern
 - **agent: unreal-pcg-specialist** - Expert in Unreal Engine PCG system for procedural terrain, vegetation, and asset placement with Python automation
 
-### blender-vfx (v2.0.4, public)
+### blender-vfx (v2.0.5, public)
 
 Blender VFX pipeline via the official Blender MCP (blender.org): modeling, animation, materials, geometry nodes, physics, rendering, sculpting, grease pencil, and ControlNet pass rendering for AI generation.
 

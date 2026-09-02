@@ -1,8 +1,8 @@
 {
-  "name": "seedance-vfx",
-  "description": "Seedance 2.0 video generation direction: prompt writing, camera, lighting, motion, characters, style, VFX, troubleshooting, and production recipes.",
-  "version": "1.0.2",
-  "author": {
-    "name": "Rob Williams"
-  }
+    "name":  "seedance-vfx",
+    "description":  "Seedance 2.0 video generation direction: prompt writing, camera, lighting, motion, characters, style, VFX, troubleshooting, and production recipes.",
+    "version":  "1.0.2",
+    "author":  {
+                   "name":  "Rob Williams"
+               }
 }

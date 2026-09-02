@@ -27,6 +27,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Tuple
 
+# Windows consoles default to cp1252, which crashes on the emoji in print output
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
 
 def parse_version(version: str) -> Optional[Tuple[int, int, int]]:
     """
@@ -132,9 +137,10 @@ def update_version_in_content(content: str, new_version: str) -> str:
     )
 
     # Update Version section
+    # \g<1> (not \1) - a bare backreference followed by a digit parses as group 12
     content = re.sub(
         r'(\*\*(?:Skill )?Version:\*\*\s*)\d+\.\d+\.\d+',
-        f'\\1{new_version}',
+        f'\\g<1>{new_version}',
         content,
         flags=re.IGNORECASE
     )
@@ -154,9 +160,10 @@ def update_last_updated(content: str) -> str:
     """
     current_date = datetime.now().strftime("%Y-%m-%d")
 
+    # \g<1> (not \1) - the date starts with a digit, so \1 would parse as group 12
     content = re.sub(
         r'(\*\*Last Updated:\*\*\s*)\d{4}-\d{2}-\d{2}',
-        f'\\1{current_date}',
+        f'\\g<1>{current_date}',
         content,
         flags=re.IGNORECASE
     )
@@ -211,10 +218,11 @@ def add_changelog_entry(
     version_history_pattern = r'(## Version History\s*\n)'
 
     if re.search(version_history_pattern, content, re.IGNORECASE):
-        # Add entry after section header
+        # Add entry after section header. Lambda replacement so backslashes in
+        # user-supplied change text are inserted literally, not parsed as escapes
         content = re.sub(
             version_history_pattern,
-            f'\\1\n{entry}\n',
+            lambda m: f'{m.group(1)}\n{entry}\n',
             content,
             flags=re.IGNORECASE
         )
@@ -374,6 +382,8 @@ class SkillUpdater:
                     [sys.executable, str(validate_script), self.skill_name],
                     capture_output=True,
                     text=True,
+                    encoding="utf-8",
+                    errors="replace",
                     timeout=30
                 )
                 if result.returncode == 0:

@@ -1,8 +1,8 @@
 {
-  "name": "maya-vfx",
-  "description": "Maya pipeline via MCP: scene control, geometry creation, materials (Arnold/USD), transforms, and FBX import/export.",
-  "version": "1.0.3",
-  "author": {
-    "name": "Rob Williams"
-  }
+    "name":  "maya-vfx",
+    "description":  "Maya pipeline via MCP: scene control, geometry creation, materials (Arnold/USD), transforms, and FBX import/export.",
+    "version":  "1.0.3",
+    "author":  {
+                   "name":  "Rob Williams"
+               }
 }

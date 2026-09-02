@@ -6,8 +6,8 @@ allowed-tools: Read,Write
 
 # Blender API Compatibility Skill
 
-**Version:** 3.0.0
-**Last Updated:** 2026-06-15
+**Version:** 3.1.0
+**Last Updated:** 2026-09-02
 **Dependencies:** Blender 5.1+
 
 ---
@@ -29,6 +29,8 @@ All changes below are tested and confirmed. The Blender MCP has full context, so
 # KeyError: 'GEOMETRY_NODES'                -> Modifier type renamed
 # KeyError/AttributeError on BSDF inputs    -> Input names changed
 # RuntimeError: "Cannot find node type"     -> Node type removed/renamed
+# TypeError: enum "FFMPEG" not found        -> Set media_type = 'VIDEO' first (5.0+)
+# AttributeError on 'sequences'             -> VSE renamed to strips/strips_all (5.0+)
 ```
 
 **Step 2: Apply the correct migration pattern** (see workflows below)
@@ -161,6 +163,68 @@ space.shading.type = 'MATERIAL'
 
 ---
 
+### Workflow 6: Render Output media_type Gates file_format (5.0+)
+
+**Use When:** Setting `file_format` fails with `enum "..." not found` (e.g. FFMPEG for video output)
+
+Blender 5.0 added `image_settings.media_type` (`IMAGE` / `MULTI_LAYER_IMAGE` / `VIDEO`). The `file_format` enum is **filtered by the active media_type** - video formats are only valid in VIDEO mode, image formats only in IMAGE mode.
+
+```python
+import bpy
+
+scene = bpy.context.scene
+
+# [X] BROKEN in 5.x - scene in default IMAGE mode
+# scene.render.image_settings.file_format = 'FFMPEG'
+# TypeError: enum "FFMPEG" not found in ('BMP', 'IRIS', 'PNG', ...)
+
+# [OK] WORKING - set media_type FIRST (portable 4.x/5.x pattern)
+if hasattr(scene.render.image_settings, "media_type"):  # 5.0+
+    scene.render.image_settings.media_type = 'VIDEO'
+scene.render.image_settings.file_format = 'FFMPEG'
+
+# Same in reverse - scene configured for video, switching to stills:
+if hasattr(scene.render.image_settings, "media_type"):
+    scene.render.image_settings.media_type = 'IMAGE'
+scene.render.image_settings.file_format = 'PNG'
+```
+
+**Save/restore gotcha:** code that snapshots and restores `image_settings` must restore `media_type` BEFORE `file_format`, or the restore itself throws - keep the property keys in an ordered sequence with `media_type` first.
+
+---
+
+### Workflow 7: VSE sequences -> strips Rename (5.0+)
+
+**Use When:** VSE code raises AttributeError on `sequences` / `sequences_all`
+
+```python
+import bpy
+
+se = bpy.context.scene.sequence_editor
+
+# [X] BROKEN in 5.x - old names removed
+# for strip in se.sequences: ...
+# all_strips = se.sequences_all
+
+# [OK] WORKING - portable via hasattr
+strips = se.strips if hasattr(se, "strips") else se.sequences
+all_strips = se.strips_all if hasattr(se, "strips_all") else se.sequences_all
+```
+
+**CRITICAL - never use `or` fallbacks here:**
+
+```python
+# [X] SUBTLE BUG - an EMPTY strips collection is falsy, so this falls
+# through to the missing 'sequences' attribute and returns None on a
+# valid (but empty) 5.x sequence editor. Survives testing on non-empty
+# scenes and only fails on empty ones.
+strips = getattr(se, "strips", None) or getattr(se, "sequences", None)
+```
+
+Branch on attribute **existence** (`hasattr`), never on truthiness.
+
+---
+
 ## ADVANCED TECHNIQUES
 
 ### Capability Detection (Preferred over Version Checking)
@@ -250,6 +314,20 @@ def set_render_engine_safe(preference):
 
 ---
 
+### TypeError: enum "FFMPEG" not found (file_format)
+
+**Cause:** Blender 5.0+ filters the `file_format` enum by `media_type`; the scene is in IMAGE mode
+**Fix:** `scene.render.image_settings.media_type = 'VIDEO'` before setting `file_format = 'FFMPEG'` (and `'IMAGE'` before PNG/JPEG etc. if the scene was set up for video)
+
+---
+
+### AttributeError: 'SequenceEditor' object has no attribute 'sequences'
+
+**Cause:** VSE `sequences`/`sequences_all` renamed to `strips`/`strips_all` in 5.0
+**Fix:** `se.strips if hasattr(se, "strips") else se.sequences` - never `getattr(...) or getattr(...)` (empty collections are falsy)
+
+---
+
 ## COMPLETE BREAKING CHANGES REFERENCE (4.2 -> 5.1)
 
 ### Render Engine
@@ -290,6 +368,12 @@ def set_render_engine_safe(preference):
 ### Cycles
 22. `from bpy_types import CyclesRenderSettings` -> Use `bpy.context.scene.cycles` directly
 
+### Render Output (5.0+)
+23. New `image_settings.media_type` (`IMAGE` / `MULTI_LAYER_IMAGE` / `VIDEO`) - `file_format` enum is filtered by it; set `media_type` BEFORE `file_format` (both directions), guard with `hasattr` for 4.x
+
+### Video Sequence Editor (5.0+)
+24. `sequence_editor.sequences` / `sequences_all` -> `strips` / `strips_all` - portable fallback must use `hasattr`, never `or` (empty collections are falsy)
+
 ---
 
 ## VALIDATION CHECKLIST
@@ -305,10 +389,17 @@ def set_render_engine_safe(preference):
 - [ ] File Output uses `directory`/`file_name` with trailing `.` for custom numbering
 - [ ] `scene.cycles` used directly (not imported from bpy_types)
 - [ ] Viewport shading uses `'MATERIAL'` not `'MATERIAL_PREVIEW'`
+- [ ] `media_type` set before `file_format` when changing render output format (5.0+)
+- [ ] VSE code uses `strips`/`strips_all` with `hasattr` fallback (no `or`-chain fallbacks)
 
 ---
 
 ## VERSION HISTORY
+
+**v3.1.0** (2026-09-02) - Blender 5.x render output + VSE gotchas (ported from a stranded July worktree edit)
+- Added Workflow 6: `image_settings.media_type` gates the `file_format` enum (5.0+) - set media_type before file_format, hasattr-guarded portable pattern
+- Added Workflow 7: VSE `sequences`/`sequences_all` -> `strips`/`strips_all` rename, with the falsy-fallback hazard (`or`-chains break on empty collections)
+- Both discovered live in Blender 5.1.2 during ai_tools addon development (2026-07-09); database entries #12/#13 in blender-ai-compatibility
 
 **v2.0.0** (2026-06-10) - MCP migration
 - Removed HTTP Bridge limitation section (bpy.ops works normally via MCP)
