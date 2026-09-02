@@ -1,6 +1,8 @@
 # comfyui-vfx installer (vfx-agent-toolkit)
 # Delegates to the comfyui MCP connector, which installs the bridge and
-# registers the MCP server with Claude Code.
+# registers the MCP server with Claude Code. Extra arguments pass through
+# to the connector: -Harness opencode|qwen|none (or -NoRegister) prints the
+# MCP server config for another harness instead of registering with Claude.
 
 $connector = Join-Path $PSScriptRoot "..\..\connectors\comfyui\install.ps1"
 if (-not (Test-Path $connector)) {
@@ -8,7 +10,7 @@ if (-not (Test-Path $connector)) {
     $connector = Join-Path $PSScriptRoot "..\..\connectors\comfyui\register.ps1"
 }
 if (Test-Path $connector) {
-    & $connector
+    & $connector @args
     exit $LASTEXITCODE
 } else {
     Write-Host "Connector not found: connectors\comfyui" -ForegroundColor Red
