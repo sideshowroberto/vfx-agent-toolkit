@@ -84,6 +84,8 @@ Full walkthrough with expected output: [docs/GETTING-STARTED.md](docs/GETTING-ST
 ## Plugins
 
 Install `vfx-core` first. Everything else is per-project, install what you use.
+The full skill-by-skill index with trigger phrases is generated into
+[docs/CAPABILITIES.md](docs/CAPABILITIES.md) on every release.
 
 | Plugin | What it covers |
 |--------|----------------|

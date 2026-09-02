@@ -238,6 +238,10 @@ powershell -ExecutionPolicy Bypass -File connectors\nuke\install.ps1
 
 ## Next steps
 
+- [CAPABILITIES.md](CAPABILITIES.md) - every skill and agent in every plugin,
+  one line each with its trigger phrases. Generated from source on each
+  release, so it is never stale. Point your agent at it when you ask "what
+  can we do for X?".
 - [ARCHITECTURE.md](ARCHITECTURE.md) - how plugins, skills, agents, and
   connectors fit together, and how to contribute your own.
 - [connectors/README.md](../connectors/README.md) - connector reference table.
