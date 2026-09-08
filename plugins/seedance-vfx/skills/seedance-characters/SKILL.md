@@ -21,6 +21,8 @@ metadata:
 
 # seedance-characters
 
+Reference resolution: `[ref:<name>]` resolves to `../seedance-20/references/<name>.md` (the seedance-20 skill's vendored reference corpus); `[skill:<name>]` is the sibling skill of that name.
+
 Use this for identity, consistency, multi-character blocking, wardrobe continuity, hand safety, expression control, and likeness-sensitive character guidance. Character prompting must remove ambiguity before adding style.
 
 Load `[ref:shot-list-continuity]` when character identity, wardrobe, props, eyeline, screen direction, or emotional state must survive across multiple shots.

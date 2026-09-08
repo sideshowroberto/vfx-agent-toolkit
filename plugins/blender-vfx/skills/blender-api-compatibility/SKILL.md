@@ -399,7 +399,7 @@ def set_render_engine_safe(preference):
 **v3.1.0** (2026-09-02) - Blender 5.x render output + VSE gotchas (ported from a stranded July worktree edit)
 - Added Workflow 6: `image_settings.media_type` gates the `file_format` enum (5.0+) - set media_type before file_format, hasattr-guarded portable pattern
 - Added Workflow 7: VSE `sequences`/`sequences_all` -> `strips`/`strips_all` rename, with the falsy-fallback hazard (`or`-chains break on empty collections)
-- Both discovered live in Blender 5.1.2 during ai_tools addon development (2026-07-09); database entries #12/#13 in blender-ai-compatibility
+- Both discovered live in Blender 5.1.2 during production addon development (2026-07-09); breaking-changes database entries #12/#13
 
 **v2.0.0** (2026-06-10) - MCP migration
 - Removed HTTP Bridge limitation section (bpy.ops works normally via MCP)

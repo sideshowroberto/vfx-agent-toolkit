@@ -1429,7 +1429,7 @@ if mat and mat.use_nodes:
 - Cross-engine export (Unreal, Unity, glTF)
 - Material library organization
 
-**blender-ai-compatibility Repository:**
+**Breaking-changes topics covered by the `blender-api-compatibility` skill:**
 - `api_changes/4.5_lighting_changes.md` - EEVEE_NEXT updates
 - `examples/production_workflows/procedural_materials.py` - Complete examples
 

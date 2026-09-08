@@ -10,6 +10,8 @@ metadata:
 
 # seedance-20
 
+Reference resolution: `[ref:<name>]` is `references/<name>.md` in this skill directory (vendored from the upstream seedance-2.0 project, MIT - see `ATTRIBUTION.md`); `[skill:<name>]` is the sibling skill of that name in this plugin.
+
 Seedance 2.0 operating loop for agent-directed video work. Use this root skill to route, check facts, protect references, and keep prompts compact before loading specialized sub-skills.
 
 ## Operating Loop

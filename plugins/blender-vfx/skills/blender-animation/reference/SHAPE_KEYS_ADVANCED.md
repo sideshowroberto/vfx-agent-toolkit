@@ -1174,8 +1174,8 @@ print("Mesh parented to armature (no modifier)")
 
 ## REFERENCE MATERIALS
 
-**Animation System Validation Report:**
-`<workspace>\Blender\blender-ai-compatibility\ANIMATION_SYSTEM_VALIDATION_REPORT.md`
+**Animation System Validation:**
+See the `blender-api-compatibility` skill's breaking-changes database (animation entries).
 
 **Blender Shape Keys API Reference (Official):**
 https://docs.blender.org/api/current/bpy.types.ShapeKey.html

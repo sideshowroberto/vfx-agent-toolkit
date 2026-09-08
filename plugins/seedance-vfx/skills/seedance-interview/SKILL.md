@@ -21,6 +21,8 @@ metadata:
 
 # seedance-interview
 
+Reference resolution: `[ref:<name>]` resolves to `../seedance-20/references/<name>.md` (the seedance-20 skill's vendored reference corpus); `[skill:<name>]` is the sibling skill of that name.
+
 Use this as the full director interview when the user has a rough idea rather than a ready scene.
 
 ## Process

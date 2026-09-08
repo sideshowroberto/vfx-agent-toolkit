@@ -10,16 +10,16 @@ Batch setup of Nuke comp/visdev files, folder structures, and shot tracking CSV.
 
 ## Script Location
 
-`Nuke/scripts/batch_shot_setup.py`
+`scripts/batch_shot_setup.py` (paths in this skill are relative to the skill directory)
 
 ## Show Configs
 
-`Nuke/configs/<show_name>.json` -- per-show overrides for OCIO, LUTs, viewer, format, etc.
+`configs/<show_name>.json` -- per-show overrides for OCIO, LUTs, viewer, format, etc.
 Only values that differ from the script's built-in defaults need to be in the JSON.
 `--show-config` may be repeated and is applied in order, so the standard call is
-`--show-config Nuke/configs/studio_defaults.json --show-config Nuke/configs/<show>.json`
+`--show-config configs/studio_defaults.json --show-config configs/<show>.json`
 (team defaults first, show overrides second; later files win). Start a show
-file from `Nuke/configs/show_template.json`.
+file from `configs/show_template.json`.
 
 **Built-in defaults:** Nuke 17.0 v2, ACEScg in/out, DWAA compression, 4608x3164, 23.976fps, and **no OCIO config**. The script prints the effective Nuke version and OCIO path at the top of every run and warns when OCIO is unset - point it at your team's config via `studio_defaults.json` (`ocio_config` key). A path baked into the script is always somebody's personal path on somebody else's machine.
 
@@ -32,8 +32,8 @@ your studio's approved channel. All paths passed to the script (`--shared`,
 if plates are missing under the local mirror, the sync has not happened yet;
 ask the pipeline owner rather than reaching for the network path directly.
 
-**Show configs:** one JSON per show under `Nuke/configs/`, e.g.
-`Nuke/configs/example_show.json` -- override only what differs from the
+**Show configs:** one JSON per show under `configs/`, e.g.
+`configs/example_show.json` -- override only what differs from the
 defaults (a common case: `viewer_process` set to a client-specific Rec.709
 output transform).
 
@@ -50,18 +50,18 @@ Ask the user for:
 ### Full run (all sequences, visdev context):
 
 ```bash
-python Nuke/scripts/batch_shot_setup.py \
+python scripts/batch_shot_setup.py \
   --csv "path/to/ShotGrid.csv" \
   --shared "PROJECT_ROOT/shared" \
   --plates-csv "path/to/plates_metadata.csv" \
-  --show-config "Nuke/configs/show_name.json" \
+  --show-config "configs/<show_name>.json" \
   --out "path/to/output/docs"
 ```
 
 ### Single sequence, comp context (legacy):
 
 ```bash
-python Nuke/scripts/batch_shot_setup.py \
+python scripts/batch_shot_setup.py \
   --csv "path/to/ShotGrid.csv" \
   --shared "PROJECT_ROOT/shared" \
   --seq ac030 \
@@ -91,13 +91,13 @@ python Nuke/scripts/batch_shot_setup.py \
 
 ### Thumbnails (headless, no MCP needed):
 
-`Nuke/scripts/make_shot_thumbnails.py` runs inside `nuke -t --safe`, takes the
+`scripts/make_shot_thumbnails.py` runs inside `nuke -t --safe`, takes the
 same plates CSV and plates dir, writes `{shot}_{plate}_thumb.png` (the name the
 tracker's Thumbnail column expects), reads every PNG back, and exits 1 if any
 failed:
 
 ```
-"C:\Program Files\Nuke17.0v2\Nuke17.0.exe" -t --safe Nuke/scripts/make_shot_thumbnails.py --plates-csv <plates.csv> --plates-dir <plates root> --out <out>/thumbnails [--ocio-config <config.ocio>]
+"C:\Program Files\Nuke17.0v2\Nuke17.0.exe" -t --safe scripts/make_shot_thumbnails.py --plates-csv <plates.csv> --plates-dir <plates root> --out <out>/thumbnails [--ocio-config <config.ocio>]
 ```
 
 ### Thumbnails (alternative, via Nuke MCP):

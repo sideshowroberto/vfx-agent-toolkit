@@ -21,6 +21,8 @@ metadata:
 
 # seedance-vfx
 
+Reference resolution: `[ref:<name>]` resolves to `../seedance-20/references/<name>.md` (the seedance-20 skill's vendored reference corpus); `[skill:<name>]` is the sibling skill of that name.
+
 VFX prompts need material behavior, source, timing, and consequence. Treat every effect as physical: it starts somewhere, interacts with light and objects, changes over time, and ends in a visible state. Avoid generic words such as magical, explosive, or cinematic unless they are translated into particles, fluids, smoke, light, debris, deformation, or energy behavior.
 
 ## Effects Contract

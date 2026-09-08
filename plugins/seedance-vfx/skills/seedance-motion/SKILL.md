@@ -21,6 +21,8 @@ metadata:
 
 # seedance-motion
 
+Reference resolution: `[ref:<name>]` resolves to `../seedance-20/references/<name>.md` (the seedance-20 skill's vendored reference corpus); `[skill:<name>]` is the sibling skill of that name.
+
 Use physical verbs and consequences. Motion should be observable on screen, timed within the clip, and assigned to a subject or object. Prefer one strong action with a visible endpoint over several vague actions competing for attention.
 
 Load `[ref:reference-workflow]` for video-motion references, `[ref:shot-list-continuity]` for action handoffs across shots, and `[ref:examples-by-mode]` for safe edit, extend, and R2V patterns.

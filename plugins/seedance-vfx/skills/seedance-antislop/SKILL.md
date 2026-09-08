@@ -20,6 +20,8 @@ metadata:
 
 # seedance-antislop
 
+Reference resolution: `[ref:<name>]` resolves to `../seedance-20/references/<name>.md` (the seedance-20 skill's vendored reference corpus); `[skill:<name>]` is the sibling skill of that name.
+
 Remove filler that hides missing visual decisions. A strong Seedance prompt uses observable nouns, verbs, camera moves, light sources, sound cues, and constraints. A weak prompt asks for excellence without saying what excellence looks or sounds like.
 
 ## Visibility Test

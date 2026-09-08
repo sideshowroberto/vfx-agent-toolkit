@@ -1148,7 +1148,7 @@ if output and not output.inputs['Surface'].is_linked:
 - `blender-rendering` - EEVEE_NEXT/Cycles settings, lighting
 - `blender-api-compatibility` - Breaking changes database
 
-**blender-ai-compatibility Repository:**
+**Breaking-changes topics covered by the `blender-api-compatibility` skill:**
 - `api_changes/4.5_lighting_changes.md` - EEVEE -> EEVEE_NEXT
 - `api_changes/4.3_node_interface_changes.md` - Node group interface API
 - `examples/production_workflows/pbr_material_setup.py` - Complete PBR examples

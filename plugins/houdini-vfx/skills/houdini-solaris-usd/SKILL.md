@@ -439,8 +439,6 @@ Properly composed USD scenes using appropriate composition arcs
 
 **Use Case:** Extend USD with custom data (game data, pipeline metadata)
 
-**Detailed Documentation:** See [reference/custom_schemas.md](reference/custom_schemas.md)
-
 **Quick Example:**
 ```python
 # Python LOP - Add custom attributes
@@ -707,25 +705,9 @@ USD ROP
 
 ### **Progressive Disclosure Pattern**
 
-For detailed information, see linked reference docs:
-
-**USD Composition Detailed Guide:** [reference/usd_composition_guide.md](reference/usd_composition_guide.md)
-- All composition arcs explained
-- Layer stack resolution
-- Opinion strength diagram
-- Debugging composition issues
-
-**Custom Schemas and Extensions:** [reference/custom_schemas.md](reference/custom_schemas.md)
-- Creating custom USD schemas
-- Pipeline-specific attributes
-- Schema generation tools
-- Best practices for extending USD
-
-**USD Export Optimization:** [reference/export_optimization.md](reference/export_optimization.md)
-- File size reduction techniques
-- Instancing strategies
-- Reference vs payload decisions
-- USDZ packaging
+This skill ships no separate reference guides: the technique sections above
+are the reference. Use the Houdini MCP `search_help` / `get_help_page` tools
+for SideFX's own documentation.
 
 ---
 

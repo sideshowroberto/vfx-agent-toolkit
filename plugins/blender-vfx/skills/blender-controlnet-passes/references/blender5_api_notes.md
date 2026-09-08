@@ -1,6 +1,6 @@
 # Blender 5.x API Notes for Pass Rendering
 
-Verified on Blender 5.1.2. Companion to `Blender/scripts/setup_controlnet_passes.py`.
+Verified on Blender 5.1.2. Companion to `scripts/setup_controlnet_passes.py`.
 
 ## Compositor node tree
 
@@ -55,7 +55,7 @@ fo.file_output_items.new(socket_type='RGBA', name='Combined')   # FLOAT / RGBA /
   only its first item" bug report on 2026-08-21 (5.1.0 beta + 5.1.2, 312
   production frames "hollow") - every file was intact. Nuke reads parts as
   layers, no merge needed. Verify with
-  `python Blender/scripts/merge_exr_layers.py --inspect file.exr` (iterates
+  `python scripts/merge_exr_layers.py --inspect file.exr` (iterates
   `File.parts`), never with `channels()` alone. Any EXR QC that reports
   only Combined has almost certainly misread a multi-part file.
 - Adding items crashed one interactive session historically; add them one

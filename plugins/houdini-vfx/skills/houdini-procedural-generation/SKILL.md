@@ -366,8 +366,6 @@ Each piece processed independently with random variations, then merged into fina
 
 **Use Case:** Trees, plants, coral, lightning, river networks
 
-**Detailed Documentation:** See [reference/lsystems_guide.md](reference/lsystems_guide.md)
-
 **Quick Example:**
 ```
 L-System SOP
@@ -620,25 +618,9 @@ Instances only created at render time, not in viewport
 
 ### **Progressive Disclosure Pattern**
 
-For detailed information, see linked reference docs:
-
-**L-Systems Guide:** [reference/lsystems_guide.md](reference/lsystems_guide.md)
-- L-System syntax and rules
-- Organic branching patterns
-- Tree/plant generation
-- Procedural lightning/rivers
-
-**Advanced Scattering Techniques:** [reference/advanced_scattering.md](reference/advanced_scattering.md)
-- Blue noise distribution
-- Texture-based scattering
-- Multi-resolution scatter
-- Terrain-aware placement
-
-**Procedural Architecture:** [reference/procedural_architecture.md](reference/procedural_architecture.md)
-- Building generation workflows
-- Modular asset assembly
-- City layout patterns
-- LOD strategies
+This skill ships no separate reference guides: the technique sections above
+are the reference. Use the Houdini MCP `search_help` / `get_help_page` tools
+for SideFX's own documentation.
 
 ---
 

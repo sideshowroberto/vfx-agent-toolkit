@@ -28,7 +28,7 @@ tools: Read,Write,Grep,Bash,Skill
 - Manage skill dependencies and execution order
 
 ### 3. API Compatibility
-- Reference `Blender/blender-ai-compatibility/` for breaking changes (19+ documented, 4.2->4.5.0)
+- Invoke the `blender-api-compatibility` skill for breaking changes (19+ documented, 4.2->4.5.0)
 - Key changes still in effect regardless of connection method:
   - `BLENDER_EEVEE_NEXT` (not `BLENDER_EEVEE`)
   - `NODES` modifier type (not `GEOMETRY_NODES`)
@@ -62,7 +62,7 @@ tools: Read,Write,Grep,Bash,Skill
 
 ### Fix API Errors
 1. Invoke `blender-api-compatibility` skill
-2. Cross-reference `Blender/blender-ai-compatibility/api_changes/VERIFIED_BREAKING_CHANGES.md`
+2. Cross-reference the breaking-changes database in that skill
 3. Provide migrated code
 
 ### Multi-Skill Workflow

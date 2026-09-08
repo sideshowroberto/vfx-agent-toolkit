@@ -1,0 +1,9 @@
+{
+    "_comment": "Per-job overrides for batch_shot_setup.py. Copy to the job's AGENT/shots/<job>.json, keep ONLY the keys that differ from studio_defaults.json, delete the rest. Pass AFTER studio_defaults.json: --show-config studio_defaults.json --show-config <job>.json",
+    "_example_format_w": 4608,
+    "_example_format_h": 3164,
+    "_example_fps": "23.976",
+    "_example_viewer_process": "Output - Rec.709 (FS)",
+    "_example_write_view": "Output - Rec.709 (FS)",
+    "_example_ocio_config": "<path to your team OCIO config>/config.ocio"
+}

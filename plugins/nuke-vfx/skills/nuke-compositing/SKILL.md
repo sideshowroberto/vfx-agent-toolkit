@@ -303,7 +303,7 @@ def setup_keying_comp(plate_path: str, bg_path: str, output_path: str,
 ### Transform
 - `Transform` - 2D position/scale/rotation
 
-### For complete list, see `reference/node-types.md`
+### For the complete list use Nuke's built-in node reference (Help > Documentation)
 
 ---
 

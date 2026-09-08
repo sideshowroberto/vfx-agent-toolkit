@@ -1375,8 +1375,8 @@ else:
 
 ## REFERENCE MATERIALS
 
-**Animation System Validation Report:**
-`<workspace>\Blender\blender-ai-compatibility\ANIMATION_SYSTEM_VALIDATION_REPORT.md`
+**Animation System Validation:**
+See the `blender-api-compatibility` skill's breaking-changes database (animation entries).
 
 **Blender Animation Specialist Agent:**
 `<workspace>\.claude\agents\blender-animation-specialist.md`

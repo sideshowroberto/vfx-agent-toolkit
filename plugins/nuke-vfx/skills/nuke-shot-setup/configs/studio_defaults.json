@@ -1,0 +1,14 @@
+{
+    "_comment": "Team defaults for batch_shot_setup.py. Pass this FIRST with --show-config, then the job's own JSON (--show-config may be repeated; later files win). This shipped file is neutral - set ocio_config to your team's OCIO config path (an empty value means no OCIO, and the script warns at the top of every run).",
+    "ocio_config": "",
+    "nuke_version": "17.0 v2",
+    "nuke_dll": "C:/Program Files/Nuke17.0v2/nuke-17.0.2.dll",
+    "viewer_process": "Output - K1S1-like - Rec.709",
+    "write_display": "FS",
+    "write_view": "Output - K1S1-like - Rec.709",
+    "monitor_lut": "ACES/sRGB",
+    "monitor_out_lut": "sRGB (ACES)",
+    "read_colorspace": "ACES - ACEScg",
+    "write_colorspace": "ACES - ACEScg",
+    "write_compression": "DWAA"
+}

@@ -444,8 +444,6 @@ Modified geometry with new points, primitives, or attribute values
 
 **Use Case:** Respond to scene events, create custom UI panels
 
-**Detailed Documentation:** See [reference/callbacks_and_ui.md](reference/callbacks_and_ui.md)
-
 **Quick Example:**
 ```python
 # Add callback when nodes are created
@@ -471,70 +469,6 @@ def create_custom_setup():
     geo.layoutChildren()
     return geo
 ```
-
----
-
-## SCRIPT REFERENCE
-
-### **batch_process.py**
-
-**Purpose:** Batch process multiple Houdini scenes
-
-**Usage:**
-```bash
-hython scripts/batch_process.py /path/to/scenes/*.hip --operation render
-```
-
-**Arguments:**
-- `scene_files` (required): Glob pattern for scene files
-- `--operation` (required): Operation to perform (render, export, cleanup)
-- `--output-dir` (optional): Output directory for results
-- `--frame-range` (optional): Frame range (default: 1-100)
-
-**Output:** Processed files in output directory
-
-**Example:**
-```bash
-hython scripts/batch_process.py "$HIP/scenes/shot_*.hip" \
-    --operation export \
-    --output-dir "$HIP/export/" \
-    --frame-range 1-240
-```
-
-**What It Does:**
-1. Loads each scene file sequentially
-2. Performs specified operation (render ROP, export geo, etc.)
-3. Saves results to output directory
-4. Logs success/failure for each file
-5. Returns summary report
-
----
-
-### **node_network_builder.py**
-
-**Purpose:** Create complex node networks from JSON templates
-
-**Usage:**
-```bash
-hython scripts/node_network_builder.py template.json --parent /obj/geo1
-```
-
-**JSON Template Format:**
-```json
-{
-  "nodes": [
-    {"type": "grid", "name": "source", "params": {"rows": 50, "cols": 50}},
-    {"type": "mountain::2.0", "name": "deform", "params": {"height": 2.0}},
-    {"type": "scatter::2.0", "name": "scatter", "params": {"npts": 5000}}
-  ],
-  "connections": [
-    {"from": "source", "to": "deform", "input": 0},
-    {"from": "deform", "to": "scatter", "input": 0}
-  ]
-}
-```
-
-**Output:** Complete node network created from template
 
 ---
 
@@ -702,22 +636,9 @@ for frame, value in [(1, 0.0), (50, 5.0), (100, 2.0)]:
 
 ### **Progressive Disclosure Pattern**
 
-For detailed information, see linked reference docs:
-
-**HOM (hou module) Complete Reference:** [reference/hom_api_reference.md](reference/hom_api_reference.md)
-- Complete hou module documentation
-- All classes (hou.Node, hou.Parm, hou.Geometry)
-- Method signatures and examples
-
-**Callbacks and UI Integration:** [reference/callbacks_and_ui.md](reference/callbacks_and_ui.md)
-- Event callback patterns (AfterLoad, BeforeSave, NodeCreated)
-- Custom UI panel creation with PySide2/Qt
-- Shelf tool development
-
-**Geometry Manipulation Patterns:** [reference/geometry_manipulation.md](reference/geometry_manipulation.md)
-- Point/primitive creation and editing
-- Attribute manipulation (read/write/create)
-- Performance optimization techniques
+This skill ships no separate reference guides: the technique sections above
+are the reference. Use the Houdini MCP `search_help` / `get_help_page` tools
+for SideFX's own documentation.
 
 ---
 

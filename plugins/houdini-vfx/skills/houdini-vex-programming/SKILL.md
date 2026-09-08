@@ -386,8 +386,6 @@ Reusable, maintainable VEX code with custom operations
 
 **Use Case:** Sample volumes, use SDFs for procedural modeling
 
-**Detailed Documentation:** See [reference/volumes_and_sdf.md](reference/volumes_and_sdf.md)
-
 **Quick Example:**
 ```vex
 // Point Wrangle (with volume connected to second input)
@@ -666,22 +664,9 @@ if (!hasattrib(0, "point", "velocity")) {
 
 ### **Progressive Disclosure Pattern**
 
-For detailed information, see linked reference docs:
-
-**VEX Language Reference:** [reference/vex_language_reference.md](reference/vex_language_reference.md)
-- Complete VEX syntax
-- All built-in functions
-- Type system details
-
-**Volumes and SDF Operations:** [reference/volumes_and_sdf.md](reference/volumes_and_sdf.md)
-- Volume sampling patterns
-- SDF queries and operations
-- VDB integration with VEX
-
-**Performance Optimization:** [reference/vex_performance.md](reference/vex_performance.md)
-- Profiling VEX code
-- Parallel execution patterns
-- Memory optimization
+This skill ships no separate reference guides: the technique sections above
+are the reference. Use the Houdini MCP `search_help` / `get_help_page` tools
+for SideFX's own documentation.
 
 ---
 

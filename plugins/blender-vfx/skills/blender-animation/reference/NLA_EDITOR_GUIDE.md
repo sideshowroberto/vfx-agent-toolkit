@@ -1122,8 +1122,8 @@ print("Strip properties updated")
 
 ## REFERENCE MATERIALS
 
-**Animation System Validation Report:**
-`<workspace>\Blender\blender-ai-compatibility\ANIMATION_SYSTEM_VALIDATION_REPORT.md`
+**Animation System Validation:**
+See the `blender-api-compatibility` skill's breaking-changes database (animation entries).
 
 **Blender NLA API Reference (Official):**
 https://docs.blender.org/api/current/bpy.types.NlaTrack.html

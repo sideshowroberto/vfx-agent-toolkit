@@ -393,8 +393,6 @@ HDA now contains embedded code and documentation accessible within Houdini
 
 **Use Case:** Create dynamic tools that respond to parameter changes
 
-**Detailed Documentation:** See [reference/hda_callbacks_guide.md](reference/hda_callbacks_guide.md)
-
 **Quick Example:**
 ```python
 # Add parameter callback
@@ -419,64 +417,6 @@ def onScaleChanged(kwargs):
         scatter_node.parm('npts').set(int(1000 * scale_val))
 """
 ```
-
----
-
-## SCRIPT REFERENCE
-
-### **create_hda.py**
-
-**Purpose:** Batch create multiple HDAs from subnet definitions
-
-**Usage:**
-```bash
-python scripts/create_hda.py /obj/subnet1 --name my_tool --output $HIP/hda/
-```
-
-**Arguments:**
-- `subnet_path` (required): Path to subnet node to convert
-- `--name` (required): HDA internal name (lowercase, underscores)
-- `--label` (optional): Display label (default: uses name)
-- `--output` (optional): Output directory (default: $HIP/hda/)
-- `--version` (optional): Version number (default: 1.0)
-
-**Output:** Creates .hda file and registers node type
-
-**Example:**
-```bash
-python scripts/create_hda.py /obj/scattering_system \
-    --name geo_scatter_advanced \
-    --label "Advanced Scatter" \
-    --output $HIP/hda/geometry/ \
-    --version 1.0
-```
-
-**What It Does:**
-1. Validates subnet exists and is accessible
-2. Creates HDA file in specified output directory
-3. Converts subnet to digital asset definition
-4. Registers node type in current session
-5. Returns path to created HDA file
-
----
-
-### **manage_hda_versions.py**
-
-**Purpose:** Version control helper for HDA libraries
-
-**Usage:**
-```bash
-# Create new version
-python scripts/manage_hda_versions.py my_tool.hda --new-version 2.0
-
-# List all versions
-python scripts/manage_hda_versions.py my_tool.hda --list-versions
-
-# Restore previous version
-python scripts/manage_hda_versions.py my_tool.hda --restore 1.5
-```
-
-**Output:** Version-controlled HDA files with metadata
 
 ---
 
@@ -649,24 +589,11 @@ instance.matchCurrentDefinition()   # Exit and save
 
 ## REFERENCE DOCUMENTATION
 
-### **Progressive Disclosure Pattern**
-
-For detailed information, see linked reference docs:
-
-**HDA Callbacks Guide:** [reference/hda_callbacks_guide.md](reference/hda_callbacks_guide.md)
-- Complete callback reference (OnCreated, OnDeleted, OnInputChanged)
-- Parameter callback patterns
-- Event handler examples for dynamic tools
-
-**Parameter Interface Design:** [reference/parameter_design_patterns.md](reference/parameter_design_patterns.md)
-- Parameter types and templates
-- Conditional parameter visibility
-- Parameter organization best practices
-
-**VEX Integration in HDAs:** [reference/vex_hda_integration.md](reference/vex_hda_integration.md)
-- Embedding VEX includes in HDA sections
-- Wrangle node patterns inside HDAs
-- Performance optimization techniques
+HDA creation, versioning and reload are driven through the Houdini MCP tools
+(`create_hda`, `update_hda`, `reload_hda`, `install_hda`, `get_hda_sections`,
+`set_hda_section_content`) or the `hou.HDADefinition` API shown above. This skill
+ships no helper scripts or separate guides: callbacks, parameter design and VEX
+integration are covered inline in the technique sections.
 
 ---
 

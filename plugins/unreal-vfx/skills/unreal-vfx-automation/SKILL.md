@@ -63,7 +63,7 @@ print("Foreground plate setup complete")
 
 ## Standard Workflows
 
-**For detailed workflow code and step-by-step instructions, see:** `reference/detailed-workflows.md`
+**For detailed workflow code and step-by-step instructions, see:** `reference/foreground_plate_workflow.md`, `reference/multi_shot_production.md` and `reference/troubleshooting.md`
 
 **Three Core Workflows:**
 

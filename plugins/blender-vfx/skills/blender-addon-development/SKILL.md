@@ -229,7 +229,7 @@ def create_procedural_material(name="Procedural"):
 
 ### Workflow: Async cloud/API calls without freezing the UI
 
-bpy is not thread-safe. The production pattern (from the `ai_tools` addon,
+bpy is not thread-safe. The production pattern (from a production cloud-generation addon,
 live-verified 2026-07):
 
 ```python
@@ -259,16 +259,16 @@ threading.Thread(target=_worker, args=(job,), daemon=True).start()
 bpy.app.timers.register(_drain, first_interval=0.4)
 ```
 
-Full implementation: `Blender/ai_tools/ops.py` (status/progress/cancel/
-multi-result variants). Related patterns proven there:
+The full implementation in that addon adds status/progress/cancel/
+multi-result variants. Related patterns proven there:
 
 - **Drag-and-drop from Explorer** (4.1+): subclass `bpy.types.FileHandler`
   with `bl_import_operator` + `bl_file_extensions`; `poll_drop` gates by
-  area type. See `AITOOLS_FH_drop` in `Blender/ai_tools/ops.py`.
+  area type.
 - **Third-party deps without touching Blender's python**: pip-install with
   `--target` into a per-user dir (`%APPDATA%\<addon>\site-packages\pyXY`),
   `sys.path.insert` at import time. Survives Blender upgrades, no admin.
-  See `Blender/ai_tools/deps_install.py`. Note: agent-shell pip runs get
+  Note: agent-shell pip runs get
   sandbox-virtualized - run installs from inside Blender.
 - **Hot-reload discipline**: never `importlib.reload` individual submodules
   (poisons the class registry). Full cycle only: disable addon -> purge
@@ -375,7 +375,7 @@ class MY_OT_Operator(bpy.types.Operator):
 - Added: async worker/queue/bpy.app.timers pattern for cloud API calls
 - Added: FileHandler drag-and-drop, per-user pip-target dependency install
 - Added: hot-reload discipline (full disable/purge/enable cycle)
-- Source: ai_tools addon development (see blender-ai-tools skill)
+- Source: production cloud-generation addon development
 
 **v2.0.0** (2026-06-10) - MCP migration
 - Removed HTTP Bridge as addon content (retired)

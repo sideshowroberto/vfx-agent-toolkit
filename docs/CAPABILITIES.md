@@ -30,7 +30,7 @@ MCP servers: `brave-search`, `context7`, `desktop-commander`
 - **agent: python-specialist** - Applying templates, systematic refactoring, type safety (mypy, type hints, protocols), async programming (AsyncIO, concurrent.futures), data science workflows (pandas, numpy vectorization), and testing methodology (pytest, fixtures, parameterized tests). Use when applying agent-skill templates, migrating code patterns, refactoring with type hints, optimizing with async/vectorization, or performing systematic code transformation across multiple files.
 - **agent: python-refactoring-specialist** - Python refactoring specialist for applying templates, batch search/replace, and systematic code refactoring. Use when applying agent-skill templates, migrating code patterns, or performing systematic refactoring across multiple files.
 
-### nuke-vfx (v1.1.3, public)
+### nuke-vfx (v1.1.4, public)
 
 Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, and batch shot setup.
 
@@ -44,21 +44,21 @@ Requires: vfx-core
 - **nuke-node-tree-patterns** - Production-tested patterns for creating robust Nuke node trees programmatically. Use for avoiding auto-connection issues, dynamic positioning, expression masks, and gradient blending.
 - **nuke-python-scripting** [scripts] - Python scripting for Nuke with NukeMCPLogger integration, script templates, and automation patterns. Use when writing Nuke Python scripts, using NukeMCPLogger, automating comps, or when user mentions nuke python, nuke script, nuke logger, nuke automation.
 - **nuke-tiling-tool** [scripts] - Automated image tiling for ML processing in Nuke with seamless gradient blending. Use for large plates (4K+) through ML nodes (ViTMatte) optimized for 1K-2K tiles.
-- **nuke-shot-setup** - Batch shot setup for Nuke comp projects. Parses a ShotGrid CSV export, reads plate metadata from a plates CSV (or scans plates on disk), creates per-shot folder structures, generates Nuke v001 visdev/comp files with plates auto-connected (Read + Stamp/Anchor with proper ACES colorspace), and produces a Google Sheets-ready CSV shot tracker. Supports multiple sequences at once, show-specific config (OCIO, LUT, compression), and configurable work context (visdev, comp). Use when the user wants to set up shots, run a batch shot setup, start a new sequence, onboard plates, build a shot tracker CSV, or create comps from a CSV. Triggers on "set up shots", "batch shot setup", "new sequence", "onboard plates", "shot tracker csv", "create comps from csv", "shot setup from ShotGrid", "visdev setup".
+- **nuke-shot-setup** [scripts] - Batch shot setup for Nuke comp projects. Parses a ShotGrid CSV export, reads plate metadata from a plates CSV (or scans plates on disk), creates per-shot folder structures, generates Nuke v001 visdev/comp files with plates auto-connected (Read + Stamp/Anchor with proper ACES colorspace), and produces a Google Sheets-ready CSV shot tracker. Supports multiple sequences at once, show-specific config (OCIO, LUT, compression), and configurable work context (visdev, comp). Use when the user wants to set up shots, run a batch shot setup, start a new sequence, onboard plates, build a shot tracker CSV, or create comps from a CSV. Triggers on "set up shots", "batch shot setup", "new sequence", "onboard plates", "shot tracker csv", "create comps from csv", "shot setup from ShotGrid", "visdev setup".
 - **agent: nuke-specialist** - Nuke compositing expert coordinating node graph operations, Python scripting, and ComfyUI integration. Use when user mentions nuke, compositing, nodes, grade, merge, multi-shot, or nuke python.
 
-### houdini-vfx (v1.0.2, public)
+### houdini-vfx (v1.0.3, public)
 
 Houdini VFX pipeline: procedural generation, USD/Solaris, VEX, Python automation, HDA creation.
 
 MCP servers: `houdini`
 Requires: vfx-core
 
-- **houdini-hda-creation** [scripts] - Create and manage Houdini Digital Assets (HDAs) including parameter interfaces, compilation, versioning, and asset organization. Use when authoring reusable Houdini tools. Triggers: hda creation, digital asset, hda compile, hda parameters, create hda
-- **houdini-procedural-generation** [scripts] - Create procedural geometry workflows using SOPs including scattering, copying, instancing, and parametric modeling. Use for procedural modeling workflows. Triggers: procedural generation, scatter, copy to points, procedural modeling, sops
-- **houdini-python-automation** [scripts] - Automate Houdini workflows using Python (HOM - Houdini Object Model) including node creation, parameter manipulation, scene management, and batch processing. Use when scripting Houdini workflows. Triggers: houdini python, hom, python script, automate houdini, batch process
-- **houdini-solaris-usd** [scripts] - Work with USD (Universal Scene Description) in Houdini Solaris including stage creation, layer composition, variants, and USD export workflows. Use for USD workflows and Solaris. Triggers: solaris, usd, stage, layer, variant, usd export
-- **houdini-vex-programming** [scripts] - Write VEX code for Houdini including wrangles, custom operations, attribute manipulation, and performance optimization. Use when writing VEX scripts or custom operations. Triggers: vex, wrangle, vex code, attribute wrangle, point wrangle
+- **houdini-hda-creation** - Create and manage Houdini Digital Assets (HDAs) including parameter interfaces, compilation, versioning, and asset organization. Use when authoring reusable Houdini tools. Triggers: hda creation, digital asset, hda compile, hda parameters, create hda
+- **houdini-procedural-generation** - Create procedural geometry workflows using SOPs including scattering, copying, instancing, and parametric modeling. Use for procedural modeling workflows. Triggers: procedural generation, scatter, copy to points, procedural modeling, sops
+- **houdini-python-automation** - Automate Houdini workflows using Python (HOM - Houdini Object Model) including node creation, parameter manipulation, scene management, and batch processing. Use when scripting Houdini workflows. Triggers: houdini python, hom, python script, automate houdini, batch process
+- **houdini-solaris-usd** - Work with USD (Universal Scene Description) in Houdini Solaris including stage creation, layer composition, variants, and USD export workflows. Use for USD workflows and Solaris. Triggers: solaris, usd, stage, layer, variant, usd export
+- **houdini-vex-programming** - Write VEX code for Houdini including wrangles, custom operations, attribute manipulation, and performance optimization. Use when writing VEX scripts or custom operations. Triggers: vex, wrangle, vex code, attribute wrangle, point wrangle
 
 ### unreal-vfx (v2.0.2, public)
 
@@ -76,7 +76,7 @@ Requires: vfx-core
 - **agent: unreal-blueprint-specialist** - Expert in automating Unreal Engine Blueprint creation and compilation using Silent Execution pattern
 - **agent: unreal-pcg-specialist** - Expert in Unreal Engine PCG system for procedural terrain, vegetation, and asset placement with Python automation
 
-### blender-vfx (v2.0.5, public)
+### blender-vfx (v2.0.6, public)
 
 Blender VFX pipeline via the official Blender MCP (blender.org): modeling, animation, materials, geometry nodes, physics, rendering, sculpting, grease pencil, and ControlNet pass rendering for AI generation.
 
@@ -93,7 +93,7 @@ Requires: vfx-core
 - **blender-physics-simulation** - Physics simulations including particles, fluids (Mantaflow), rigid/soft body, and cloth in Blender. Use for physics, particles, fluid simulations, or when user mentions "physics," "particle," "fluid," "rigid body," "soft body," "cloth," "fire," "smoke," or "hair.
 - **blender-rendering** - EEVEE_NEXT and Cycles rendering, lighting, and render optimization in Blender. Use for rendering setup, lighting, render settings, or when user mentions "render," "lighting," "EEVEE," "Cycles," or "materials.
 - **blender-sculpting** - Terrain creation, organic modeling, and surface details using Blender sculpting tools. Use for terrain, organic shapes, sculpted details, or when user mentions "sculpt," "terrain," or "organic.
-- **blender-controlnet-passes** - Set up and render ControlNet conditioning passes from a Blender scene for AI image/video generation - grey clay override, compositor-normalized depth, cryptomatte EXR, optional wireframe overlay for temporal consistency. Wraps Blender/scripts/setup_controlnet_passes.py (Blender 5.x APIs, test-slice discipline, trailing-dot File Output naming). Use when preparing depth/edge conditioning inputs, clay renders for video models, or crypto mattes for comp. Triggers: \"controlnet passes\", \"render depth pass\", \"clay render\", \"grey shade render\", \"render passes for AI\", \"control net setup blender\".
+- **blender-controlnet-passes** [scripts] - Set up and render ControlNet conditioning passes from a Blender scene for AI image/video generation - grey clay override, compositor-normalized depth, cryptomatte EXR, optional wireframe overlay for temporal consistency. Wraps scripts/setup_controlnet_passes.py (Blender 5.x APIs, test-slice discipline, trailing-dot File Output naming). Use when preparing depth/edge conditioning inputs, clay renders for video models, or crypto mattes for comp. Triggers: \"controlnet passes\", \"render depth pass\", \"clay render\", \"grey shade render\", \"render passes for AI\", \"control net setup blender\".
 - **agent: blender-specialist** - Expert in Blender workflows via official Blender MCP. Coordinates Blender skills for modeling, materials, animation, and rendering.
 
 ### comfyui-vfx (v2.2.3, public)
@@ -143,12 +143,14 @@ Requires: vfx-core
 - **magnific-local-upload** - Upload local images to Magnific as references for generation, then download outputs to a local folder. Use when user wants to upload photos from a local folder or drive, use local files as image/style references in Magnific, batch upload from a directory, move uploads to a Magnific folder, or save/download Magnific generated images to a local path. Triggers: \"upload local images\", \"use local photos as reference\", \"upload from folder\", \"upload these images to magnific\", \"download magnific output\", \"save generated image to folder\", \"local ref upload\".
 - **magnific-video-gen** - Magnific MCP video generation skill. Use when generating video via Magnific, selecting video models, animating stills, using start/end keyframes, camera motion, audio/lipsync, multishot, or video upscale. Triggers on: \"generate video with magnific\", \"magnific video\", \"animate this image\", \"magnific camera motion\", \"seedance\", \"kling video\", \"veo video\", \"video from still\".
 
-### seedance-vfx (v1.0.2, public)
+### seedance-vfx (v1.1.0, public)
 
 Seedance 2.0 video generation direction: prompt writing, camera, lighting, motion, characters, style, VFX, troubleshooting, and production recipes.
 Requires: vfx-core
 
 - **seedance-20** - This skill should be used when directing Seedance 2.0 T2V, I2V, V2V, R2V, audio, safety, or API work.
+- **seedance-filter** - This skill should be used when a Seedance 2.0 prompt is blocked, rejected, silently degraded, or likely to trigger a content filter; or when the user asks for a safer rewrite without losing the creative intent.
+- **seedance-copyright** - This skill should be used when a Seedance 2.0 prompt mentions named characters, franchises, studios, celebrities, public figures, private people, brand logos, copyrighted scenes, songs, voices, or real-person likeness workflows and needs an IP-safe rewrite.
 - **seedance-antislop** - This skill should be used when a Seedance 2.0 prompt contains generic AI filler, hollow superlatives, vague cinematic language, bloated adjectives, weak verbs, or needs sharper production-specific wording.
 - **seedance-camera** - This skill should be used when the user asks for camera movement, shot scale, lens feel, framing, one-take direction, dolly, pan, tilt, push-in, handheld, aerial, macro, or camera-transfer guidance for Seedance 2.0.
 - **seedance-characters** - This skill should be used when the user asks for character consistency, character tags, identity lock, multi-character blocking, wardrobe continuity, hand safety, expression control, or likeness-sensitive character guidance.

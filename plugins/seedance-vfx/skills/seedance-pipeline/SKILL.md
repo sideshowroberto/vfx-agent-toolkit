@@ -21,6 +21,8 @@ metadata:
 
 # seedance-pipeline
 
+Reference resolution: `[ref:<name>]` resolves to `../seedance-20/references/<name>.md` (the seedance-20 skill's vendored reference corpus); `[skill:<name>]` is the sibling skill of that name.
+
 Use this for operational workflows, APIs, web surfaces, post-production, and integration planning.
 
 ## Status Rule

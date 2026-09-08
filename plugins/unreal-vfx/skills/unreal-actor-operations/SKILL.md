@@ -73,7 +73,7 @@ SUCCESS: Spawned MyCube
 
 ## STANDARD WORKFLOWS
 
-**For detailed workflow code and step-by-step instructions, see:** `reference/detailed-workflows.md`
+**For the actor API surface used by these workflows, see:** `reference/actor_api_reference.md`
 
 **Five Core Workflows:**
 

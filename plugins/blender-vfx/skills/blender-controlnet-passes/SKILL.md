@@ -1,6 +1,6 @@
 ---
 name: blender-controlnet-passes
-description: "Set up and render ControlNet conditioning passes from a Blender scene for AI image/video generation - grey clay override, compositor-normalized depth, cryptomatte EXR, optional wireframe overlay for temporal consistency. Wraps Blender/scripts/setup_controlnet_passes.py (Blender 5.x APIs, test-slice discipline, trailing-dot File Output naming). Use when preparing depth/edge conditioning inputs, clay renders for video models, or crypto mattes for comp. Triggers: \"controlnet passes\", \"render depth pass\", \"clay render\", \"grey shade render\", \"render passes for AI\", \"control net setup blender\"."
+description: "Set up and render ControlNet conditioning passes from a Blender scene for AI image/video generation - grey clay override, compositor-normalized depth, cryptomatte EXR, optional wireframe overlay for temporal consistency. Wraps scripts/setup_controlnet_passes.py (Blender 5.x APIs, test-slice discipline, trailing-dot File Output naming). Use when preparing depth/edge conditioning inputs, clay renders for video models, or crypto mattes for comp. Triggers: \"controlnet passes\", \"render depth pass\", \"clay render\", \"grey shade render\", \"render passes for AI\", \"control net setup blender\"."
 ---
 
 # Blender ControlNet Passes
@@ -8,7 +8,7 @@ description: "Set up and render ControlNet conditioning passes from a Blender sc
 **Version:** 1.1.0 | **Last Updated:** 2026-08-21 | **Blender:** 5.x
 
 One parameterized script replaces the per-project pass-render scripts:
-`Blender/scripts/setup_controlnet_passes.py`
+`scripts/setup_controlnet_passes.py` (relative to this skill directory)
 
 Outputs per shot: `<root>/<shot>/grey/` (16-bit PNG clay), `<root>/<shot>/depth/`
 (16-bit PNG, near=white/far=black, fixed normalization), `<root>/<shot>/crypto/`
@@ -155,7 +155,7 @@ does the full range.
     2026-08-21 this produced a confident, wrong "5.1.x File Output drops all
     but the first item" diagnosis against 312 production frames (and a
     merge-based rewrite of this script that was reverted). Instrument:
-    `python Blender/scripts/merge_exr_layers.py --inspect <file.exr>` lists
+    `python scripts/merge_exr_layers.py --inspect <file.exr>` lists
     every part; the script's `verify_crypto_exr()` does the same on frame
     0001 when the calling python has OpenEXR (Blender's bundled python does
     not - it prints a skip notice, never a false PASS). Rule 8 in action:
