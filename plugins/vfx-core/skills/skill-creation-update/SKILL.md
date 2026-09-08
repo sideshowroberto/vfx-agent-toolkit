@@ -109,6 +109,16 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py unreal-vfx-a
      flag argparse rejects is doc drift: qwen-delegate shipped a phantom `--file`
      and a dead default port for weeks because nobody ran the script from the doc
      (observation #4, 2026-09-01).
+   - **Shipped defaults (manual, principle 9):** grep the skill's `scripts/` for
+     drive letters, usernames and version-pinned install paths inside DEFAULTS
+     blocks and module constants:
+     `grep -nE "[A-Za-z]:[/\]|Users|[0-9]+[.][0-9]+ ?v[0-9]" scripts/*.py`.
+     Every hit moves to a config file the workflow passes explicitly (layered,
+     repeatable) or to an argument, and the run must PRINT the effective value
+     so a wrong one is read back instead of trusted. A default baked into a
+     shipped script is always somebody's personal path on somebody else's
+     machine: nuke-shot-setup shipped a dead personal OCIO path and Nuke 15 as
+     built-in defaults (observation #9, 2026-09-08).
 3. **Address failures:**
    - Article I: Remove hard-coded paths, add params
    - Article III: Move details to reference docs

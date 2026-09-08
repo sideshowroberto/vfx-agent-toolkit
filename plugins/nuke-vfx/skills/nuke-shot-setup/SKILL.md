@@ -16,8 +16,12 @@ Batch setup of Nuke comp/visdev files, folder structures, and shot tracking CSV.
 
 `Nuke/configs/<show_name>.json` -- per-show overrides for OCIO, LUTs, viewer, format, etc.
 Only values that differ from the script's built-in defaults need to be in the JSON.
+`--show-config` may be repeated and is applied in order, so the standard call is
+`--show-config Nuke/configs/studio_defaults.json --show-config Nuke/configs/<show>.json`
+(team defaults first, show overrides second; later files win). Start a show
+file from `Nuke/configs/show_template.json`.
 
-**Built-in defaults:** Nuke 15.0 v5, ACEScg in/out, DWAA compression, 4608x3164, 23.976fps. Point the script at your team's OCIO config via the show JSON (`ocio_config` key) - never hardcode a personal or network path in the script itself.
+**Built-in defaults:** Nuke 17.0 v2, ACEScg in/out, DWAA compression, 4608x3164, 23.976fps, and **no OCIO config**. The script prints the effective Nuke version and OCIO path at the top of every run and warns when OCIO is unset - point it at your team's config via `studio_defaults.json` (`ocio_config` key). A path baked into the script is always somebody's personal path on somebody else's machine.
 
 ## Network-Drive Policy (adapt to your studio)
 
@@ -77,7 +81,7 @@ python Nuke/scripts/batch_shot_setup.py \
 | `--plates-csv` | none | Plates metadata CSV (avoids file scanning) |
 | `--plates-dir` | auto | Plates root dir (defaults to dirname of `--plates-csv`) |
 | `--plate-prefix` | `processed_plate` | Subdir/filename prefix for file scanning |
-| `--show-config` | none | Show-specific config JSON |
+| `--show-config` | none | Config JSON; repeatable, applied in order (studio defaults, then show) |
 | `--seq` | all | Filter to one sequence |
 | `--skip` | none | Shot codes to skip |
 | `--csv-only` | false | Only generate CSV tracker |
@@ -85,9 +89,20 @@ python Nuke/scripts/batch_shot_setup.py \
 | `--fps` | from config | Frame rate override |
 | `--ocio-config` | from config | OCIO config path override |
 
-### Thumbnails (via Nuke MCP):
+### Thumbnails (headless, no MCP needed):
 
-Thumbnails require Nuke running with MCP. Run this Python script inside Nuke:
+`Nuke/scripts/make_shot_thumbnails.py` runs inside `nuke -t --safe`, takes the
+same plates CSV and plates dir, writes `{shot}_{plate}_thumb.png` (the name the
+tracker's Thumbnail column expects), reads every PNG back, and exits 1 if any
+failed:
+
+```
+"C:\Program Files\Nuke17.0v2\Nuke17.0.exe" -t --safe Nuke/scripts/make_shot_thumbnails.py --plates-csv <plates.csv> --plates-dir <plates root> --out <out>/thumbnails [--ocio-config <config.ocio>]
+```
+
+### Thumbnails (alternative, via Nuke MCP):
+
+If you prefer to drive a GUI Nuke over MCP, run this Python inside Nuke:
 
 ```python
 # Use mcp__nuke__runPythonScript with this script:

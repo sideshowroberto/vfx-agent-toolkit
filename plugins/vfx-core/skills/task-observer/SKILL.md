@@ -58,7 +58,21 @@ Every field and rule: `references/log-format.md`.
 
 **Unreachable workspace.** If `status` reports UNREACHABLE (a team share
 not mounted), skip logging for this session and say so once. Never create
-a second log elsewhere - a fork is worse than a gap.
+a second log elsewhere - a fork is worse than a gap. **Exception:** an
+UNREACHABLE right after the workspace folder was moved or renamed means the
+`TASK_OBSERVER_WS` pin is stale, not that a share is unmounted - repoint the
+pin (and any other absolute path in the harness config) before skipping.
+
+**Activation - no absolute workspace path in the hook.** The session-start
+hook command must locate the helper through the path the harness exports,
+never through a hardcoded workspace path: Claude Code project settings use
+`bash "${CLAUDE_PROJECT_DIR:-.}/.claude/skills/task-observer/scripts/observe.sh" status`
+(verified with a backslash `CLAUDE_PROJECT_DIR`, a forward-slash one, and
+unset); the plugin form uses `${CLAUDE_PLUGIN_ROOT}/skills/task-observer/...`.
+`TASK_OBSERVER_WS` is the ONE deliberate absolute pin (it names a log that
+may live outside the repo, e.g. a team share) - declare it as such and know
+its stale symptom (above). A skill whose activation pins the workspace by
+absolute path is silently disabled by a folder move (observation #7).
 
 ## Session Start Protocol (run it, do not just load this file)
 
