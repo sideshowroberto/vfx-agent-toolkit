@@ -11,7 +11,7 @@
     "plugins":  [
                     {
                         "name":  "vfx-core",
-                        "version":  "2.3.3",
+                        "version":  "2.4.1",
                         "description":  "Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).",
                         "source":  "./plugins/vfx-core"
                     },
@@ -41,7 +41,7 @@
                     },
                     {
                         "name":  "comfyui-vfx",
-                        "version":  "2.2.3",
+                        "version":  "2.3.0",
                         "description":  "ComfyUI pipeline via the ComfyUI MCP and Comfy CLI, with optional ComfyUI_FL-MCP for live canvas operations: workflow analysis, node/model requirements mapping, and headless generation guidance, plus the previs-to-photoreal anchor keyframe recipe for reference-guided video generation.",
                         "source":  "./plugins/comfyui-vfx"
                     },

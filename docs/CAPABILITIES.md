@@ -6,7 +6,7 @@ GENERATED 2026-09-08 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/re
 
 ## Skills, by plugin
 
-### vfx-core (v2.3.3, public)
+### vfx-core (v2.4.1, public)
 
 Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).
 
@@ -24,6 +24,9 @@ MCP servers: `brave-search`, `context7`, `desktop-commander`
 - **wrap-session** - End-of-session wrap-up ritual before clearing context. Reviews the session for durable facts to save to memory, updates skills with newly discovered gotchas, writes a session log for substantial project work, cleans up temp files, and writes a handoff plan so the next session can resume without re-discovery. Use when the user is about to /clear, when context is running low, or at the natural end of a work session. Triggers on "/wrap-session", "wrap up this session", "we're running low on context", "prepare to clear context", "before we clear".
 - **qwen-delegate** [scripts] - Delegate tasks from a Claude Code session to the local Qwen model on Ollama (port 11434) - the same model the team's OpenCode / Qwen Code installs use. Use when user says "ask Qwen", "have Qwen do this", "delegate to local model", "use local LLM", "keep this NDA-safe", "do this locally". Also use proactively for NDA-sensitive file analysis, large-file summarization, boilerplate generation, BlinkScript drafts, or batch text transforms where privacy and Claude-token savings matter more than deep reasoning.
 - **task-observer** [scripts] - Watches every tool-using session for skill lessons and writes each one to the observation log the moment it happens - user corrections, rules the agent broke, better workflows, sibling skills that need the same fix, sections nobody uses. Nothing is applied until a review the skill owner approves. Invoke before the FIRST tool call of any session and run its Session Start Protocol (status, scan, review trigger); loading alone activates nothing. Also triggers on "observation log", "any observations logged", "skill review", "task observer", "log that as an observation", "review the backlog".
+- **youtube-transcript** [scripts] - Retrieve available YouTube captions with timestamps and provenance, or analyze a video from its transcript. Use for YouTube links and transcript requests; this does not watch video frames or transcribe uncaptained audio.
+- **vfx-research** - Research VFX application APIs, errors, workflow integrations, and library examples using Brave Search and Context7. Use for Blender, Nuke, Houdini, Unreal, ComfyUI, and related development questions that need external evidence.
+- **vfx-workflow** - Apply this toolkit's audited application lessons when scripting DCC scenes, running ComfyUI workflows, or preparing cross-application VFX handoffs. Use for execution and integration work; use vfx-research for documentation lookup.
 - **agent: search-specialist** - Expert VFX research specialist using Brave Search API for technical documentation, tutorials, problem-solving, and industry intelligence across Unreal Engine, Blender, Houdini, Nuke, and ComfyUI
 - **agent: documentation-specialist** - Index-driven documentation updates for VFX application projects. Reads DOCUMENTATION_INDEX.md to understand structure, maintains consistency across related files, updates progress trackers, and creates session summaries. Use with "update documentation," "document session," or "index-driven update.
 - **agent: testing-specialist** - Testing and validating Python scripts, skill scripts, and agent outputs. Use when requests include "test", "validate", "verify", "check", or "pytest". Validates JSON outputs, error handling, script independence, and generates test reports. Proactively invoked after refactoring to ensure functionality.
@@ -96,7 +99,7 @@ Requires: vfx-core
 - **blender-controlnet-passes** [scripts] - Set up and render ControlNet conditioning passes from a Blender scene for AI image/video generation - grey clay override, compositor-normalized depth, cryptomatte EXR, optional wireframe overlay for temporal consistency. Wraps scripts/setup_controlnet_passes.py (Blender 5.x APIs, test-slice discipline, trailing-dot File Output naming). Use when preparing depth/edge conditioning inputs, clay renders for video models, or crypto mattes for comp. Triggers: \"controlnet passes\", \"render depth pass\", \"clay render\", \"grey shade render\", \"render passes for AI\", \"control net setup blender\".
 - **agent: blender-specialist** - Expert in Blender workflows via official Blender MCP. Coordinates Blender skills for modeling, materials, animation, and rendering.
 
-### comfyui-vfx (v2.2.3, public)
+### comfyui-vfx (v2.3.0, public)
 
 ComfyUI pipeline via the ComfyUI MCP and Comfy CLI, with optional ComfyUI_FL-MCP for live canvas operations: workflow analysis, node/model requirements mapping, and headless generation guidance, plus the previs-to-photoreal anchor keyframe recipe for reference-guided video generation.
 
@@ -105,6 +108,7 @@ Requires: vfx-core
 
 - **comfyui-workflow-analysis** - Analyze downloaded ComfyUI workflow JSON files to extract required custom nodes and models, map them to correct install locations, and generate a setup checklist. Use when user shares a workflow JSON, asks "what nodes does this need", "what models does this use", "help me set up this workflow", or "analyze this comfy workflow".
 - **previs-anchor-keyframes** - Generate photoreal anchor keyframes from CG previs for reference-guided video generation (Seedance-class models). Covers previs shading for AI readability, anchor frame selection, bootstrapping action-pose reference sets from a single reference, lighting-accurate prompt language, and validation. Use when converting previs/CG animation to photoreal video, preparing anchor/reference frames for a video model, or when generations ignore CG placement or pose. Triggers on "anchor keyframes", "anchor frames", "previs to photoreal video", "reference frames for video gen", "generations not following the CG".
+- **comfy-cli-skills** - Install comfy-cli's bundled agent skills (comfy, comfy-build, comfy-debug, comfy-deploy, comfy-director, comfy-relay) into any harness and apply this toolkit's zero-cost validation gate and credit audit around paid ComfyUI runs. Use when setting up comfy-cli for an agent, when the comfy skills are missing from the skill catalog, or before submitting a workflow that bills partner-node credits.
 
 ### comfyui-node-dev (v1.1.1, public)
 

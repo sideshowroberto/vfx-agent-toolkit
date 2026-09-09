@@ -1,0 +1,11 @@
+{
+    "$schema":  "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+    "name":  "unreal-vfx",
+    "version":  "2.0.2",
+    "description":  "Unreal Engine 5.8 VFX pipeline via the native UE MCP (ModelContextProtocol plugin + VibeUE toolsets): Blueprint automation, PCG, actor operations, Sequencer, Python scripting.",
+    "author":  {
+                   "name":  "Rob Williams"
+               },
+    "license":  "MIT",
+    "repository":  "https://github.com/sideshowroberto/vfx-agent-toolkit"
+}

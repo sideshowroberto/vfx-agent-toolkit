@@ -1,0 +1,11 @@
+{
+    "$schema":  "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+    "name":  "seedance-vfx",
+    "version":  "1.1.0",
+    "description":  "Seedance 2.0 video generation direction: prompt writing, camera, lighting, motion, characters, style, VFX, troubleshooting, and production recipes.",
+    "author":  {
+                   "name":  "Rob Williams"
+               },
+    "license":  "MIT",
+    "repository":  "https://github.com/sideshowroberto/vfx-agent-toolkit"
+}

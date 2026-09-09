@@ -1,0 +1,128 @@
+{
+    "name":  "vfx-agent-toolkit",
+    "interface":  {
+                      "displayName":  "VFX Agent Toolkit"
+                  },
+    "plugins":  [
+                    {
+                        "name":  "vfx-core",
+                        "source":  {
+                                       "source":  "local",
+                                       "path":  "./plugins/vfx-core"
+                                   },
+                        "policy":  {
+                                       "installation":  "AVAILABLE",
+                                       "authentication":  "ON_INSTALL"
+                                   },
+                        "category":  "VFX"
+                    },
+                    {
+                        "name":  "nuke-vfx",
+                        "source":  {
+                                       "source":  "local",
+                                       "path":  "./plugins/nuke-vfx"
+                                   },
+                        "policy":  {
+                                       "installation":  "AVAILABLE",
+                                       "authentication":  "ON_INSTALL"
+                                   },
+                        "category":  "VFX"
+                    },
+                    {
+                        "name":  "houdini-vfx",
+                        "source":  {
+                                       "source":  "local",
+                                       "path":  "./plugins/houdini-vfx"
+                                   },
+                        "policy":  {
+                                       "installation":  "AVAILABLE",
+                                       "authentication":  "ON_INSTALL"
+                                   },
+                        "category":  "VFX"
+                    },
+                    {
+                        "name":  "unreal-vfx",
+                        "source":  {
+                                       "source":  "local",
+                                       "path":  "./plugins/unreal-vfx"
+                                   },
+                        "policy":  {
+                                       "installation":  "AVAILABLE",
+                                       "authentication":  "ON_INSTALL"
+                                   },
+                        "category":  "VFX"
+                    },
+                    {
+                        "name":  "blender-vfx",
+                        "source":  {
+                                       "source":  "local",
+                                       "path":  "./plugins/blender-vfx"
+                                   },
+                        "policy":  {
+                                       "installation":  "AVAILABLE",
+                                       "authentication":  "ON_INSTALL"
+                                   },
+                        "category":  "VFX"
+                    },
+                    {
+                        "name":  "comfyui-vfx",
+                        "source":  {
+                                       "source":  "local",
+                                       "path":  "./plugins/comfyui-vfx"
+                                   },
+                        "policy":  {
+                                       "installation":  "AVAILABLE",
+                                       "authentication":  "ON_INSTALL"
+                                   },
+                        "category":  "VFX"
+                    },
+                    {
+                        "name":  "comfyui-node-dev",
+                        "source":  {
+                                       "source":  "local",
+                                       "path":  "./plugins/comfyui-node-dev"
+                                   },
+                        "policy":  {
+                                       "installation":  "AVAILABLE",
+                                       "authentication":  "ON_INSTALL"
+                                   },
+                        "category":  "VFX"
+                    },
+                    {
+                        "name":  "maya-vfx",
+                        "source":  {
+                                       "source":  "local",
+                                       "path":  "./plugins/maya-vfx"
+                                   },
+                        "policy":  {
+                                       "installation":  "AVAILABLE",
+                                       "authentication":  "ON_INSTALL"
+                                   },
+                        "category":  "VFX"
+                    },
+                    {
+                        "name":  "magnific-vfx",
+                        "source":  {
+                                       "source":  "local",
+                                       "path":  "./plugins/magnific-vfx"
+                                   },
+                        "policy":  {
+                                       "installation":  "AVAILABLE",
+                                       "authentication":  "ON_INSTALL"
+                                   },
+                        "category":  "VFX"
+                    },
+                    {
+                        "name":  "seedance-vfx",
+                        "source":  {
+                                       "source":  "local",
+                                       "path":  "./plugins/seedance-vfx"
+                                   },
+                        "policy":  {
+                                       "installation":  "AVAILABLE",
+                                       "authentication":  "ON_INSTALL"
+                                   },
+                        "category":  "VFX"
+                    }
+                ]
+}

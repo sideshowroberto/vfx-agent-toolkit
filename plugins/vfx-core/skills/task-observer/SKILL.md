@@ -71,7 +71,16 @@ never through a hardcoded workspace path: Claude Code project settings use
 unset); the plugin form uses `${CLAUDE_PLUGIN_ROOT}/skills/task-observer/...`.
 `TASK_OBSERVER_WS` is the ONE deliberate absolute pin (it names a log that
 may live outside the repo, e.g. a team share) - declare it as such and know
-its stale symptom (above). A skill whose activation pins the workspace by
+its stale symptom (above). **Never start a hook line with `bash`:** outside
+Claude Code the Windows PATH `bash` is the WSL stub in system32, so the hook
+dies silently. The plugin hook runs `python scripts/observe_hook.py`, a
+dispatcher that calls observe.ps1 / observe.sh and prints the SessionStart
+`additionalContext` envelope every harness injects. **Codex** ignores
+plugin-bundled hooks (feature `plugin_hooks` removed in CLI 0.151): give the
+workspace a repo-level `.codex/hooks.json` whose command locates the installed
+vfx-core plugin's dispatcher (see the public GETTING-STARTED, Codex section),
+trust it once with `/hooks` in the Codex TUI, and pass `--ws` because hook
+processes do not inherit the harness's settings env. A skill whose activation pins the workspace by
 absolute path is silently disabled by a folder move (observation #7).
 
 ## Session Start Protocol (run it, do not just load this file)

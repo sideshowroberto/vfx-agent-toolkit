@@ -189,7 +189,7 @@ Registers the hosted Magnific MCP at https://mcp.magnific.com. You need a
 Magnific account; the first time Claude uses a Magnific tool, an OAuth page
 opens in your browser to authorize.
 
-### Using another harness (OpenCode, Qwen Code)
+### Using another harness (OpenCode, Qwen Code, Codex)
 
 If your agent is OpenCode or Qwen Code rather than Claude Code, run the
 same connector scripts with `-Harness opencode` or `-Harness qwen`. The
@@ -205,6 +205,42 @@ connectors\nuke\install.ps1 -Harness qwen
 `-NoRegister` (same as `-Harness none`) prints a plain command and
 argument list for any other MCP client. Restart the harness after editing
 its config. Steps 1-3 above are Claude Code specific and can be skipped.
+
+### Codex
+
+The same repository is a Codex plugin marketplace: every plugin carries a root
+`plugin.json` (agent-plugins.org schema), its MCP servers in `mcp.json`, and the
+marketplace index lives at `.agents/plugins/marketplace.json`.
+
+```sh
+codex plugin marketplace add sideshowroberto/vfx-agent-toolkit
+codex plugin list
+codex plugin add vfx-core
+codex plugin marketplace upgrade vfx-agent-toolkit   # after a new release
+```
+
+Skills are the same SKILL.md files Claude Code reads. Claude subagents
+(`agents/`) have no Codex equivalent and are ignored. Connector setup per
+application (Step 4) is identical; point the MCP server paths in your Codex
+`config.toml` at the same bridges. For the comfy-cli agent skills, see the
+`comfy-cli-skills` skill in comfyui-vfx.
+
+**Hooks.** Codex ignores hooks bundled inside plugins, so the task-observer
+session-start hook needs a repo-level `.codex/hooks.json` in your workspace:
+
+```json
+{
+  "hooks": { "SessionStart": [ { "matcher": "", "hooks": [ {
+    "type": "command", "timeout": 60,
+    "command": "python \"<vfx-core plugin dir>/skills/task-observer/scripts/observe_hook.py\" --ws <your observation workspace>"
+  } ] } ] }
+}
+```
+
+The installed plugin dir is `~/.codex/plugins/cache/vfx-agent-toolkit/vfx-core/<version>`;
+a small launcher script that globs for the newest version keeps the hook
+valid across upgrades. Trust the hook once with `/hooks` in the Codex TUI
+(headless runs: `codex exec --dangerously-bypass-hook-trust`).
 
 ## Step 5: Verify
 

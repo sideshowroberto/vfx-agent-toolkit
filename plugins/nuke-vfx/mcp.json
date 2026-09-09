@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "nuke": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${NUKE_MCP_SERVER_PATH}"
+      ],
+      "env": {}
+    }
+  }
+}
