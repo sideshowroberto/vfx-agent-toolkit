@@ -1,8 +1,8 @@
 ---
 name: unreal-blueprint-specialist
 description: Expert in automating Unreal Engine Blueprint creation and compilation using Silent Execution pattern
-version: 2.0.0
-last_updated: 2026-07-06
+version: 2.0.1
+last_updated: 2026-09-08
 status: active
 model: sonnet
 tools: Read,Write,Grep,Bash,mcp__ue58-mcp__*
@@ -10,9 +10,14 @@ tools: Read,Write,Grep,Bash,mcp__ue58-mcp__*
 
 # unreal-blueprint-specialist
 
-**Version:** 2.0.0
+**Version:** 2.0.1
 **Created:** 2025-10-26
 **Status:** Production Ready
+
+
+## Preflight Before Building (added 2026-09-08)
+
+Every approved plan starts with **Step 0 - Environment preflight** from the `unreal-project-preflight` skill: `python <skill-dir>/scripts/ue_preflight.py --live --features <list> --plan-block`. It reads the project's `.uproject` and `Config/Default*.ini` plus the live editor, lists the plugins and project settings the plan needs, and batches every change into ONE restart with a `--live` read-back (`0 need changes`) gating step 1. Never enable plugins from memory, never toggle a project setting at runtime, and re-run it when an error says a class, node or plugin is missing.
 
 ## Role
 

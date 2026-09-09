@@ -6,7 +6,7 @@ GENERATED 2026-09-08 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/re
 
 ## Skills, by plugin
 
-### vfx-core (v2.4.2, public)
+### vfx-core (v2.4.3, public)
 
 Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).
 
@@ -63,7 +63,7 @@ Requires: vfx-core
 - **houdini-solaris-usd** - Work with USD (Universal Scene Description) in Houdini Solaris including stage creation, layer composition, variants, and USD export workflows. Use for USD workflows and Solaris. Triggers: solaris, usd, stage, layer, variant, usd export
 - **houdini-vex-programming** - Write VEX code for Houdini including wrangles, custom operations, attribute manipulation, and performance optimization. Use when writing VEX scripts or custom operations. Triggers: vex, wrangle, vex code, attribute wrangle, point wrangle
 
-### unreal-vfx (v2.0.2, public)
+### unreal-vfx (v2.1.0, public)
 
 Unreal Engine 5.8 VFX pipeline via the native UE MCP (ModelContextProtocol plugin + VibeUE toolsets): Blueprint automation, PCG, actor operations, Sequencer, Python scripting.
 
@@ -73,6 +73,7 @@ Requires: vfx-core
 - **unreal-actor-operations** [scripts] - Spawn, manipulate, and query actors in Unreal Engine via Python. Use when spawning actors, setting transforms, getting/setting properties, or when user mentions "actor", "spawn", "transform", "location", "rotation", "static mesh actor", "blueprint actor".
 - **unreal-blueprint-automation** - Automate Blueprint creation, component addition, property configuration, and compilation in Unreal Engine 5.8 using phased execution pattern. Use when creating Blueprints, adding components, setting properties, debugging Blueprint crashes, or when user mentions blueprint, create blueprint, compile blueprint, add component, blueprint property, set component property, blueprint automation.
 - **unreal-pcg-automation** [scripts] - Automate PCG (Procedural Content Generation) graph creation, node configuration, and asset integration in Unreal Engine 5.8. Use when creating PCG graphs, configuring nodes, debugging PCG, or when user mentions pcg, procedural generation, pcg graph, scatter, pcg node, procedural content, point cloud.
+- **unreal-project-preflight** [scripts] - Verify and batch-fix the Unreal project prerequisites a plan depends on - plugins, project settings, editor config - as a mandatory Step 0 between plan approval and execution, so a build never dies mid-task on a disabled plugin or a setting that needs a restart. Use after any Unreal plan is approved, before the first build step, whenever a task will touch MegaPlants/PVE, PCG interops, Water, Landscape Patches, Movie Render Queue, cryptomatte, ImagePlate, Substrate, ray tracing or the MCP server, and whenever an error says a class, node or plugin is missing. Triggers on "preflight", "check the project settings", "which plugins do we need", "is nanite foliage on", "enable the plugin", "why is the class missing", "restart the editor", "project prerequisites", "before we build".
 - **unreal-python-scripting** - Python API patterns for Unreal Engine 5.8 including Blueprint spawning, material workflows, component manipulation, and API limitations workarounds. Use when scripting Unreal, creating Python tools, encountering API limitations, or when user mentions unreal python, blueprint spawning, material instance, component properties, python api limitations, ue python.
 - **unreal-sequencer-automation** [scripts] - Automate Level Sequence creation, camera cuts, transform animation, and VFX plate workflows via Python. Use when creating sequences, adding tracks, setting keyframes, camera cuts, ImagePlate, or when user mentions "sequencer", "level sequence", "animation", "keyframe", "cinematic", "camera cut", "foreground plate".
 - **unreal-vfx-automation** - Automate VFX workflows in Unreal Engine 5.8 including foreground plates, image sequences, and multi-shot production. Use when setting up ImagePlate, creating foreground plates, batch processing shots, or when user mentions unreal foreground plate, image sequence, vfx set extension, imageplate setup, foreground plate, vfx automation, unreal vfx, set extension, multi shot.

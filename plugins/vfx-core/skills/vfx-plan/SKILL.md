@@ -149,6 +149,27 @@ The plan that survives review is significantly better than one that didn't go th
 
 ---
 
+## Step 3b - Environment Preflight (DCC builds)
+
+A plan that builds inside a DCC is not executable until the application can
+actually run its steps: plugins enabled, project settings on, add-ons loaded,
+MCP bridge up. Those switches usually need a restart, and a restart mid-build
+loses unsaved work - so they are settled ONCE, between plan approval and
+step 1, as **Step 0 - Environment preflight**.
+
+- **Unreal:** the `unreal-project-preflight` skill generates Step 0 from the
+  project files and the live editor (`ue_preflight.py --live --features ...
+  --plan-block`). Mandatory for every approved Unreal plan (rule in
+  `.claude/rules/unreal.md`).
+- **Other DCCs:** list the add-ons / packages / bridges each step depends on,
+  read their state back from the application (not from memory), and put the
+  changes plus the single restart into Step 0.
+
+Step 0 has its own read-back: after the restart, the same check must report
+zero outstanding changes before step 1 starts.
+
+---
+
 ## Step 4 - Output Format
 
 After planning, produce a brief in this format:
@@ -167,6 +188,9 @@ After planning, produce a brief in this format:
 [What this produces]
 
 ## Implementation steps
+0. Environment preflight - plugins / project settings / bridges the steps
+   below need, applied as one batch with one restart, read back before step 1
+   (Unreal: paste the `unreal-project-preflight --plan-block` output here)
 1. [First step]
 2. [Second step]
 ...

@@ -11,7 +11,7 @@
     "plugins":  [
                     {
                         "name":  "vfx-core",
-                        "version":  "2.4.2",
+                        "version":  "2.4.3",
                         "description":  "Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).",
                         "source":  "./plugins/vfx-core"
                     },
@@ -29,7 +29,7 @@
                     },
                     {
                         "name":  "unreal-vfx",
-                        "version":  "2.0.2",
+                        "version":  "2.1.0",
                         "description":  "Unreal Engine 5.8 VFX pipeline via the native UE MCP (ModelContextProtocol plugin + VibeUE toolsets): Blueprint automation, PCG, actor operations, Sequencer, Python scripting.",
                         "source":  "./plugins/unreal-vfx"
                     },

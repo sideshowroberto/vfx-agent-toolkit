@@ -1,0 +1,226 @@
+{
+  "schema": 1,
+  "engine": "5.8",
+  "about": "Feature -> project requirements for Unreal Engine 5.8. Read by scripts/ue_preflight.py --features. Plugin names are the .uplugin basenames verified against the 5.8 launcher install on 2026-09-08; ini keys were read from real project configs. Every .uproject or Default*.ini change needs an editor restart - the catalog does not repeat that per entry. Spec grammar is documented in the SKILL.md.",
+  "aliases": {
+    "pve": "megaplants",
+    "procedural-vegetation": "megaplants",
+    "nanite-foliage": "megaplants",
+    "cryptomatte": "mrq-cryptomatte",
+    "objectid": "mrq-cryptomatte",
+    "movie-render-queue": "mrq",
+    "image-plate": "imageplate",
+    "foreground-plate": "imageplate",
+    "sequencer": "sequencer-python",
+    "vibe": "vibeue",
+    "ray-tracing": "raytracing",
+    "hardware-raytracing": "raytracing",
+    "virtual-shadow-maps": "vsm",
+    "geometry-script": "geometry-scripting",
+    "landscape-patches": "landscape-patch",
+    "hair": "hair-strands",
+    "groom": "hair-strands"
+  },
+  "features": {
+    "pcg": {
+      "summary": "Procedural Content Generation graphs and components",
+      "requires": ["plugin:PCG"],
+      "notes": [
+        "Enabled by default in 5.8 templates, but a project can have it off - check, do not assume.",
+        "Landscape input since 5.4 needs a Get Landscape Data node (the Input node lost its Landscape pin)."
+      ]
+    },
+    "pcg-geometry": {
+      "summary": "PCG nodes that sample meshes / dynamic meshes via Geometry Script",
+      "requires": ["plugin:PCGGeometryScriptInterop", "plugin:GeometryScripting", "plugin:PCG"]
+    },
+    "pcg-water": {
+      "summary": "PCG reading Water Body splines / zones",
+      "requires": ["plugin:PCGWaterInterop", "plugin:Water", "plugin:PCG"],
+      "notes": ["Experimental. Water Body spline points carry spline width as point scale - TransformPoints downstream needs absolute_scale=True."]
+    },
+    "pcg-biome": {
+      "summary": "PCG Biome Core sample content",
+      "requires": ["plugin:PCGBiomeCore", "plugin:PCG"]
+    },
+    "pcg-niagara": {
+      "summary": "PCG to Niagara data interop",
+      "requires": ["plugin:PCGNiagaraInterop", "plugin:PCG"]
+    },
+    "megaplants": {
+      "summary": "MegaPlants / Procedural Vegetation Editor trees (Quixel PVE line on Fab)",
+      "requires": [
+        "plugin:ProceduralVegetationEditor",
+        "plugin:PCG",
+        "ini:DefaultEngine:/Script/Engine.RendererSettings:r.Nanite.Foliage=True",
+        "ini:DefaultEngine:/Script/WindowsTargetPlatform.WindowsTargetSettings:+D3D12TargetedShaderFormats=PCD3D_SM6",
+        "ini:DefaultEngine:/Script/WindowsTargetPlatform.WindowsTargetSettings:DefaultGraphicsRHI=DefaultGraphicsRHI_DX12"
+      ],
+      "notes": [
+        "The Nanite Foliage (Experimental) project setting is r.Nanite.Foliage under RendererSettings - restart after enabling.",
+        "GrowerPresets are recipes, not meshes: bake via the PVE Output node (Skeletal Mesh + Nanite) in the UI. The ProceduralVegetation asset graph is not scriptable.",
+        "Place at scale with the PCG Skinned Mesh Spawner; the classic Foliage painter cannot take skeletal meshes.",
+        "Known 5.7/5.8 bugs: PCG-spawned skinned instances have no collision; PVE meshes reported to crash PACKAGED builds (editor + MRQ fine); MRQ ObjectId does not capture InstancedSkinnedMesh instances (use the custom-stencil matte workaround)."
+      ]
+    },
+    "nanite": {
+      "summary": "Nanite meshes (needs SM6 + DX12)",
+      "requires": [
+        "ini:DefaultEngine:/Script/WindowsTargetPlatform.WindowsTargetSettings:+D3D12TargetedShaderFormats=PCD3D_SM6",
+        "ini:DefaultEngine:/Script/WindowsTargetPlatform.WindowsTargetSettings:DefaultGraphicsRHI=DefaultGraphicsRHI_DX12"
+      ],
+      "notes": ["Dense Nanite canopies 'boil' during fly-ins: r.Nanite.MaxPixelsPerEdge 0.5-0.75 on the MRQ preset, not an HLOD problem."]
+    },
+    "lumen": {
+      "summary": "Lumen GI + reflections",
+      "requires": [
+        "ini:DefaultEngine:/Script/Engine.RendererSettings:r.DynamicGlobalIlluminationMethod=1",
+        "ini:DefaultEngine:/Script/Engine.RendererSettings:r.ReflectionMethod=1",
+        "ini:DefaultEngine:/Script/Engine.RendererSettings:r.GenerateMeshDistanceFields=True",
+        "ini:DefaultEngine:/Script/WindowsTargetPlatform.WindowsTargetSettings:+D3D12TargetedShaderFormats=PCD3D_SM6"
+      ]
+    },
+    "vsm": {
+      "summary": "Virtual Shadow Maps",
+      "requires": ["ini:DefaultEngine:/Script/Engine.RendererSettings:r.Shadow.Virtual.Enable=1"]
+    },
+    "substrate": {
+      "summary": "Substrate materials",
+      "requires": ["ini:DefaultEngine:/Script/Engine.RendererSettings:r.Substrate=True"],
+      "notes": ["Toggling Substrate recompiles every shader in the project - plan the restart for a break, not mid-session."]
+    },
+    "raytracing": {
+      "summary": "Hardware ray tracing (RT shadows, Lumen HWRT, path tracer)",
+      "requires": [
+        "ini:DefaultEngine:/Script/Engine.RendererSettings:r.RayTracing=True",
+        "ini:DefaultEngine:/Script/Engine.RendererSettings:r.SkinCache.CompileShaders=True",
+        "ini:DefaultEngine:/Script/WindowsTargetPlatform.WindowsTargetSettings:+D3D12TargetedShaderFormats=PCD3D_SM6",
+        "ini:DefaultEngine:/Script/WindowsTargetPlatform.WindowsTargetSettings:DefaultGraphicsRHI=DefaultGraphicsRHI_DX12"
+      ],
+      "notes": ["Ray-traced sun shadows resolved sub-VSM-texel self-shadowing flicker on a small hero object that VSM physically could not (production finding, 2026-08-13)."]
+    },
+    "water": {
+      "summary": "Water plugin (Water Body actors, water zones)",
+      "requires": ["plugin:Water"],
+      "notes": ["Experimental. Pulls Landmass and Niagara in as dependencies automatically."]
+    },
+    "landscape-patch": {
+      "summary": "Landscape Patch actors / PCG landscape edits",
+      "requires": ["plugin:LandscapePatch"],
+      "notes": ["Patches only take effect on a landscape with Edit Layers enabled - that is a per-landscape-actor setting, check it in the level, not the project."]
+    },
+    "landmass": {
+      "summary": "Landmass blueprint brushes",
+      "requires": ["plugin:Landmass"]
+    },
+    "mrq": {
+      "summary": "Movie Render Queue renders",
+      "requires": ["plugin:MovieRenderPipeline"],
+      "notes": [
+        "Render launches always time out the MCP call (PIE blocks the response) - fire with a short timeout and poll the output folder; the render DID start.",
+        "Temporal samples bake motion blur - sharp comp masters are spatial N / temporal 1."
+      ]
+    },
+    "mrq-cryptomatte": {
+      "summary": "MRQ ObjectId / cryptomatte pass",
+      "requires": ["plugin:MoviePipelineMaskRenderPass", "plugin:MovieRenderPipeline"],
+      "notes": ["ObjectId does NOT capture InstancedSkinnedMeshComponent instances (PCG skinned spawners) - use the custom-depth stencil matte workaround."]
+    },
+    "ocio": {
+      "summary": "OpenColorIO colour management in MRQ / viewport",
+      "requires": ["plugin:OpenColorIO"]
+    },
+    "imageplate": {
+      "summary": "ImagePlate actors for foreground / background plates",
+      "requires": ["plugin:ImagePlate"],
+      "notes": ["Experimental and OFF by default - the unreal-sequencer-automation and unreal-vfx-automation skills both need it."]
+    },
+    "sequencer-python": {
+      "summary": "Level Sequence scripting from Python",
+      "requires": ["plugin:SequencerScripting", "plugin:LevelSequenceEditor"]
+    },
+    "python": {
+      "summary": "Editor Python (the MCP execute_python_code path depends on it)",
+      "requires": ["plugin:PythonScriptPlugin", "plugin:EditorScriptingUtilities"]
+    },
+    "geometry-scripting": {
+      "summary": "Geometry Script (dynamic mesh) functions",
+      "requires": ["plugin:GeometryScripting"]
+    },
+    "modeling": {
+      "summary": "Modeling Tools editor mode",
+      "requires": ["plugin:ModelingToolsEditorMode"]
+    },
+    "mcp": {
+      "summary": "UE 5.8 native MCP server (what the agent talks to)",
+      "requires": [
+        "plugin:ModelContextProtocol",
+        "ini:DefaultEditorPerProjectUser|EditorPerProjectUserSettings:/Script/UnrealEd.EditorModelContextProtocolSettings:bAutoStartServer=True",
+        "ini:DefaultEditorPerProjectUser|EditorPerProjectUserSettings:/Script/UnrealEd.EditorModelContextProtocolSettings:Port=8000",
+        "ini:DefaultEditorPerProjectUser|EditorPerProjectUserSettings:/Script/UnrealEd.EditorModelContextProtocolSettings:URLPath=/mcp"
+      ],
+      "notes": [
+        "Absent ini keys mean the plugin's own defaults apply, which may still serve on 8000 - the authoritative check is a netstat on the port or a successful --live probe, not the ini alone.",
+        "Port 8000 can be stolen by a ComfyUI FL-MCP backend that starts first - netstat before blaming the plugin.",
+        "The server can be (re)started inside a running editor with the console command ModelContextProtocol.StartServer <port>."
+      ]
+    },
+    "vibeue": {
+      "summary": "VibeUE toolset services (Fab plugin, project-level)",
+      "requires": ["plugin:VibeUE", "plugin:ModelContextProtocol"],
+      "notes": ["Installs from Fab into <project>/Plugins/Marketplace/VibeUE - a NOT_IN_ENGINE result means it is not installed, not merely disabled."]
+    },
+    "niagara-fluids": {
+      "summary": "Niagara Fluids sims",
+      "requires": ["plugin:NiagaraFluids"]
+    },
+    "hair-strands": {
+      "summary": "Groom / hair strands",
+      "requires": ["plugin:HairStrands", "ini:DefaultEngine:/Script/Engine.RendererSettings:r.SkinCache.CompileShaders=True"]
+    },
+    "usd": {
+      "summary": "USD import / stage actor",
+      "requires": ["plugin:USDImporter"]
+    },
+    "alembic": {
+      "summary": "Alembic import (geometry cache)",
+      "requires": ["plugin:AlembicImporter"]
+    },
+    "datasmith": {
+      "summary": "Datasmith content import",
+      "requires": ["plugin:DatasmithContent"]
+    },
+    "livelink": {
+      "summary": "Live Link sources",
+      "requires": ["plugin:LiveLink"]
+    },
+    "takes": {
+      "summary": "Take Recorder",
+      "requires": ["plugin:Takes"]
+    },
+    "virtual-camera": {
+      "summary": "Virtual Camera",
+      "requires": ["plugin:VirtualCamera"]
+    },
+    "composure": {
+      "summary": "Composure compositing",
+      "requires": ["plugin:Composure"]
+    },
+    "camera-calibration": {
+      "summary": "Camera calibration / lens files",
+      "requires": ["plugin:CameraCalibration"]
+    },
+    "cine-camera-rigs": {
+      "summary": "Cine camera rig rails / cranes",
+      "requires": ["plugin:CineCameraRigs"]
+    },
+    "template-sequence": {
+      "summary": "Template Sequences",
+      "requires": ["plugin:TemplateSequence"]
+    },
+    "virtual-heightfield": {
+      "summary": "Virtual Heightfield Mesh landscapes",
+      "requires": ["plugin:VirtualHeightfieldMesh"]
+    }
+  }
+}

@@ -6,10 +6,12 @@ allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool,Read,
 
 # Unreal Python Scripting
 
-**Version:** 2.0.0
-**Last Updated:** 2026-07-06
+**Version:** 2.0.1
+**Last Updated:** 2026-09-08
 **Target:** Unreal Engine 5.8+
 **Dependencies:** unreal Python module (built-in), UE 5.8 native MCP (HTTP, port 8000)
+
+> **Preflight first (2026-09-08):** before the first build step of any approved plan, run the `unreal-project-preflight` skill (`ue_preflight.py --live --features <list> --plan-block`) so plugins and project settings this skill depends on are enabled in ONE restart. Mid-task "class not found / plugin not enabled" errors go back to that Step 0, never to a runtime toggle.
 
 ---
 
