@@ -17,7 +17,7 @@
                     },
                     {
                         "name":  "nuke-vfx",
-                        "version":  "1.1.4",
+                        "version":  "1.1.5",
                         "description":  "Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, and batch shot setup.",
                         "source":  "./plugins/nuke-vfx"
                     },

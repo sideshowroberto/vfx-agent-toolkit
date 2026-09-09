@@ -5,7 +5,12 @@ This script automatically tiles large images for processing through ML nodes (li
 that work best with smaller image sizes. It creates a node tree that:
 1. Divides the input image into overlapping tiles
 2. Processes each tile through an ML node
-3. Seamlessly blends the tiles back together using gradient masks
+3. Blends the tiles back together using gradient masks
+
+Nuke 17.0v2 identity reconstruction passed 80 rendered signal/grid/overlap cases.
+4K identity RGBA and unchanged source auxiliary channels also passed.
+Independent model edits can disagree across overlaps; feathering cannot repair
+semantic/material inconsistency (evidence: vfx-agent-toolkit-codex archive, docs/WORK-DESKTOP-CONTINUATION.md).
 
 Author: Claude Code
 Created: 2026-01-21
@@ -61,9 +66,15 @@ def calculate_grid_dimensions(image_width, image_height, tile_size, overlap):
         - 8192x8192 image, 2048 tile, 128 overlap:
           Grid = (5, 5)
     """
+    if any(type(value) is not int or value <= 0
+           for value in (image_width, image_height, tile_size)):
+        raise ValueError('Image dimensions and tile size must be positive integers')
+    if type(overlap) is not int or not 0 <= overlap <= tile_size // 2:
+        raise ValueError('Overlap must be an integer from zero to half the tile size')
+    # Pairwise complementary fades require no more than two tiles per axis.
     effective_step = tile_size - overlap
-    grid_x = math.ceil(image_width / effective_step)
-    grid_y = math.ceil(image_height / effective_step)
+    grid_x = 1 + max(0, (image_width - tile_size + effective_step - 1) // effective_step)
+    grid_y = 1 + max(0, (image_height - tile_size + effective_step - 1) // effective_step)
     return grid_x, grid_y
 
 
@@ -87,24 +98,14 @@ def calculate_tile_transform(tile_x, tile_y, tile_size, overlap, image_width, im
         tuple: (translate_x, translate_y) for Transform node
     """
     effective_step = tile_size - overlap
-    image_center_x = image_width / 2.0
-    image_center_y = image_height / 2.0
 
     # Calculate top-left corner of tile in original image space
     tile_offset_x = tile_x * effective_step
     tile_offset_y = tile_y * effective_step
 
-    # Convert to transform translate values (relative to image center)
-    # Transform node translates relative to center, so we need to:
-    # 1. Find tile center in image space
-    # 2. Subtract image center to get relative offset
-    tile_center_x = tile_offset_x + tile_size / 2.0
-    tile_center_y = tile_offset_y + tile_size / 2.0
-
-    translate_x = tile_center_x - image_center_x
-    translate_y = tile_center_y - image_center_y
-
-    return translate_x, translate_y
+    # Translation does not depend on the Transform center knob. Move the
+    # tile origin to (0, 0), and keep Reformat centering disabled.
+    return -tile_offset_x, -tile_offset_y
 
 
 # ============================================================================
@@ -131,51 +132,37 @@ def create_expression_blend_mask(tile_x, tile_y, grid_x, grid_y, tile_size, over
     Returns:
         nuke.Node: Expression node generating the blend mask
     """
-    # Deselect all to prevent auto-connection
+    # Validate before creating any nodes. Reuse the grid parameter contract.
+    calculate_grid_dimensions(tile_size, tile_size, tile_size, overlap)
+    if any(type(value) is not int or value <= 0 for value in (grid_x, grid_y)):
+        raise ValueError('Grid dimensions must be positive integers')
+    if (type(tile_x) is not int or type(tile_y) is not int
+            or not 0 <= tile_x < grid_x or not 0 <= tile_y < grid_y):
+        raise ValueError('Tile index is outside the grid')
     for node in nuke.allNodes():
         node.setSelected(False)
 
     expr_node = nuke.nodes.Expression()
     expr_node.setName(f'TileMask_{tile_x}_{tile_y}')
 
-    # Build expression based on grid position
-    # Pattern:
-    # - Leftmost column (x=0): only left fade
-    # - Middle columns: both left AND right fade
-    # - Rightmost column: only right fade
-    # Same for Y direction
+    # Fade only toward an existing neighbor. Ascending smoothstep bounds avoid
+    # relying on undefined/reversed-edge behavior. A zero overlap is a hard cut.
     expr_parts = []
-
-    # X direction (horizontal fades)
-    if tile_x == 0:
-        # Leftmost column: fade in from left edge
-        expr_parts.append(f'smoothstep(0, {overlap}, x)')
-    elif tile_x == grid_x - 1:
-        # Rightmost column: fade out to right edge
-        expr_parts.append(f'smoothstep({tile_size}, {tile_size - overlap}, x)')
-    else:
-        # Middle columns: fade both edges
-        expr_parts.append(f'smoothstep(0, {overlap}, x)')
-        expr_parts.append(f'smoothstep({tile_size}, {tile_size - overlap}, x)')
-
-    # Y direction (vertical fades)
-    if tile_y == 0:
-        # Top row: fade in from top edge
-        expr_parts.append(f'smoothstep(0, {overlap}, y)')
-    elif tile_y == grid_y - 1:
-        # Bottom row: fade out to bottom edge
-        expr_parts.append(f'smoothstep({tile_size}, {tile_size - overlap}, y)')
-    else:
-        # Middle rows: fade both edges
-        expr_parts.append(f'smoothstep(0, {overlap}, y)')
-        expr_parts.append(f'smoothstep({tile_size}, {tile_size - overlap}, y)')
+    if overlap:
+        for axis, index, count in (('x', tile_x, grid_x), ('y', tile_y, grid_y)):
+            if index > 0:
+                expr_parts.append(f'smoothstep(0, {overlap}, {axis})')
+            if index < count - 1:
+                expr_parts.append(
+                    f'(1 - smoothstep({tile_size - overlap}, {tile_size}, {axis}))')
 
     # Multiply all factors together
     expression = ' * '.join(expr_parts) if expr_parts else '1.0'
 
     # Set expression to output to mask channel
     expr_node['expr3'].setValue(expression)
-    expr_node['channel3'].setValue('mask')  # Output to mask channel
+    nuke.Layer('codex_tile_mask', ['codex_tile_mask.alpha'])
+    expr_node['channel3'].setValue('codex_tile_mask.alpha')
 
     # Disable RGB channels (pass through)
     expr_node['channel0'].setValue('none')  # Red
@@ -252,6 +239,7 @@ def create_tile_branch(input_node, tile_x, tile_y, grid_x, grid_y, tile_size, ov
     reformat['box_height'].setValue(tile_size)
     reformat['box_fixed'].setValue(True)
     reformat['resize'].setValue('none')
+    reformat['center'].setValue(False)
     reformat['black_outside'].setValue(True)
     reformat.setXYpos(tile_x_pos, y_reformat)
     reformat.setInput(0, transform)
@@ -273,8 +261,8 @@ def create_tile_branch(input_node, tile_x, tile_y, grid_x, grid_y, tile_size, ov
     # Create Premult node to apply mask
     premult = nuke.nodes.Premult()
     premult.setName(f'Premult_{tile_x}_{tile_y}')
-    premult['channels'].setValue('all')
-    premult['alpha'].setValue('mask.a')
+    premult['channels'].setValue('rgba')
+    premult['alpha'].setValue('codex_tile_mask.alpha')
     premult.setXYpos(tile_x_pos, y_premult)
     premult.setInput(0, expression)
 
@@ -511,8 +499,18 @@ def create_tiling_setup(input_node=None, tile_size='2K', overlap=DEFAULT_OVERLAP
         final_reformat['box_height'].setValue(image_height)
         final_reformat['box_fixed'].setValue(True)
         final_reformat['resize'].setValue('none')
+        final_reformat['center'].setValue(False)
         final_reformat.setXYpos(merge_output.xpos(), merge_y + 80)
-        final_reformat.setInput(0, merge_output)
+        # Only RGBA is processed by this recipe. Preserve auxiliary source
+        # channels at full resolution instead of leaking one unweighted tile.
+        restore_channels = nuke.nodes.Copy()
+        restore_channels.setName('Restore_Source_Channels')
+        restore_channels.setInput(0, input_node)
+        restore_channels.setInput(1, merge_output)
+        for index, channel in enumerate(('red', 'green', 'blue', 'alpha')):
+            restore_channels['from%d' % index].setValue('rgba.' + channel)
+            restore_channels['to%d' % index].setValue('rgba.' + channel)
+        final_reformat.setInput(0, restore_channels)
 
         print(f"  Added final reformat to {image_width}x{image_height}")
 
@@ -530,6 +528,7 @@ def create_tiling_setup(input_node=None, tile_size='2K', overlap=DEFAULT_OVERLAP
             'placeholders': placeholders,
             'output': final_reformat,
             'final_reformat': final_reformat,
+            'input_dimensions': (image_width, image_height),
         }
 
     except Exception as e:
@@ -569,7 +568,8 @@ def create_tiling_setup_with_logger(input_node=None, tile_size='2K', overlap=DEF
         result = create_tiling_setup(input_node, tile_size, overlap)
 
         if result['status'] == 'success':
-            log.info(f"Input format: {input_node.format().width()}x{input_node.format().height()}")
+            width, height = result['input_dimensions']
+            log.info(f"Input format: {width}x{height}")
             log.info(f"Tile size: {tile_size}")
             log.info(f"Grid: {result['grid'][0]}x{result['grid'][1]}")
             log.set_stat('grid_size', f"{result['grid'][0]}x{result['grid'][1]}")

@@ -33,7 +33,7 @@ MCP servers: `brave-search`, `context7`, `desktop-commander`
 - **agent: python-specialist** - Applying templates, systematic refactoring, type safety (mypy, type hints, protocols), async programming (AsyncIO, concurrent.futures), data science workflows (pandas, numpy vectorization), and testing methodology (pytest, fixtures, parameterized tests). Use when applying agent-skill templates, migrating code patterns, refactoring with type hints, optimizing with async/vectorization, or performing systematic code transformation across multiple files.
 - **agent: python-refactoring-specialist** - Python refactoring specialist for applying templates, batch search/replace, and systematic code refactoring. Use when applying agent-skill templates, migrating code patterns, or performing systematic refactoring across multiple files.
 
-### nuke-vfx (v1.1.4, public)
+### nuke-vfx (v1.1.5, public)
 
 Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, and batch shot setup.
 
