@@ -242,6 +242,19 @@ a small launcher script that globs for the newest version keeps the hook
 valid across upgrades. Trust the hook once with `/hooks` in the Codex TUI
 (headless runs: `codex exec --dangerously-bypass-hook-trust`).
 
+**Headless runs and MCP tools.** `codex exec -s read-only` or `-s workspace-write`
+sets the approval policy to `never`; shell-only skills work, but the first MCP
+tool call is refused with `MCP tool call requires approval, but approval policy
+is never`. For MCP-driven skills (Unreal, live Nuke/Houdini/Blender) run
+`codex exec --approve-for-me "..."` instead - it routes approvals through
+automatic review inside the workspace-write sandbox (verified with an Unreal
+actor spawn and read-back on Codex CLI 0.153). `--full-auto` is a top-level
+flag that `codex exec` rejects. Codex's sandboxed PowerShell cannot write its
+transcript on Windows; tell the model to use cmd.exe or python launchers. With
+the public and team marketplaces both installed (about 130 skills) Codex warns
+that skill descriptions were shortened to fit its context budget - disable
+plugins you do not use.
+
 ## Step 5: Verify
 
 Restart Claude Code (required - see troubleshooting), then:
