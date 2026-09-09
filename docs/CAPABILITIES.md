@@ -1,6 +1,6 @@
 # Capabilities index (public toolkit)
 
-GENERATED 2026-09-08 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/registry.json, the skill and agent files, .mcp.json and the script folders. Do not edit; it is rewritten on every /sync-plugins. Registry 2.0.3, updated 2026-09-01.
+GENERATED 2026-09-08 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/registry.json, the skill and agent files, .mcp.json and the script folders. Do not edit; it is rewritten on every /sync-plugins. Registry 2.0.3, updated 2026-09-08.
 
 **How to use it:** ask your agent "what can we do for <task>?" - it should read this file and name the skill, agent, tool or script to reach for. Each line is: name, then what it does and the phrases that trigger it.
 
