@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Local LLM agent with a tool-calling loop. The local model reads files itself,
-so file content stays on-machine and out of Claude's context window.
+LLM agent with a tool-calling loop. File contents go to the configured server;
+the final reply goes to the caller and may reproduce those contents.
 
 Tools the model gets: read_file, list_dir, search_files - all confined to --dir.
 
@@ -18,6 +18,7 @@ Usage:
 import argparse
 import glob
 import json
+import ntpath
 import os
 import sys
 import urllib.error
@@ -93,13 +94,79 @@ def file_char_budget(num_ctx):
     return max(8_000, min(HARD_FILE_CAP, (num_ctx // 2) * 3))
 
 
+def confined_path(path, working_dir):
+    """Resolve before checking containment, including symlink destinations.
+
+    This is an application-level check for a stable filesystem, not protection
+    against another process replacing filesystem entries during an operation.
+    """
+    root = os.path.realpath(working_dir)
+    if not os.path.isdir(root):
+        raise ValueError("Working directory does not exist")
+    candidate = os.path.realpath(os.path.join(root, path))
+    try:
+        inside = os.path.commonpath([root, candidate]) == root
+    except ValueError:
+        inside = False  # Different drives on Windows.
+    if not inside:
+        raise PermissionError("Path is outside the allowed directory")
+    return candidate
+
+
+def glob_parts(pattern):
+    """Validate a relative glob before any filesystem enumeration."""
+    if not isinstance(pattern, str):
+        raise ValueError("Glob must be a string")
+    # Accept either separator, but never drive/UNC paths or parent components.
+    normalized = pattern.replace("\\", "/")
+    parts = normalized.split("/")
+    if (ntpath.splitdrive(pattern)[0] or normalized.startswith("/")
+            or ".." in parts or ":" in normalized):
+        raise ValueError("Glob must be relative and cannot contain parent paths or drives")
+    return [part for part in parts if part not in ("", ".")]
+
+
+def confined_glob(directory, pattern, working_dir):
+    """Expand relative globs without walking outside the root.
+
+    Recursive ** does not follow directory links (including Windows junctions).
+    Explicit in-root links can still be used as paths or matched by name.
+    """
+    parts = glob_parts(pattern)
+
+    def expand(current, remaining):
+        current = confined_path(current, working_dir)
+        if not remaining:
+            yield current
+            return
+        if not os.path.isdir(current):
+            return
+        first, rest = remaining[0], remaining[1:]
+        if first == "**":
+            yield from expand(current, rest)
+            with os.scandir(current) as entries:
+                for entry in entries:
+                    if entry.name.startswith("."):
+                        continue
+                    if (entry.is_dir(follow_symlinks=False)
+                            and os.path.realpath(entry.path) == os.path.abspath(entry.path)):
+                        yield from expand(entry.path, remaining)
+        else:
+            for match in glob.iglob(os.path.join(current, first)):
+                try:
+                    match = confined_path(match, working_dir)
+                except PermissionError:
+                    continue
+                yield from expand(match, rest)
+
+    yield from expand(directory, parts)
+
+
 def execute_tool(name, arguments, working_dir, char_budget):
     try:
+        working_dir = confined_path(".", working_dir)
         if name == "read_file":
-            path = arguments["path"]
-            if not os.path.isabs(path):
-                path = os.path.join(working_dir, path)
-            path = os.path.realpath(path)
+            path = confined_path(arguments["path"], working_dir)
             if not os.path.isfile(path):
                 return f"Error: File not found: {path}"
             with open(path, "r", errors="replace") as f:
@@ -111,22 +178,23 @@ def execute_tool(name, arguments, working_dir, char_budget):
             return text
 
         elif name == "list_dir":
-            path = arguments.get("path") or "."
-            if not os.path.isabs(path):
-                path = os.path.join(working_dir, path)
-            path = os.path.realpath(path)
+            path = confined_path(arguments.get("path") or ".", working_dir)
             if not os.path.isdir(path):
                 return f"Error: Directory not found: {path}"
             pattern = arguments.get("pattern")
             if pattern:
-                matches = glob.glob(os.path.join(path, pattern), recursive=True)
-                entries = sorted(os.path.relpath(m, path) for m in matches)
+                matches = confined_glob(path, pattern, working_dir)
+                entries = sorted(set(os.path.relpath(m, path) for m in matches))
             else:
                 entries = []
                 for e in sorted(os.listdir(path)):
                     if e.startswith("."):
                         continue
                     full = os.path.join(path, e)
+                    try:
+                        confined_path(full, working_dir)
+                    except PermissionError:
+                        continue
                     entries.append(e + "/" if os.path.isdir(full) else e)
             if not entries:
                 return "(empty directory)"
@@ -135,13 +203,17 @@ def execute_tool(name, arguments, working_dir, char_budget):
         elif name == "search_files":
             import re
             pattern = arguments["pattern"]
-            search_path = arguments.get("path") or "."
-            if not os.path.isabs(search_path):
-                search_path = os.path.join(working_dir, search_path)
-            search_path = os.path.realpath(search_path)
+            search_path = confined_path(arguments.get("path") or ".", working_dir)
             file_pattern = arguments.get("file_pattern") or "*"
             matches = []
-            for filepath in glob.glob(os.path.join(search_path, "**", file_pattern), recursive=True):
+            # Validate the caller's pattern before prepending recursive search.
+            glob_parts(file_pattern)
+            seen = set()
+            for filepath in confined_glob(search_path, "**/" + file_pattern, working_dir):
+                filepath = confined_path(filepath, working_dir)
+                if filepath in seen:
+                    continue
+                seen.add(filepath)
                 if not os.path.isfile(filepath) or os.path.getsize(filepath) > HARD_FILE_CAP:
                     continue
                 try:

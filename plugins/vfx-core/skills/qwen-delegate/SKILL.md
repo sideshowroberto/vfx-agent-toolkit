@@ -6,10 +6,12 @@ allowed-tools: Bash,Read
 
 # Qwen Delegate
 
-Routes a task to the **local Qwen model served by Ollama**. The prompt, any files
-the model reads, and the answer never leave the machine, and the file content
-never enters Claude's context - only the model's reply comes back. NDA-safe by
-design, and cheap on Claude tokens.
+Routes a task to the **local Qwen model served by Ollama** (localhost by default).
+Pointed at localhost, the prompt, any files the model reads, and the answer never
+leave the machine, and the file content never enters Claude's context - only
+the model's reply comes back. That reply CAN quote input content, so review what
+returns before it lands in a hosted session. A remote `--url` or `LOCAL_LLM_URL`
+sends the inputs off-machine: then it is not NDA-safe, whatever the model.
 
 ## What you have installed
 
@@ -74,6 +76,17 @@ Neither script has a `--file` flag. To summarize a file, give `agent_local.py`
 the folder via `--dir` and name the file in the prompt. To transform text,
 pipe it into `query_local.py` on stdin.
 
+`agent_local.py` resolves file-tool paths before checking that they are inside
+`--dir`. Outside paths and symlink targets are rejected; glob filters must be
+relative without parent components or drive prefixes. Recursive `**` skips
+directory links, including junctions, to avoid escape and cycles. Explicit
+in-root links remain usable. Outside links are omitted from listings/searches.
+
+This is an application-level boundary for a stable filesystem, not an OS
+sandbox against concurrent file/link replacement. Use OS isolation when other
+processes can change an untrusted tree. Explicit operator-supplied `--image`
+attachments are separate inputs and are not restricted by the file-tool root.
+
 ---
 
 ## Invocation patterns
@@ -124,8 +137,9 @@ python <skill-dir>/scripts/query_local.py --model qwen3:8b --max-tokens 8000 "..
 - **One file per question on the 14B**; the 27B can take a folder.
 - **Thinking is off by default** for speed. Add `--think` to `query_local.py`
   for harder reasoning (BlinkScript, tricky refactors).
-- **The model has no MCP, no internet, no write access.** It can only read
-  inside `--dir` and answer. Claude does the editing.
+- **The helper exposes no MCP, web, or write tools.** File tools are confined
+  to `--dir` and their results go to the configured server; that says nothing
+  about the server's own network or storage behaviour. Claude does the editing.
 
 ---
 
@@ -155,3 +169,16 @@ ever sees it - rephrase inside the allowed paths rather than working around it.
 - `agent_local.py` stops after 10 tool turns (`--max-turns` to raise).
 - Ollama unloads the model after ~5 minutes idle; the first call after that
   takes 10-20 s to reload. That is normal, not a hang.
+
+## Directory-boundary regression tests
+
+Run offline with synthetic fixtures (no model or credentials required):
+
+```bash
+python -m unittest discover -s <skill-dir>/tests -v
+```
+
+Tests cover valid paths and globs, outside/parent paths, sibling-prefix paths,
+symlinks, recursive cycles, missing files, and read truncation. macOS: 7 passed
+(2026-09-07). Windows: 5 passed, the 2 symlink cases skip unless the account
+holds the create-symbolic-link privilege (2026-09-08).

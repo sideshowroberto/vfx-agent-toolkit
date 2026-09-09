@@ -466,30 +466,15 @@ for d in defs:
 - Modified parameters in Type Properties don't appear on node instances
 - Old parameter interface persists after changes
 
-**Cause:**
-HDA instances cache parameter templates. Changes to definition don't automatically propagate to existing instances.
-
-**Solution:**
-```python
-# Method 1: Reload definition for all instances
-node_type = hou.nodeType(category, hda_name)
-for instance in node_type.instances():
-    instance.matchCurrentDefinition()
-
-# Method 2: Sync single instance
-instance.syncNodeVersionIfNeeded()
-
-# Method 3: Force recreation (preserves parameter values)
-old_parms = instance.parmTuple("scale").eval()
-instance.destroy()
-new_instance = hou.node("/obj").createNode(hda_name)
-new_instance.parmTuple("scale").set(old_parms)
-```
-
-**Prevention:**
-- Use `Allow Editing of Contents` carefully (locks definitions)
-- Test changes on new instances before updating existing ones
-- Document parameter changes in HDA help section
+**Cause and fix (verified on Houdini 21.0.596, 2026-09-08):**
+Locked instances follow definition updates; unlocked instances keep their local
+edits. Check which definition is active (`hou.HDADefinition.isPreferred()`) and
+whether the affected instance is unlocked (`instance.isEditable()`). Do NOT
+bulk-match or destroy instances as a refresh remedy: `matchCurrentDefinition()`
+discards unsaved contents, and recreation can lose connections and state.
+Parameter-interface changes must be saved with `definition.setParmTemplateGroup`;
+an instance-only spare parameter never reaches future instances. A parameter
+version migration is a deliberate migration of the actual asset, not a refresh.
 
 ---
 
@@ -552,38 +537,31 @@ new_instance.parmTuple("scale").set(old_parms)
 - Changes to nodes inside HDA are lost after save/reload
 
 **Cause:**
-HDA is locked or changes weren't saved to definition file.
+Unlocking an instance and saving its definition are separate operations, and
+two calls are commonly misread: `setIsPreferred(True)` selects which definition
+is active - it does not unlock a node or grant write access; and
+`matchCurrentDefinition()` REVERTS the instance to the saved definition - it is
+not an "exit and save" command. Calling match before save throws the edits away.
 
-**Solution:**
+**Solution (save-then-match; native save/match/reopen and intentional revert
+verified on Houdini 21.0.596, 2026-09-08):**
 ```python
-# Unlock HDA for editing
-instance = hou.node("/obj/my_tool1")
+instance = hou.node("/obj/my_tool1")     # an explicitly chosen, disposable test instance
+instance.allowEditingOfContents()         # unlock: local edits now allowed
+# ... apply the intended internal edits ...
 definition = instance.type().definition()
-
-# Check if locked
-if definition.isReadOnly():
-    # Unlock definition
-    definition.setIsPreferred(True)
-    print("Definition unlocked")
-
-# Make changes to internal network
-# ... modify nodes inside HDA ...
-
-# Save changes back to definition
-definition.updateFromNode(instance)
-
-# Save to HDA file
-definition.save(definition.libraryFilePath())
-print("Changes saved to HDA file")
+if definition is None:
+    raise ValueError("Selected node has no HDA definition")
+definition.updateFromNode(instance)       # SAVE first. A failure must stop here,
+                                          # leaving the instance unmatched so the edits survive.
+instance.matchCurrentDefinition()         # only after a successful save: relock
 ```
 
-**Alternative: Use Type Properties Interface:**
-```python
-# Open Type Properties dialog programmatically
-instance.allowEditingOfContents()  # Enter HDA
-# Make changes...
-instance.matchCurrentDefinition()   # Exit and save
-```
+Check the definition's library target before saving (`definition.libraryFilePath()`):
+it can be embedded, or a read-only/published library that needs the project's
+writable, versioned asset workflow. Verification: edit one disposable HDA, save,
+reopen the hip and inspect the internal change; separately make an unsaved change
+and confirm that an intentional match reverts it.
 
 ---
 

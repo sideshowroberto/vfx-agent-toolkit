@@ -1,7 +1,7 @@
 {
     "$schema":  "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
     "name":  "houdini-vfx",
-    "version":  "1.0.3",
+    "version":  "1.0.4",
     "description":  "Houdini VFX pipeline: procedural generation, USD/Solaris, VEX, Python automation, HDA creation.",
     "author":  {
                    "name":  "Rob Williams"

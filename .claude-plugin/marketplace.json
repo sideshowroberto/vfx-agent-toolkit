@@ -11,7 +11,7 @@
     "plugins":  [
                     {
                         "name":  "vfx-core",
-                        "version":  "2.4.1",
+                        "version":  "2.4.2",
                         "description":  "Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).",
                         "source":  "./plugins/vfx-core"
                     },
@@ -23,7 +23,7 @@
                     },
                     {
                         "name":  "houdini-vfx",
-                        "version":  "1.0.3",
+                        "version":  "1.0.4",
                         "description":  "Houdini VFX pipeline: procedural generation, USD/Solaris, VEX, Python automation, HDA creation.",
                         "source":  "./plugins/houdini-vfx"
                     },
@@ -47,7 +47,7 @@
                     },
                     {
                         "name":  "comfyui-node-dev",
-                        "version":  "1.1.1",
+                        "version":  "1.1.2",
                         "description":  "ComfyUI custom node development: V3 API node structure, schemas, datatypes, inputs/outputs, execution lifecycle, frontend extensions, V1-to-V3 migration, and packaging/publishing.",
                         "source":  "./plugins/comfyui-node-dev"
                     },

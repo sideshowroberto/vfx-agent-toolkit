@@ -181,11 +181,11 @@ my_custom_nodes/
 // locales/zh/nodeDefs.json
 {
     "MyNode1_UniqueID": {
-        "display_name": "我的节点1",
-        "description": "处理图像",
+        "display_name": "\u6211\u7684\u8282\u70b91",
+        "description": "\u5904\u7406\u56fe\u50cf",
         "inputs": {
-            "image": { "display_name": "图像" },
-            "value": { "display_name": "数值", "tooltip": "处理强度" }
+            "image": { "display_name": "\u56fe\u50cf" },
+            "value": { "display_name": "\u6570\u503c", "tooltip": "\u5904\u7406\u5f3a\u5ea6" }
         }
     }
 }

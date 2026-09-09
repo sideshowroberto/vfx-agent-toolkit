@@ -6,7 +6,7 @@ GENERATED 2026-09-08 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/re
 
 ## Skills, by plugin
 
-### vfx-core (v2.4.1, public)
+### vfx-core (v2.4.2, public)
 
 Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).
 
@@ -50,7 +50,7 @@ Requires: vfx-core
 - **nuke-shot-setup** [scripts] - Batch shot setup for Nuke comp projects. Parses a ShotGrid CSV export, reads plate metadata from a plates CSV (or scans plates on disk), creates per-shot folder structures, generates Nuke v001 visdev/comp files with plates auto-connected (Read + Stamp/Anchor with proper ACES colorspace), and produces a Google Sheets-ready CSV shot tracker. Supports multiple sequences at once, show-specific config (OCIO, LUT, compression), and configurable work context (visdev, comp). Use when the user wants to set up shots, run a batch shot setup, start a new sequence, onboard plates, build a shot tracker CSV, or create comps from a CSV. Triggers on "set up shots", "batch shot setup", "new sequence", "onboard plates", "shot tracker csv", "create comps from csv", "shot setup from ShotGrid", "visdev setup".
 - **agent: nuke-specialist** - Nuke compositing expert coordinating node graph operations, Python scripting, and ComfyUI integration. Use when user mentions nuke, compositing, nodes, grade, merge, multi-shot, or nuke python.
 
-### houdini-vfx (v1.0.3, public)
+### houdini-vfx (v1.0.4, public)
 
 Houdini VFX pipeline: procedural generation, USD/Solaris, VEX, Python automation, HDA creation.
 
@@ -110,7 +110,7 @@ Requires: vfx-core
 - **previs-anchor-keyframes** - Generate photoreal anchor keyframes from CG previs for reference-guided video generation (Seedance-class models). Covers previs shading for AI readability, anchor frame selection, bootstrapping action-pose reference sets from a single reference, lighting-accurate prompt language, and validation. Use when converting previs/CG animation to photoreal video, preparing anchor/reference frames for a video model, or when generations ignore CG placement or pose. Triggers on "anchor keyframes", "anchor frames", "previs to photoreal video", "reference frames for video gen", "generations not following the CG".
 - **comfy-cli-skills** - Install comfy-cli's bundled agent skills (comfy, comfy-build, comfy-debug, comfy-deploy, comfy-director, comfy-relay) into any harness and apply this toolkit's zero-cost validation gate and credit audit around paid ComfyUI runs. Use when setting up comfy-cli for an agent, when the comfy skills are missing from the skill catalog, or before submitting a workflow that bills partner-node credits.
 
-### comfyui-node-dev (v1.1.1, public)
+### comfyui-node-dev (v1.1.2, public)
 
 ComfyUI custom node development: V3 API node structure, schemas, datatypes, inputs/outputs, execution lifecycle, frontend extensions, V1-to-V3 migration, and packaging/publishing.
 Requires: vfx-core
