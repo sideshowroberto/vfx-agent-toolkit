@@ -1,0 +1,23 @@
+{
+  "name": "short_loop_name",
+  "working_folder": "D:/work/my_loop",
+  "dcc": "blender",
+  "reference_dir": "D:/work/my_loop/refs",
+  "render_size": [1376, 768],
+  "views": [
+    {"name": "hero", "camera": "CAM_hero", "reference": "hero.png", "crop": null, "notes": "wide frontal view"},
+    {"name": "detail", "camera": "CAM_detail", "reference": "sheet.png", "crop": [0, 0, 1820, 1024], "notes": "top-left tile of a contact sheet"}
+  ],
+  "rubric": [
+    {"name": "composition", "desc": "major lines land where they do in the reference (within about 3 percent of frame height)"},
+    {"name": "scale", "desc": "human-scale anchors hold; nothing reads larger than life"},
+    {"name": "inventory", "desc": "every element visible in the reference exists in the render with the right count"},
+    {"name": "lighting", "desc": "key direction, shaft angle, warmth and contrast match"},
+    {"name": "materials", "desc": "value and hue families, reflectivity, trim placement"},
+    {"name": "constraints", "desc": "nothing from the forbidden list is present"}
+  ],
+  "priority_order": ["composition", "scale", "inventory", "lighting", "materials", "detail"],
+  "stop": {"pass_score": 4, "consecutive_passes": 2, "max_iterations": 15, "no_improvement_streak": 3},
+  "constraints": ["no screens or projections", "human scale only"],
+  "brief_file": "D:/work/my_loop/SCENE_BRIEF.md"
+}

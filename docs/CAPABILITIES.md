@@ -1,12 +1,12 @@
 # Capabilities index (public toolkit)
 
-GENERATED 2026-09-08 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/registry.json, the skill and agent files, .mcp.json and the script folders. Do not edit; it is rewritten on every /sync-plugins. Registry 2.0.3, updated 2026-09-08.
+GENERATED 2026-09-09 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/registry.json, the skill and agent files, .mcp.json and the script folders. Do not edit; it is rewritten on every /sync-plugins. Registry 2.0.3, updated 2026-09-09.
 
 **How to use it:** ask your agent "what can we do for <task>?" - it should read this file and name the skill, agent, tool or script to reach for. Each line is: name, then what it does and the phrases that trigger it.
 
 ## Skills, by plugin
 
-### vfx-core (v2.4.3, public)
+### vfx-core (v2.5.0, public)
 
 Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).
 
@@ -27,6 +27,7 @@ MCP servers: `brave-search`, `context7`, `desktop-commander`
 - **youtube-transcript** [scripts] - Retrieve available YouTube captions with timestamps and provenance, or analyze a video from its transcript. Use for YouTube links and transcript requests; this does not watch video frames or transcribe uncaptained audio.
 - **vfx-research** - Research VFX application APIs, errors, workflow integrations, and library examples using Brave Search and Context7. Use for Blender, Nuke, Houdini, Unreal, ComfyUI, and related development questions that need external evidence.
 - **vfx-workflow** - Apply this toolkit's audited application lessons when scripting DCC scenes, running ComfyUI workflows, or preparing cross-application VFX handoffs. Use for execution and integration work; use vfx-research for documentation lookup.
+- **loop-gauntlet** [scripts] - Run a build-until-it-matches loop in a DCC - an agent builds a scene from reference images, renders matched camera views every iteration, compares each render to its reference side by side, scores it against a rubric the HUMAN authored, logs read-back evidence, and a stop rule decides when it is done. Use when asked to rebuild an environment or set from concept art or photos in Blender (Houdini and Unreal later), to "keep iterating until it matches", to write the prompt another agent (Codex, Claude Code, OpenCode) will run for such a loop, or to judge a finished run. Triggers on "loop gauntlet", "gauntlet loop", "match the reference", "build it from these refs", "keep checking against the ref", "iterate until it matches", "reference match loop", "astra loop".
 - **agent: search-specialist** - Expert VFX research specialist using Brave Search API for technical documentation, tutorials, problem-solving, and industry intelligence across Unreal Engine, Blender, Houdini, Nuke, and ComfyUI
 - **agent: documentation-specialist** - Index-driven documentation updates for VFX application projects. Reads DOCUMENTATION_INDEX.md to understand structure, maintains consistency across related files, updates progress trackers, and creates session summaries. Use with "update documentation," "document session," or "index-driven update.
 - **agent: testing-specialist** - Testing and validating Python scripts, skill scripts, and agent outputs. Use when requests include "test", "validate", "verify", "check", or "pytest". Validates JSON outputs, error handling, script independence, and generates test reports. Proactively invoked after refactoring to ensure functionality.
