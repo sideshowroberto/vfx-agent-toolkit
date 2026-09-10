@@ -20,7 +20,9 @@ Decision order (first match wins):
                          on EITHER measure resets the streak -- this dual
                          rule exists because a global-minimum-only rule froze
                          a real run while four of six views were still
-                         improving on total.
+                         improving on total. A stall is only allowed once
+                         `min_iterations` (optional, default 0) have run, so
+                         the later fix tiers get iterations of their own.
   otherwise CONTINUE.
 
 Usage:
@@ -176,7 +178,12 @@ def decide(iterations, stop_cfg):
     if decision == "continue" and n >= max_iterations and n > 0:
         decision, reason = "stop", "MAX_ITERATIONS"
 
-    if decision == "continue" and streak >= no_improvement_streak:
+    # v1.2.0: a stall cannot fire before `min_iterations` (default 0 = off).
+    # A builder that follows the fix priority (composition first) plateaus on
+    # structure early; without a floor the stall rule fired at iteration 5 on
+    # a real run before the materials tier had a single iteration of its own.
+    min_iterations = int(stop_cfg.get("min_iterations", 0) or 0)
+    if decision == "continue" and streak >= no_improvement_streak and n >= min_iterations:
         decision, reason = "stop", "STALLED"
 
     return decision, reason, streak, best_min, best_total

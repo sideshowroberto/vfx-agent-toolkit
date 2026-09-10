@@ -17,7 +17,7 @@
     {"name": "constraints", "desc": "nothing from the forbidden list is present"}
   ],
   "priority_order": ["composition", "scale", "inventory", "lighting", "materials", "detail"],
-  "stop": {"pass_score": 4, "consecutive_passes": 2, "max_iterations": 15, "no_improvement_streak": 3},
+  "stop": {"pass_score": 4, "consecutive_passes": 2, "max_iterations": 15, "no_improvement_streak": 3, "min_iterations": 8},
   "constraints": ["no screens or projections", "human scale only"],
   "brief_file": "D:/work/my_loop/SCENE_BRIEF.md"
 }

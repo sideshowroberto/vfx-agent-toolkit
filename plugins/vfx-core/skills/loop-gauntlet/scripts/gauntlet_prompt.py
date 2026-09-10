@@ -17,6 +17,11 @@ Usage:
             The effective value is printed and written into the prompt.
 --out       write the prompt to this file (ASCII) instead of stdout only.
 
+Optional spec fields (v1.1.0): "tools" - a list of strings naming the tools
+the builder may use beyond the DCC (rendered as a section); "spend_cap_usd" -
+a number that switches on the spend contract (zero-cost gate, balance
+read-back, GEN_LEDGER.md, no real marks). Absent = round-1 prompt unchanged.
+
 ASCII only. No paths are assumed; everything comes from the spec or flags.
 """
 import argparse
@@ -145,6 +150,36 @@ def build(spec, spec_path, harness, scripts_dir):
     for c in spec["constraints"]:
         add("- %s" % c)
     add("")
+    # Optional round-2 fields: an explicit tool surface and a spend contract.
+    # Absent fields render nothing, so a round-1 spec still produces the
+    # round-1 prompt.
+    tools = spec.get("tools") or []
+    if tools:
+        add("## Tools you may use beyond the DCC")
+        add("")
+        add("You are not limited to modelling by hand. Use any of the following when it "
+            "gets a view closer to its reference, and say in the log which you used and "
+            "why. Nothing else is in scope (no other services, no installs).")
+        add("")
+        for t in tools:
+            add("- %s" % t)
+        add("")
+    cap = spec.get("spend_cap_usd")
+    if cap is not None:
+        add("## Spend contract")
+        add("")
+        add("Paid generation (partner-node or hosted-model calls) is allowed up to %s USD "
+            "for this run in total. Before every paid call, state the purpose and the "
+            "expected cost; run the zero-cost checks the tool offers first (workflow "
+            "validation, a print of the exact graph, a balance read) and read the balance "
+            "back afterwards. Keep GEN_LEDGER.md in the working folder: one line per "
+            "generation with tool, model, purpose, cost, and the output path. A generation "
+            "that is not in the ledger did not happen. When the cap is reached, stop "
+            "generating and continue with what you have; never route around the cap "
+            "through another tool. Generated content must not carry real team logos, "
+            "wordmarks or sponsor marks: numbers, colours and silhouettes only."
+            % cap)
+        add("")
     add("## The loop")
     add("")
     add("Start by writing SCENE_BRIEF.md in the working folder: the plan with your chosen "
@@ -178,14 +213,19 @@ def build(spec, spec_path, harness, scripts_dir):
     for i, r in enumerate(rubric, 1):
         add("%d. %s - %s" % (i, r["name"], r["desc"]))
     add("")
+    floor = int(stop.get("min_iterations", 0) or 0)
+    floor_txt = (" A stall cannot fire before iteration %d: the early iterations belong to "
+                 "composition and scale, and the later tiers (inventory, lighting, materials) "
+                 "must each get their own iterations before the loop may conclude it is stuck."
+                 % floor) if floor else ""
     add("Stop when the script says stop: every view scores %d or better on every criterion "
         "for %d consecutive iterations (target met); or %d iterations are complete; or "
         "neither the lowest score nor the total has improved for %d consecutive iterations "
-        "(stalled). When stalled, stop and tell me what is stuck and what you would need. "
+        "(stalled).%s When stalled, stop and tell me what is stuck and what you would need. "
         "Scores are your own judgement of the comparison image; a score that jumps without "
         "a visible change is a reason to look again. There is no numeric score: the "
         "comparison image is the judge."
-        % (stop["pass_score"], stop["consecutive_passes"], stop["max_iterations"], stop["no_improvement_streak"]))
+        % (stop["pass_score"], stop["consecutive_passes"], stop["max_iterations"], stop["no_improvement_streak"], floor_txt))
     add("")
     add("## Finish")
     add("")

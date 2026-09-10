@@ -6,7 +6,7 @@ user-invocable: true
 
 # Loop Gauntlet
 
-**Version:** 1.0.0 | **Created:** 2026-09-09 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
+**Version:** 1.2.0 | **Created:** 2026-09-09 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
 
 A gauntlet loop is a builder that keeps going until an authored quality bar
 says stop. The pattern comes from the "builder plus fresh-eyes critic" idea
@@ -43,7 +43,10 @@ The lessons from that run are folded in below and in
    consecutive iterations), max iterations, or STALLED. Stalled means neither
    the global minimum nor the total score improved for K iterations - the
    dual rule exists because a minimum-only rule froze the first run while
-   four of six views were still improving.
+   four of six views were still improving. `min_iterations` is the floor
+   below which a stall cannot fire: with composition fixed first, a builder
+   plateaus on structure early, and one round-2 run stalled at iteration 5
+   before the materials tier had a single iteration of its own.
 
 All five live in one spec file: `templates/gauntlet_spec.example.json`.
 The scripts read it, the prompt generator reads it, and a reviewer can diff it.
@@ -198,6 +201,13 @@ as the match evidence, and treat the hero-engine pass as a new task.
 poll the status JSON; never re-submit a render while one is running.
 
 ## Version History
+
+**v1.2.0** (2026-09-10) - Round-2 bench lessons. `stop.min_iterations`
+floor for the stall rule (stop_check + prompt). Generator v1.1.0 fields
+`tools[]` and `spend_cap_usd` (tool-surface section, spend contract with
+zero-cost gate, balance read-back, GEN_LEDGER.md, no real marks). Rubric
+anchors recommended in every `desc` (they tightened self-calibration from
+a 40-point gap to within 5 points across two builders).
 
 **v1.0.0** (2026-09-09) - First release, from the Codex/Astra museum run
 (observation #26). Contract, prompt generator, comparison and logging
