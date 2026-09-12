@@ -33,9 +33,8 @@ HARNESS_RULES = {
     "codex": (
         "Work in the {dcc} session that is already open and connected through the "
         "{dcc} MCP server so the operator can watch the scene change; do not launch "
-        "extra {dcc} instances (the policy hook refuses app launches anyway). Use bpy "
-        "scripts through the MCP execute tool for every change and keep those scripts "
-        "ASCII-only with raw-string Windows paths. For any shell step use cmd.exe or "
+        "extra {dcc} instances (the policy hook refuses app launches anyway). {script_note} "
+        "Keep those scripts ASCII-only with raw-string Windows paths. For any shell step use cmd.exe or "
         "python, not PowerShell. The reference images are attached to this message "
         "and also on disk at the paths below; re-open them with your image viewer "
         "whenever you need to. Infer intent from this brief and see the task through; "
@@ -89,6 +88,14 @@ def fmt_path(p):
 
 def build(spec, spec_path, harness, scripts_dir):
     dcc = spec["dcc"]
+    if dcc.lower() == "houdini":
+        script_note = ("Use Python (hou) scripts through the MCP execute tool for every "
+                       "change; see reference/houdini_loop_patterns.md for scene layout, "
+                       "camera and Karma render conventions.")
+    else:
+        script_note = ("Use bpy scripts through the MCP execute tool for every change; "
+                       "see reference/blender_loop_patterns.md for the render-queue and "
+                       "material patterns.")
     wf = spec["working_folder"]
     ref_dir = spec["reference_dir"]
     w, h = spec["render_size"]
@@ -101,7 +108,7 @@ def build(spec, spec_path, harness, scripts_dir):
 
     add("You are building a scene in %s from reference images and you will keep "
         "iterating until renders from matched cameras agree with those references, "
-        "or a stop rule below says stop. %s" % (dcc, HARNESS_RULES[harness].format(dcc=dcc)))
+        "or a stop rule below says stop. %s" % (dcc, HARNESS_RULES[harness].format(dcc=dcc, script_note=script_note)))
     add("")
     add("## What this is")
     add("")

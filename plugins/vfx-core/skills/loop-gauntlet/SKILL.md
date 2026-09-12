@@ -6,7 +6,7 @@ user-invocable: true
 
 # Loop Gauntlet
 
-**Version:** 1.4.1 | **Created:** 2026-09-09 | **Last updated:** 2026-09-11 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
+**Version:** 1.5.0 | **Created:** 2026-09-09 | **Last updated:** 2026-09-12 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
 
 A gauntlet loop is a builder that keeps going until an authored quality bar
 says stop. The pattern comes from the "builder plus fresh-eyes critic" idea
@@ -297,9 +297,16 @@ grants them.
   views inline times out), the image-pixel persistence trap (assign colour
   space BEFORE writing pixels, pack, then verify nonzero pixels after save),
   EEVEE for the loop, incremental save before every render.
-- **Houdini / Unreal:** not exercised yet. The contract and scripts are
-  DCC-agnostic; only the render step changes. Add a reference file when the
-  first run happens.
+- **Houdini:** `reference/houdini_loop_patterns.md` - fxhoudinimcp scene
+  layout and version-save, matched cameras via focal/aperture read-back,
+  the Karma ROP render call with an honest UNVERIFIED list (XPU vs CPU,
+  PNG output from a ROP), MaterialX/displacement conventions, and the
+  same fit-before-render and scratch-test rules carried over from Blender.
+  Not yet exercised by a real run - draft from workspace Houdini MCP facts,
+  not from a logged iteration.
+- **Unreal:** not exercised yet. The contract and scripts are DCC-agnostic;
+  only the render step changes. Add a reference file when the first run
+  happens.
 
 ## Scripts
 
@@ -340,6 +347,8 @@ as the match evidence, and treat the hero-engine pass as a new task.
 poll the status JSON; never re-submit a render while one is running.
 
 ## Version History
+
+- **1.5.0** (2026-09-12) - Houdini support: reference/houdini_loop_patterns.md (live-verified on 21.0.596) and a dcc=houdini branch in gauntlet_prompt.py; save-before-render rule.
 
 **v1.4.1** (2026-09-11) - Observation 0042: `compare_views.py` adds a
 5-panel instrument image (`compare/<tag>_<view>_5.png`, kept separate from
