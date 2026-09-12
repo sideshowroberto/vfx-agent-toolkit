@@ -198,6 +198,19 @@ def main():
     for line in section_lines:
         print(line)
 
+    # Operator nudge channel (2026-09-11): the human watching the run can drop
+    # notes into <working_folder>/OPERATOR_NOTES.md at any time; they are
+    # printed after every logged iteration so the builder sees them without
+    # the run being restarted. Additive only - scoring is untouched.
+    notes_path = working_folder / "OPERATOR_NOTES.md"
+    if notes_path.exists():
+        notes = notes_path.read_text(encoding="utf-8", errors="replace").strip()
+        if notes:
+            print("")
+            print("OPERATOR NOTES (read these before planning the next iteration; "
+                  "they override the brief where they conflict):")
+            print(notes)
+
     sys.exit(0)
 
 

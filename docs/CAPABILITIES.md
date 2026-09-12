@@ -1,12 +1,12 @@
 # Capabilities index (public toolkit)
 
-GENERATED 2026-09-10 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/registry.json, the skill and agent files, .mcp.json and the script folders. Do not edit; it is rewritten on every /sync-plugins. Registry 2.0.3, updated 2026-09-10.
+GENERATED 2026-09-11 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/registry.json, the skill and agent files, .mcp.json and the script folders. Do not edit; it is rewritten on every /sync-plugins. Registry 2.0.3, updated 2026-09-10.
 
 **How to use it:** ask your agent "what can we do for <task>?" - it should read this file and name the skill, agent, tool or script to reach for. Each line is: name, then what it does and the phrases that trigger it.
 
 ## Skills, by plugin
 
-### vfx-core (v2.6.0, public)
+### vfx-core (v2.8.0, public)
 
 Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).
 
@@ -34,7 +34,7 @@ MCP servers: `brave-search`, `context7`, `desktop-commander`
 - **agent: python-specialist** - Applying templates, systematic refactoring, type safety (mypy, type hints, protocols), async programming (AsyncIO, concurrent.futures), data science workflows (pandas, numpy vectorization), and testing methodology (pytest, fixtures, parameterized tests). Use when applying agent-skill templates, migrating code patterns, refactoring with type hints, optimizing with async/vectorization, or performing systematic code transformation across multiple files.
 - **agent: python-refactoring-specialist** - Python refactoring specialist for applying templates, batch search/replace, and systematic code refactoring. Use when applying agent-skill templates, migrating code patterns, or performing systematic refactoring across multiple files.
 
-### nuke-vfx (v1.1.5, public)
+### nuke-vfx (v1.1.6, public)
 
 Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, and batch shot setup.
 
@@ -81,7 +81,7 @@ Requires: vfx-core
 - **agent: unreal-blueprint-specialist** - Expert in automating Unreal Engine Blueprint creation and compilation using Silent Execution pattern
 - **agent: unreal-pcg-specialist** - Expert in Unreal Engine PCG system for procedural terrain, vegetation, and asset placement with Python automation
 
-### blender-vfx (v2.0.6, public)
+### blender-vfx (v2.0.7, public)
 
 Blender VFX pipeline via the official Blender MCP (blender.org): modeling, animation, materials, geometry nodes, physics, rendering, sculpting, grease pencil, and ControlNet pass rendering for AI generation.
 
@@ -101,7 +101,7 @@ Requires: vfx-core
 - **blender-controlnet-passes** [scripts] - Set up and render ControlNet conditioning passes from a Blender scene for AI image/video generation - grey clay override, compositor-normalized depth, cryptomatte EXR, optional wireframe overlay for temporal consistency. Wraps scripts/setup_controlnet_passes.py (Blender 5.x APIs, test-slice discipline, trailing-dot File Output naming). Use when preparing depth/edge conditioning inputs, clay renders for video models, or crypto mattes for comp. Triggers: \"controlnet passes\", \"render depth pass\", \"clay render\", \"grey shade render\", \"render passes for AI\", \"control net setup blender\".
 - **agent: blender-specialist** - Expert in Blender workflows via official Blender MCP. Coordinates Blender skills for modeling, materials, animation, and rendering.
 
-### comfyui-vfx (v2.3.0, public)
+### comfyui-vfx (v2.3.1, public)
 
 ComfyUI pipeline via the ComfyUI MCP and Comfy CLI, with optional ComfyUI_FL-MCP for live canvas operations: workflow analysis, node/model requirements mapping, and headless generation guidance, plus the previs-to-photoreal anchor keyframe recipe for reference-guided video generation.
 
@@ -138,7 +138,7 @@ Requires: vfx-core
 - **maya-materials** - Create and assign materials in Maya via MCP - Arnold (aiStandardSurface), Lambert, Blinn, and USD Preview Surface. Use for shader creation, texture assignment, material assignment to geometry, and look dev workflows. Triggers on "maya material", "assign shader", "aiStandardSurface", "maya texture", "look dev".
 - **agent: maya-specialist** - Maya scene control, rigging, modeling, and animation automation via MCP. Auto-triggers on .ma/.mb files, maya.cmds, pymel, rigging, blend shapes, joints, and deformers. Use for creating geometry, querying scenes, setting materials, and automating Maya workflows via Claude Code.
 
-### magnific-vfx (v1.1.2, public)
+### magnific-vfx (v1.1.3, public)
 
 Magnific AI generation via MCP: image generation with model selection and references, local file upload/download pipelines, and video generation.
 

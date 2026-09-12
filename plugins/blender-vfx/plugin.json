@@ -1,7 +1,7 @@
 {
     "$schema":  "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
     "name":  "blender-vfx",
-    "version":  "2.0.6",
+    "version":  "2.0.7",
     "description":  "Blender VFX pipeline via the official Blender MCP (blender.org): modeling, animation, materials, geometry nodes, physics, rendering, sculpting, grease pencil, and ControlNet pass rendering for AI generation.",
     "author":  {
                    "name":  "Rob Williams"

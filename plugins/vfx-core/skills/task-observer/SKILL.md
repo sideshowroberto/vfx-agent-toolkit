@@ -88,7 +88,14 @@ absolute path is silently disabled by a folder move (observation #7).
 1. **Status.** Read the hook's output, or run `observe.sh status`. If it
    reports MISSING, run `observe.sh init` once and re-run status. It
    reports open/parked counts, last review, staged updates, unresolved
-   targets, and missing sibling checks.
+   targets, and missing sibling checks. The "targets skills that do not
+   resolve here" line can be a false alarm under a plugin-installed
+   harness (Codex): the helper only searches the harness's plain skills
+   dir, not the plugin cache it is actually running from, so it can flag
+   its own host skill as unresolved. Treat a workspace-only target the
+   same way: label it "not installed in this harness" rather than
+   "unresolved". The helper's search-path fix is an open script
+   follow-up, not something to work around here.
 2. **Scan.** If there are open observations, run `observe.sh scan` and hold
    the `skill:`, `proposes_skill:` and `title` values in awareness. When you
    later load any skill, apply its OPEN observations to the work even though
@@ -147,7 +154,11 @@ Write the file **silently, within the same turn or the next**. Never batch
 mentally for later; the act of writing is the enforcement.
 
 1. `id=$(observe.sh next-id)` - once per file, at the moment of that file's
-   write (never pre-compute a range for a batch). The helper fails loudly on
+   write (never pre-compute a range for a batch). The value comes back
+   ALREADY zero-padded (`0033`): use it verbatim as the filename prefix
+   (`${id}-slug.md`) and never re-format it - bash `printf '%04d'` reads a
+   leading zero as octal and files land under a colliding id (obs 32).
+   Write the frontmatter `id:` without the padding. The helper fails loudly on
    a populated log with no ids or an unreachable workspace; treat that as a
    stop signal, not a reason to start from 0001.
 2. Validate the target: every name in `skill:` must be a skill that exists

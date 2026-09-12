@@ -11,13 +11,13 @@
     "plugins":  [
                     {
                         "name":  "vfx-core",
-                        "version":  "2.6.0",
+                        "version":  "2.8.0",
                         "description":  "Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).",
                         "source":  "./plugins/vfx-core"
                     },
                     {
                         "name":  "nuke-vfx",
-                        "version":  "1.1.5",
+                        "version":  "1.1.6",
                         "description":  "Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, and batch shot setup.",
                         "source":  "./plugins/nuke-vfx"
                     },
@@ -35,13 +35,13 @@
                     },
                     {
                         "name":  "blender-vfx",
-                        "version":  "2.0.6",
+                        "version":  "2.0.7",
                         "description":  "Blender VFX pipeline via the official Blender MCP (blender.org): modeling, animation, materials, geometry nodes, physics, rendering, sculpting, grease pencil, and ControlNet pass rendering for AI generation.",
                         "source":  "./plugins/blender-vfx"
                     },
                     {
                         "name":  "comfyui-vfx",
-                        "version":  "2.3.0",
+                        "version":  "2.3.1",
                         "description":  "ComfyUI pipeline via the ComfyUI MCP and Comfy CLI, with optional ComfyUI_FL-MCP for live canvas operations: workflow analysis, node/model requirements mapping, and headless generation guidance, plus the previs-to-photoreal anchor keyframe recipe for reference-guided video generation.",
                         "source":  "./plugins/comfyui-vfx"
                     },
@@ -59,7 +59,7 @@
                     },
                     {
                         "name":  "magnific-vfx",
-                        "version":  "1.1.2",
+                        "version":  "1.1.3",
                         "description":  "Magnific AI generation via MCP: image generation with model selection and references, local file upload/download pipelines, and video generation.",
                         "source":  "./plugins/magnific-vfx"
                     },

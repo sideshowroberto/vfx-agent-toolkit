@@ -6,7 +6,7 @@ user-invocable: true
 
 # Loop Gauntlet
 
-**Version:** 1.2.0 | **Created:** 2026-09-09 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
+**Version:** 1.4.0 | **Created:** 2026-09-09 | **Last updated:** 2026-09-11 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
 
 A gauntlet loop is a builder that keeps going until an authored quality bar
 says stop. The pattern comes from the "builder plus fresh-eyes critic" idea
@@ -31,7 +31,14 @@ The lessons from that run are folded in below and in
    run lost a view to exactly that.
 2. **Matched views.** One camera per reference, named `CAM_<view>`. A tile
    inside a contact sheet is a view too: give the crop box in the spec so the
-   comparison uses the tile, not the sheet.
+   comparison uses the tile, not the sheet. **Lighting feasibility
+   pre-check:** for each view, list the key lit surfaces the reference
+   shows and confirm the planned key light can reach them (normal dot
+   light direction), or record in the spec that the view will be scored
+   with that limitation. Two views of the same curved corridor from
+   opposite ends cannot both show a sunlit wall from one sun; catching this
+   before the loop starts (not after several lighting-only iterations)
+   turned out to require moving a camera, not tweaking the light.
 3. **Rubric.** Fixed criteria scored 1 to 5 per view, a pass score, and a
    priority order for fixes (composition > scale > inventory > lighting >
    materials > detail). Materials are never polished while geometry is wrong.
@@ -50,6 +57,24 @@ The lessons from that run are folded in below and in
 
 All five live in one spec file: `templates/gauntlet_spec.example.json`.
 The scripts read it, the prompt generator reads it, and a reviewer can diff it.
+
+### Three more contract rules (props bench, 2026-09-11)
+
+- **A frozen criterion still needs a real score against the reference, or
+  it must be excluded from the total.** "4 = unchanged" as a rubric
+  description rewarded an oversized plinth that had simply never been
+  touched. Freezing a criterion means "verify it did not drift", not
+  "assume it still matches" - see Continuation and refinement runs below.
+- **A materials or render criterion needs a stated lighting target in the
+  brief:** the world type and strength, the key light position, and a
+  measured target luminance for the hero surface. Two refinement runs
+  stalled with the exposure moved in opposite directions because the
+  brief left the target for the builder to solve.
+- **A human-authored count in a brief is a hypothesis until measured on
+  the reference, not a given.** A brief specified six rim loops on a net;
+  the reference photo showed nine. Treat counts and orientations the same
+  way as any other claim - verify before building to them (see the
+  camera-projection fit method in `reference/blender_loop_patterns.md`).
 
 ## Workflow
 
@@ -109,6 +134,16 @@ view at iter01 AND iter07 - it did not track the progress the eye saw. Use
 it only as a copy alarm (a value near 1.0 means the "render" is the
 reference), never as a score.
 
+A downsized comparison panel (viewed at roughly 600 px per panel) is a
+steering aid, not a measuring instrument. Before moving geometry more than
+0.5 m for composition, confirm the offset with a luminance row profile or
+the projected camera position - never from the panel alone. One run read a
+frieze as a full band too high and prescribed a 1.5 m move by eye; a row
+profile and the analytic projection both showed the actual offset was
+inside tolerance, and the same eye-read missed a real 15 percent luminance
+drop between two iterations that a mean-luminance readback would have
+caught immediately.
+
 ### 4. Finish
 
 - Render finals with the SAME engine the loop used, then one pass with the
@@ -120,6 +155,55 @@ reference), never as a score.
   dimensions, first objects to touch next.
 - `python <skill>/scripts/stop_check.py --spec gauntlet_spec.json` prints
   the whole trajectory as a table - paste it into the session log.
+
+### Continuation and refinement runs
+
+A leg that continues or refines an existing scene (rather than building
+from scratch) shares a live DCC session with the run that came before it,
+and that changes the opening step: **before opening the working file,
+read back the currently open file's path, `bpy.data.is_dirty`, and its
+last-save time (mtime), and confirm the other run's LOOP_LOG ends with a
+STOP decision.** If the scene is dirty, or the mtime does not match the
+file's own last save, or the log has no stop decision, report and wait -
+do not open the file. A live DCC is shared state; opening a file is a
+destructive act on whatever is loaded.
+
+A refinement run that freezes some criteria (camera, scale, composition)
+still owes those criteria a real score against the reference, or they must
+be excluded from the total - never scored as an automatic pass. A round-3
+lesson: a rubric description of "4 = unchanged" rewarded an oversized
+plinth that had simply never been touched. A frozen criterion means
+"verify it did not drift" (a `matrix_world` compare, or a re-read of the
+same measurement used to accept it originally), not "assume it still
+matches."
+
+**Open follow-ups, not yet implemented in the scripts:** a spec `mode`
+field (`build` / `continue` / `refine`) so the generated prompt's opening
+paragraph and "Where to work" section describe the actual task instead of
+always reading as a from-scratch build; and `gauntlet_prompt.py` emitting
+the dual stall rule verbatim into the brief so the prompt and
+`log_iteration.py` can never disagree (they diverged once: the brief's
+older min-only wording said STOP while the script's dual rule said
+CONTINUE).
+
+### Operator nudge channel
+
+A headless loop has no input channel after launch, so give the operator one
+file the builder is required to read: `<working_folder>/OPERATOR_NOTES.md`.
+`log_iteration.py` prints its contents after every logged iteration, so the
+operator watching the DCC or the console can drop a correction in at any
+time without touching the running session. Read it before planning every
+iteration; a note in it overrides the brief where the two conflict.
+Date-stamp each note so the builder (and the log) can tell which iteration
+it landed on.
+
+The channel only updates at an iteration boundary, so a note written mid
+iteration is not seen until the next `log_iteration.py` call. Two
+consequences for the operator: send a note at least two iterations before
+`no_improvement_streak` could fire the stall rule, or raise
+`no_improvement_streak` for that run when you know you plan to nudge partway
+through - a note that lands one iteration before a stall fires cannot save
+the run.
 
 ### 5. Judge the run (human)
 
@@ -150,6 +234,34 @@ interventions, wall-clock, tokens.
 | Codex (GPT-6 Astra) | paste the generated prompt into the GUI, attach refs | high reasoning; managed policy hook applies; the DCC must already be open (harness mode blocks app launches); MCP calls need an approval mode that does not click per call |
 | Claude Code | this skill is the runbook; run the ritual above | incremental saves during ALL Blender work (house rule); build in the live session so the operator can watch |
 | OpenCode | packaged-workflow runner | shell-only steps fine; DCC MCP through its plugin |
+
+### Isolation between legs on the same harness
+
+A harness that auto-loads its own workspace docs at session start (Codex
+reading `HANDOFF.md`/`AGENTS.md`, or any harness reading a memory file) makes
+every earlier leg part of the next leg's brief. A leg whose brief
+deliberately withholds information (a "find the dimensions yourself" test),
+or any second leg run on the same harness after a first one, MUST run from
+an isolated profile with no workspace docs in it - a fresh working folder is
+not enough, because the workspace-level handoff file is still there to be
+read. Before launching leg N, grep the harness's auto-loaded docs for leg
+N-1's object name to confirm nothing leaked.
+
+Verified isolated Codex launch (2026-09-09, reconfirmed 2026-09-11): build a
+throwaway `CODEX_HOME` with its own `config.toml` (model, model_reasoning_effort,
+the Blender MCP server entry, `[features]` `hooks=true`, and a
+`[projects.'<cwd>']` `trust_level = "trusted"` entry) plus a copy of
+`auth.json`, then run from an empty cwd:
+
+```
+codex --search exec --skip-git-repo-check --approve-for-me --add-dir <work> -i <ref> - < PROMPT.md
+```
+
+`--search` is a top-level flag - `codex exec` rejects it if placed after
+`exec`. An untrusted/empty cwd needs `--skip-git-repo-check` (or the
+`trust_level = "trusted"` entry above). The sandbox reports itself as
+read-only in this profile; writes still land because `--approve-for-me`
+grants them.
 
 ## DCC specifics
 
@@ -201,6 +313,28 @@ as the match evidence, and treat the hero-engine pass as a new task.
 poll the status JSON; never re-submit a render while one is running.
 
 ## Version History
+
+**v1.4.0** (2026-09-11) - Props bench lessons. Added the operator nudge
+channel (`OPERATOR_NOTES.md`, printed by `log_iteration.py` every
+iteration, notes override the brief, timing rule against the stall
+streak) to SKILL.md and to the generated prompt. Added the harness
+isolation rule for legs that withhold information or repeat on the same
+harness, with the verified vanilla Codex launch line. Added three
+contract rules: a frozen criterion must still be scored or excluded from
+the total; a materials/render criterion needs a stated lighting target
+(world, key position, measured hero-surface luminance); human-authored
+counts in a brief are hypotheses to verify on the reference. Added a
+"Fit before render" camera-projection method and the render-pipeline
+scratch-test rule to `reference/blender_loop_patterns.md`.
+
+**v1.3.0** (2026-09-10) - Round-3 lessons. Lighting-feasibility pre-check
+added to the matched-views contract step. Composition moves above 0.5 m
+now require a row-profile or projection check, not a panel eyeball.
+Continuation/refinement runs get a shared-live-DCC opening check
+(is_dirty, mtime, other run's stop decision) and a rule that frozen
+criteria must still be scored, not auto-passed. Noted open follow-ups: a
+spec `mode` field and the generator emitting the dual stall rule verbatim
+(not yet implemented).
 
 **v1.2.0** (2026-09-10) - Round-2 bench lessons. `stop.min_iterations`
 floor for the stall rule (stop_check + prompt). Generator v1.1.0 fields

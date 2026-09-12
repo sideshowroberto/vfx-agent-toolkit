@@ -182,6 +182,12 @@ def build(spec, spec_path, harness, scripts_dir):
         add("")
     add("## The loop")
     add("")
+    add("Before planning every iteration, check %s for OPERATOR_NOTES.md and read it if "
+        "present; the operator watching this run may drop a dated note in there at any time "
+        "with a correction or a new priority, and it is also printed after every logged "
+        "iteration. A note in that file overrides this brief where the two conflict."
+        % fmt_path(Path(wf) / "OPERATOR_NOTES.md"))
+    add("")
     add("Start by writing SCENE_BRIEF.md in the working folder: the plan with your chosen "
         "dimensions, the camera list (%s, each with the reference it matches), and the "
         "order you will build in. Then build the blockout in one pass, place the cameras "

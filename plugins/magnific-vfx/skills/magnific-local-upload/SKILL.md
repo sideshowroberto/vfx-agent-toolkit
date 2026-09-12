@@ -6,8 +6,8 @@ allowed-tools: mcp__magnific__creations_request_upload,mcp__magnific__creations_
 
 # Magnific Local Upload Skill
 
-**Version:** 1.1.0
-**Last Updated:** 2026-06-09
+**Version:** 1.2.0
+**Last Updated:** 2026-09-09
 
 Handles the full pipeline: local folder -> upload to Magnific -> move to folder -> use as generation references -> download output to local folder.
 
@@ -19,21 +19,27 @@ Magnific does **not** accept file paths directly. Local files require a 3-step p
 
 ```
 1. creations_request_upload(mimeType, count=N)  ->  N presigned PUT URLs + temp paths
-2. Python: PUT each file's bytes to its directUploadUrl (GCS)
-3. creations_finalize_upload(uploads=[...paths])  ->  creation identifiers
+2. Python: PUT each file's bytes to the upload URL the response gives you
+3. creations_finalize_upload(uploads=[...paths], folderReference=...)  ->  creation identifiers
 ```
 
 `creations_upload_file` is for host-attached files (ChatGPT-style uploads) - it does **not** work for local disk files. Always use the 3-step flow.
 
 ---
 
-## Critical: Use directUploadUrl, NOT proxyUploadUrl
+## Which PUT target to use (API changed - read the response, not this doc)
 
-Each `creations_request_upload` response includes two PUT targets:
-- `directUploadUrl` - GCS (`storage.googleapis.com`) - **use this always**
-- `proxyUploadUrl` - Magnific proxy - **unreliable, returns 503/404 in batch operations**
+PUT to whichever upload URL field the `creations_request_upload` response
+actually contains. As of 2026-09-09 that is **`proxyUploadUrl` only** - the
+`directUploadUrl` (GCS) field this skill used to mandate is no longer returned
+(three 4-7 MB PNGs uploaded through the proxy at first attempt, 200 each).
+Earlier in 2026 the response carried both and the proxy was the flaky one;
+if `directUploadUrl` reappears, prefer it, but never stall looking for a
+field that is not there.
 
-Always PUT to `directUploadUrl`.
+**Never re-PUT to the same URL after a failure** - a repeat PUT to one target
+is rate-limited (429). Request fresh targets with `creations_request_upload`
+and retry from there.
 
 ---
 
@@ -60,7 +66,7 @@ Glob(pattern="D:/path/to/folder/*.png")
 **Step 2: Request all presigned URLs in one call**
 ```python
 creations_request_upload(mimeType="image/png", count=8)
-# Returns: { uploads: [ {directUploadUrl, path}, ... ] }
+# Returns: { uploads: [ {proxyUploadUrl, path, mimeType, expiresAt}, ... ] }  (2026-09 shape)
 ```
 
 Request the full batch count upfront - all URLs expire in 1 hour, so get them all before starting uploads.
@@ -72,10 +78,10 @@ Write to `tmp/magnific_upload.py`, execute immediately:
 ```python
 import urllib.request, pathlib, sys
 
-# Pair each local file with its directUploadUrl and temp path
+# Pair each local file with its upload URL (the field the response gave you) and temp path
 pairs = [
-    (r"D:\path\to\file1.png", "<directUploadUrl_1>", "temp-files/<uuid1>.png"),
-    (r"D:\path\to\file2.png", "<directUploadUrl_2>", "temp-files/<uuid2>.png"),
+    (r"D:\path\to\file1.png", "<uploadUrl_1>", "temp-files/<uuid1>.png"),
+    (r"D:\path\to\file2.png", "<uploadUrl_2>", "temp-files/<uuid2>.png"),
     # ... one entry per file
 ]
 
@@ -110,15 +116,19 @@ creations_finalize_upload(uploads=[
 # Returns: { results: [ {identifier, status: "completed"}, ... ] }
 ```
 
-**Step 5: Move to a Magnific folder**
+**Step 5: Land the uploads in the right Magnific folder**
+
+`creations_finalize_upload` now accepts `folderReference` (verified 2026-09-09:
+three uploads finalized straight into a job subfolder), so pass it in Step 4
+and skip the move. `creations_move` remains the fallback for uploads that
+already landed in the root:
 ```python
 creations_move(
     creationIdentifiers=["id1", "id2", ...],
     targetFolderReference="<folder_ref>"
 )
 ```
-
-`creations_finalize_upload` has no folder targeting - uploads land in root. Always call `creations_move` immediately after. See the `magnific-image-gen` skill for known folder references.
+See the `magnific-image-gen` skill for known folder references.
 
 ---
 
@@ -136,7 +146,7 @@ Then run Python inline via Bash:
 python - <<'EOF'
 import urllib.request, pathlib
 data = pathlib.Path(r"D:\path\to\file.jpg").read_bytes()
-req = urllib.request.Request("<directUploadUrl>", data=data, method="PUT")
+req = urllib.request.Request("<uploadUrl>", data=data, method="PUT")
 req.add_header("Content-Type", "image/jpeg")
 with urllib.request.urlopen(req) as r:
     print(f"OK {r.status}")
@@ -238,10 +248,10 @@ For combat-sports / action content specifically - use the stills as `image` refs
 ```
 1.  Glob local folder           -> collect paths
 2.  creations_request_upload    -> get N presigned URLs (count=N)
-3.  Write tmp/magnific_upload.py -> pair files to directUploadUrls
+3.  Write tmp/magnific_upload.py -> pair files to the upload URLs returned
 4.  python tmp/magnific_upload.py -> PUT all files, collect OK paths
 5.  creations_finalize_upload   -> batch finalize -> get identifiers
-6.  creations_move              -> move to target Magnific folder
+6.  creations_move              -> only if finalize was called without folderReference
 7.  images_generate             -> use identifiers as references, folderReference for output
 8.  creations_wait              -> poll until complete, get URL from results
 9.  urllib.request.urlretrieve  -> download to local output folder
@@ -263,7 +273,7 @@ For combat-sports / action content specifically - use the stills as `image` refs
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| PUT returns 503/404 | Using proxyUploadUrl | Switch to directUploadUrl (GCS) |
+| PUT returns 503/404/429 | Flaky target, or a re-PUT to a URL already used | Do NOT retry the same URL - request fresh upload targets and PUT again |
 | PUT returns non-200 on GCS | Expired presigned URL (>1hr) | Re-request upload URLs, re-run |
 | `creations_finalize_upload` error | PUT didn't complete before finalize | Check Python script output for FAIL lines |
 | Generation fails NSFW | Style ref contains violence/weapons | Move that ref to `image` type or remove it |

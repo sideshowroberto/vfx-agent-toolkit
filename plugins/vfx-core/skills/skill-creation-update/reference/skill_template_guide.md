@@ -236,6 +236,13 @@ description: Automate VFX workflows in Unreal Engine 5.5 including foreground pl
 - Mix technical terms ("imageplate") and natural language ("set up foreground plate")
 - Include abbreviations/acronyms if common
 - Test with actual user language
+- Put the trigger phrases in the FIRST sentence, or keep the whole
+  description well under the 1024-char cap. Claude budgets per skill, but
+  some harnesses (Codex) budget the WHOLE installed catalog and truncate
+  each description from the end once the total is too large - a 128-skill
+  catalog was observed to trigger this. A description that pushes its
+  Triggers clause to the end loses exactly the part that routes a request
+  to the skill (observation #20).
 
 ---
 
@@ -1007,6 +1014,18 @@ grep -n "^### Issue" SKILL.md | wc -l
 - [ ] Test Quick Start with copy-paste (no errors)
 - [ ] Test scripts with 3+ targets (Article I)
 - [ ] Review Constitutional Compliance section (all articles addressed)
+- [ ] The skill documents its own scripts as `<skill-dir>/...` (relative
+      to the skill directory), never by an absolute path - an absolute
+      path becomes stale on any machine other than the one that authored
+      it and is unrunnable for a teammate
+- [ ] Run `check_skill_self_contained.py` plus the team-gate pattern set
+      (`sync/gate-patterns.json` minus `team_skip_ids`) against the new
+      skill directory, whatever its intended distribution tier - including
+      internal/workspace-only. A skill exempt from every scan accumulates
+      exactly the defects the scan exists to catch, and they only surface
+      the day someone finally tries to ship it (observation #19). Wiring
+      this check into the authoring script itself is an open follow-up;
+      until then, run it by hand at authoring time.
 
 ### Common Mistakes
 

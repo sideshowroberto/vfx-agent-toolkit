@@ -66,7 +66,12 @@ and list gaps. For `shared-core` families, verify the pointers still
 resolve. This is the only step that catches drift predating the log or
 introduced by a skill authored outside it. Cross-cutting principles: check
 each `Propagation: immediate` principle is present in every skill it
-applies to.
+applies to. For the non-ASCII principle specifically: resolve each hit
+against the publish gate allowlist (`sync/gate-allowlist.json`, pattern
+`non-ascii`) BEFORE listing it as drift, and report an allowlisted file as
+"deliberate, allowlisted" rather than as a gap. Generalise this: any drift
+check that has a documented exception list consults that list first,
+before it reports a FAIL.
 
 **Step 5 - Stage, never edit live.** For each skill receiving changes:
 copy the FULL live directory to `skill-updates/<YYYY-MM-DD>/<skill>/`,

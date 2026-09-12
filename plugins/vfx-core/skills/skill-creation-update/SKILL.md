@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Edit
 
 # skill-creation-update
 
-**Skill Version:** 1.1.0
-**Last Updated:** 2025-12-03
+**Skill Version:** 1.2.0
+**Last Updated:** 2026-09-10
 **Dependencies:** Python 3.12+, VFX_SKILL_CONSTITUTION.md (v2.0.0+)
 **Status:** Production-ready
 
@@ -373,6 +373,16 @@ Not applicable (this is a skill, uses directory structure)
 ---
 
 ## Version History
+
+**v1.2.0** (2026-09-10) - Catalog-budget and self-containment observations
+- Description rule: put trigger phrases in the FIRST sentence, or keep the
+  description well under the 1024-char cap, because some harnesses (Codex)
+  budget the whole installed catalog and truncate from the end (observation #20)
+- Validation checklist: a skill documents its own scripts as `<skill-dir>/...`,
+  never by an absolute path
+- Validation checklist: run check_skill_self_contained.py plus the team-gate
+  pattern set against every new skill directory regardless of its distribution
+  tier, including internal/workspace-only (observation #19)
 
 **v1.1.0** (2025-12-03) - Agent OS Integration
 - Added Agent OS standards validation support

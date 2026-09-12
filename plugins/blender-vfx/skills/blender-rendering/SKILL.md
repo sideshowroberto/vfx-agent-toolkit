@@ -6,8 +6,8 @@ allowed-tools: Read,Write
 
 # Blender Rendering Skill
 
-**Version:** 2.0.0
-**Last Updated:** 2026-06-10
+**Version:** 2.1.0
+**Last Updated:** 2026-09-10
 **Dependencies:** Blender 5.1+
 
 ---
@@ -36,6 +36,41 @@ bsdf.inputs["Emission Color"].default_value = (1,1,1,1)  # was "Emission"
 cycles = bpy.context.scene.cycles    # Direct access - no import needed
 cycles.samples = 128
 ```
+
+---
+
+## EEVEE Next / Cycles facts (loop-gauntlet round-2/3 lessons, 2026-09-10)
+
+- **Emissive meshes do not illuminate anything in EEVEE Next.** A mesh with
+  an emission shader (LED strips, glowing coves) renders bright itself but
+  casts no light on neighbouring surfaces. If a reference shows spill from
+  a glowing surface, place a real light (area light along the strip) - do
+  not expect the emissive mesh to do it.
+- **Light-probe volume bake from a script/MCP execute context returns
+  `FINISHED` without actually baking.**
+  `bpy.ops.object.lightprobe_cache_bake(subset='ALL')` completes in well
+  under a second (even after waiting 60 s) with no visible change, and
+  `bpy.app.is_job_running` has no `LIGHT_BAKE` enum to poll the bake state.
+  Verify with an A/B render (probe object hidden vs visible) before relying
+  on a bake - a script-triggered bake is unverifiable otherwise.
+- **Blender 5.1 `LightProbeVolume` properties:** `resolution_x`,
+  `resolution_y`, `resolution_z`, `surfel_density` (int), `bake_samples`,
+  `capture_world`. The older `grid_*` names (`grid_resolution_x`, etc.) do
+  not exist on this version - do not assume they do from older docs.
+- **Cycles light linking** (Blender 4.0+):
+  `obj.light_linking.receiver_collection` restricts which objects a light
+  illuminates. Use it to give each zone (and each matched camera view) its
+  own lights without those lights leaking into other zones - a
+  chamber-only near-vertical sun, a lantern-only point light, a
+  hallway-only steeper sun, and view-only fills can all coexist in one
+  scene this way. The linking collection does not need to be in the view
+  layer and may hold child collections.
+- **A strip emission value that reads as a clean bright line in EEVEE
+  floods a room in Cycles.** Moving an EEVEE-tuned rig to Cycles: strip
+  emission strengths tuned for EEVEE (e.g. 40) need to drop roughly by a
+  factor of 8 (to about 5) once Cycles adds real bounce light on top of
+  them - re-measure with a mean-luminance readback rather than assuming a
+  ratio.
 
 ---
 
@@ -275,6 +310,12 @@ print(f"Output path: {scene.render.filepath}")
 ---
 
 ## VERSION HISTORY
+
+**v2.1.0** (2026-09-10) - Loop-gauntlet lessons: emissive meshes do not
+light in EEVEE Next, light-probe volume bake is a no-op from a script
+context (verify with an A/B render), Blender 5.1 LightProbeVolume property
+names, Cycles light linking API, EEVEE-to-Cycles emission-strength
+derating.
 
 **v2.0.0** (2026-06-10) - MCP migration
 - Removed HTTP Bridge requirements and curl health-check

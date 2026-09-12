@@ -43,3 +43,24 @@ Submit with `comfy run --workflow api.json --wait --json --timeout 600`. Feed th
 workflow's API-format export; UI-format graphs with Get/Set virtual nodes or
 subgraphs only resolve in the frontend and cannot run headless. Keep the API key
 in the environment (`COMFY_API_KEY`), never in a workflow file or a chat message.
+
+## Native 3D template nodes are browser-only for saving
+
+`Save3DAdvanced` and `Preview3DAdvanced` (the bundled native 3D templates,
+e.g. Trellis2 image-to-model) require a `viewport_state` input of type
+`LOAD_3D` that only the browser supplies, and they write nothing headless
+even when the job reports `completed`. Swap in `SaveGLB` instead (mesh or
+`FILE_3D` in, `filename_prefix`) - it needs no viewport state and writes the
+file. Verify any headless 3D-template run by checking the outputs list for
+the expected file extension; `ok: true` alone is not proof anything was
+written.
+
+## UI-to-API conversion can drop widget values on native 3D nodes
+
+`comfy run` converts a UI-format workflow client-side, but on the native 3D
+nodes some combo/int widgets arrive wrong: Trellis2UpsampleStage.target_resolution
+came through as the string "1536" and the width of Preview3DAdvanced and
+Save3DAdvanced as "" (four shape_mismatch errors). Fix: take the API prompt
+from the run's `prompt_preview` event, patch the values, and submit that API
+file instead of the UI file. Validate it with `comfy validate --where local`
+before the run.

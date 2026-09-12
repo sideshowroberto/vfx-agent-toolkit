@@ -6,8 +6,8 @@ allowed-tools: Read,Write
 
 # Blender Materials & Shaders Skill
 
-**Version:** 2.0.0
-**Last Updated:** 2026-06-10
+**Version:** 2.1.0
+**Last Updated:** 2026-09-10
 **Dependencies:** Blender 5.1+
 
 ---
@@ -26,6 +26,35 @@ bsdf.inputs['Subsurface Weight'].default_value = 0.2    # was 'Subsurface'
 bsdf.inputs['Emission Color'].default_value = (1,1,1,1) # was 'Emission'
 bsdf.inputs['Base Color'].default_value = (0.8, 0.2, 0.2, 1.0)
 ```
+
+---
+
+## Procedural texturing on parametric geometry (loop-gauntlet lessons, 2026-09-10)
+
+- **Use Texture Coordinate > Object, not the default Generated
+  coordinates, for procedural textures on parametric architecture.** A
+  Noise texture on Generated coordinates stretched into streaks on
+  120-segment arc rings and long boxes; Object coordinates are metric and
+  isotropic because all objects share the world origin.
+- **Brick texture reads the X/Y of its input vector - it is planar in that
+  plane, not aligned to the surface it is applied to.** On a wall lying in
+  the YZ plane a Brick texture produces blotches instead of coursing. Build
+  a Z-based course mask instead (SeparateXYZ > multiply > fract >
+  less-than > bump) - it works on every wall orientation and lines up
+  scene-wide.
+- **A texture that shares a shader with an already-accepted plate must
+  share its histogram.** Before assigning a new image plate to a shader
+  slot that an accepted plate already uses, match the new plate's
+  luminance mean and standard deviation to the accepted one (a two-line
+  PIL script: read both images, scale/offset the new one to match mean and
+  std). Two extra relief plates with greyscale means of 126 and 172 against
+  an accepted plate's 181 rendered as dark grey stone instead of matching
+  stone, costing a full iteration before the mismatch was found.
+- **A photo's surface grain becomes an unwanted bump map at close range.**
+  A photo-derived plate used as colour-plus-bump reads as rough bark
+  texture when the nearest matched camera is close (about 2 m); reserve
+  photo-derived plates for bands whose nearest camera is several metres
+  away, and use the smoothest (e.g. generated) plate on close-up bands.
 
 ---
 
@@ -280,6 +309,12 @@ if not output.inputs['Surface'].is_linked:
 ---
 
 ## VERSION HISTORY
+
+**v2.1.0** (2026-09-10) - Loop-gauntlet lessons: procedural textures need
+Object coordinates (not Generated) on parametric geometry, Brick texture is
+planar-XY (use a Z-based course mask for walls), and image plates sharing a
+shader with an accepted plate must be histogram-matched, with photo-derived
+plates reserved for bands far from the nearest camera.
 
 **v2.0.0** (2026-06-10) - MCP migration
 - Removed HTTP Bridge requirements and curl steps

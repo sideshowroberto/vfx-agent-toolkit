@@ -6,6 +6,8 @@ allowed-tools: Read,Write,Edit,Bash,Glob,Grep,mcp__nuke__runPythonScript,mcp__nu
 
 # Nuke Shot Setup
 
+**Version:** 1.1.0
+
 Batch setup of Nuke comp/visdev files, folder structures, and shot tracking CSV.
 
 ## Script Location
@@ -22,6 +24,25 @@ Only values that differ from the script's built-in defaults need to be in the JS
 file from `configs/show_template.json`.
 
 **Built-in defaults:** Nuke 17.0 v2, ACEScg in/out, DWAA compression, 4608x3164, 23.976fps, and **no OCIO config**. The script prints the effective Nuke version and OCIO path at the top of every run and warns when OCIO is unset - point it at your team's config via `studio_defaults.json` (`ocio_config` key). A path baked into the script is always somebody's personal path on somebody else's machine.
+
+**An empty `ocio_config` is not neutral by itself.** The warning only covers
+the `ocio_config` key - the other colour keys (`ACES - ACEScg` read/write
+colorspace, the `Output - K1S1-like - Rec.709` viewer process, monitor LUTs)
+still default to ACES-specific names even when no OCIO config is set to
+resolve them. A run with `ocio_config` empty therefore still writes those
+ACES names, and the generated comp opens with "Bad value for viewerProcess"
+and every Read in error ("Invalid LUT selected : ACES - ACEScg") under
+plain `nuke-default`. Interim rule until this is fixed in the script: EITHER
+always pass a real `ocio_config` (never run with it empty), OR set
+`colorManagement` to `Nuke` and the Read/Write colorspaces to a linear
+default by hand in your show config when no studio config exists yet.
+**Read-back step, every run:** open one generated `.nk` with
+`nuke -t --safe <script.nk>` and assert `Read1.error()` is False before
+calling the run done - a correct node count and correct plate paths do not
+prove the comp opens without a colour error. Open follow-up: make
+`batch_shot_setup.py` fall back to a coherent nuke-default colour set
+(no ACES names) when `ocio_config` is empty, instead of leaving the other
+keys ACES-specific.
 
 ## Network-Drive Policy (adapt to your studio)
 
