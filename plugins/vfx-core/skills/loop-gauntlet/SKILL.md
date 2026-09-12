@@ -6,7 +6,7 @@ user-invocable: true
 
 # Loop Gauntlet
 
-**Version:** 1.4.0 | **Created:** 2026-09-09 | **Last updated:** 2026-09-11 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
+**Version:** 1.4.1 | **Created:** 2026-09-09 | **Last updated:** 2026-09-11 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
 
 A gauntlet loop is a builder that keeps going until an authored quality bar
 says stop. The pattern comes from the "builder plus fresh-eyes critic" idea
@@ -119,7 +119,8 @@ Every iteration, in this order, no skipping:
 # 1. render every matched view to renders/<tag>_<view>.png (DCC side; Blender pattern in reference/blender_loop_patterns.md)
 # 2. compare + read back (exit 2 if any render is missing)
 python <skill>/scripts/compare_views.py --spec gauntlet_spec.json --tag iter03
-# 3. LOOK at compare/iter03_<view>.png for every view, then write compare/iter03_review.json:
+# 3. LOOK at compare/iter03_<view>_5.png for every view (5 panels: reference,
+#    blend, render, edge overlay, difference), then write compare/iter03_review.json:
 #    {"tag":"iter03","scores":{"hero":[3,4,2,2,2,4], ...},"gaps":["..","..",".."],"next":"..."}
 # 4. log (refuses a tag already logged; refuses a tag with no readback file) and get the stop decision
 python <skill>/scripts/log_iteration.py --spec gauntlet_spec.json --tag iter03
@@ -128,11 +129,37 @@ python <skill>/scripts/log_iteration.py --spec gauntlet_spec.json --tag iter03
 
 Scores are the builder's judgement of the comparison image. A score that
 jumps without a visible change is a reason to look again. There is no
-numeric score on purpose: `--metric` adds an edge-map correlation to the
-readback, and on the first run's real renders it read 0.01 to 0.08 on every
-view at iter01 AND iter07 - it did not track the progress the eye saw. Use
-it only as a copy alarm (a value near 1.0 means the "render" is the
-reference), never as a score.
+numeric score on purpose.
+
+`compare_views.py` writes two comparison instruments per view, each scoring
+what the rubric scores separately (observation 0042: a 50 percent blend
+mixes alignment and exposure into one soft double image and neither reads
+cleanly). Look at the 5-panel `compare/<tag>_<view>_5.png`, not just the
+3-panel image:
+
+- **Edge overlay** (panel 4) is the silhouette/alignment instrument:
+  reference edges cyan, render edges red, edges that coincide within 2px
+  white, background black. A close match reads as mostly white. Quote
+  `edge_iou` (intersection over union of the two dilated edge masks) and
+  `edge_ref_covered` (fraction of reference edges within 2px of a render
+  edge) in the review JSON's gaps when silhouette is in question - "edge
+  overlay mostly white, edge_iou 0.71" is a real anchor; "the blend reads
+  as one image" is not.
+- **Difference panel** (panel 5) is the exposure/materials instrument: the
+  absolute luminance difference through a black -> blue -> red -> yellow
+  heat ramp, with the signed mean difference (render minus reference)
+  printed in its header. Quote `mean_signed_lum_diff` and
+  `mean_abs_lum_diff` from the readback when exposure or value match is in
+  question.
+- The **blend panel** (panel 2) stays only as a quick glance aid for
+  gross composition sanity - it is not the instrument for either
+  silhouette or exposure and should not be cited as evidence for either.
+
+The older `--metric` flag still adds a separate edge-map correlation
+(`edge_similarity`) to the readback, and on the first run's real renders it
+read 0.01 to 0.08 on every view at iter01 AND iter07 - it did not track the
+progress the eye saw. Use it only as a copy alarm (a value near 1.0 means
+the "render" is the reference), never as a score.
 
 A downsized comparison panel (viewed at roughly 600 px per panel) is a
 steering aid, not a measuring instrument. Before moving geometry more than
@@ -279,7 +306,7 @@ grants them.
 | Script | What it does |
 |---|---|
 | `scripts/gauntlet_prompt.py` | spec + brief -> paste-ready prompt for codex / claude / opencode |
-| `scripts/compare_views.py` | renders vs references: 3-panel comparisons, contact sheet, readback JSON with suspect-blank flag, optional edge metric |
+| `scripts/compare_views.py` | renders vs references: 3-panel comparison (compatibility) plus a 5-panel instrument image (edge overlay, difference heatmap), contact sheet, readback JSON with suspect-blank flag, edge/difference metrics, optional edge_similarity metric |
 | `scripts/log_iteration.py` | appends the iteration to LOOP_LOG.md from review + readback, runs the stop rule |
 | `scripts/stop_check.py` | trajectory table and the continue/stop decision (dual stall rule) |
 | `scripts/test_loop_scripts.py` | self-test on synthetic images; run it after any edit |
@@ -313,6 +340,16 @@ as the match evidence, and treat the hero-engine pass as a new task.
 poll the status JSON; never re-submit a render while one is running.
 
 ## Version History
+
+**v1.4.1** (2026-09-11) - Observation 0042: `compare_views.py` adds a
+5-panel instrument image (`compare/<tag>_<view>_5.png`, kept separate from
+the unchanged 3-panel image for compatibility) with an edge overlay
+(cyan=reference-only, red=render-only, white=coincident within 2px) and a
+black-blue-red-yellow difference heatmap, plus four new readback metrics
+(`edge_iou`, `edge_ref_covered`, `mean_signed_lum_diff`,
+`mean_abs_lum_diff`). SKILL.md step 3 now points at the 5-panel image and
+names the edge overlay / difference panel as the silhouette / exposure
+instruments respectively, with the blend panel demoted to a glance aid.
 
 **v1.4.0** (2026-09-11) - Props bench lessons. Added the operator nudge
 channel (`OPERATOR_NOTES.md`, printed by `log_iteration.py` every

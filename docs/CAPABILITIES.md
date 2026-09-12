@@ -6,7 +6,7 @@ GENERATED 2026-09-11 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/re
 
 ## Skills, by plugin
 
-### vfx-core (v2.8.0, public)
+### vfx-core (v2.8.1, public)
 
 Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).
 

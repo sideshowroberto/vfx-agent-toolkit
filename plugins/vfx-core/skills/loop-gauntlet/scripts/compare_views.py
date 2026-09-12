@@ -9,18 +9,39 @@ For every view in the spec this script:
   3. Resizes the render to render_size if it is not already that size.
   4. Builds a 3-panel comparison image (reference | 50 percent blend |
      render), each panel labelled in a 28px header strip, plus a JPEG
-     preview no wider than 2064px.
-  5. Builds one contact sheet for the whole tag: one row per view, reference
-     left / render right at half render_size, with a per-row label strip.
+     preview no wider than 2064px. This file name and shape are unchanged
+     from earlier versions so existing consumers keep working.
+  5. Builds a SEPARATE 5-panel instrument image, compare/<tag>_<view>_5.png
+     (plus a capped JPEG preview): the same reference | blend | render three
+     panels, PLUS an edge overlay panel and an absolute-difference panel.
+     A 5-panel row routinely exceeds the 2064px preview width at normal
+     render sizes, so it is its own file rather than replacing the 3-panel
+     one -- see observation 0042.
+       - EDGE OVERLAY: FIND_EDGES (after a small Gaussian blur) on the
+         letterboxed reference and the render, each thresholded to a binary
+         edge mask. Reference-only edges are cyan, render-only edges are
+         red, edges that coincide within a 2px dilation are white,
+         background is black. This is the silhouette/alignment instrument:
+         it separates "the edges line up" from "the exposure matches",
+         which a 50 percent blend cannot (observation 0042).
+       - DIFFERENCE: absolute difference of the two luminance images mapped
+         through a black -> blue -> red -> yellow heat ramp, with the
+         signed mean difference (render minus reference, 0-255 scale)
+         printed in its header strip. This is the exposure instrument.
   6. Writes compare/<tag>_readback.json: path, byte size, modified time
      (ISO UTC), pixel size, comparison path, unique_values (distinct 8-bit
-     grey levels in the render sampled at 256px wide) and suspect_blank
-     (unique_values < 8).
+     grey levels in the render sampled at 256px wide), suspect_blank
+     (unique_values < 8), and the edge/difference metrics below.
 
 IMPORTANT: the comparison image is the judge. A human or agent scores the
-rubric by LOOKING at compare/<tag>_<view>.png. The optional --metric value
-(edge_similarity) is a tie-breaker and a drift alarm ONLY -- it is never the
-score, and a high or low value proves nothing about the render on its own.
+rubric by LOOKING at compare/<tag>_<view>_5.png (or the 3-panel image if the
+5-panel has not been generated). The edge overlay panel is the instrument
+for silhouette; the difference panel is the instrument for exposure. The
+blend panel stays only as a quick glance aid -- quote the edge/difference
+numbers in the review JSON's gaps when they matter, rather than describing
+the blend. The optional --metric value (edge_similarity) is a separate,
+older tie-breaker and drift alarm ONLY -- it is never the score, and a high
+or low value proves nothing about the render on its own.
 
 Usage:
     python compare_views.py --spec gauntlet_spec.json --tag iter03 [--metric]
@@ -36,11 +57,23 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from PIL import Image, ImageOps, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageOps, ImageDraw, ImageFont, ImageFilter, ImageChops, ImageStat
 
 HEADER_H = 28
 JPEG_MAX_W = 2064
 BLANK_THRESHOLD = 8
+
+# Edge-instrument defaults (observation 0042): a small blur suppresses
+# single-pixel sensor/render noise before FIND_EDGES, the threshold keeps
+# only edges with real contrast, and the 2px dilation is the "close enough
+# to count as aligned" tolerance for both the overlay and the metrics.
+EDGE_BLUR_RADIUS = 1.0
+EDGE_THRESHOLD = 32
+EDGE_DILATE_PX = 2
+
+EDGE_CYAN = (0, 255, 255)
+EDGE_RED = (255, 0, 0)
+EDGE_WHITE = (255, 255, 255)
 
 
 def load_spec(spec_path):
@@ -113,6 +146,122 @@ def edge_similarity(ref_img, render_img, sample_width=256):
         edges = small.filter(ImageFilter.FIND_EDGES)
         out.append(list(edges.getdata()))
     return round(ncc(out[0], out[1]), 3)
+
+
+def binary_edge_mask(gray_img, blur_radius=EDGE_BLUR_RADIUS, threshold=EDGE_THRESHOLD):
+    """Full-resolution binary (0/255, mode L) edge mask for one greyscale image."""
+    blurred = gray_img.filter(ImageFilter.GaussianBlur(blur_radius))
+    edges = blurred.filter(ImageFilter.FIND_EDGES)
+    return edges.point(lambda p: 255 if p >= threshold else 0)
+
+
+def dilate_mask(mask, px=EDGE_DILATE_PX):
+    """Grow a binary mask by px pixels using a square max filter."""
+    size = 2 * px + 1
+    return mask.filter(ImageFilter.MaxFilter(size))
+
+
+def mask_and(a, b):
+    """Pixelwise AND of two binary (0/255) L-mode masks."""
+    return ImageChops.multiply(a, b)
+
+
+def mask_or(a, b):
+    """Pixelwise OR of two binary (0/255) L-mode masks."""
+    return ImageChops.lighter(a, b)
+
+
+def mask_and_not(a, b):
+    """Pixelwise (a AND NOT b) of two binary (0/255) L-mode masks."""
+    return ImageChops.subtract(a, b)
+
+
+def count_on(mask):
+    """Count of 255-valued pixels in a binary (0/255) L-mode mask."""
+    return mask.histogram()[255]
+
+
+def heat_ramp_luts():
+    """Three 256-entry LUTs (R, G, B) mapping 0-255 to a black -> blue ->
+    red -> yellow heat ramp, for use with Image.point()."""
+    lut_r = [0] * 256
+    lut_g = [0] * 256
+    lut_b = [0] * 256
+    for v in range(256):
+        if v < 85:
+            t = v / 85.0
+            r, g, b = 0, 0, int(255 * t)
+        elif v < 170:
+            t = (v - 85) / 85.0
+            r, g, b = int(255 * t), 0, int(255 * (1 - t))
+        else:
+            t = (v - 170) / 85.0
+            r, g, b = 255, int(255 * t), 0
+        lut_r[v] = r
+        lut_g[v] = g
+        lut_b[v] = b
+    return lut_r, lut_g, lut_b
+
+
+HEAT_LUT_R, HEAT_LUT_G, HEAT_LUT_B = heat_ramp_luts()
+
+
+def difference_heatmap(ref_gray, render_gray):
+    diff_l = ImageChops.difference(ref_gray, render_gray)
+    r = diff_l.point(HEAT_LUT_R)
+    g = diff_l.point(HEAT_LUT_G)
+    b = diff_l.point(HEAT_LUT_B)
+    return Image.merge("RGB", (r, g, b)), diff_l
+
+
+def edge_overlay_and_metrics(ref_img, render_img):
+    """Build the cyan/red/white edge overlay and the four edge/luminance
+    metrics from a pair of already letterboxed/resized RGB images.
+
+    Returns (overlay_rgb, metrics_dict).
+    """
+    ref_gray = ref_img.convert("L")
+    render_gray = render_img.convert("L")
+
+    ref_edge = binary_edge_mask(ref_gray)
+    render_edge = binary_edge_mask(render_gray)
+    ref_dil = dilate_mask(ref_edge)
+    render_dil = dilate_mask(render_edge)
+
+    ref_count = count_on(ref_edge)
+    union_dil = count_on(mask_or(ref_dil, render_dil))
+    intersect_dil = count_on(mask_and(ref_dil, render_dil))
+    edge_iou = round(intersect_dil / float(union_dil), 3) if union_dil else 0.0
+
+    ref_near_render = count_on(mask_and(ref_edge, render_dil))
+    edge_ref_covered = round(ref_near_render / float(ref_count), 3) if ref_count else 0.0
+
+    coincident = mask_or(mask_and(ref_edge, render_dil), mask_and(render_edge, ref_dil))
+    ref_only = mask_and_not(ref_edge, coincident)
+    render_only = mask_and_not(render_edge, coincident)
+
+    overlay = Image.new("RGB", ref_img.size, (0, 0, 0))
+    overlay.paste(EDGE_CYAN, mask=ref_only)
+    overlay.paste(EDGE_RED, mask=render_only)
+    overlay.paste(EDGE_WHITE, mask=coincident)
+
+    mean_signed_lum_diff = round(
+        ImageStat.Stat(render_gray).mean[0] - ImageStat.Stat(ref_gray).mean[0], 2
+    )
+
+    metrics = {
+        "edge_iou": edge_iou,
+        "edge_ref_covered": edge_ref_covered,
+        "mean_signed_lum_diff": mean_signed_lum_diff,
+    }
+    return overlay, metrics, ref_gray, render_gray
+
+
+def scaled_preview(image, max_w=JPEG_MAX_W):
+    if image.width > max_w:
+        scale = max_w / float(image.width)
+        return image.resize((max_w, max(1, round(image.height * scale))), Image.LANCZOS)
+    return image
 
 
 def main():
@@ -190,6 +339,8 @@ def main():
 
         panel_w = render_size[0]
         panel_h = render_size[1]
+
+        # --- existing 3-panel comparison image (name/shape unchanged) ---
         comp = Image.new("RGB", (panel_w * 3, panel_h + HEADER_H), (0, 0, 0))
         comp.paste(stack_panel(panel_w, panel_h, "REFERENCE: {0}".format(name), ref_padded), (0, 0))
         comp.paste(stack_panel(panel_w, panel_h, "BLEND 50%: {0}".format(name), blend), (panel_w, 0))
@@ -199,13 +350,30 @@ def main():
         comp.save(comp_path)
 
         jpeg_path = compare_dir / "{0}_{1}.jpg".format(args.tag, name)
-        total_w = comp.width
-        if total_w > JPEG_MAX_W:
-            scale = JPEG_MAX_W / float(total_w)
-            preview = comp.resize((JPEG_MAX_W, max(1, round(comp.height * scale))), Image.LANCZOS)
-        else:
-            preview = comp
-        preview.save(jpeg_path, "JPEG", quality=88)
+        scaled_preview(comp).save(jpeg_path, "JPEG", quality=88)
+
+        # --- edge overlay and difference instruments (observation 0042) ---
+        overlay_img, edge_metrics, ref_gray, render_gray = edge_overlay_and_metrics(ref_padded, render_img)
+        diff_img, diff_l = difference_heatmap(ref_gray, render_gray)
+        mean_abs_lum_diff = round(ImageStat.Stat(diff_l).mean[0], 2)
+
+        # --- separate 5-panel instrument image ---
+        comp5 = Image.new("RGB", (panel_w * 5, panel_h + HEADER_H), (0, 0, 0))
+        comp5.paste(stack_panel(panel_w, panel_h, "REFERENCE: {0}".format(name), ref_padded), (0, 0))
+        comp5.paste(stack_panel(panel_w, panel_h, "BLEND 50%: {0}".format(name), blend), (panel_w, 0))
+        comp5.paste(stack_panel(panel_w, panel_h, "RENDER {0}: {1}".format(args.tag, name), render_img), (panel_w * 2, 0))
+        comp5.paste(
+            stack_panel(panel_w, panel_h, "edge overlay (cyan=ref red=render white=both)", overlay_img),
+            (panel_w * 3, 0),
+        )
+        diff_label = "abs difference (mean diff render-ref: {0})".format(edge_metrics["mean_signed_lum_diff"])
+        comp5.paste(stack_panel(panel_w, panel_h, diff_label, diff_img), (panel_w * 4, 0))
+
+        comp5_path = compare_dir / "{0}_{1}_5.png".format(args.tag, name)
+        comp5.save(comp5_path)
+
+        jpeg5_path = compare_dir / "{0}_{1}_5.jpg".format(args.tag, name)
+        scaled_preview(comp5).save(jpeg5_path, "JPEG", quality=88)
 
         uv = unique_grey_values(render_img)
         suspect_blank = uv < BLANK_THRESHOLD
@@ -217,14 +385,21 @@ def main():
             "modified": datetime.fromtimestamp(rpath.stat().st_mtime, tz=timezone.utc).isoformat(),
             "pixel_size": list(original_size),
             "comparison_path": str(comp_path),
+            "comparison_5_path": str(comp5_path),
             "unique_values": uv,
             "suspect_blank": suspect_blank,
+            "edge_iou": edge_metrics["edge_iou"],
+            "edge_ref_covered": edge_metrics["edge_ref_covered"],
+            "mean_signed_lum_diff": edge_metrics["mean_signed_lum_diff"],
+            "mean_abs_lum_diff": mean_abs_lum_diff,
         }
         if args.metric:
             entry["edge_similarity"] = edge_similarity(ref_padded, render_img)
         readback.append(entry)
 
-        summary_bits = "unique_values={0} suspect_blank={1}".format(uv, suspect_blank)
+        summary_bits = "unique_values={0} suspect_blank={1} edge_iou={2} edge_ref_covered={3} mean_signed_lum_diff={4} mean_abs_lum_diff={5}".format(
+            uv, suspect_blank, entry["edge_iou"], entry["edge_ref_covered"], entry["mean_signed_lum_diff"], entry["mean_abs_lum_diff"]
+        )
         if args.metric:
             summary_bits += " edge_similarity={0}".format(entry["edge_similarity"])
         print("{0}: {1} -- {2}".format(name, comp_path.name, summary_bits))
