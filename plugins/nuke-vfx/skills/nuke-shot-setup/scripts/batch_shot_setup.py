@@ -27,6 +27,10 @@ ShotGrid CSV columns:
 
 Plates CSV (optional, from processed plates delivery):
     Filename, Context, First Frame, Last Frame, Duration
+    Directory (optional column): folder that holds the sequence, absolute or
+    relative to --plates-dir. Use it when the delivery is not laid out as
+    {plates-dir}/{shot}/{prefix}/ (e.g. raw deliveries in dated folders whose
+    filenames START with the shot code: <shot>_bg01_raw_primary_v001_main).
 
 If --plates-csv is not provided, plates are scanned from disk at:
     {plates-dir}/{shot}/{plate-prefix}/
@@ -106,8 +110,16 @@ def parse_csv(csv_path: str, sequence_filter: str = None) -> list[dict]:
         print("ERROR: Could not find 'Shot Code' column in CSV")
         sys.exit(1)
 
-    reader = csv.DictReader(lines[header_idx:])
-    for row in reader:
+    # ShotGrid exports repeat column names per task (Status, Description,
+    # Id, Assigned To ...). csv.DictReader keeps the LAST duplicate, which
+    # would report the FX task status as the shot status. The shot-level
+    # columns come first, so build each row keeping the FIRST occurrence.
+    raw_reader = csv.reader(lines[header_idx:])
+    header = [h.strip() for h in next(raw_reader)]
+    for values in raw_reader:
+        row = {}
+        for key, value in zip(header, values):
+            row.setdefault(key, value)
         code = row.get("Shot Code", "").strip()
         if not code or code in seen_codes:
             continue
@@ -161,12 +173,25 @@ def scan_plates_from_csv(plates_csv_path: str, plates_dir: Path) -> dict[str, li
             # Derive plate name and subdir from filename using known shot code
             # e.g. processed_plate_ac030_0110_bg01_raw_v002.%04d.exr
             parts = filename.split(f"_{shot}_", 1)
-            if len(parts) != 2:
+            if len(parts) == 2:
+                prefix, rest = parts
+            elif filename.startswith(f"{shot}_"):
+                # Raw delivery naming: <shot>_bg01_raw_primary_v001_main.%04d.exr
+                prefix, rest = "", filename[len(shot) + 1:]
+            else:
                 continue
-            prefix = parts[0]
-            plate_name = parts[1].split("_raw_")[0]
+            plate_name = rest.split("_raw_")[0]
 
-            plate_path = str(plates_dir / shot / prefix / filename).replace("\\", "/")
+            # Optional explicit folder (absolute, or relative to plates_dir);
+            # otherwise the standard {plates_dir}/{shot}/{prefix}/ layout.
+            directory = (row.get("Directory") or "").strip()
+            if directory:
+                seq_dir = Path(directory)
+                if not seq_dir.is_absolute():
+                    seq_dir = plates_dir / seq_dir
+                plate_path = str(seq_dir / filename).replace("\\", "/")
+            else:
+                plate_path = str(plates_dir / shot / prefix / filename).replace("\\", "/")
 
             all_plates.setdefault(shot, []).append({
                 "name": plate_name,

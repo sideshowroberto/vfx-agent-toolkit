@@ -6,7 +6,7 @@ allowed-tools: Read,Write,Edit,Bash,Glob,Grep,mcp__nuke__runPythonScript,mcp__nu
 
 # Nuke Shot Setup
 
-**Version:** 1.1.0
+**Version:** 1.1.1
 
 Batch setup of Nuke comp/visdev files, folder structures, and shot tracking CSV.
 
@@ -194,7 +194,7 @@ for shot in shots:
 
 ### Plate Loading
 Two modes:
-1. **Plates CSV** (`--plates-csv`): reads metadata CSV with columns `Filename, Context, First Frame, Last Frame, Duration`. Derives plate name and subdir from filename pattern. Plates dir defaults to the CSV's parent directory.
+1. **Plates CSV** (`--plates-csv`): reads metadata CSV with columns `Filename, Context, First Frame, Last Frame, Duration`, plus an optional `Directory` column (the folder holding the sequence, absolute or relative to `--plates-dir`) for deliveries that are not laid out as `{plates-dir}/{shot}/{prefix}/`. Derives plate name and subdir from the filename pattern; raw-delivery names that START with the shot code (`<shot>_bg01_raw_primary_v001_main`) are recognised too. Plates dir defaults to the CSV's parent directory. ShotGrid exports repeat column names per task (Status, Id...); the parser keeps the FIRST occurrence so the shot-level Status is read, not a task's (1.1.1).
 2. **File scanning** (fallback): scans `{plates-dir}/{shot}/{plate-prefix}/`, groups by plate name via regex, picks highest version per plate group.
 
 ### Sequence Derivation
