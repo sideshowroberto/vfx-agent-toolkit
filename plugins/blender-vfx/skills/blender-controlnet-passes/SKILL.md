@@ -1,11 +1,11 @@
 ---
 name: blender-controlnet-passes
-description: "Set up and render ControlNet conditioning passes from a Blender scene for AI image/video generation - grey clay override, compositor-normalized depth, cryptomatte EXR, optional wireframe overlay for temporal consistency. Wraps scripts/setup_controlnet_passes.py (Blender 5.x APIs, test-slice discipline, trailing-dot File Output naming). Use when preparing depth/edge conditioning inputs, clay renders for video models, or crypto mattes for comp. Triggers: \"controlnet passes\", \"render depth pass\", \"clay render\", \"grey shade render\", \"render passes for AI\", \"control net setup blender\"."
+description: "Renders ControlNet conditioning passes from a Blender scene for AI image and video generation - grey clay, normalized depth, cryptomatte EXR, optional wireframe. Use when preparing depth, edge or clay inputs for video models, or crypto mattes for comp."
 ---
 
 # Blender ControlNet Passes
 
-**Version:** 1.1.0 | **Last Updated:** 2026-08-21 | **Blender:** 5.x
+**Version:** 1.1.1 | **Last Updated:** 2026-08-21 | **Blender:** 5.x
 
 One parameterized script replaces the per-project pass-render scripts:
 `scripts/setup_controlnet_passes.py` (relative to this skill directory)

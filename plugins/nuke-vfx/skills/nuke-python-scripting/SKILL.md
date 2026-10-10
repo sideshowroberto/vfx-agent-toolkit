@@ -1,12 +1,12 @@
 ---
 name: nuke-python-scripting
-description: Python scripting for Nuke with NukeMCPLogger integration, script templates, and automation patterns. Use when writing Nuke Python scripts, using NukeMCPLogger, automating comps, or when user mentions nuke python, nuke script, nuke logger, nuke automation.
+description: Writes Nuke Python automation scripts using the NukeMCPLogger pattern so results and logs return through the MCP bridge. Use when scripting Nuke, automating comps, or when "nuke python", "nuke script" or the nuke logger come up.
 allowed-tools: Read,Write,Bash
 ---
 
 # nuke-python-scripting
 
-**Version:** 1.0.0
+**Version:** 1.0.1
 **Last Updated:** 2025-12-03
 **Dependencies:** Nuke (Foundry), NukeMCPLogger
 

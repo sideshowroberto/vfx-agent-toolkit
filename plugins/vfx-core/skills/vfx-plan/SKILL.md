@@ -1,6 +1,6 @@
 ---
 name: vfx-plan
-description: VFX planning framework - guides selecting the right planning mode (Iterative, Spec-Driven, or Safety-First) for a given task, runs adversarial plan review, and structures the output as an actionable brief. Use when user says "help me plan", "let's plan this out", "vfx plan", "plan this task", or before any complex multi-file or multi-system build.
+description: Plans complex VFX builds by choosing Iterative, Spec-Driven or Safety-First mode, running an adversarial plan review and writing an actionable brief. Use on "help me plan" or "vfx plan", or before any multi-file or multi-system build.
 allowed-tools: Read,Write,Bash,Glob,Grep,Agent
 ---
 

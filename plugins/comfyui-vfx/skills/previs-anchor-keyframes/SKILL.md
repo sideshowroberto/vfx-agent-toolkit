@@ -1,6 +1,6 @@
 ---
 name: previs-anchor-keyframes
-description: Generate photoreal anchor keyframes from CG previs for reference-guided video generation (Seedance-class models). Covers previs shading for AI readability, anchor frame selection, bootstrapping action-pose reference sets from a single reference, lighting-accurate prompt language, and validation. Use when converting previs/CG animation to photoreal video, preparing anchor/reference frames for a video model, or when generations ignore CG placement or pose. Triggers on "anchor keyframes", "anchor frames", "previs to photoreal video", "reference frames for video gen", "generations not following the CG".
+description: Generates photoreal anchor keyframes from CG previs for reference-guided video models such as Seedance - previs shading, frame choice, pose reference sets. Use for "anchor keyframes", "previs to photoreal video", or generations that ignore the CG pose.
 allowed-tools: Read,Write,Bash
 ---
 

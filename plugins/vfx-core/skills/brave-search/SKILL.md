@@ -1,23 +1,24 @@
 ---
 name: brave-search
-description: "VFX-focused web research using Brave Search API. Two modes: MCP web_search for filtered URL results, LLM Context script for deep research with actual extracted page content. Use when searching for tutorials, documentation, errors, plugins, software updates, or any VFX research task."
+description: "Researches VFX topics with Brave Search - MCP web search for filtered URL lists, an LLM Context script for deep research with extracted page content, and image search for references. Use when searching for tutorials, docs, errors, plugins or software updates."
 allowed-tools: Read,Bash
 ---
 
 # Brave Search Skill - VFX Research Intelligence
 
-**Version:** 2.1.0 | **Updated:** 2026-07-08
+**Version:** 2.2.2 | **Updated:** 2026-10-10
 
 ---
 
-## Two Tools, Two Jobs
+## Three Tools, Three Jobs
 
 | Tool | When to use | What you get |
 |------|------------|--------------|
 | `mcp__brave-search__brave_web_search` | Quick lookups, filtered results, URL lists, pagination | URLs + snippets |
 | `brave_llm_context.py` (via Bash) | Deep research, grounding, actual page content | Extracted text, tables, code blocks |
+| `brave_image_search.py` (via Bash) | Finding reference photos / stills | Full-size image URL + WxH + caption per hit |
 
-**Decision rule:** If you need to read the content of pages (not just find them), use LLM Context. If you need URL lists, type-filtering, or pagination, use web_search.
+**Decision rule:** If you need to read the content of pages (not just find them), use LLM Context. If you need URL lists, type-filtering, or pagination, use web_search. If you need the images themselves, use image search (Tool 3) - not a page search followed by scraping.
 
 ---
 
@@ -33,7 +34,7 @@ mcp__brave-search__brave_web_search(query, count, result_filter, freshness, extr
 |-------|--------|---------|-------|
 | `query` | string | - | Required. Max 400 chars / 50 words |
 | `count` | 1-20 | 10 | 20 for comprehensive research |
-| `result_filter` | `web` `news` `videos` `discussions` `images` | web | |
+| `result_filter` | `web` `news` `videos` `discussions` `images` | web | For reference photos with full-size URLs use Tool 3 |
 | `freshness` | `pd` `pw` `pm` `py` or date range | - | pm = past 31 days |
 | `extra_snippets` | boolean | false | Up to 5 extra excerpts per result |
 | `spellcheck` | boolean | true | Set false for exact error messages |
@@ -101,6 +102,41 @@ python <skill-dir>/scripts/brave_llm_context.py "USD Solaris render settings" \
 - Standard research: `--tokens 8192` (default)
 - Deep research: `--tokens 16384`
 - Comprehensive: `--tokens 32768`
+
+---
+
+## Tool 3 - Image Search (Reference Sourcing)
+
+Calls `/images/search` directly via Python. For every hit it returns the full-size image URL, the source page, the caption and the pixel size, largest first. One command replaces the search-pages-then-scrape loop. Search for images, not for pages about images.
+
+**Script:** bundled with this skill at `scripts/brave_image_search.py` - resolve the path against this skill's own directory.
+
+**Requires:** `BRAVE_API_KEY` environment variable (same key as Tool 2). The script reads it from the environment and never prints it.
+
+### Usage
+```bash
+python <skill-dir>/scripts/brave_image_search.py "1980s arcade cabinet front view" 40
+python <skill-dir>/scripts/brave_image_search.py "1980s arcade cabinet front view" --count 40 --safesearch strict
+```
+
+| Arg | Default | Notes |
+|-----|---------|-------|
+| `query` | - | Required |
+| `count` (positional or `--count`) | 40 | 1-200 |
+| `--safesearch` | strict | `off` or `strict` |
+
+### Output
+One line per hit, largest pixel area first, then a `RESULTS <n>` line:
+```
+<width>x<height> | <full image url> | <source page url> | <title/caption>
+```
+- `0x0` means Brave did not report a size: unknown, not small.
+- The caption often carries the event and date, and the size is the first resolution filter - read both before downloading.
+- `RESULTS <n>` proves the call ran. A failed call prints `FAIL ...` and exits 1.
+
+### Rules
+- **Zero results means rephrase.** `RESULTS 0` is returned for valid queries. Re-run with other wording (add or drop the year, name the event or the exact object); never conclude "no images exist".
+- **Hits are leads, not verdicts.** Sidebar images of other people or items get attached to the right page, and many CDNs serve AVIF/WEBP under a `.jpg` URL. Download, confirm the file opens, then open every candidate and look before keeping or naming it (see vfx-research, "Verify sourced URLs and images").
 
 ---
 
@@ -181,13 +217,12 @@ mcp__brave-search__brave_web_search(
 After finding a Python/library-based tool via search:
 ```python
 # 1. Resolve
-lib = mcp__context7__resolve-library-id(libraryName="FastMCP")
+lib = mcp__context7__resolve-library-id(libraryName="FastMCP", query="how to create server tools")
 
 # 2. Get docs
-docs = mcp__context7__get-library-docs(
-    context7CompatibleLibraryID="/jlowin/fastmcp",
-    topic="server creation tools",
-    tokens=3000
+docs = mcp__context7__query-docs(
+    libraryId="/jlowin/fastmcp",
+    query="how to create server tools"
 )
 ```
 Use Context7 for Python packages and frameworks. Use LLM Context for general web research.
@@ -215,4 +250,5 @@ Higher token budgets (`--tokens 16384` or `--tokens 32768`) are now practical si
 Brave Search is a paid API ($5/month credit, pay-as-you-go beyond).
 - Web Search: no hard per-second limit on paid plans, but space requests ~1 second apart as good practice
 - LLM Context: allow 30-second timeout (page extraction takes time)
+- Image Search: same key and plan as web search; run sequentially. When downloading hits, stop on the first HTTP 429 from an image CDN
 - No parallel execution - run searches sequentially

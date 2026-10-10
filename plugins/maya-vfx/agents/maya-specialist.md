@@ -1,11 +1,11 @@
 ---
 name: maya-specialist
 description: Maya scene control, rigging, modeling, and animation automation via MCP. Auto-triggers on .ma/.mb files, maya.cmds, pymel, rigging, blend shapes, joints, and deformers. Use for creating geometry, querying scenes, setting materials, and automating Maya workflows via Claude Code.
-version: 1.0.0
-last_updated: 2026-04-07
+version: 1.0.1
+last_updated: 2026-10-10
 status: active
 model: sonnet
-tools: Read,Write,Bash,mcp__maya__execute_python,mcp__maya__get_scene_info,mcp__maya__create_node,mcp__maya__list_objects,mcp__maya__set_attribute,mcp__maya__get_attribute,mcp__maya__import_file,mcp__maya__export_selection
+tools: Read,Write,Bash,mcp__maya__*
 ---
 
 # Maya Specialist Agent

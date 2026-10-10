@@ -1,7 +1,8 @@
 """stop_check.py -- decide whether a loop-gauntlet run should continue or stop.
 
-Reads every compare/<tag>_review.json whose tag matches iter\\d+ (sorted by
-the number in the tag). Each review file has the shape:
+Reads every compare/<tag>_review.json whose tag matches iter\\d+ with an
+optional single lowercase letter suffix (iter06, iter06b), sorted by the
+number in the tag and then the suffix. Each review file has the shape:
 
     {"tag": "iter03", "scores": {"<view>": [ints, one per rubric entry]},
      "gaps": ["..."], "next": "...", "notes": "..."}
@@ -25,6 +26,16 @@ Decision order (first match wins):
                          the later fix tiers get iterations of their own.
   otherwise CONTINUE.
 
+RE-RUN TAGS (observation 0066): the evidence rule forbids overwriting a
+burnt tag, so a re-run of iteration 6 is logged as iter06b (then iter06c ...).
+A suffixed tag is a re-run of the SAME iteration number and the latest suffix
+wins ("" < a < b ...): for the decision above only the winning record of each
+iteration number counts, and a re-run does not use up one of max_iterations.
+The superseded record stays in the iteration table, marked with the tag that
+replaced it, and --json lists it under "superseded". A file named
+iter*_review.json whose tag does not fit the pattern (iter06bb, iter6_x) is
+never ignored silently: it is reported on stderr as skipped.
+
 Usage:
     python stop_check.py --spec gauntlet_spec.json [--json]
 
@@ -38,7 +49,10 @@ import re
 import sys
 from pathlib import Path
 
-TAG_RE = re.compile(r"^(iter(\d+))_review\.json$")
+TAG_RE = re.compile(r"^(iter(\d+)([a-z]?))_review\.json$")
+# Anything that starts like an iteration tag but did not match TAG_RE gets a
+# stderr warning instead of vanishing from the table (observation 0066).
+ITER_LIKE_RE = re.compile(r"^iter.*_review\.json$", re.IGNORECASE)
 
 
 def load_spec(spec_path):
@@ -64,8 +78,11 @@ def _fail(review_path, field, detail):
 def collect_reviews(compare_dir, views, rubric):
     """Load, validate and score every iterNN_review.json under compare_dir.
 
-    Returns a list of iteration records sorted by iteration number, each:
-    {"tag", "num", "scores", "global_min", "total", "per_view_sum", "lowest"}.
+    Returns a list of iteration records sorted by iteration number and then
+    suffix, each: {"tag", "num", "suffix", "superseded", "superseded_by",
+    "scores", "global_min", "total", "per_view_sum", "lowest"}. For a re-run
+    (iter06 then iter06b) the earlier records of that number are marked
+    superseded and point at the winner (the latest suffix).
     """
     view_names = [v["name"] for v in views]
     rubric_len = len(rubric)
@@ -76,11 +93,16 @@ def collect_reviews(compare_dir, views, rubric):
         for path in compare_dir.iterdir():
             m = TAG_RE.match(path.name)
             if m:
-                found.append((int(m.group(2)), m.group(1), path))
-    found.sort(key=lambda x: x[0])
+                found.append((int(m.group(2)), m.group(3), m.group(1), path))
+            elif ITER_LIKE_RE.match(path.name):
+                print(
+                    "WARNING: skipped review file {0}: tag does not match iterNN or iterNN<letter>".format(path.name),
+                    file=sys.stderr,
+                )
+    found.sort(key=lambda x: (x[0], x[1], x[2]))
 
     iterations = []
-    for num, tag, path in found:
+    for num, suffix, tag, path in found:
         try:
             with open(path, "r", encoding="utf-8") as fh:
                 review = json.load(fh)
@@ -128,6 +150,9 @@ def collect_reviews(compare_dir, views, rubric):
             {
                 "tag": tag,
                 "num": num,
+                "suffix": suffix,
+                "superseded": False,
+                "superseded_by": None,
                 "scores": scores,
                 "global_min": global_min,
                 "total": total,
@@ -135,6 +160,18 @@ def collect_reviews(compare_dir, views, rubric):
                 "lowest": {"view": lowest_view, "criterion": lowest_criterion},
             }
         )
+
+    # Re-runs: within one iteration number the latest suffix wins. Records with
+    # the SAME suffix (iter6 next to iter06) are not re-runs of each other and
+    # all stay effective, as before this rule existed.
+    winner = {}
+    for it in iterations:
+        winner[it["num"]] = it  # sorted ascending, so the last one per number is the latest
+    for it in iterations:
+        top = winner[it["num"]]
+        if it["suffix"] < top["suffix"]:
+            it["superseded"] = True
+            it["superseded_by"] = top["tag"]
     return iterations
 
 
@@ -197,10 +234,13 @@ def compute(spec):
     stop_cfg = spec["stop"]
 
     iterations = collect_reviews(compare_dir, views, rubric)
-    decision, reason, streak, best_min, best_total = decide(iterations, stop_cfg)
+    # Only the winning record of each iteration number feeds the decision; the
+    # superseded ones stay in "iterations" so the table never drops a tag.
+    effective = [it for it in iterations if not it.get("superseded")]
+    decision, reason, streak, best_min, best_total = decide(effective, stop_cfg)
 
-    if iterations:
-        last = iterations[-1]
+    if effective:
+        last = effective[-1]
         global_min, total = last["global_min"], last["total"]
         per_view_total, lowest = last["per_view_sum"], last["lowest"]
     else:
@@ -209,8 +249,9 @@ def compute(spec):
     return {
         "decision": decision,
         "reason": reason,
-        "count": len(iterations),
+        "count": len(effective),
         "iterations": iterations,
+        "superseded": [it["tag"] for it in iterations if it.get("superseded")],
         "global_min": global_min,
         "total": total,
         "best_min": best_min,
@@ -226,7 +267,8 @@ def print_human(spec, result):
     print("{0:<10}{1:>6}{2:>8}  lowest".format("tag", "min", "total"))
     for it in result["iterations"]:
         low = "{0}/{1}".format(it["lowest"]["view"], it["lowest"]["criterion"])
-        print("{0:<10}{1:>6}{2:>8}  {3}".format(it["tag"], it["global_min"], it["total"], low))
+        note = "  (superseded by {0})".format(it["superseded_by"]) if it.get("superseded") else ""
+        print("{0:<10}{1:>6}{2:>8}  {3}{4}".format(it["tag"], it["global_min"], it["total"], low, note))
     print("")
     print(
         "streak={0} best_min={1} best_total={2}".format(
@@ -257,6 +299,7 @@ def main():
             "decision": result["decision"],
             "reason": result["reason"],
             "iterations": result["count"],
+            "superseded": result["superseded"],
             "global_min": result["global_min"],
             "total": result["total"],
             "best_min": result["best_min"],

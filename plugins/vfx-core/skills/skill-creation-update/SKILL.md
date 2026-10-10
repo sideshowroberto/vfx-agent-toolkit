@@ -1,13 +1,13 @@
 ---
 name: skill-creation-update
-description: Standardized workflow for creating and updating VFX Agent Skills with constitutional validation, progressive disclosure enforcement, and automated template application. Use when creating skills, validating compliance, testing scripts, updating skill versions, or when user mentions "create skill", "validate skill", "skill template", "constitutional compliance", "skill testing".
+description: Creates, validates and versions VFX Agent Skills against the skill constitution using template scripts (create_skill, validate_skill, test_skill). Use when creating or updating a skill, checking compliance, or bumping a skill version.
 allowed-tools: Read,Write,Edit
 ---
 
 # skill-creation-update
 
-**Skill Version:** 1.2.0
-**Last Updated:** 2026-09-10
+**Skill Version:** 1.3.1
+**Last Updated:** 2026-10-09
 **Dependencies:** Python 3.12+, VFX_SKILL_CONSTITUTION.md (v2.0.0+)
 **Status:** Production-ready
 
@@ -119,6 +119,18 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py unreal-vfx-a
      shipped script is always somebody's personal path on somebody else's
      machine: nuke-shot-setup shipped a dead personal OCIO path and Nuke 15 as
      built-in defaults (observation #9, 2026-09-08).
+   - **Scripts that walk a share or folder tree at run time (manual, principle 10):**
+     a shipped script that enumerates a share or folder tree bypasses the agent's
+     drive-policy hook, because the hook sees only the command line (which names
+     no drive), not what the launched program opens. The script must apply the
+     policy itself: allowlisted roots or the policy's folder pattern checked
+     before it opens anything, and named folders opened directly instead of
+     listing the root. Review every contributed script package against a hostile
+     fixture - a folder it must not read (holding a marker line that must never
+     appear in the output), a misnamed file, a character outside cp1252 - not
+     against the author's examples. One such fixture caught all three faults in
+     a roll-up script that the author's own examples had passed (observation
+     #131, 2026-10-05).
 3. **Address failures:**
    - Article I: Remove hard-coded paths, add params
    - Article III: Move details to reference docs
@@ -373,6 +385,12 @@ Not applicable (this is a skill, uses directory structure)
 ---
 
 ## Version History
+
+**v1.3.0** (2026-10-09) - Run-time access policy for shipped scripts
+- Workflow 2 checklist: a shipped script that walks a share or folder tree at
+  run time must apply the drive policy itself (the command-text hook cannot see
+  what the program opens); contributed script packages are reviewed against a
+  hostile fixture, not the author's examples (observation #131, principle 10)
 
 **v1.2.0** (2026-09-10) - Catalog-budget and self-containment observations
 - Description rule: put trigger phrases in the FIRST sentence, or keep the

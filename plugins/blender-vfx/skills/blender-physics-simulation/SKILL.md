@@ -1,12 +1,12 @@
 ---
 name: blender-physics-simulation
-description: Physics simulations including particles, fluids (Mantaflow), rigid/soft body, and cloth in Blender. Use for physics, particles, fluid simulations, or when user mentions "physics," "particle," "fluid," "rigid body," "soft body," "cloth," "fire," "smoke," or "hair."
+description: Sets up Blender physics simulations - particle systems, Mantaflow fluid, smoke and fire, rigid body, soft body, cloth and hair. Use for physics, particle, fluid, cloth or hair simulation requests in Blender.
 allowed-tools: Read,Write
 ---
 
 # Blender Physics Simulation Skill
 
-**Version:** 2.0.0
+**Version:** 2.0.1
 **Last Updated:** 2026-06-10
 **Dependencies:** Blender 5.1+
 

@@ -30,11 +30,21 @@ status = ROOT / "renders" / (TAG + "_status.json")
 def write_status():
     status.write_text(json.dumps(job, indent=2), encoding="ascii")
 
+def verify_scene():
+    """The iteration's geometry read-back. Return a list of fault strings (empty = pass).
+    Fill it from the spec: routes connect, zone volumes inside tolerance, nothing below
+    the floor, every object the plan names exists. Left unwritten it raises, on purpose:
+    a gate that cannot fail is not a gate."""
+    raise NotImplementedError("write the geometry read-back for this build before queuing renders")
+
 def step():
     try:
         s = bpy.context.scene
         if job["index"] >= len(VIEWS):
             job["state"] = "complete"; job["elapsed"] = time.time() - job["started"]; write_status(); return None
+        faults = verify_scene() if job["index"] == 0 else []   # once per job, before the first render
+        if faults:
+            raise RuntimeError("geometry read-back faults, not rendering: " + "; ".join(faults))
         view = VIEWS[job["index"]]
         out = ROOT / "renders" / (TAG + "_" + view + ".png")
         if out.exists():
@@ -63,6 +73,17 @@ Poll `renders/<tag>_status.json` until `state` is `complete` or `failed`.
 The `output already exists` guard is deliberate: a re-run must get a new
 tag, so no iteration's evidence is overwritten.
 
+**Gate the queue on the geometry read-back.** The matched views are a
+narrow window on a scene that is delivered whole, and the evidence rule
+forbids overwriting, so a render spent on a faulty scene burns the tag.
+Never send a rebuild and the render queue in one call without the read-back
+in between: in one run the read-back that came back with the combined call
+showed two quadrants were solid blocks (56 route faults, zone volume 2
+percent over), the tag was already burnt, and the re-run had to take a new
+tag. The queue above runs `verify_scene()` itself and REFUSES to render on
+any fault. Prove the gate once by feeding it a known fault on a throwaway
+copy of the scene and reading the `failed` status JSON's `error`.
+
 ## 2. Generated image pixels that vanish
 
 Symptom: a relief or bump texture renders flat black; the loop scored it
@@ -84,6 +105,13 @@ Read the pixels back after the save, not after the assignment.
 
 ## 3. Scene hygiene the loop depends on
 
+- **Up axis and units are stated in the brief, not chosen by the builder.**
+  Blender is +Z up, floors in the XY plane, metres. The rendered comparison
+  cannot catch a wrong axis (a scene and a camera built on the same wrong
+  axis render like a correct pair; earlier Blender legs only matched by
+  coincidence of the native convention), so read it back as a value each
+  iteration: the ground object's lowest z is about 0 and the tallest
+  object's extent lies along z (per-object read-back below).
 - Read state before creating: `bpy.data.objects.get(name)` then update, never
   `bpy.ops.mesh.primitive_*` again for an object that exists.
 - One collection per zone plus CAMERAS and LIGHTS; every object named
@@ -115,6 +143,95 @@ Read the pixels back after the save, not after the assignment.
   on a wall lying in the YZ plane it produced blotches instead of coursing.
   Horizontal coursing from object-space Z (SeparateXYZ > multiply > fract >
   less-than > bump) works on every wall orientation and lines up scene-wide.
+- **`me.materials.clear()` after `bpy.data.meshes.new_from_object`.** The
+  copy made from an evaluated boolean host carries the host's EMPTY slot 0
+  and every polygon points at it, so the whole object renders default
+  white - four towers did for twelve iterations while the builder explained
+  the white as sunlight. Clear, append the materials you intend, then set
+  `polygon.material_index` explicitly (clear and re-append resets the
+  indexes, see the material-slot bullet above). Read back: polygon counts grouped by
+  `material_index`, and `slot.material is not None` for every slot in use -
+  not a pixel sample, where lighting can hide the wrong material.
+- **A scripted boolean carve can fail silently two ways; the DCC reports
+  success either way.** (1) *Excluded collection:* a host created inside a
+  collection a previous run left EXCLUDED from the view layer evaluates
+  WITHOUT its modifiers - 386 polygons in, 386 out, zero seconds - and
+  `view_layer.update()` does not help. (2) *Inside-out cutters:*
+  `bmesh.ops.recalc_face_normals` on a freshly built closed solid returned
+  inside-out cutters for some parameter values (same code, different radii),
+  and an inside-out cutter makes the EXACT solver return an EMPTY mesh for a
+  DIFFERENCE; with a collection operand one bad cutter empties the whole
+  result. Checks:
+
+  ```python
+  import bpy, bmesh
+
+  def walk(lc):
+      for child in lc.children:
+          yield child
+          yield from walk(child)
+
+  root = bpy.context.view_layer.layer_collection
+  was_excluded = [lc.name for lc in walk(root) if lc.exclude]
+  for lc in walk(root):
+      lc.exclude = False                      # un-exclude BEFORE creating or evaluating the host
+  # ... create host and cutters, add the Boolean modifier, evaluate ...
+  for lc in walk(root):
+      if lc.name in was_excluded:
+          lc.exclude = True                   # restore afterwards
+
+  def assert_cutter_ok(bm, name):
+      """Wind faces explicitly (profile CCW: side quads a[j], a[j+1], b[j+1], b[j];
+      start cap reversed, end cap forward) - do not rely on recalc_face_normals."""
+      vol = bm.calc_volume(signed=True)
+      if vol <= 0:
+          raise RuntimeError("%s: signed volume %.6f (inside-out)" % (name, vol))
+      bad = [e for e in bm.edges if not e.is_manifold]
+      if bad:
+          raise RuntimeError("%s: %d non-manifold edges" % (name, len(bad)))
+
+  POLY_FLOOR = 1000                           # from the plan: fewer polygons than this = carve failed
+  host_eval = host.evaluated_get(bpy.context.evaluated_depsgraph_get())
+  if len(host_eval.data.polygons) < POLY_FLOOR:
+      raise RuntimeError("carve produced %d polygons" % len(host_eval.data.polygons))
+  ```
+
+  The poly-count floor raises instead of continuing. When it trips, test the
+  cutters ONE AT A TIME with an Object operand (set the modifier's
+  `operand_type = 'OBJECT'` and its `object` to each cutter in turn, evaluate,
+  read the polygon count, restore the modifier in a `finally`): the cutter
+  whose count collapses names itself. Every procedural build step needs a
+  produced-something assertion of its own (polygon count, signed volume).
+- **Per-object read-back in the FINAL state, not only per iteration.** For
+  every object that belongs to the delivery record its name, evaluated
+  polygon count, bounding-box size in metres, world location and whether it
+  is hidden. It is the one independent record a consumer can re-measure to
+  decide which objects are the deliverable (the members' counts must sum to
+  the leg's own totals) and which hidden helpers, superseded parts or
+  render-only duplicates to leave out, and it carries the axis check above.
+  Record it with `up` (+Z), `front`, `units` (metres), `ground` and the
+  excluded helpers with a reason; the field names are the ones in
+  `templates/final_delivery.example.json`, which is the authority. Generate
+  it from the final scene, never type it.
+
+  ```python
+  import json, bpy
+
+  dg = bpy.context.evaluated_depsgraph_get()
+  rows = []
+  for ob in bpy.data.objects:
+      if ob.type != 'MESH':
+          continue
+      ev = ob.evaluated_get(dg)
+      rows.append({
+          "object": ob.name,
+          "polys": len(ev.data.polygons),
+          "size_m": [round(v, 4) for v in ev.dimensions],
+          "location_m": [round(v, 4) for v in ob.matrix_world.translation],
+          "hidden_render": bool(ob.hide_render),
+      })
+  print(json.dumps(rows, indent=1))
+  ```
 
 ## 4. Engines
 
@@ -151,7 +268,20 @@ shafts largely disappeared under Cycles. That is a finding, not a polish.
   and surfaces zones whose references disagree on brightness (one run
   needed the same room darker for two views and brighter for a third -
   that is a plan problem to settle in the brief, not something one lighting
-  rig can serve).
+  rig can serve). The per-view luminance read and its thresholds are in
+  `reference/lighting_match.md`; the scratch script is
+  `scripts/scratch_luminance.py` (section 10).
+- **A world light cannot be zoned - it enters every opening.** In a scene
+  that mixes an enclosed room with open corridors, keep the world low and
+  fill each zone with its own area lights placed high in its openings, and
+  give the camera a separate dim sky (Light Path > Is Camera Ray) so a
+  visible sky does not dominate the luminance read of an exterior-facing
+  view. Measured: raising the world strength 0.35 -> 0.85 to lift dark
+  corridors poured light through the roof opening into the enclosed room
+  (+19 mean luminance) and blew the corridor frames (+32, +52); corridor
+  fills of 600 W gave +20 / +34 / +52 against the references, 220 W gave
+  +3 / -4 / +28 (hero view -8.5), and the iteration render then reproduced
+  the scratch numbers exactly.
 
 ## 6. Moving an EEVEE loop scene to Cycles
 
@@ -254,6 +384,54 @@ and read back a handful of named pixel boxes (background, hero surface,
 each light source) converted to sRGB, before submitting the real iteration
 render.
 
+**Any light, world, exposure or emission change counts, including "just a
+world strength".** Scratch-render ALL matched views, and before the
+iteration tag is spent read each view's render mean luminance against its
+reference mean as a signed difference. `scripts/scratch_luminance.py` takes
+the scratch tag and prints, per view, render mean / reference mean / signed
+difference; the method and the thresholds are in
+`reference/lighting_match.md`. A lighting value is a guess until a scratch
+frame has been measured against the reference; measured first, the
+iteration render is a confirmation, not an experiment (skipping this for a
+world-strength tweak regressed three views at once, section 5).
+
+**A scratch render saves a NEW increment first, like any render.** A plain
+save (or Ctrl-S) after an iteration render writes the post-iteration edits
+into that iteration's render snapshot, and the iteration can no longer be
+reopened as rendered: call `bpy.ops.wm.save_mainfile(incremental=True)`
+before the scratch render, exactly as the queue in section 1 does.
+
+**Thin negative features get a measured contrast here too.** A groove, wall
+joint, seam, panel gap or inlay can be modelled exactly right and still be
+invisible to the comparison, because its faces share the neighbouring
+surface's grey (one build: a 2.2-level dip out of 255 where the reference
+joint was 97-123 levels darker, so the scorer could only mark it "present
+but weak"). In the scratch step, for each rubric element that is a thin
+negative feature, sample a column- (or row-) averaged profile across the
+element at its expected position in BOTH the scratch render and the
+reference and log the two dips side by side; a render dip that is a small
+fraction of the reference's is reported as "not visible" up front, and the
+element gets its own darker grey in the value study.
+
+```python
+from PIL import Image
+
+def column_profile(png, x0, x1, y0, y1):
+    """Column-averaged luma over the band [x0,x1) x [y0,y1): one value per column.
+    For a horizontal feature, crop a band of rows and resize to (1, y1-y0) instead."""
+    band = Image.open(png).convert("L").crop((x0, y0, x1, y1))
+    return list(band.resize((x1 - x0, 1), Image.BOX).getdata())
+
+def dip(profile):
+    """How far the darkest column sits below the median of the band (levels of 255)."""
+    s = sorted(profile)
+    return s[len(s) // 2] - s[0]
+```
+
+Compare `dip(render_profile)` with `dip(reference_profile)` for the same band;
+include a few columns either side of the feature so the median is the
+neighbouring surface.
+
 Blender 5.1 compositor facts worth knowing before debugging this blind:
 there is no `scene.node_tree` any more - the compositor lives at
 `scene.compositing_node_group`, a node group whose output is a
@@ -264,3 +442,59 @@ produces a silent black frame, not an error. Object texture coordinates on
 a SCALED object are in that object's LOCAL space (a 400 m floor plane
 scaled up from a small mesh will emit or texture as if it were still small)
 - use Geometry > Position for anything that needs to gate in world space.
+
+## 11. Solve camera and room from repeated elements
+
+Repetition in a reference is measurement data: equal elements at known
+ratios over-determine the camera and the room, so solve them BEFORE
+iteration one instead of discovering the numbers by render. Use it whenever
+a matched view shows a regular repeated element on a circle or a line
+(niches, columns, ribs, windows). Record the solve in the brief.
+
+1. **Tabulate landmarks per visible element** (centre x, top y, foot y, and
+   BOTH edge x, so the width is a column too) from the reference at full
+   size.
+2. **Solve in closed form first.** Centre offset over height per element
+   gives `R * sin(k * delta) / H`, so `sin(3d) / sin(d)` fixes the slot
+   angle and with it the count and the radius; the centre-to-edge height
+   ratio fixes the camera distance; the centre height fixes the focal
+   length; the floor-curvature sign change fixes the camera height; the
+   horizon row fixes the lens shift. Project two elements through the
+   result: they should land within about 2 percent of frame height on the
+   first rebuild.
+3. **Put every measurable and every line the rubric scores in the fit.**
+   Centres and heights alone are under-constrained - foreshortening carries
+   the wall angle, and that lives in the WIDTHS - and so are the elements
+   alone when the rubric also scores another line (an opening's edge, the
+   wall-to-ceiling line). Two measured cases:
+   - A fit on centres and heights agreed with its own verification
+     instrument to 0.5 percent for eleven iterations while the reference's
+     edge elements were 21 percent wider than the build. Adding widths to
+     the cost moved the answer (radius 8.06 -> 9.0 m, 26 -> 30 slots, camera
+     from outside the room to 8.55 m behind the centre, inside it; widths
+     within 4 percent, centres within 2-5 percent), and both "findings for
+     the human" the first solve had reported (camera outside the room,
+     entrances in frame) disappeared - they were artefacts of the
+     under-constrained fit.
+   - A pre-solve from the repeated elements alone gave a clean camera
+     (31 px RMS) whose first render matched the element band and put a
+     large opening off-frame; adding 11 samples of that opening's rim showed
+     the concept is not one consistent circle, and no camera satisfies both.
+4. **Verify with an instrument that measures something the solve did NOT
+   fit** (widths when the solve fitted centres and heights; an unfitted
+   line). A solve and an instrument built from the same measurements agree
+   by construction. Keep one plain reference-over-render pair at full size
+   every few iterations next to the multi-panel; it is how the 21 percent
+   error was finally seen.
+5. **When the constraints cannot all fit, report the trade-off with renders
+   and do not choose silently.** Render each candidate (element-weighted,
+   rim-weighted, a blend) and put the residuals and the frames in front of
+   the human - in the second case above the element-weighted camera left
+   the opening hundreds of pixels off, the rim-weighted one left the element
+   tops 144 px off, and a 0.4 blend was worse on both. Two findings a solve
+   can return that only the human may settle: a camera position outside the
+   room, and a plan feature that cannot be hidden from the view.
+
+Read-back that proves it: a per-element residual table (pixels or percent of
+frame height) at the fitted camera, plus the verification instrument's
+numbers for the quantity the fit did not use.

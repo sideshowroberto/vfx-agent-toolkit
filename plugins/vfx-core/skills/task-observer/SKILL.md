@@ -1,6 +1,6 @@
 ---
 name: task-observer
-description: Watches every tool-using session for skill lessons and writes each one to the observation log the moment it happens - user corrections, rules the agent broke, better workflows, sibling skills that need the same fix, sections nobody uses. Nothing is applied until a review the skill owner approves. Invoke before the FIRST tool call of any session and run its Session Start Protocol (status, scan, review trigger); loading alone activates nothing. Also triggers on "observation log", "any observations logged", "skill review", "task observer", "log that as an observation", "review the backlog".
+description: Logs skill lessons (user corrections, broken rules, better workflows) to the observation log as they happen; applied only after owner review. Invoke before the first tool call of any session and run its Session Start Protocol. Also "observation log", "skill review".
 ---
 
 # Task Observer

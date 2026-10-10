@@ -5,8 +5,10 @@ description: Apply this toolkit's audited application lessons when scripting DCC
 
 # VFX workflow adapter
 
-Read the relevant domain from the [audited lessons index](references/README.md);
-load only the applications involved. The references ship with this skill.
+Open the [audited lessons index](references/README.md) and then the reference
+file for each application involved (for example `references/blender.md`) before
+you act; the method lives in those files, not in this one. Load only the
+applications involved. The references ship with this skill.
 
 Use callable tools exposed in the current session, or inspect local CLI help.
 A tool name recorded in another skill is not evidence that the current harness

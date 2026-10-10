@@ -1,7 +1,7 @@
 {
     "name":  "houdini-vfx",
     "description":  "Houdini VFX pipeline: procedural generation, USD/Solaris, VEX, Python automation, HDA creation.",
-    "version":  "1.0.4",
+    "version":  "1.1.2",
     "author":  {
                    "name":  "Rob Williams"
                }

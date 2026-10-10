@@ -1,12 +1,12 @@
 ---
 name: magnific-local-upload
-description: "Upload local images to Magnific as references for generation, then download outputs to a local folder. Use when user wants to upload photos from a local folder or drive, use local files as image/style references in Magnific, batch upload from a directory, move uploads to a Magnific folder, or save/download Magnific generated images to a local path. Triggers: \"upload local images\", \"use local photos as reference\", \"upload from folder\", \"upload these images to magnific\", \"download magnific output\", \"save generated image to folder\", \"local ref upload\"."
+description: "Uploads local images to Magnific as generation references, moves them into folders, and downloads outputs to a local path. Use when using local photos as references, batch uploading a directory, or saving Magnific results to a local folder."
 allowed-tools: mcp__magnific__creations_request_upload,mcp__magnific__creations_finalize_upload,mcp__magnific__creations_move,mcp__magnific__creations_get,mcp__magnific__creations_show,mcp__magnific__creations_wait,mcp__magnific__images_generate,mcp__magnific__images_variations,mcp__magnific__folders_list,Bash,Glob,Write
 ---
 
 # Magnific Local Upload Skill
 
-**Version:** 1.2.0
+**Version:** 1.2.1
 **Last Updated:** 2026-09-09
 
 Handles the full pipeline: local folder -> upload to Magnific -> move to folder -> use as generation references -> download output to local folder.

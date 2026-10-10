@@ -1,0 +1,72 @@
+{
+  "_notes": [
+    "Delivery record for a finished loop leg. Whoever consumes the scene (an exporter, a downstream DCC, another artist's agent) must never have to guess the coordinate system or which nodes are the deliverable.",
+    "Generate this file FROM THE FINAL SCENE with a read-back script (node/object paths, prim and point counts, bounding boxes). Do not type the numbers.",
+    "A consumer re-measures the per-object read-back and checks that the member totals equal readback_totals. If they do not, the membership list is wrong.",
+    "Forward slashes, relative paths from the working folder, ASCII only. Delete the _notes keys if you like; nothing reads them."
+  ],
+  "leg": "short_loop_name",
+  "dcc": "houdini",
+  "dcc_version": "21.0.x",
+  "scene_file": "scenes/short_loop_name_v042.hip",
+  "scene": {
+    "up": "+Y",
+    "front": "-Z",
+    "units": "m",
+    "ground": "assets rest on the XZ plane at y = 0",
+    "axis_read_back": "bbox height of asset_a is the Y extent (1.84 m)"
+  },
+  "dressing_inventory": "asset_a members only; comparison copies, variants other than the default, probes and backdrops excluded",
+  "assets": [
+    {
+      "name": "asset_a",
+      "member_nodes": ["/obj/asset_a/body", "/obj/asset_a/handle", "/obj/asset_a/base"],
+      "excluded_helpers": [
+        {"node": "/obj/probe_dims", "why": "null with packed dimension prims, not part of the asset"},
+        {"node": "/obj/backdrop_grey", "why": "render backdrop"},
+        {"node": "/obj/lights", "why": "render lights"},
+        {"node": "/obj/cameras", "why": "matched cameras"}
+      ],
+      "hidden_in_saved_scene": [
+        {
+          "item": "/obj/asset_a/comparison_copy",
+          "kind": "node",
+          "why": "linked flipped comparison copy, tagged comparison_only",
+          "enabled_in_renders": ["final_hero"]
+        },
+        {
+          "item": "COL_variant_b",
+          "kind": "collection",
+          "why": "alternate variant; a dedicated collection shows the hide at a glance, prefer it over per-object hide flags (Blender: hide the collection, enable it per render layer)",
+          "enabled_in_renders": ["final_variant_b"]
+        }
+      ],
+      "variants": [
+        {"name": "default", "nodes": ["/obj/asset_a/body"], "is_default": true, "used_in_renders": ["final_hero", "final_side"]},
+        {"name": "variant_b", "nodes": ["/obj/asset_a/body_b"], "is_default": false, "used_in_renders": ["final_variant_b"]}
+      ],
+      "final_render_files": [
+        "renders/final_hero.png",
+        "renders/final_side.png",
+        "compare/final_contactsheet.jpg"
+      ],
+      "readback": {
+        "prim_count": 51544,
+        "point_count": 49812,
+        "bbox_min_m": [-0.31, 0.0, -0.22],
+        "bbox_max_m": [0.31, 1.84, 0.22],
+        "bbox_size_m": [0.62, 1.84, 0.44]
+      },
+      "per_object_readback": [
+        {"node": "/obj/asset_a/body", "prims": 40112, "points": 38900, "bbox_size_m": [0.62, 1.60, 0.44], "visible_in_saved_scene": true},
+        {"node": "/obj/asset_a/handle", "prims": 8210, "points": 7955, "bbox_size_m": [0.12, 0.48, 0.10], "visible_in_saved_scene": true},
+        {"node": "/obj/asset_a/base", "prims": 3222, "points": 2957, "bbox_size_m": [0.62, 0.08, 0.44], "visible_in_saved_scene": true}
+      ],
+      "members_sum_matches_totals": true
+    }
+  ],
+  "readback_totals": {
+    "prim_count": 51544,
+    "note": "the leg's own total from its final read-back; the sum of per_object_readback prims over the visible members"
+  }
+}

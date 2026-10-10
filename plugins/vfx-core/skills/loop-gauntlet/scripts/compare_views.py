@@ -31,7 +31,20 @@ For every view in the spec this script:
   6. Writes compare/<tag>_readback.json: path, byte size, modified time
      (ISO UTC), pixel size, comparison path, unique_values (distinct 8-bit
      grey levels in the render sampled at 256px wide), suspect_blank
-     (unique_values < 8), and the edge/difference metrics below.
+     (unique_values < 8), ref_aspect / render_aspect / ref_aspect_mismatch
+     (see below), and the edge/difference metrics below.
+
+ASPECT CHECK (observation 0061): the reference (after any crop) is letterboxed
+into render_size, never stretched. When its aspect differs from render_size's
+by more than 1 percent, the reference content fills only part of the frame
+while the render fills all of it, so that view's edge_iou and composition
+score are capped by the instrument, not by the builder. At startup the script
+prints every view's reference aspect against render_size, and the readback
+carries ref_aspect, render_aspect and ref_aspect_mismatch (true/false) next to
+suspect_blank. A mismatch is resolved by cropping the reference (the spec's
+crop field) or matching render_size, or stated in the view's notes with the
+instruction that the render must match the LETTERBOXED reference. The padding
+itself is unchanged.
 
 IMPORTANT: the comparison image is the judge. A human or agent scores the
 rubric by LOOKING at compare/<tag>_<view>_5.png (or the 3-panel image if the
@@ -62,6 +75,11 @@ from PIL import Image, ImageOps, ImageDraw, ImageFont, ImageFilter, ImageChops, 
 HEADER_H = 28
 JPEG_MAX_W = 2064
 BLANK_THRESHOLD = 8
+# Relative aspect difference above which a reference counts as mismatched with
+# render_size (observation 0061). 1 percent leaves a crop that is a few pixels
+# off its tile unflagged: the resulting black bars are under 1 percent of the
+# frame.
+ASPECT_TOLERANCE = 0.01
 
 # Edge-instrument defaults (observation 0042): a small blur suppresses
 # single-pixel sensor/render noise before FIND_EDGES, the threshold keeps
@@ -86,6 +104,26 @@ def load_spec(spec_path):
     except json.JSONDecodeError as exc:
         print("ERROR: spec file is not valid JSON: {0} ({1})".format(spec_path, exc), file=sys.stderr)
         sys.exit(2)
+
+
+def aspect_info(ref_size, crop, render_size):
+    """(ref_aspect, render_aspect, mismatch) for one view.
+
+    ref_size is the reference file's (w, h); crop is the spec's optional crop
+    box (x0, y0, x1, y1), which sets the size the reference has after cropping.
+    mismatch is True when the two aspects differ by more than ASPECT_TOLERANCE
+    (relative), meaning the letterbox bars are visible in the comparison.
+    """
+    if crop:
+        ref_w, ref_h = crop[2] - crop[0], crop[3] - crop[1]
+    else:
+        ref_w, ref_h = ref_size
+    render_aspect = render_size[0] / float(render_size[1])
+    if ref_w <= 0 or ref_h <= 0:
+        return 0.0, render_aspect, True
+    ref_aspect = ref_w / float(ref_h)
+    mismatch = abs(ref_aspect / render_aspect - 1.0) > ASPECT_TOLERANCE
+    return ref_aspect, render_aspect, mismatch
 
 
 def label_strip(width, text):
@@ -313,6 +351,21 @@ def main():
             print("  {0}".format(m), file=sys.stderr)
         sys.exit(2)
 
+    # Aspect check (observation 0061): print every reference's aspect against
+    # render_size before any work, so a letterboxed (score-capping) view
+    # announces itself at iteration one.
+    aspects = {}
+    for view in views:
+        with Image.open(ref_paths[view["name"]]) as probe:
+            ref_size = probe.size
+        crop_box = tuple(view["crop"]) if view.get("crop") else None
+        ref_aspect, render_aspect, mismatch = aspect_info(ref_size, crop_box, render_size)
+        aspects[view["name"]] = (ref_aspect, render_aspect, mismatch)
+        print("aspect {0}: reference{1} {2:.4f} vs render_size {3:.4f} -> {4}".format(
+            view["name"], " (cropped)" if crop_box else "", ref_aspect, render_aspect,
+            "MISMATCH (reference is letterboxed; the render must match the letterboxed reference)"
+            if mismatch else "ok"))
+
     readback = []
     computed = {}  # view name -> (ref_padded, render_img), reused for the contact sheet
     for view in views:
@@ -388,6 +441,9 @@ def main():
             "comparison_5_path": str(comp5_path),
             "unique_values": uv,
             "suspect_blank": suspect_blank,
+            "ref_aspect": round(aspects[name][0], 4),
+            "render_aspect": round(aspects[name][1], 4),
+            "ref_aspect_mismatch": aspects[name][2],
             "edge_iou": edge_metrics["edge_iou"],
             "edge_ref_covered": edge_metrics["edge_ref_covered"],
             "mean_signed_lum_diff": edge_metrics["mean_signed_lum_diff"],
@@ -397,8 +453,8 @@ def main():
             entry["edge_similarity"] = edge_similarity(ref_padded, render_img)
         readback.append(entry)
 
-        summary_bits = "unique_values={0} suspect_blank={1} edge_iou={2} edge_ref_covered={3} mean_signed_lum_diff={4} mean_abs_lum_diff={5}".format(
-            uv, suspect_blank, entry["edge_iou"], entry["edge_ref_covered"], entry["mean_signed_lum_diff"], entry["mean_abs_lum_diff"]
+        summary_bits = "unique_values={0} suspect_blank={1} ref_aspect_mismatch={2} edge_iou={3} edge_ref_covered={4} mean_signed_lum_diff={5} mean_abs_lum_diff={6}".format(
+            uv, suspect_blank, entry["ref_aspect_mismatch"], entry["edge_iou"], entry["edge_ref_covered"], entry["mean_signed_lum_diff"], entry["mean_abs_lum_diff"]
         )
         if args.metric:
             summary_bits += " edge_similarity={0}".format(entry["edge_similarity"])

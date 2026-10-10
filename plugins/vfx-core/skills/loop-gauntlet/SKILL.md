@@ -1,12 +1,13 @@
 ---
 name: loop-gauntlet
-description: Run a build-until-it-matches loop in a DCC - an agent builds a scene from reference images, renders matched camera views every iteration, compares each render to its reference side by side, scores it against a rubric the HUMAN authored, logs read-back evidence, and a stop rule decides when it is done. Use when asked to rebuild an environment or set from concept art or photos in Blender (Houdini and Unreal later), to "keep iterating until it matches", to write the prompt another agent (Codex, Claude Code, OpenCode) will run for such a loop, or to judge a finished run. Triggers on "loop gauntlet", "gauntlet loop", "match the reference", "build it from these refs", "keep checking against the ref", "iterate until it matches", "reference match loop", "astra loop".
+description: Runs a build-until-it-matches loop in a DCC - an agent rebuilds a scene from reference images, scoring renders against a human-authored rubric until a stop rule fires. Use for 'iterate until it matches', Blender set rebuilds from refs, or writing or judging such a loop prompt.
 user-invocable: true
 ---
 
 # Loop Gauntlet
 
-**Version:** 1.5.0 | **Created:** 2026-09-09 | **Last updated:** 2026-09-12 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
+**Version:** 1.6.1 | **Created:** 2026-09-09 | **Last updated:** 2026-10-10 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
+Version history: `reference/version_history.md`.
 
 A gauntlet loop is a builder that keeps going until an authored quality bar
 says stop. The pattern comes from the "builder plus fresh-eyes critic" idea
@@ -28,7 +29,10 @@ The lessons from that run are folded in below and in
    `magnific-local-upload`), copy to one folder, and SETTLE DISAGREEMENTS
    between references before the loop. Two refs that disagree on an object
    count or a hero prop shape cannot both be matched by one scene; the first
-   run lost a view to exactly that.
+   run lost a view to exactly that. Curate a lead-supplied set by allowlist.
+   A plan drawing or a generated "orthographic" elevation is a MEASURING
+   reference, never a view: a dimension table with one human-stated anchor,
+   bands classified as geometry or projection (`reference/contract_authoring.md` 1-3).
 2. **Matched views.** One camera per reference, named `CAM_<view>`. A tile
    inside a contact sheet is a view too: give the crop box in the spec so the
    comparison uses the tile, not the sheet. **Lighting feasibility
@@ -38,10 +42,16 @@ The lessons from that run are folded in below and in
    with that limitation. Two views of the same curved corridor from
    opposite ends cannot both show a sunlit wall from one sun; catching this
    before the loop starts (not after several lighting-only iterations)
-   turned out to require moving a camera, not tweaking the light.
+   turned out to require moving a camera, not tweaking the light. Trace each
+   lit EVENT (patch, streak, beam, glow) through the real openings: a
+   painted concept can need one light per event. Also check (`reference/contract_authoring.md`
+   4-6, 8): a reference whose aspect differs from `render_size` caps that
+   view (readback flag `ref_aspect_mismatch`); the human states the up axis
+   and units (`scene` block); solve a repeated-element hero view before building.
 3. **Rubric.** Fixed criteria scored 1 to 5 per view, a pass score, and a
    priority order for fixes (composition > scale > inventory > lighting >
    materials > detail). Materials are never polished while geometry is wrong.
+   Every element needs an instrument that can fail (Rubric instruments).
 4. **Evidence rule.** An iteration counts only when every render file has
    been read back (path, bytes, mtime, pixels) and the comparison image has
    been LOOKED AT. `compare_views.py` also flags a suspect-blank render;
@@ -53,7 +63,11 @@ The lessons from that run are folded in below and in
    four of six views were still improving. `min_iterations` is the floor
    below which a stall cannot fire: with composition fixed first, a builder
    plateaus on structure early, and one round-2 run stalled at iteration 5
-   before the materials tier had a single iteration of its own.
+   before the materials tier had a single iteration of its own. Size
+   `max_iterations` against the runner's remaining budget: estimate cost per
+   iteration by subject class (roughly 30k tokens for a prop, 75k for an
+   environment), record both numbers, require finals by the halfway
+   iteration, keep a `RESUME.md` (`reference/contract_authoring.md` 10).
 
 All five live in one spec file: `templates/gauntlet_spec.example.json`.
 The scripts read it, the prompt generator reads it, and a reviewer can diff it.
@@ -76,6 +90,40 @@ The scripts read it, the prompt generator reads it, and a reviewer can diff it.
   way as any other claim - verify before building to them (see the
   camera-projection fit method in `reference/blender_loop_patterns.md`).
 
+### Rubric instruments - an element nothing can fail is not scored
+
+An element the comparison cannot show is unverifiable, not verified
+(`reference/contract_authoring.md` 8-9). Mirror, glass and gloss: run a grey
+clay pass every iteration and read openings and voids off the clay only
+(colour can fake a hole and hide one). Thin negative features (joints,
+grooves, seams) need their own grey in the value study. Spaces no reference
+covers get unscored survey cameras; an element counts only when a pixel or a
+ray shows it; the render is gated on the geometry read-back. Lighting: box
+means give value balance, feature checks (brightest-1% centroid, mask IoU,
+peak and contrast) give placement - see `reference/lighting_match.md`,
+`scripts/scratch_luminance.py`, `scripts/solve_light_mix.py`.
+
+### Which subjects to loop
+
+Turned, extruded, lettered and engraved forms, and relief with a depth-map
+step, converge in about 6 iterations. Organic bodies (gloves, cloth, figures)
+do not: generate the base mesh BEFORE the loop. Parts no photograph shows are
+a stated assumption plus a verdict flag, never scored as matched
+(`reference/contract_authoring.md` 7).
+
+### Stand-in / grey-pass production mode
+
+When the output stands in for a downstream grey pass (per-material greys, no
+final shading) rather than a photo match: render a clay pass and judge
+silhouette, proportion, inventory and openings, not hue or finish; exclude
+the materials criterion from the total (never auto-pass it). The cap is the
+intended stop: legs stop at `max_iterations` (6 is enough for the classes
+above) and none stalls, so a MAX_ITERATIONS stop is expected, not a failure -
+say so in the brief. The template ships `min_iterations: 8`, so with a cap of
+6 the stall floor can never fire. Choose on purpose: leave `min_iterations`
+above the cap (stall off, the cap is the only stop) or lower it below the cap
+if a flat leg should end early.
+
 ## Workflow
 
 ### 1. Prepare references and the spec
@@ -94,6 +142,12 @@ cp .claude/skills/loop-gauntlet/templates/gauntlet_spec.example.json <working_fo
   from the client. Give real-world anchors (bench 0.45 m, door 2.1 m) so
   scale is derived, not guessed - and say which reference wins when two
   disagree.
+- `scene` (optional) `{"up_axis": "+Z"|"+Y", "units": "m"|"cm"}`, human-stated;
+  defaults Blender +Z m, Houdini +Y m, Unreal +Z cm; the prompt generator
+  reads it. A wrong axis renders identically through a camera on the same
+  axis, so read it back as a value in iteration one.
+- `lighting_target` (optional): `boxes` and per-event `features` (example template).
+- View `notes` carry the authoring verdicts: letterbox, crop, projection-only bands.
 
 ### 2. Generate the prompt (or run it yourself)
 
@@ -113,10 +167,15 @@ python for shell steps, reasoning effort high.
 
 ### 3. Run the loop - the per-iteration ritual
 
+**Step 0, before iteration one: read `reference/<dcc>_loop_patterns.md`**
+(fit-before-render, render queue, save rule). A harness that reads SKILL.md
+once never opens a reference file on its own, so the launch prompt must name
+it by absolute path.
+
 Every iteration, in this order, no skipping:
 
 ```bash
-# 1. render every matched view to renders/<tag>_<view>.png (DCC side; Blender pattern in reference/blender_loop_patterns.md)
+# 1. read back the geometry (a fault refuses the render), then render every matched view to renders/<tag>_<view>.png (DCC side; Blender pattern in reference/blender_loop_patterns.md)
 # 2. compare + read back (exit 2 if any render is missing)
 python <skill>/scripts/compare_views.py --spec gauntlet_spec.json --tag iter03
 # 3. LOOK at compare/iter03_<view>_5.png for every view (5 panels: reference,
@@ -127,9 +186,21 @@ python <skill>/scripts/log_iteration.py --spec gauntlet_spec.json --tag iter03
 # 5. fix the three biggest gaps in priority order, save an increment, go again
 ```
 
-Scores are the builder's judgement of the comparison image. A score that
-jumps without a visible change is a reason to look again. There is no
-numeric score on purpose.
+**Who scores (default since 1.6.0).** The builder self-scores each iteration
+from the comparison image (it needs the gaps to steer). A fresh, cheaper
+sub-agent scores every 3rd iteration and before any STOP: it sees only
+`compare/<tag>_5.png`, the references, the rubric and the readback numbers,
+never the builder's notes or scores, and writes
+`compare/<tag>_review_independent.json` in the review shape (extra keys are
+ignored by `log_iteration.py`). Its scores are the ones logged for that
+iteration; the builder may challenge once, with evidence, and the re-score
+stands. A thorough scorer takes 15-25 minutes (260-360k tokens) against
+seconds for render and compare, so pipeline it: start scorer N in the
+background, build N+1, log N when it lands, and wait for the last verdict
+before accepting a STOP. Bound its tool calls and point it at the readback
+files. Without sub-agents, a human scores before STOP. A score that jumps
+without a visible change is a reason to look again. There is no numeric
+score on purpose.
 
 `compare_views.py` writes two comparison instruments per view, each scoring
 what the rubric scores separately (observation 0042: a 50 percent blend
@@ -182,6 +253,12 @@ caught immediately.
   dimensions, first objects to touch next.
 - `python <skill>/scripts/stop_check.py --spec gauntlet_spec.json` prints
   the whole trajectory as a table - paste it into the session log.
+- Write `final_delivery.json` from `templates/final_delivery.example.json`,
+  generated from the final scene: axes, units, ground, member nodes or
+  objects, excluded helpers, objects hidden in the saved scene but enabled in
+  a named render (use a dedicated collection, not per-object hide flags), and
+  a per-object read-back (prims, bbox) the consumer can re-measure. Name the
+  "dressing inventory" in one line.
 
 ### Continuation and refinement runs
 
@@ -195,14 +272,10 @@ file's own last save, or the log has no stop decision, report and wait -
 do not open the file. A live DCC is shared state; opening a file is a
 destructive act on whatever is loaded.
 
-A refinement run that freezes some criteria (camera, scale, composition)
-still owes those criteria a real score against the reference, or they must
-be excluded from the total - never scored as an automatic pass. A round-3
-lesson: a rubric description of "4 = unchanged" rewarded an oversized
-plinth that had simply never been touched. A frozen criterion means
-"verify it did not drift" (a `matrix_world` compare, or a re-read of the
-same measurement used to accept it originally), not "assume it still
-matches."
+A refinement run that freezes criteria still owes them a real score (see
+Three more contract rules): "verify it did not drift" means a
+`matrix_world` compare or a re-read of the measurement used to accept it,
+not "assume it still matches."
 
 **Open follow-ups, not yet implemented in the scripts:** a spec `mode`
 field (`build` / `continue` / `refine`) so the generated prompt's opening
@@ -231,6 +304,22 @@ consequences for the operator: send a note at least two iterations before
 `no_improvement_streak` for that run when you know you plan to nudge partway
 through - a note that lands one iteration before a stall fires cannot save
 the run.
+
+**Writing a note.** A note outranks the brief, and a correct diagnosis does
+not make a prescription correct. A note that prescribes an ACTION carries a
+named restore point (exact values, object or saved version), a checkable
+target (arithmetic the builder can verify without a render) and the deciding
+metric. Phrase a structural claim read off a photo as "verify against the
+photo" unless certain, after looking at the comparison panel. When the
+geometry already scores 3, ask for a scratch comparison (build the
+alternative beside it, keep the better), not a replacement. If the metric
+falls after a note, withdraw it BY NAME in the next note and say which part
+was wrong.
+
+**Comparison benches.** Every operator input is part of the treatment: give
+every leg identical notes at the same iterations, or none (nudge in a
+labelled continuation), and log notes received per leg. A note only one leg
+got is a confound, recorded in the RESULT section.
 
 ### 5. Judge the run (human)
 
@@ -274,6 +363,14 @@ not enough, because the workspace-level handoff file is still there to be
 read. Before launching leg N, grep the harness's auto-loaded docs for leg
 N-1's object name to confirm nothing leaked.
 
+For a toolkit-versus-vanilla comparison, read back the skill the harness
+ACTUALLY loads and record this skill's version line from that copy before
+launch (Codex: plugin cache path and version; Claude Code: plugin cache or
+`.claude/skills` under the launch cwd; OpenCode: installed plugin dir). A
+cached install drifts silently from the repo. Record which skill and
+reference files each leg opened (grep its log): uptake is files read, not
+the profile name.
+
 Verified isolated Codex launch (2026-09-09, reconfirmed 2026-09-11): build a
 throwaway `CODEX_HOME` with its own `config.toml` (model, model_reasoning_effort,
 the Blender MCP server entry, `[features]` `hooks=true`, and a
@@ -290,6 +387,19 @@ codex --search exec --skip-git-repo-check --approve-for-me --add-dir <work> -i <
 read-only in this profile; writes still land because `--approve-for-me`
 grants them.
 
+**Parallel DCC chains on Codex.** Every `codex exec` starts ALL the MCP
+servers in its config, so a Houdini leg also drives the live Blender another
+chain is using. Disable the others per run (global flag, before `exec`):
+
+```
+codex --search -c mcp_servers.<other_dcc>.enabled=false exec --skip-git-repo-check --approve-for-me --add-dir <work> -i <ref> - < PROMPT.md
+```
+
+Launch-test first (~40 s): ask for READY, the MCP server list and a
+description of the attached image; the disabled servers must be absent. A
+six-iteration leg is about 40-50 minutes in either DCC, so two chains halve
+the wall clock.
+
 ## DCC specifics
 
 - **Blender:** `reference/blender_loop_patterns.md` - non-blocking render
@@ -299,11 +409,10 @@ grants them.
   EEVEE for the loop, incremental save before every render.
 - **Houdini:** `reference/houdini_loop_patterns.md` - fxhoudinimcp scene
   layout and version-save, matched cameras via focal/aperture read-back,
-  the Karma ROP render call with an honest UNVERIFIED list (XPU vs CPU,
-  PNG output from a ROP), MaterialX/displacement conventions, and the
+  the Karma ROP render call, MaterialX/displacement conventions, and the
   same fit-before-render and scratch-test rules carried over from Blender.
-  Not yet exercised by a real run - draft from workspace Houdini MCP facts,
-  not from a logged iteration.
+  Live-verified by real runs, no longer a draft. Houdini is Y-up: say so in
+  the `scene` block, never leave the axis to the builder.
 - **Unreal:** not exercised yet. The contract and scripts are DCC-agnostic;
   only the render step changes. Add a reference file when the first run
   happens.
@@ -316,8 +425,15 @@ grants them.
 | `scripts/compare_views.py` | renders vs references: 3-panel comparison (compatibility) plus a 5-panel instrument image (edge overlay, difference heatmap), contact sheet, readback JSON with suspect-blank flag, edge/difference metrics, optional edge_similarity metric |
 | `scripts/log_iteration.py` | appends the iteration to LOOP_LOG.md from review + readback, runs the stop rule |
 | `scripts/stop_check.py` | trajectory table and the continue/stop decision (dual stall rule) |
+| `scripts/scratch_luminance.py`, `scripts/solve_light_mix.py` | lighting_target read-back on scratch renders and the light-mix solve (method: `reference/lighting_match.md`) |
 | `scripts/test_loop_scripts.py` | self-test on synthetic images; run it after any edit |
+| `scripts/test_lighting_scripts.py` | self-test for the two lighting scripts (synthetic passes, no renders) |
+
+Requirements: Python 3 with Pillow; `scratch_luminance.py` and `solve_light_mix.py` also need numpy
+(OpenEXR is optional, for .exr passes - without it they say so and accept PNG or .npy).
 | `templates/gauntlet_spec.example.json` | the contract, as a file |
+| `templates/final_delivery.example.json` | the delivery record a consumer reads |
+| `reference/contract_authoring.md` | long-form contract authoring: reference prep, aspect and axis checks, routing table, rubric instruments, cap sizing |
 
 Every flag above exists in the script's `--help`; the self-test proves the
 three loop scripts agree on the spec shape.
@@ -345,50 +461,3 @@ as the match evidence, and treat the hero-engine pass as a new task.
 
 **Render call times out through MCP.** Use the timer-based queue pattern;
 poll the status JSON; never re-submit a render while one is running.
-
-## Version History
-
-- **1.5.0** (2026-09-12) - Houdini support: reference/houdini_loop_patterns.md (live-verified on 21.0.596) and a dcc=houdini branch in gauntlet_prompt.py; save-before-render rule.
-
-**v1.4.1** (2026-09-11) - Observation 0042: `compare_views.py` adds a
-5-panel instrument image (`compare/<tag>_<view>_5.png`, kept separate from
-the unchanged 3-panel image for compatibility) with an edge overlay
-(cyan=reference-only, red=render-only, white=coincident within 2px) and a
-black-blue-red-yellow difference heatmap, plus four new readback metrics
-(`edge_iou`, `edge_ref_covered`, `mean_signed_lum_diff`,
-`mean_abs_lum_diff`). SKILL.md step 3 now points at the 5-panel image and
-names the edge overlay / difference panel as the silhouette / exposure
-instruments respectively, with the blend panel demoted to a glance aid.
-
-**v1.4.0** (2026-09-11) - Props bench lessons. Added the operator nudge
-channel (`OPERATOR_NOTES.md`, printed by `log_iteration.py` every
-iteration, notes override the brief, timing rule against the stall
-streak) to SKILL.md and to the generated prompt. Added the harness
-isolation rule for legs that withhold information or repeat on the same
-harness, with the verified vanilla Codex launch line. Added three
-contract rules: a frozen criterion must still be scored or excluded from
-the total; a materials/render criterion needs a stated lighting target
-(world, key position, measured hero-surface luminance); human-authored
-counts in a brief are hypotheses to verify on the reference. Added a
-"Fit before render" camera-projection method and the render-pipeline
-scratch-test rule to `reference/blender_loop_patterns.md`.
-
-**v1.3.0** (2026-09-10) - Round-3 lessons. Lighting-feasibility pre-check
-added to the matched-views contract step. Composition moves above 0.5 m
-now require a row-profile or projection check, not a panel eyeball.
-Continuation/refinement runs get a shared-live-DCC opening check
-(is_dirty, mtime, other run's stop decision) and a rule that frozen
-criteria must still be scored, not auto-passed. Noted open follow-ups: a
-spec `mode` field and the generator emitting the dual stall rule verbatim
-(not yet implemented).
-
-**v1.2.0** (2026-09-10) - Round-2 bench lessons. `stop.min_iterations`
-floor for the stall rule (stop_check + prompt). Generator v1.1.0 fields
-`tools[]` and `spend_cap_usd` (tool-surface section, spend contract with
-zero-cost gate, balance read-back, GEN_LEDGER.md, no real marks). Rubric
-anchors recommended in every `desc` (they tightened self-calibration from
-a 40-point gap to within 5 points across two builders).
-
-**v1.0.0** (2026-09-09) - First release, from the Codex/Astra museum run
-(observation #26). Contract, prompt generator, comparison and logging
-scripts with the dual stall rule, Blender patterns, first-run lessons.

@@ -1,12 +1,12 @@
 ---
 name: unreal-project-preflight
-description: Verify and batch-fix the Unreal project prerequisites a plan depends on - plugins, project settings, editor config - as a mandatory Step 0 between plan approval and execution, so a build never dies mid-task on a disabled plugin or a setting that needs a restart. Use after any Unreal plan is approved, before the first build step, whenever a task will touch MegaPlants/PVE, PCG interops, Water, Landscape Patches, Movie Render Queue, cryptomatte, ImagePlate, Substrate, ray tracing or the MCP server, and whenever an error says a class, node or plugin is missing. Triggers on "preflight", "check the project settings", "which plugins do we need", "is nanite foliage on", "enable the plugin", "why is the class missing", "restart the editor", "project prerequisites", "before we build".
+description: Checks and batch-fixes the Unreal project prerequisites a plan needs (plugins, project settings, editor config) as Step 0 before building. Use once an Unreal plan is approved, before MegaPlants, PCG, MRQ or ImagePlate work, or when a class, node or plugin is missing.
 allowed-tools: Read,Bash,Grep,mcp__ue58-mcp__execute_python_code
 ---
 
 # unreal-project-preflight
 
-**Version:** 1.0.0
+**Version:** 1.0.1
 **Last Updated:** 2026-09-08
 **Dependencies:** Unreal Engine 5.8 (launcher install), Python 3.10+, curl on PATH, UE 5.8 native MCP on the project's configured port for `--live`
 **Status:** Production-ready (probed against two real 5.8 projects on 2026-09-08)

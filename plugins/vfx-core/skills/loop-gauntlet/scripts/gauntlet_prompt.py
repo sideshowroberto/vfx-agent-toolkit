@@ -22,6 +22,19 @@ the builder may use beyond the DCC (rendered as a section); "spend_cap_usd" -
 a number that switches on the spend contract (zero-cost gate, balance
 read-back, GEN_LEDGER.md, no real marks). Absent = round-1 prompt unchanged.
 
+Optional spec block "scene": {"up_axis": "+Z" | "+Y", "units": "m" | "cm"}.
+It sets the up axis and unit scale the prompt states to the builder (a builder
+left to choose its own builds the scene on its side - observation 0060). When
+absent the DCC default applies: blender +Z m, houdini +Y m, unreal +Z cm. For
+any other DCC with no scene block the prompt says the convention must be
+stated in the spec, and a warning is printed.
+
+Reference file: the prompt carries a numbered "Before iteration one" step that
+names reference/<dcc>_loop_patterns.md by ABSOLUTE path (observation 0047: a
+harness that reads SKILL.md once never opens a relative pointer). The path is
+the parent of the scripts dir plus reference/, so with the default scripts dir
+it is resolved from this file's own location.
+
 ASCII only. No paths are assumed; everything comes from the spec or flags.
 """
 import argparse
@@ -29,13 +42,48 @@ import json
 import sys
 from pathlib import Path
 
+# Scene convention defaults per DCC (observation 0060). +Z up floors lie in XY,
+# +Y up floors lie in XZ.
+SCENE_DEFAULTS = {
+    "blender": {"up_axis": "+Z", "units": "m"},
+    "houdini": {"up_axis": "+Y", "units": "m"},
+    "unreal": {"up_axis": "+Z", "units": "cm"},
+}
+FLOOR_PLANE = {"+Z": "XY", "+Y": "XZ"}
+UNIT_WORDS = {"m": "metre", "cm": "centimetre"}
+UNIT_ALIASES = {
+    "m": "m", "metre": "m", "metres": "m", "meter": "m", "meters": "m",
+    "cm": "cm", "centimetre": "cm", "centimetres": "cm",
+    "centimeter": "cm", "centimeters": "cm",
+}
+# DCCs that ship a reference/<dcc>_loop_patterns.md in the skill.
+KNOWN_REFERENCE_DCCS = ("blender", "houdini")
+
+# Launch rule for Codex, conditioned on the sandbox mode (observations 0120 and
+# 0122; windows-gotchas "Codex on Windows" and "cmd.exe /c" entries). The text
+# keeps the {dcc} placeholder - HARNESS_RULES is formatted later.
+CODEX_LAUNCH_RULE = (
+    "How you start programs depends on how this Codex run is sandboxed. Under a "
+    "sandboxed profile (-s read-only or workspace-write) Codex's own PowerShell cannot "
+    "create its transcript directory and dies, so run shell steps through cmd.exe or "
+    "python, and start a program from cmd as cmd /s /c \"\"<exe>\" <flags>\" (the "
+    "doubled outer quotes matter). Under an unsandboxed profile use the PowerShell call "
+    "operator, & \"<exe>\" <flags>, which is the proven form for a quoted exe path; plain "
+    "cmd /c breaks a command line that starts with a quoted exe and holds more quotes. "
+    "In both cases a headless {dcc} launch is ONE direct shell line with the exe path "
+    "and its flags together - never inside a Python subprocess call or a multi-line "
+    "script - and never name the {dcc} executable in any other command (a path check or "
+    "listing of it reads as a GUI launch and the policy hook refuses it)."
+)
+
 HARNESS_RULES = {
     "codex": (
         "Work in the {dcc} session that is already open and connected through the "
         "{dcc} MCP server so the operator can watch the scene change; do not launch "
         "extra {dcc} instances (the policy hook refuses app launches anyway). {script_note} "
-        "Keep those scripts ASCII-only with raw-string Windows paths. For any shell step use cmd.exe or "
-        "python, not PowerShell. The reference images are attached to this message "
+        "Keep those scripts ASCII-only with raw-string Windows paths. "
+        + CODEX_LAUNCH_RULE +
+        " The reference images are attached to this message "
         "and also on disk at the paths below; re-open them with your image viewer "
         "whenever you need to. Infer intent from this brief and see the task through; "
         "if a question is genuinely blocking, ask it and keep working on everything "
@@ -86,16 +134,98 @@ def fmt_path(p):
     return str(p).replace("/", "\\") if "\\" in str(p) or ":" in str(p) else str(p)
 
 
+def normalise_axis(value):
+    s = str(value).strip().upper().replace(" ", "")
+    if s in ("Z", "+Z"):
+        return "+Z"
+    if s in ("Y", "+Y"):
+        return "+Y"
+    sys.stderr.write("spec scene.up_axis must be \"+Z\" or \"+Y\" (got %r)\n" % (value,))
+    sys.exit(2)
+
+
+def normalise_units(value):
+    u = UNIT_ALIASES.get(str(value).strip().lower())
+    if u is None:
+        sys.stderr.write("spec scene.units must be \"m\" or \"cm\" (got %r)\n" % (value,))
+        sys.exit(2)
+    return u
+
+
+def scene_convention(spec):
+    """Return (sentence, warning) for the up axis and unit scale.
+
+    Source order: the spec's optional "scene" block, then the DCC default. When
+    either value is still unknown (a DCC with no default and no scene block)
+    the sentence tells the builder the convention must be stated in the spec
+    and asks it to stop and ask, and warning is a stderr message for the human
+    generating the prompt. warning is None when the convention is fully known.
+    """
+    dcc = str(spec["dcc"])
+    block = spec.get("scene")
+    if block is None:
+        block = {}
+    if not isinstance(block, dict):
+        sys.stderr.write("spec 'scene' must be an object like {\"up_axis\": \"+Y\", \"units\": \"m\"}\n")
+        sys.exit(2)
+    defaults = SCENE_DEFAULTS.get(dcc.lower(), {})
+    axis = normalise_axis(block["up_axis"]) if block.get("up_axis") else defaults.get("up_axis")
+    units = normalise_units(block["units"]) if block.get("units") else defaults.get("units")
+    missing = [name for name, val in (("up_axis", axis), ("units", units)) if not val]
+    if missing:
+        sentence = ("The %s of this scene %s NOT stated: there is no default for %s and the "
+                    "spec has no \"scene\" block. The up axis and unit scale must be stated in "
+                    "the spec - stop and ask the operator for them before you model anything, "
+                    "and do not choose your own."
+                    % (" and ".join("up axis" if n == "up_axis" else "unit scale" for n in missing),
+                       "is" if len(missing) == 1 else "are", dcc))
+        warning = ("warning: up axis / unit scale not defined for dcc '%s' - add a spec block "
+                   "\"scene\": {\"up_axis\": \"+Z\"|\"+Y\", \"units\": \"m\"|\"cm\"} (missing: %s)"
+                   % (dcc, ", ".join(missing)))
+        return sentence, warning
+    sentence = ("Scene convention, stated by the operator and not yours to change: %s is up, "
+                "floors lie in the %s plane, 1 unit = 1 %s. Build to it from the first object "
+                "and report the up axis and the unit scale in your iteration-one geometry "
+                "readback (a scene built on the wrong axis renders upright through a camera "
+                "built on the same wrong axis, so the comparison images cannot catch it)."
+                % (axis, FLOOR_PLANE[axis], UNIT_WORDS[units]))
+    return sentence, None
+
+
+def reference_file(spec, scripts_dir):
+    """Absolute path of reference/<dcc>_loop_patterns.md, or None.
+
+    Derived from the scripts dir (its parent holds reference/), so with the
+    default scripts dir it is resolved from this file's own location. Returned
+    when the file exists on this machine or the DCC is one the skill ships a
+    reference for (the runner's copy may not be visible from here).
+    """
+    dcc = str(spec["dcc"]).lower()
+    if not dcc or not dcc.replace("_", "").isalnum():
+        return None
+    path = Path(scripts_dir).absolute().parent / "reference" / ("%s_loop_patterns.md" % dcc)
+    if path.exists() or dcc in KNOWN_REFERENCE_DCCS:
+        return path
+    return None
+
+
 def build(spec, spec_path, harness, scripts_dir):
     dcc = spec["dcc"]
+    ref_file = reference_file(spec, scripts_dir)
+    # The pointer to the reference file is a numbered step in the loop section
+    # (absolute path); the note here only says where to find it, never a
+    # relative path a harness that read SKILL.md once would not follow.
     if dcc.lower() == "houdini":
-        script_note = ("Use Python (hou) scripts through the MCP execute tool for every "
-                       "change; see reference/houdini_loop_patterns.md for scene layout, "
-                       "camera and Karma render conventions.")
+        script_note = "Use Python (hou) scripts through the MCP execute tool for every change."
+        if ref_file:
+            script_note += (" The Houdini reference named under 'Before iteration one' below "
+                            "covers scene layout, camera and Karma render conventions.")
     else:
-        script_note = ("Use bpy scripts through the MCP execute tool for every change; "
-                       "see reference/blender_loop_patterns.md for the render-queue and "
-                       "material patterns.")
+        script_note = "Use bpy scripts through the MCP execute tool for every change."
+        if ref_file:
+            script_note += (" The reference named under 'Before iteration one' below covers "
+                            "the render-queue and material patterns.")
+    scene_sentence, _scene_warning = scene_convention(spec)
     wf = spec["working_folder"]
     ref_dir = spec["reference_dir"]
     w, h = spec["render_size"]
@@ -140,7 +270,7 @@ def build(spec, spec_path, harness, scripts_dir):
     add("")
     add("## Ground rules for the build")
     add("")
-    add("Real-world metres, Z up. One collection per zone plus CAMERAS and LIGHTS, and every "
+    add("%s One collection per zone plus CAMERAS and LIGHTS, and every "
         "object named for what it is. Before creating anything, read back what already "
         "exists so you never end up with auto-numbered duplicates; before re-running a "
         "creation script, check whether the objects are already there and update them "
@@ -150,7 +280,7 @@ def build(spec, spec_path, harness, scripts_dir):
         "parametric geometry that can be edited later. Blockout materials are simple "
         "shaders in the right value and hue family; refine them only after geometry and "
         "cameras match. Use the fast engine for loop renders and the hero engine only for "
-        "the final pass.")
+        "the final pass." % scene_sentence)
     add("")
     add("## Constraints (hard)")
     add("")
@@ -195,10 +325,22 @@ def build(spec, spec_path, harness, scripts_dir):
         "iteration. A note in that file overrides this brief where the two conflict."
         % fmt_path(Path(wf) / "OPERATOR_NOTES.md"))
     add("")
-    add("Start by writing SCENE_BRIEF.md in the working folder: the plan with your chosen "
-        "dimensions, the camera list (%s, each with the reference it matches), and the "
-        "order you will build in. Then build the blockout in one pass, place the cameras "
-        "with focal lengths and heights estimated from each reference, and enter the loop." % ", ".join("CAM_" + n for n in view_names))
+    scene_brief_body = ("SCENE_BRIEF.md in the working folder: the plan with your chosen "
+                        "dimensions, the camera list (%s, each with the reference it matches), and the "
+                        "order you will build in. Then build the blockout in one pass, place the cameras "
+                        "with focal lengths and heights estimated from each reference, and enter the loop."
+                        % ", ".join("CAM_" + n for n in view_names))
+    if ref_file:
+        add("Before iteration one, in this order:")
+        add("")
+        add("1. Read %s before iteration one. It holds the %s patterns for scene layout, the "
+            "render call, hygiene read-backs, and the fit-before-render and scratch-test rules; "
+            "follow them instead of rediscovering them by rendering. A reference file you "
+            "have not opened is not part of the method you are using."
+            % (fmt_path(ref_file), dcc))
+        add("2. Write %s" % scene_brief_body)
+    else:
+        add("Start by writing %s" % scene_brief_body)
     add("")
     add("Every iteration follows the same shape, tagged iter01, iter02, ...:")
     add("")
@@ -279,6 +421,17 @@ def main():
     print("spec        : %s" % spec_path, file=sys.stderr)
     print("scripts dir : %s" % scripts_dir, file=sys.stderr)
     print("harness     : %s" % args.harness, file=sys.stderr)
+    ref_file = reference_file(spec, scripts_dir)
+    if ref_file is None:
+        print("reference   : none for dcc '%s' (no step emitted)" % spec["dcc"], file=sys.stderr)
+    else:
+        print("reference   : %s" % ref_file, file=sys.stderr)
+        if not ref_file.exists():
+            sys.stderr.write("warning: %s not found on this machine; the prompt still names it "
+                             "(check the runner's copy)\n" % ref_file)
+    _sentence, scene_warning = scene_convention(spec)
+    if scene_warning:
+        sys.stderr.write(scene_warning + "\n")
 
     text = build(spec, spec_path, args.harness, scripts_dir)
     try:

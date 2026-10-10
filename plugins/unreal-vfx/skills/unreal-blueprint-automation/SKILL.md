@@ -1,12 +1,12 @@
 ---
 name: unreal-blueprint-automation
-description: Automate Blueprint creation, component addition, property configuration, and compilation in Unreal Engine 5.8 using phased execution pattern. Use when creating Blueprints, adding components, setting properties, debugging Blueprint crashes, or when user mentions blueprint, create blueprint, compile blueprint, add component, blueprint property, set component property, blueprint automation.
+description: Creates and compiles Blueprints in Unreal Engine 5.8 via Python using phased Silent Execution (components, properties, compile). Use when creating a Blueprint, adding components, setting Blueprint properties, or debugging Blueprint compile crashes.
 allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool
 ---
 
 # unreal-blueprint-automation
 
-**Version:** 2.0.1
+**Version:** 2.0.2
 **Last Updated:** 2026-09-08
 **Dependencies:** Unreal Engine 5.8+, UE 5.8 native MCP (HTTP, port 8000), VibeUE plugin (optional)
 **Status:** Production Ready

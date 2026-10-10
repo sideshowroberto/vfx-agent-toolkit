@@ -1,12 +1,12 @@
 ---
 name: blender-api-compatibility
-description: Blender API compatibility across versions (4.2 -> 5.1+), breaking changes detection, and migration strategies. Use for API errors, version migration, breaking changes, or when user mentions "compatibility," "breaking change," "migration," "API error," or "doesn't work in newer Blender."
+description: Diagnoses and migrates Blender Python API breakage across versions 4.2 to 5.1+ (EEVEE_NEXT, renamed modifier types and BSDF inputs, VSE strips). Use when a bpy script errors on a newer Blender, or for breaking changes and migration.
 allowed-tools: Read,Write
 ---
 
 # Blender API Compatibility Skill
 
-**Version:** 3.1.0
+**Version:** 3.1.1
 **Last Updated:** 2026-09-02
 **Dependencies:** Blender 5.1+
 

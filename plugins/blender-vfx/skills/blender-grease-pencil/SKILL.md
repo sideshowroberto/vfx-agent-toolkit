@@ -1,12 +1,12 @@
 ---
 name: blender-grease-pencil
-description: 2D animation and Grease Pencil workflows in Blender. Use for 2D animation, hand-drawn animation, mixed media, stroke creation, layer management, or when user mentions "2D," "grease pencil," "hand drawn," "traditional animation," "NPR rendering," or "stylized animation."
+description: Builds 2D and mixed-media animation in Blender with Grease Pencil - strokes, layers, frame-by-frame animation, 2D/3D integration, NPR rendering. Use for 2D or hand-drawn animation, traditional animation, or any grease pencil request.
 allowed-tools: Read,Write
 ---
 
 # Blender Grease Pencil Skill
 
-**Version:** 2.0.0
+**Version:** 2.0.1
 **Last Updated:** 2026-06-10
 **Dependencies:** Blender 5.1+
 

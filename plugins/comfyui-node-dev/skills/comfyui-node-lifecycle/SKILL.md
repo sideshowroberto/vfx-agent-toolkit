@@ -1,6 +1,6 @@
 ---
 name: comfyui-node-lifecycle
-description: ComfyUI node execution lifecycle - caching, fingerprint_inputs/IS_CHANGED, validate_inputs/VALIDATE_INPUTS, check_lazy_status, execution order. Use when debugging execution, implementing caching control, input validation, or understanding execution flow.
+description: Explains the ComfyUI custom-node execution lifecycle - caching, fingerprint_inputs/IS_CHANGED, validate_inputs, check_lazy_status, execution order. Use when debugging node execution, controlling caching, or adding input validation.
 ---
 
 # ComfyUI Node Execution Lifecycle

@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Bash
 
 # houdini-solaris-usd
 
-**Version:** 1.0.0
-**Last Updated:** 2026-02-15
+**Version:** 1.1.1
+**Last Updated:** 2026-10-10
 **Dependencies:** Houdini 20+, USD libraries
 
 ---
@@ -699,15 +699,20 @@ USD ROP
 - Archive Type: USDZ (compressed, portable)
 ```
 
+**See also:** `reference/usd_export_checks.md` - loose points export as a Points prim that Karma draws as spheres (list non-Mesh gprims before rendering); re-parenting a mesh must move its GeomSubsets with it (verify per face with `ComputeBoundMaterial`); an invalid `savestyle` token leaves a ~700-byte stub silently.
+
 ---
 
 ## REFERENCE DOCUMENTATION
 
 ### **Progressive Disclosure Pattern**
 
-This skill ships no separate reference guides: the technique sections above
-are the reference. Use the Houdini MCP `search_help` / `get_help_page` tools
-for SideFX's own documentation.
+Export and restructure checks live in `reference/usd_export_checks.md`; the technique
+sections above are the rest of the reference. Use the Houdini MCP `search_help` /
+`get_help_page` tools for SideFX's own documentation.
+
+Karma lights: `reference/karma_lights.md` - how Houdini light and ROP parameters land as UsdLux
+attributes (cone angle and softness, distance-squared falloff, double-sided area lights, x 2 pi intensity).
 
 ---
 
@@ -798,6 +803,10 @@ USD export failed
 
 ## VERSION HISTORY
 
+**v1.1.1** (2026-10-10) - Karma light mapping facts (obs 113): new reference/karma_lights.md, pointer added
+
+**v1.1.0** (2026-10-09) - USD export/restructure checks (obs 123, 146, 101): new reference/usd_export_checks.md
+
 **v1.0.0** (2026-02-15) - Initial Release
 - USD stage creation and SOP import
 - Layer composition and override workflows
@@ -818,6 +827,6 @@ USD export failed
 
 **Skill Status:** Production Ready
 **Maintainer:** VFX Pipeline Development
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-10-10
 **Dependencies:** Houdini 20+, USD libraries
 **Tested With:** Houdini 20.0, Houdini 20.5, USD 23.11

@@ -1,12 +1,12 @@
 ---
 name: blender-addon-development
-description: Blender addon development - operator design, UI panels, bpy.props, poll() methods, and registration systems. Use when creating addons, building operators, designing UI panels, or when user mentions "addon," "operator," "UI panel," or "Blender Python."
+description: Guides Blender addon development - operators, UI panels, bpy.props, poll() methods and registration. Use when creating a Blender addon, building an operator or UI panel, or writing Blender Python for a tool.
 allowed-tools: Read,Write
 ---
 
 # Blender Addon Development Skill
 
-**Version:** 2.1.0
+**Version:** 2.1.1
 **Last Updated:** 2026-06-10
 **Dependencies:** Blender 5.1+, Python 3.11+
 

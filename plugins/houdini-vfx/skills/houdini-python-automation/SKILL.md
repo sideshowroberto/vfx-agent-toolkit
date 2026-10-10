@@ -1,13 +1,13 @@
 ---
 name: houdini-python-automation
-description: "Automate Houdini workflows using Python (HOM - Houdini Object Model) including node creation, parameter manipulation, scene management, and batch processing. Use when scripting Houdini workflows. Triggers: houdini python, hom, python script, automate houdini, batch process"
+description: "Automates Houdini with Python (HOM) - node creation, parameter manipulation, scene management and batch processing. Use when scripting Houdini workflows, e.g. 'houdini python', 'hom script', 'automate houdini' or batch processing hip files."
 allowed-tools: Read,Write,Bash
 ---
 
 # houdini-python-automation
 
-**Version:** 1.0.0
-**Last Updated:** 2026-02-15
+**Version:** 1.1.1
+**Last Updated:** 2026-10-09
 **Dependencies:** Houdini 20+, Python 3.9+
 
 ---
@@ -636,9 +636,11 @@ for frame, value in [(1, 0.0), (50, 5.0), (100, 2.0)]:
 
 ### **Progressive Disclosure Pattern**
 
-This skill ships no separate reference guides: the technique sections above
-are the reference. Use the Houdini MCP `search_help` / `get_help_page` tools
-for SideFX's own documentation.
+Two guides live in `reference/`: `geometry_export.md` (hython export traps: fake
+`saveToFile` formats, ROP menu defaults, missing bulk calls) and
+`verify_through_display_node.md` (read back through the display/render-flag node). The
+technique sections above are the rest of the reference. Use the Houdini MCP
+`search_help` / `get_help_page` tools for SideFX's own documentation.
 
 ---
 
@@ -653,7 +655,8 @@ Before finalizing Python automation, verify:
 - [x] Parameters set without errors
 - [x] Connections established correctly
 - [x] Geometry modifications applied (if applicable)
-- [x] Output files created in expected locations
+- [x] Output files created in expected locations AND opened to check their format (`saveToFile` writes a fake file for unknown extensions - `reference/geometry_export.md`)
+- [x] Result read back through the node carrying the display/render flag, not only the edited node (`reference/verify_through_display_node.md`)
 - [x] Scene saved if changes should persist
 - [x] Error handling implemented for robustness
 
@@ -728,6 +731,8 @@ Python automation failed
 
 ## VERSION HISTORY
 
+**v1.1.0** (2026-10-09) - hython geometry-export traps (obs 101) and verify-through-display-node (obs 149): new reference/geometry_export.md, reference/verify_through_display_node.md
+
 **v1.0.0** (2026-02-15) - Initial Release
 - Node creation and connection workflows
 - Parameter manipulation and animation
@@ -746,6 +751,6 @@ Python automation failed
 
 **Skill Status:** Production Ready
 **Maintainer:** VFX Pipeline Development
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-10-09
 **Dependencies:** Houdini 20+, Python 3.9+
 **Tested With:** Houdini 20.0, Houdini 20.5

@@ -1,6 +1,6 @@
 ---
 name: comfy-cli-skills
-description: Install comfy-cli's bundled agent skills (comfy, comfy-build, comfy-debug, comfy-deploy, comfy-director, comfy-relay) into any harness and apply this toolkit's zero-cost validation gate and credit audit around paid ComfyUI runs. Use when setting up comfy-cli for an agent, when the comfy skills are missing from the skill catalog, or before submitting a workflow that bills partner-node credits.
+description: Installs comfy-cli's bundled agent skills into any harness and sets the zero-cost validate gate and credit audit for paid ComfyUI runs. Use when setting up comfy-cli, when comfy skills are missing, or before a workflow run that bills partner-node credits.
 ---
 
 # comfy-cli skills
@@ -33,9 +33,18 @@ moment a graph is accepted. Two zero-cost steps come first, every time:
 1. **Validate, then print without posting.** `comfy validate --workflow api.json
    --where local` must be clean, then `comfy run --workflow api.json
    --print-prompt --json` logs the exact graph. This catches wrong input names
-   and DynamicCombo dot-path mistakes for free.
+   and DynamicCombo dot-path mistakes for free. "Clean" means `valid=true`,
+   `error_count=0` and every warning READ, not merely counted. Known false
+   positive (comfy validate 1.11.1): an `edge_type_mismatch` warning when the
+   expected input is a type UNION that already contains the produced type
+   (e.g. "expects MESH,FILE_3D_GLB,...,FILE_3D but X produces FILE_3D_GLB") -
+   the validator compares the whole comma-joined union as one string. That one
+   warning is acceptable; any other warning stops the run. The validator can
+   also be wrong the other way (pass a graph the server rejects), so the real
+   pass is the expected output file on disk after the run, never the status.
 2. **Read the balance before and after.** `GET https://api.comfy.org/customers/balance`
-   with header `X-API-KEY: <key>`; `effective_balance_micros` / 100 = credits.
+   with header `X-API-KEY: <key>`; `effective_balance_micros` is US CENTS despite the name:
+   value / 100 = USD, USD x 211 = credits (docs.comfy.org billing reference; comfy-cli PR #926).
    Reconcile the delta against the price badges. A larger drop than predicted
    means stop and find what else billed.
 

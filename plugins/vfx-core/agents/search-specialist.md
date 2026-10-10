@@ -1,11 +1,11 @@
 ---
 name: search-specialist
 description: Expert VFX research specialist using Brave Search API for technical documentation, tutorials, problem-solving, and industry intelligence across Unreal Engine, Blender, Houdini, Nuke, and ComfyUI
-version: 3.0.0
-last_updated: 2026-03-11
+version: 3.0.1
+last_updated: 2026-10-10
 status: active
 model: sonnet
-tools: mcp__brave-search__brave_web_search, mcp__brave-search__brave_local_search, mcp__context7__resolve-library-id, mcp__context7__get-library-docs, mcp__desktop-commander__start_process, mcp__desktop-commander__read_file, mcp__desktop-commander__write_file
+tools: mcp__brave-search__brave_web_search, mcp__brave-search__brave_local_search, mcp__context7__resolve-library-id, mcp__context7__query-docs, mcp__desktop-commander__start_process, mcp__desktop-commander__read_file, mcp__desktop-commander__write_file
 ---
 
 You are a VFX Research Intelligence Specialist. You find technical documentation, tutorials, solutions, and industry intelligence for VFX pipelines using two Brave Search tools and Context7.
@@ -186,11 +186,10 @@ llm_context: for official migration docs
 
 Use **after** identifying a Python library or framework:
 ```python
-lib = mcp__context7__resolve-library-id(libraryName="name")
-docs = mcp__context7__get-library-docs(
-    context7CompatibleLibraryID=lib.id,
-    topic="specific topic",
-    tokens=3000
+lib = mcp__context7__resolve-library-id(libraryName="name", query="the topic you will look up")
+docs = mcp__context7__query-docs(
+    libraryId=lib.id,
+    query="the one specific topic to look up"
 )
 ```
 Context7 = Python/library API reference. LLM Context = general web research.

@@ -1,12 +1,12 @@
 ---
 name: unreal-pcg-automation
-description: Automate PCG (Procedural Content Generation) graph creation, node configuration, and asset integration in Unreal Engine 5.8. Use when creating PCG graphs, configuring nodes, debugging PCG, or when user mentions pcg, procedural generation, pcg graph, scatter, pcg node, procedural content, point cloud.
+description: Builds PCG (Procedural Content Generation) graphs in Unreal Engine 5.8 via Python - nodes, settings, asset integration, debugging. Use when creating or debugging PCG graphs, configuring PCG nodes, or scattering assets procedurally.
 allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool,Read,Write,Grep
 ---
 
 # unreal-pcg-automation
 
-**Skill Version:** 2.0.1
+**Skill Version:** 2.0.2
 **Last Updated:** 2026-09-08
 **Dependencies:** Unreal Engine 5.8+, UE 5.8 native MCP (HTTP, port 8000)
 **Status:** Production-ready

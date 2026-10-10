@@ -1,6 +1,6 @@
 ---
 name: maya-materials
-description: Create and assign materials in Maya via MCP - Arnold (aiStandardSurface), Lambert, Blinn, and USD Preview Surface. Use for shader creation, texture assignment, material assignment to geometry, and look dev workflows. Triggers on "maya material", "assign shader", "aiStandardSurface", "maya texture", "look dev".
+description: Creates and assigns Maya materials via MCP - Arnold aiStandardSurface, Lambert, Blinn and USD Preview Surface. Use for shader creation, texture assignment, assigning materials to geometry or look dev in Maya.
 allowed-tools: Read,Write,Bash
 ---
 

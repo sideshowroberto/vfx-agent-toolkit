@@ -1,12 +1,12 @@
 ---
 name: development-management
-description: Specification-Driven Development (SDD) workflows for VFX pipeline using spec-kit methodology. Covers agent creation, constitutional governance, roadmaps, specs, and validation. Use when user requests development work, agent audits, skill creation, constitutional compliance checks, or mentions 'how do I create agent', 'audit agents', 'spec-kit', 'development process', 'validate this', 'create constitution', 'governance rules'.
+description: Runs Specification-Driven Development (spec-kit) workflows - agent creation, constitutional governance, roadmaps, specs and validation. Use when creating or auditing agents, writing a constitution, or validating compliance.
 allowed-tools: Read,Write,Edit
 ---
 
 # Development Management
 
-**Version:** 1.0.0
+**Version:** 1.0.1
 **Last Updated:** 2025-12-03
 **Status:** Production-ready
 **Dependencies:** VFX_SKILL_CONSTITUTION.md v2.0.0, spec-kit templates

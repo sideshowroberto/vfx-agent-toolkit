@@ -1,13 +1,13 @@
 ---
 name: blender-materials-shaders
-description: Shader nodes, PBR materials, and procedural textures in Blender. Use for material creation, shader setups, PBR workflows, cross-engine compatibility (EEVEE_NEXT/Cycles), or when user mentions "material," "shader," "PBR," "texture," "node tree," or "Principled BSDF."
+description: Creates Blender shader node trees, PBR materials and procedural textures, with EEVEE_NEXT and Cycles compatibility notes. Use for material creation, shader setups, Principled BSDF inputs, or procedural texturing of parametric geometry.
 allowed-tools: Read,Write
 ---
 
 # Blender Materials & Shaders Skill
 
-**Version:** 2.1.0
-**Last Updated:** 2026-09-10
+**Version:** 2.1.2
+**Last Updated:** 2026-10-09
 **Dependencies:** Blender 5.1+
 
 ---
@@ -36,6 +36,22 @@ bsdf.inputs['Base Color'].default_value = (0.8, 0.2, 0.2, 1.0)
   Noise texture on Generated coordinates stretched into streaks on
   120-segment arc rings and long boxes; Object coordinates are metric and
   isotropic because all objects share the world origin.
+- **Caveat: Object coordinates are relative to the object, so changing the
+  object's transform changes the material.** Applying transforms, joining,
+  realising instances, baking to world space or re-centring the origin
+  silently changes the scale, orientation or phase of every pattern fed by
+  Texture Coordinate > Object - no error, and the geometry numbers (face
+  count, bounding box, part count) still pass. Two relatives: a procedural
+  node with an unlinked Vector input uses Generated coordinates (the mesh
+  bounding box), and Geometry > Position is world space. Before applying or
+  baking, list the materials that read any of these (check inside node
+  groups too). Either keep the transform, or store the evaluated
+  object-space coordinates as a FLOAT_VECTOR point attribute BEFORE the
+  bake and replace every linked Object output with the Vector output of an
+  Attribute node (type Geometry, that attribute name). Read-back: render
+  the same camera rig from the source and from the result and compare the
+  images, or sample one pixel - a mean absolute difference of 1.1e-3 against
+  1.5e-4 once fixed was invisible by eye at 512 px and was the only signal.
 - **Brick texture reads the X/Y of its input vector - it is planar in that
   plane, not aligned to the surface it is applied to.** On a wall lying in
   the YZ plane a Brick texture produces blotches instead of coursing. Build
@@ -305,10 +321,17 @@ if not output.inputs['Surface'].is_linked:
 - [ ] Material Output node connected
 - [ ] Viewport shading = `MATERIAL` (not `MATERIAL_PREVIEW`)
 - [ ] Test render validates appearance
+- [ ] Before applying/joining/baking transforms: materials reading Object / Generated / Position coordinates listed, and a before/after render (or sampled pixel) matches
 
 ---
 
 ## VERSION HISTORY
+
+**v2.1.1** (2026-10-09) - Observation 98: applying, joining, realising or
+baking transforms silently changes materials that read Object-space
+coordinates (also Generated and Geometry Position); caveat added to the
+procedural-texturing section with the attribute rewire and a same-rig render
+diff as the read-back, plus one validation checklist line.
 
 **v2.1.0** (2026-09-10) - Loop-gauntlet lessons: procedural textures need
 Object coordinates (not Generated) on parametric geometry, Brick texture is

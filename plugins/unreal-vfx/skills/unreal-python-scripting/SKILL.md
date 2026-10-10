@@ -1,13 +1,13 @@
 ---
 name: unreal-python-scripting
-description: Python API patterns for Unreal Engine 5.8 including Blueprint spawning, material workflows, component manipulation, and API limitations workarounds. Use when scripting Unreal, creating Python tools, encountering API limitations, or when user mentions unreal python, blueprint spawning, material instance, component properties, python api limitations, ue python.
+description: Gives Unreal Engine 5.8 Python API patterns - Blueprint spawning, material instances, component properties, workarounds for API limits. Use when scripting Unreal in Python, writing Unreal Python tools, or hitting an Unreal Python API limitation.
 allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool,Read,Write,Grep
 ---
 
 # Unreal Python Scripting
 
-**Version:** 2.0.1
-**Last Updated:** 2026-09-08
+**Version:** 2.0.3
+**Last Updated:** 2026-10-09
 **Target:** Unreal Engine 5.8+
 **Dependencies:** unreal Python module (built-in), UE 5.8 native MCP (HTTP, port 8000)
 
@@ -20,6 +20,11 @@ allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool,Read,
 All Python code runs via `mcp__ue58-mcp__execute_python_code(code=...)` which executes directly in the UE editor process. VibeUE toolsets are also available via `mcp__ue58-mcp__call_tool(toolset_name=..., tool_name=..., arguments={...})`.
 
 Use `mcp__ue58-mcp__discover_python_module(module_name="unreal")` to introspect available Python API.
+
+- **An execute call times out at about 30 s** ("Python execution exceeded
+  30000ms") **while the script keeps running in the editor.** Split long work
+  into short calls, and after a timeout read the state back instead of
+  re-running - a timeout is not a failure.
 
 ---
 
@@ -284,6 +289,9 @@ asset = tools.create_asset(
 ---
 
 ## Version History
+
+**v2.0.2** (2026-10-09) - Observation 140: MCP execute calls time out at about
+30 s while the script keeps running; split long work, read state back.
 
 **v2.0.0** (2026-07-06) - UE 5.8 Migration
 - Migrated from UE 5.5 to UE 5.8

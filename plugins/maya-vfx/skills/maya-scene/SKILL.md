@@ -1,6 +1,6 @@
 ---
 name: maya-scene
-description: Query and manipulate Maya scene objects, transforms, hierarchy, and attributes via MCP commandPort. Use for listing scene contents, creating geometry, setting transforms, parenting objects, selecting, importing/exporting FBX. Triggers on "maya scene", "list objects", "create sphere", "cmds.ls", "FBX export from Maya".
+description: Queries and edits a live Maya scene via the MCP commandPort - objects, transforms, hierarchy, attributes, selection, FBX import/export. Use for listing scene contents, creating geometry, parenting, setting transforms or exporting FBX from Maya.
 allowed-tools: Read,Write,Bash
 ---
 

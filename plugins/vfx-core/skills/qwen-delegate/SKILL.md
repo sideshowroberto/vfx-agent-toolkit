@@ -1,6 +1,6 @@
 ---
 name: qwen-delegate
-description: Delegate tasks from a Claude Code session to the local Qwen model on Ollama (port 11434) - the same model the team's OpenCode / Qwen Code installs use. Use when user says "ask Qwen", "have Qwen do this", "delegate to local model", "use local LLM", "keep this NDA-safe", "do this locally". Also use proactively for NDA-sensitive file analysis, large-file summarization, boilerplate generation, BlinkScript drafts, or batch text transforms where privacy and Claude-token savings matter more than deep reasoning.
+description: Delegates tasks to the local Qwen model on Ollama so file content stays on the machine and out of Claude's context. Use for "ask Qwen" or "do this locally", NDA-safe file analysis, large-file summaries, boilerplate and BlinkScript drafts.
 allowed-tools: Bash,Read
 ---
 
@@ -109,12 +109,23 @@ python <skill-dir>/scripts/agent_local.py --dir "path/to/shot/comp" \
   "Read shot_040.nk and summarize: inputs, main operations, final output"
 ```
 
-### Multi-file analysis
+### Multi-file analysis (shape the prompt as a SEARCH)
 ```bash
-python <skill-dir>/scripts/agent_local.py --verbose --dir "path/to/pipeline" \
-  "Find every hardcoded absolute path in the Python files and list file:line"
+python <skill-dir>/scripts/agent_local.py --verbose --max-tokens 12000 --dir "path/to/pipeline" \
+  'Use search_files with file_pattern "*.py" and pattern "[A-Za-z]:[/\\]" to find lines holding an absolute path, then output a table of file:line and the path found'
 ```
-`--verbose` shows each tool call on stderr so you can see what it read.
+`--verbose` shows each tool call on stderr so you can see what it did.
+
+- **Name the search tool (`search_files`) and give the regex.** A "list every
+  file, read each one fully and report every line containing X" prompt exited 0
+  over a folder of about 15 scripts and printed only `(no content returned)`:
+  the model spent its budget reading and never answered. The search-shaped
+  prompt finished in ONE tool call and returned a 26-row table.
+- **Always pass `--verbose` and a raised `--max-tokens`** (default 4096) for
+  multi-file jobs.
+- **`(no content returned)` with exit 0 is a FAILED run, never "nothing
+  found".** Re-prompt in the search shape. Spot-check the table against a
+  ripgrep count of the same folder before trusting it.
 
 ### Image analysis (27B variant only)
 ```bash
@@ -134,6 +145,8 @@ python <skill-dir>/scripts/query_local.py --model qwen3:8b --max-tokens 8000 "..
 
 - **Be explicit and bounded.** Say what to read, what to output, and the format.
   "Summarize shot_040.nk as: inputs / operations / output" beats "look at the comp".
+- **For "find X across many files", give the search, not a reading list**:
+  name `search_files` and the regex (see Multi-file analysis above).
 - **One file per question on the 14B**; the 27B can take a folder.
 - **Thinking is off by default** for speed. Add `--think` to `query_local.py`
   for harder reasoning (BlinkScript, tricky refactors).

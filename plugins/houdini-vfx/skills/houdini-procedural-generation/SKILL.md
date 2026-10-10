@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Bash
 
 # houdini-procedural-generation
 
-**Version:** 1.0.0
-**Last Updated:** 2026-02-15
+**Version:** 1.1.0
+**Last Updated:** 2026-10-09
 **Dependencies:** Houdini 20+
 
 ---
@@ -638,6 +638,7 @@ Before finalizing procedural setup, verify:
 - [x] Random seed set for repeatability
 - [x] Procedural parameters exposed via channels
 - [x] Works with different input geometry (not hard-coded to specific mesh)
+- [x] Result read back through the node carrying the display/render flag - a downstream filecache/freeze can hide your edit (`houdini-python-automation/reference/verify_through_display_node.md`)
 
 ---
 
@@ -710,6 +711,8 @@ Procedural generation failed
 
 ## VERSION HISTORY
 
+**v1.1.0** (2026-10-09) - Checklist pointer to the display-node verification rule in houdini-python-automation (obs 149)
+
 **v1.0.0** (2026-02-15) - Initial Release
 - Scatter and copy workflows
 - Advanced scattering with density control
@@ -729,6 +732,6 @@ Procedural generation failed
 
 **Skill Status:** Production Ready
 **Maintainer:** VFX Pipeline Development
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-10-09
 **Dependencies:** Houdini 20+
 **Tested With:** Houdini 20.0, Houdini 20.5

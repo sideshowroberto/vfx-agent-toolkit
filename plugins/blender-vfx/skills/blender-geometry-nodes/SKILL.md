@@ -6,8 +6,8 @@ allowed-tools: Read,Write
 
 # Blender Geometry Nodes Skill
 
-**Version:** 2.0.0
-**Last Updated:** 2026-06-10
+**Version:** 2.0.1
+**Last Updated:** 2026-10-10
 **Dependencies:** Blender 5.1+
 
 ---
@@ -458,6 +458,13 @@ if node_tree:
 
 ---
 
+### Issue 3: Scripted Boolean carve reports success but produced nothing
+
+Silent causes: host collection EXCLUDED from the view layer (modifiers skipped), or an inside-out
+cutter (empty Difference). Checks and snippet: `reference/BOOLEAN_CARVE_TRAPS.md` (obs 64).
+
+---
+
 ## VALIDATION CHECKLIST
 
 - [ ] Using `type='NODES'` not `type='GEOMETRY_NODES'`
@@ -465,11 +472,14 @@ if node_tree:
 - [ ] Node connections valid (matching socket types)
 - [ ] Parameters exposed for user control
 - [ ] Visual result visible in viewport
+- [ ] Scripted carves: evaluated polygon count checked against a floor (Issue 3)
 - [ ] No console errors
 
 ---
 
 ## VERSION HISTORY
+
+**v2.0.1** (2026-10-10) - Troubleshooting Issue 3: scripted Boolean carve fails silently (excluded collection, inside-out cutter) (obs 64)
 
 **v2.0.0** (2026-06-10) - MCP migration
 - Removed legacy HTTP bridge patterns (migrated to Blender MCP)

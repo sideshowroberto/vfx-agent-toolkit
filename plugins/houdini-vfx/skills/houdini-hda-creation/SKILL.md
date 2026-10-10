@@ -1,13 +1,13 @@
 ---
 name: houdini-hda-creation
-description: "Create and manage Houdini Digital Assets (HDAs) including parameter interfaces, compilation, versioning, and asset organization. Use when authoring reusable Houdini tools. Triggers: hda creation, digital asset, hda compile, hda parameters, create hda"
+description: "Creates and manages Houdini Digital Assets (HDAs) - parameter interfaces, compilation, versioning and asset organization. Use when authoring reusable Houdini tools or asked about HDA creation, HDA parameters or compiling an HDA."
 allowed-tools: Read,Write,Bash
 ---
 
 # houdini-hda-creation
 
-**Version:** 1.0.0
-**Last Updated:** 2026-02-15
+**Version:** 1.1.1
+**Last Updated:** 2026-10-09
 **Dependencies:** Houdini 20+, Python 3.9+
 
 ---
@@ -265,6 +265,7 @@ Definition file: /path/to/project/hda/my_tool.hda
 - [x] New parameters/changes applied
 - [x] Existing instances still functional
 - [x] New instances have updated interface
+- [x] A new `name::N` version is checked with `exact_type_name=True` + `type().name()` (an unversioned `createNode` builds the NEWEST) - see `reference/versioning_and_verification.md`
 
 ---
 
@@ -570,8 +571,9 @@ and confirm that an intentional match reverts it.
 HDA creation, versioning and reload are driven through the Houdini MCP tools
 (`create_hda`, `update_hda`, `reload_hda`, `install_hda`, `get_hda_sections`,
 `set_hda_section_content`) or the `hou.HDADefinition` API shown above. This skill
-ships no helper scripts or separate guides: callbacks, parameter design and VEX
-integration are covered inline in the technique sections.
+ships no helper scripts: callbacks, parameter design and VEX integration are covered
+inline in the technique sections; versioning, int-menu and delivery-verification traps
+are in `reference/versioning_and_verification.md`.
 
 ---
 
@@ -589,6 +591,7 @@ Before finalizing HDA creation, verify:
 - [x] HDA works after save/reload
 - [x] Help documentation added (if needed)
 - [x] Version number/metadata set appropriately
+- [x] Every output (0..N-1) and member node force-cooked with counts recorded; int menus tested by what they store (`reference/versioning_and_verification.md`)
 
 ---
 
@@ -661,6 +664,8 @@ HDA Creation failed
 
 ## VERSION HISTORY
 
+**v1.1.0** (2026-10-09) - Version pinning, int-menu position, force-cook every output, display-node cross-ref (obs 150, 139, 121, 149): new reference/versioning_and_verification.md
+
 **v1.0.0** (2026-02-15) - Initial Release
 - HDA creation workflows (basic and advanced)
 - Parameter interface customization
@@ -679,6 +684,6 @@ HDA Creation failed
 
 **Skill Status:** Production Ready
 **Maintainer:** VFX Pipeline Development
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-10-09
 **Dependencies:** Houdini 20+, Python 3.9+
 **Tested With:** Houdini 20.0, Houdini 20.5

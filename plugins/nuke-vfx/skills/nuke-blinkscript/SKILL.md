@@ -1,12 +1,12 @@
 ---
 name: nuke-blinkscript
-description: BlinkScript kernel development for Nuke with GPU acceleration, composition grids, procedural patterns, and custom effects. Use when creating BlinkScript kernels, GPU-accelerated effects, or when user mentions blinkscript, blink kernel, nuke kernel, custom kernel, GPU effect.
+description: Writes GPU-accelerated BlinkScript kernels for Nuke - composition grids, procedural patterns, custom pixel effects. Use when creating a BlinkScript or "blink kernel", or a custom GPU effect the standard Nuke nodes cannot do.
 allowed-tools: Read,Write,Bash
 ---
 
 # nuke-blinkscript
 
-**Version:** 1.3.0
+**Version:** 1.3.1
 **Last Updated:** 2026-03-26
 **Dependencies:** Nuke 15.0+, BlinkScript node
 

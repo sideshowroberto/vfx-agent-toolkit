@@ -1,12 +1,12 @@
 ---
 name: nuke-cattery-inference
-description: PyTorch model integration in Nuke via CatFileCreator and Inference nodes. Use when tracing ML models for Nuke, setting up depth estimation, AI-powered effects, or when user mentions CatFileCreator, .cat file, Inference node, cattery, TorchScript, depth model, DA3, DepthAnything, or ML inference in Nuke.
+description: Brings PyTorch models into Nuke via TorchScript export, CatFileCreator .cat files and the Inference node, e.g. DepthAnything depth. Use when tracing an ML model for Nuke, building a .cat file, or running ML inference in a comp.
 allowed-tools: Read,Write,Bash
 ---
 
 # nuke-cattery-inference
 
-**Version:** 1.1.0
+**Version:** 1.1.1
 **Last Updated:** 2026-03-10
 **Dependencies:** NukeX or Nuke Studio (not Nuke Indie/Non-Commercial), Python 3.10+, PyTorch 2.1.1+cpu
 **Deep Reference:** `ClaudeCode/data/research/Nuke_ML_Inference_Research.md`

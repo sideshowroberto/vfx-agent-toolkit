@@ -1,6 +1,6 @@
 ---
 name: unreal-vfx-automation
-description: Automate VFX workflows in Unreal Engine 5.8 including foreground plates, image sequences, and multi-shot production. Use when setting up ImagePlate, creating foreground plates, batch processing shots, or when user mentions unreal foreground plate, image sequence, vfx set extension, imageplate setup, foreground plate, vfx automation, unreal vfx, set extension, multi shot.
+description: Automates VFX plate workflows in Unreal Engine 5.8 - ImagePlate and foreground plates, image sequences, multi-shot setups, set extension. Use when setting up an ImagePlate or foreground plate, loading image sequences, or batch-processing shots in Unreal.
 allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool,Read,Write,Grep
 ---
 

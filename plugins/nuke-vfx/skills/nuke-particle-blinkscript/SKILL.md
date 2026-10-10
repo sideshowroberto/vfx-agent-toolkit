@@ -1,12 +1,12 @@
 ---
 name: nuke-particle-blinkscript
-description: ParticleBlinkScript node development for NukeX 16+ - custom particle systems, GPU particle physics, and Foundry gadget templates. Also covers procedural BlinkScript atmospheric effects (snow, embers, dust) that bypass the particle system entirely. Use when user mentions particle blinkscript, ParticleBlinkScript node, custom particles nuke, blinkscript particles, GPU particles nuke, particle gadgets, procedural snow nuke, atmospheric blinkscript.
+description: Builds particle effects in Nuke with the ParticleBlinkScript node (NukeX 16+) or procedural BlinkScript for snow, embers and dust on any Nuke. Use when asked for custom GPU particles, particle gadgets or atmospheric particle effects in Nuke.
 allowed-tools: Read,Write,Bash
 ---
 
 # nuke-particle-blinkscript
 
-**Version:** 1.0.0
+**Version:** 1.0.1
 **Last Updated:** 2026-03-11
 **Dependencies:** NukeX 16+ (for ParticleBlinkScript node) OR Nuke 13+ (for procedural BlinkScript approach)
 

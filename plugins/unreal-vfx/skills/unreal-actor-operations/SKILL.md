@@ -1,12 +1,12 @@
 ---
 name: unreal-actor-operations
-description: Spawn, manipulate, and query actors in Unreal Engine via Python. Use when spawning actors, setting transforms, getting/setting properties, or when user mentions "actor", "spawn", "transform", "location", "rotation", "static mesh actor", "blueprint actor".
+description: Spawns, transforms and queries actors in Unreal Engine 5.8 via Python over the MCP. Use when spawning actors, setting location or rotation, reading or setting actor properties, or placing static mesh and Blueprint actors.
 allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool
 ---
 
 # Unreal Actor Operations
 
-**Version:** 2.0.1
+**Version:** 2.0.2
 **Last Updated:** 2026-09-08
 **Dependencies:** Unreal Engine 5.8+, UE 5.8 native MCP (HTTP, port 8000), VibeUE plugin (optional)
 **Context7 Validation:** ACTOR_API_VALIDATION_REPORT.md (18/20 APIs validated)

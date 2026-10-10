@@ -1,6 +1,6 @@
 ---
 name: wrap-session
-description: End-of-session wrap-up ritual before clearing context. Reviews the session for durable facts to save to memory, updates skills with newly discovered gotchas, writes a session log for substantial project work, cleans up temp files, and writes a handoff plan so the next session can resume without re-discovery. Use when the user is about to /clear, when context is running low, or at the natural end of a work session. Triggers on "/wrap-session", "wrap up this session", "we're running low on context", "prepare to clear context", "before we clear".
+description: Runs the end-of-session wrap-up before clearing context - saves durable facts to memory, folds gotchas into skills, writes the session log and a handoff plan, cleans temp files. Use before /clear, when context runs low, or on "wrap up this session".
 ---
 
 # Wrap Session
@@ -113,6 +113,8 @@ Write a concise next-session plan file to the canonical home: `Documentation/ses
 - **In flight** - what's partially done and its current state
 - **Next steps** - exact, actionable steps in order (not vague goals)
 - **Context needed** - the specific files/paths the next session should read first
+
+Cite what is SAVED, not what a live session holds: before a work file goes into the handoff, read it back from disk (search a scene or script for the node or path you claim, check a media file's size) and list newer `_v###` siblings in its folder. A read-back through a running application proves the session's state, which may include changes that were never saved, and the file's owner may have saved a newer version since.
 
 Tell the user exactly where the handoff file is.
 

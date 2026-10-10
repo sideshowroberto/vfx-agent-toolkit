@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Bash
 
 # houdini-vex-programming
 
-**Version:** 1.0.0
-**Last Updated:** 2026-02-15
+**Version:** 1.1.0
+**Last Updated:** 2026-10-09
 **Dependencies:** Houdini 20+
 
 ---
@@ -658,15 +658,17 @@ if (!hasattrib(0, "point", "velocity")) {
 - Create attributes explicitly before using
 - Use Geometry Spreadsheet to see available attributes
 
+**See also:** `reference/wrangle_traps.md` - `set*attrib()` writes are deferred; `prim()`/`point()`/`detail()` in the same wrangle read the INPUT (keep multi-pass state in arrays, write once at the end).
+
 ---
 
 ## REFERENCE DOCUMENTATION
 
 ### **Progressive Disclosure Pattern**
 
-This skill ships no separate reference guides: the technique sections above
-are the reference. Use the Houdini MCP `search_help` / `get_help_page` tools
-for SideFX's own documentation.
+Longer traps live in `reference/` (currently `wrangle_traps.md`); the technique
+sections above are the rest of the reference. Use the Houdini MCP `search_help` /
+`get_help_page` tools for SideFX's own documentation.
 
 ---
 
@@ -756,6 +758,8 @@ VEX compilation failed
 
 ## VERSION HISTORY
 
+**v1.1.0** (2026-10-09) - Deferred set*attrib() writes (obs 148): new reference/wrangle_traps.md
+
 **v1.0.0** (2026-02-15) - Initial Release
 - Attribute manipulation workflows
 - Noise and procedural deformation
@@ -775,6 +779,6 @@ VEX compilation failed
 
 **Skill Status:** Production Ready
 **Maintainer:** VFX Pipeline Development
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-10-09
 **Dependencies:** Houdini 20+
 **Tested With:** Houdini 20.0, Houdini 20.5

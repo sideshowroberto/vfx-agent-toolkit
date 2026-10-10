@@ -1,6 +1,6 @@
 ---
 name: comfyui-workflow-analysis
-description: Analyze downloaded ComfyUI workflow JSON files to extract required custom nodes and models, map them to correct install locations, and generate a setup checklist. Use when user shares a workflow JSON, asks "what nodes does this need", "what models does this use", "help me set up this workflow", or "analyze this comfy workflow".
+description: Analyzes a downloaded ComfyUI workflow JSON to list required custom nodes and models, install locations and a setup checklist. Use when the user shares a workflow JSON or asks 'what nodes does this need' or 'help me set up this workflow'.
 allowed-tools: Read,Write
 ---
 

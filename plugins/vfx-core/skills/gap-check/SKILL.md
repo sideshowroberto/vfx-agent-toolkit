@@ -1,6 +1,6 @@
 ---
 name: gap-check
-description: Audit Claude's own knowledge gaps against a settled plan before building. Claude categorizes what it knows confidently vs. guesses at, launches search-specialist agents to fill gaps, and surfaces unknowns for the user to answer. Use after /grill-me when scope is settled, before any planning or build session, or when user says "gap-check", "check your assumptions", "what don't you know about this".
+description: Audits Claude's own knowledge gaps against a settled plan before building - sorts confident from guessed, researches public gaps, and lists unknowns for the user. Use after /grill-me, before a build session, or on 'gap-check' or 'check your assumptions'.
 ---
 
 You are about to audit your own knowledge against the current plan. The goal is to surface silent assumptions and fill gaps with research BEFORE planning or building begins.

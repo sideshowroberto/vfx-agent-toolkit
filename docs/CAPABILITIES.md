@@ -1,118 +1,118 @@
 # Capabilities index (public toolkit)
 
-GENERATED 2026-10-05 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/registry.json, the skill and agent files, .mcp.json and the script folders. Do not edit; it is rewritten on every /sync-plugins. Registry 2.0.4, updated 2026-09-15.
+GENERATED 2026-10-10 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/registry.json, the skill and agent files, .mcp.json and the script folders. Do not edit; it is rewritten on every /sync-plugins. Registry 2.0.4, updated 2026-10-06.
 
 **How to use it:** ask your agent "what can we do for <task>?" - it should read this file and name the skill, agent, tool or script to reach for. Each line is: name, then what it does and the phrases that trigger it.
 
 ## Skills, by plugin
 
-### vfx-core (v2.8.2, public)
+### vfx-core (v2.10.2, public)
 
 Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).
 
 MCP servers: `brave-search`, `context7`, `desktop-commander`
 
 - **agent-creation-update** [scripts] - Create and update VFX agents with constitutional compliance. Use when creating agents, updating agents, validating agents, or managing agent versions.
-- **skill-creation-update** [scripts] - Standardized workflow for creating and updating VFX Agent Skills with constitutional validation, progressive disclosure enforcement, and automated template application. Use when creating skills, validating compliance, testing scripts, updating skill versions, or when user mentions "create skill", "validate skill", "skill template", "constitutional compliance", "skill testing".
-- **development-management** - Specification-Driven Development (SDD) workflows for VFX pipeline using spec-kit methodology. Covers agent creation, constitutional governance, roadmaps, specs, and validation. Use when user requests development work, agent audits, skill creation, constitutional compliance checks, or mentions 'how do I create agent', 'audit agents', 'spec-kit', 'development process', 'validate this', 'create constitution', 'governance rules'.
-- **brave-search** [scripts] - VFX-focused web research using Brave Search API. Two modes: MCP web_search for filtered URL results, LLM Context script for deep research with actual extracted page content. Use when searching for tutorials, documentation, errors, plugins, software updates, or any VFX research task.
+- **skill-creation-update** [scripts] - Creates, validates and versions VFX Agent Skills against the skill constitution using template scripts (create_skill, validate_skill, test_skill). Use when creating or updating a skill, checking compliance, or bumping a skill version.
+- **development-management** - Runs Specification-Driven Development (spec-kit) workflows - agent creation, constitutional governance, roadmaps, specs and validation. Use when creating or auditing agents, writing a constitution, or validating compliance.
+- **brave-search** [scripts] - Researches VFX topics with Brave Search - MCP web search for filtered URL lists, an LLM Context script for deep research with extracted page content, and image search for references. Use when searching for tutorials, docs, errors, plugins or software updates.
 - **vfx-documentation** - Index-driven documentation system for VFX applications. Use with "document this," "create documentation index," "update docs," or when starting documentation for Nuke, Houdini, Blender, Unreal, or multi-app VFX pipelines.
 - **grill-me** - Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me".
-- **gap-check** - Audit Claude's own knowledge gaps against a settled plan before building. Claude categorizes what it knows confidently vs. guesses at, launches search-specialist agents to fill gaps, and surfaces unknowns for the user to answer. Use after /grill-me when scope is settled, before any planning or build session, or when user says "gap-check", "check your assumptions", "what don't you know about this".
-- **vfx-plan** - VFX planning framework - guides selecting the right planning mode (Iterative, Spec-Driven, or Safety-First) for a given task, runs adversarial plan review, and structures the output as an actionable brief. Use when user says "help me plan", "let's plan this out", "vfx plan", "plan this task", or before any complex multi-file or multi-system build.
+- **gap-check** - Audits Claude's own knowledge gaps against a settled plan before building - sorts confident from guessed, researches public gaps, and lists unknowns for the user. Use after /grill-me, before a build session, or on 'gap-check' or 'check your assumptions'.
+- **vfx-plan** - Plans complex VFX builds by choosing Iterative, Spec-Driven or Safety-First mode, running an adversarial plan review and writing an actionable brief. Use on "help me plan" or "vfx plan", or before any multi-file or multi-system build.
 - **git-guardrails-claude-code** [scripts] - Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, branch -D, etc.) before they execute. Use when user wants to prevent destructive git operations, add git safety hooks, or block git push/reset in Claude Code.
-- **wrap-session** - End-of-session wrap-up ritual before clearing context. Reviews the session for durable facts to save to memory, updates skills with newly discovered gotchas, writes a session log for substantial project work, cleans up temp files, and writes a handoff plan so the next session can resume without re-discovery. Use when the user is about to /clear, when context is running low, or at the natural end of a work session. Triggers on "/wrap-session", "wrap up this session", "we're running low on context", "prepare to clear context", "before we clear".
-- **qwen-delegate** [scripts] - Delegate tasks from a Claude Code session to the local Qwen model on Ollama (port 11434) - the same model the team's OpenCode / Qwen Code installs use. Use when user says "ask Qwen", "have Qwen do this", "delegate to local model", "use local LLM", "keep this NDA-safe", "do this locally". Also use proactively for NDA-sensitive file analysis, large-file summarization, boilerplate generation, BlinkScript drafts, or batch text transforms where privacy and Claude-token savings matter more than deep reasoning.
-- **task-observer** [scripts] - Watches every tool-using session for skill lessons and writes each one to the observation log the moment it happens - user corrections, rules the agent broke, better workflows, sibling skills that need the same fix, sections nobody uses. Nothing is applied until a review the skill owner approves. Invoke before the FIRST tool call of any session and run its Session Start Protocol (status, scan, review trigger); loading alone activates nothing. Also triggers on "observation log", "any observations logged", "skill review", "task observer", "log that as an observation", "review the backlog".
+- **wrap-session** - Runs the end-of-session wrap-up before clearing context - saves durable facts to memory, folds gotchas into skills, writes the session log and a handoff plan, cleans temp files. Use before /clear, when context runs low, or on "wrap up this session".
+- **qwen-delegate** [scripts] - Delegates tasks to the local Qwen model on Ollama so file content stays on the machine and out of Claude's context. Use for "ask Qwen" or "do this locally", NDA-safe file analysis, large-file summaries, boilerplate and BlinkScript drafts.
+- **task-observer** [scripts] - Logs skill lessons (user corrections, broken rules, better workflows) to the observation log as they happen; applied only after owner review. Invoke before the first tool call of any session and run its Session Start Protocol. Also "observation log", "skill review".
 - **youtube-transcript** [scripts] - Retrieve available YouTube captions with timestamps and provenance, or analyze a video from its transcript. Use for YouTube links and transcript requests; this does not watch video frames or transcribe uncaptained audio.
 - **vfx-research** - Research VFX application APIs, errors, workflow integrations, and library examples using Brave Search and Context7. Use for Blender, Nuke, Houdini, Unreal, ComfyUI, and related development questions that need external evidence.
 - **vfx-workflow** - Apply this toolkit's audited application lessons when scripting DCC scenes, running ComfyUI workflows, or preparing cross-application VFX handoffs. Use for execution and integration work; use vfx-research for documentation lookup.
-- **loop-gauntlet** [scripts] - Run a build-until-it-matches loop in a DCC - an agent builds a scene from reference images, renders matched camera views every iteration, compares each render to its reference side by side, scores it against a rubric the HUMAN authored, logs read-back evidence, and a stop rule decides when it is done. Use when asked to rebuild an environment or set from concept art or photos in Blender (Houdini and Unreal later), to "keep iterating until it matches", to write the prompt another agent (Codex, Claude Code, OpenCode) will run for such a loop, or to judge a finished run. Triggers on "loop gauntlet", "gauntlet loop", "match the reference", "build it from these refs", "keep checking against the ref", "iterate until it matches", "reference match loop", "astra loop".
+- **loop-gauntlet** [scripts] - Runs a build-until-it-matches loop in a DCC - an agent rebuilds a scene from reference images, scoring renders against a human-authored rubric until a stop rule fires. Use for 'iterate until it matches', Blender set rebuilds from refs, or writing or judging such a loop prompt.
 - **agent: search-specialist** - Expert VFX research specialist using Brave Search API for technical documentation, tutorials, problem-solving, and industry intelligence across Unreal Engine, Blender, Houdini, Nuke, and ComfyUI
 - **agent: documentation-specialist** - Index-driven documentation updates for VFX application projects. Reads DOCUMENTATION_INDEX.md to understand structure, maintains consistency across related files, updates progress trackers, and creates session summaries. Use with "update documentation," "document session," or "index-driven update.
 - **agent: testing-specialist** - Testing and validating Python scripts, skill scripts, and agent outputs. Use when requests include "test", "validate", "verify", "check", or "pytest". Validates JSON outputs, error handling, script independence, and generates test reports. Proactively invoked after refactoring to ensure functionality.
 - **agent: python-specialist** - Applying templates, systematic refactoring, type safety (mypy, type hints, protocols), async programming (AsyncIO, concurrent.futures), data science workflows (pandas, numpy vectorization), and testing methodology (pytest, fixtures, parameterized tests). Use when applying agent-skill templates, migrating code patterns, refactoring with type hints, optimizing with async/vectorization, or performing systematic code transformation across multiple files.
 - **agent: python-refactoring-specialist** - Python refactoring specialist for applying templates, batch search/replace, and systematic code refactoring. Use when applying agent-skill templates, migrating code patterns, or performing systematic refactoring across multiple files.
 
-### nuke-vfx (v1.1.7, public)
+### nuke-vfx (v1.1.8, public)
 
 Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, and batch shot setup.
 
 MCP servers: `nuke`
 Requires: vfx-core
 
-- **nuke-blinkscript** - BlinkScript kernel development for Nuke with GPU acceleration, composition grids, procedural patterns, and custom effects. Use when creating BlinkScript kernels, GPU-accelerated effects, or when user mentions blinkscript, blink kernel, nuke kernel, custom kernel, GPU effect.
-- **nuke-particle-blinkscript** - ParticleBlinkScript node development for NukeX 16+ - custom particle systems, GPU particle physics, and Foundry gadget templates. Also covers procedural BlinkScript atmospheric effects (snow, embers, dust) that bypass the particle system entirely. Use when user mentions particle blinkscript, ParticleBlinkScript node, custom particles nuke, blinkscript particles, GPU particles nuke, particle gadgets, procedural snow nuke, atmospheric blinkscript.
-- **nuke-cattery-inference** - PyTorch model integration in Nuke via CatFileCreator and Inference nodes. Use when tracing ML models for Nuke, setting up depth estimation, AI-powered effects, or when user mentions CatFileCreator, .cat file, Inference node, cattery, TorchScript, depth model, DA3, DepthAnything, or ML inference in Nuke.
+- **nuke-blinkscript** - Writes GPU-accelerated BlinkScript kernels for Nuke - composition grids, procedural patterns, custom pixel effects. Use when creating a BlinkScript or "blink kernel", or a custom GPU effect the standard Nuke nodes cannot do.
+- **nuke-particle-blinkscript** - Builds particle effects in Nuke with the ParticleBlinkScript node (NukeX 16+) or procedural BlinkScript for snow, embers and dust on any Nuke. Use when asked for custom GPU particles, particle gadgets or atmospheric particle effects in Nuke.
+- **nuke-cattery-inference** - Brings PyTorch models into Nuke via TorchScript export, CatFileCreator .cat files and the Inference node, e.g. DepthAnything depth. Use when tracing an ML model for Nuke, building a .cat file, or running ML inference in a comp.
 - **nuke-compositing** [scripts] - Node graph compositing workflows for Nuke including Read/Write setup, grading, merging, keying, and multi-layer comp patterns. Use when setting up comps, creating node graphs, or when user mentions nuke comp, node graph, grade, merge, keying, aov.
 - **nuke-node-tree-patterns** - Production-tested patterns for creating robust Nuke node trees programmatically. Use for avoiding auto-connection issues, dynamic positioning, expression masks, and gradient blending.
-- **nuke-python-scripting** [scripts] - Python scripting for Nuke with NukeMCPLogger integration, script templates, and automation patterns. Use when writing Nuke Python scripts, using NukeMCPLogger, automating comps, or when user mentions nuke python, nuke script, nuke logger, nuke automation.
+- **nuke-python-scripting** [scripts] - Writes Nuke Python automation scripts using the NukeMCPLogger pattern so results and logs return through the MCP bridge. Use when scripting Nuke, automating comps, or when "nuke python", "nuke script" or the nuke logger come up.
 - **nuke-tiling-tool** [scripts] - Automated image tiling for ML processing in Nuke with seamless gradient blending. Use for large plates (4K+) through ML nodes (ViTMatte) optimized for 1K-2K tiles.
-- **nuke-shot-setup** [scripts] - Batch shot setup for Nuke comp projects. Parses a ShotGrid CSV export, reads plate metadata from a plates CSV (or scans plates on disk), creates per-shot folder structures, generates Nuke v001 visdev/comp files with plates auto-connected (Read + Stamp/Anchor with proper ACES colorspace), and produces a Google Sheets-ready CSV shot tracker. Supports multiple sequences at once, show-specific config (OCIO, LUT, compression), and configurable work context (visdev, comp). Use when the user wants to set up shots, run a batch shot setup, start a new sequence, onboard plates, build a shot tracker CSV, or create comps from a CSV. Triggers on "set up shots", "batch shot setup", "new sequence", "onboard plates", "shot tracker csv", "create comps from csv", "shot setup from ShotGrid", "visdev setup".
+- **nuke-shot-setup** [scripts] - Batch-creates Nuke visdev or comp v001 files, per-shot folders and a tracker CSV from a ShotGrid CSV and plates data, with ACES Reads and per-show config. Use for "set up shots" or "create comps from csv"; the team job ritual is shot-setup.
 - **agent: nuke-specialist** - Nuke compositing expert coordinating node graph operations, Python scripting, and ComfyUI integration. Use when user mentions nuke, compositing, nodes, grade, merge, multi-shot, or nuke python.
 
-### houdini-vfx (v1.0.4, public)
+### houdini-vfx (v1.1.2, public)
 
 Houdini VFX pipeline: procedural generation, USD/Solaris, VEX, Python automation, HDA creation.
 
 MCP servers: `houdini`
 Requires: vfx-core
 
-- **houdini-hda-creation** - Create and manage Houdini Digital Assets (HDAs) including parameter interfaces, compilation, versioning, and asset organization. Use when authoring reusable Houdini tools. Triggers: hda creation, digital asset, hda compile, hda parameters, create hda
+- **houdini-hda-creation** - Creates and manages Houdini Digital Assets (HDAs) - parameter interfaces, compilation, versioning and asset organization. Use when authoring reusable Houdini tools or asked about HDA creation, HDA parameters or compiling an HDA.
 - **houdini-procedural-generation** - Create procedural geometry workflows using SOPs including scattering, copying, instancing, and parametric modeling. Use for procedural modeling workflows. Triggers: procedural generation, scatter, copy to points, procedural modeling, sops
-- **houdini-python-automation** - Automate Houdini workflows using Python (HOM - Houdini Object Model) including node creation, parameter manipulation, scene management, and batch processing. Use when scripting Houdini workflows. Triggers: houdini python, hom, python script, automate houdini, batch process
+- **houdini-python-automation** - Automates Houdini with Python (HOM) - node creation, parameter manipulation, scene management and batch processing. Use when scripting Houdini workflows, e.g. 'houdini python', 'hom script', 'automate houdini' or batch processing hip files.
 - **houdini-solaris-usd** - Work with USD (Universal Scene Description) in Houdini Solaris including stage creation, layer composition, variants, and USD export workflows. Use for USD workflows and Solaris. Triggers: solaris, usd, stage, layer, variant, usd export
 - **houdini-vex-programming** - Write VEX code for Houdini including wrangles, custom operations, attribute manipulation, and performance optimization. Use when writing VEX scripts or custom operations. Triggers: vex, wrangle, vex code, attribute wrangle, point wrangle
 
-### unreal-vfx (v2.1.0, public)
+### unreal-vfx (v2.2.1, public)
 
 Unreal Engine 5.8 VFX pipeline via the native UE MCP (ModelContextProtocol plugin + VibeUE toolsets): Blueprint automation, PCG, actor operations, Sequencer, Python scripting.
 
 MCP servers: `ue58-mcp`
 Requires: vfx-core
 
-- **unreal-actor-operations** [scripts] - Spawn, manipulate, and query actors in Unreal Engine via Python. Use when spawning actors, setting transforms, getting/setting properties, or when user mentions "actor", "spawn", "transform", "location", "rotation", "static mesh actor", "blueprint actor".
-- **unreal-blueprint-automation** - Automate Blueprint creation, component addition, property configuration, and compilation in Unreal Engine 5.8 using phased execution pattern. Use when creating Blueprints, adding components, setting properties, debugging Blueprint crashes, or when user mentions blueprint, create blueprint, compile blueprint, add component, blueprint property, set component property, blueprint automation.
-- **unreal-pcg-automation** [scripts] - Automate PCG (Procedural Content Generation) graph creation, node configuration, and asset integration in Unreal Engine 5.8. Use when creating PCG graphs, configuring nodes, debugging PCG, or when user mentions pcg, procedural generation, pcg graph, scatter, pcg node, procedural content, point cloud.
-- **unreal-project-preflight** [scripts] - Verify and batch-fix the Unreal project prerequisites a plan depends on - plugins, project settings, editor config - as a mandatory Step 0 between plan approval and execution, so a build never dies mid-task on a disabled plugin or a setting that needs a restart. Use after any Unreal plan is approved, before the first build step, whenever a task will touch MegaPlants/PVE, PCG interops, Water, Landscape Patches, Movie Render Queue, cryptomatte, ImagePlate, Substrate, ray tracing or the MCP server, and whenever an error says a class, node or plugin is missing. Triggers on "preflight", "check the project settings", "which plugins do we need", "is nanite foliage on", "enable the plugin", "why is the class missing", "restart the editor", "project prerequisites", "before we build".
-- **unreal-python-scripting** - Python API patterns for Unreal Engine 5.8 including Blueprint spawning, material workflows, component manipulation, and API limitations workarounds. Use when scripting Unreal, creating Python tools, encountering API limitations, or when user mentions unreal python, blueprint spawning, material instance, component properties, python api limitations, ue python.
-- **unreal-sequencer-automation** [scripts] - Automate Level Sequence creation, camera cuts, transform animation, and VFX plate workflows via Python. Use when creating sequences, adding tracks, setting keyframes, camera cuts, ImagePlate, or when user mentions "sequencer", "level sequence", "animation", "keyframe", "cinematic", "camera cut", "foreground plate".
-- **unreal-vfx-automation** - Automate VFX workflows in Unreal Engine 5.8 including foreground plates, image sequences, and multi-shot production. Use when setting up ImagePlate, creating foreground plates, batch processing shots, or when user mentions unreal foreground plate, image sequence, vfx set extension, imageplate setup, foreground plate, vfx automation, unreal vfx, set extension, multi shot.
+- **unreal-actor-operations** [scripts] - Spawns, transforms and queries actors in Unreal Engine 5.8 via Python over the MCP. Use when spawning actors, setting location or rotation, reading or setting actor properties, or placing static mesh and Blueprint actors.
+- **unreal-blueprint-automation** - Creates and compiles Blueprints in Unreal Engine 5.8 via Python using phased Silent Execution (components, properties, compile). Use when creating a Blueprint, adding components, setting Blueprint properties, or debugging Blueprint compile crashes.
+- **unreal-pcg-automation** [scripts] - Builds PCG (Procedural Content Generation) graphs in Unreal Engine 5.8 via Python - nodes, settings, asset integration, debugging. Use when creating or debugging PCG graphs, configuring PCG nodes, or scattering assets procedurally.
+- **unreal-project-preflight** [scripts] - Checks and batch-fixes the Unreal project prerequisites a plan needs (plugins, project settings, editor config) as Step 0 before building. Use once an Unreal plan is approved, before MegaPlants, PCG, MRQ or ImagePlate work, or when a class, node or plugin is missing.
+- **unreal-python-scripting** - Gives Unreal Engine 5.8 Python API patterns - Blueprint spawning, material instances, component properties, workarounds for API limits. Use when scripting Unreal in Python, writing Unreal Python tools, or hitting an Unreal Python API limitation.
+- **unreal-sequencer-automation** [scripts] - Automates Level Sequences in Unreal Engine 5.8 via Python - tracks, keyframes, camera cuts, transform animation, ImagePlate plates. Use when creating a sequence, adding tracks, setting keyframes or camera cuts, or setting up foreground plates in Sequencer.
+- **unreal-vfx-automation** - Automates VFX plate workflows in Unreal Engine 5.8 - ImagePlate and foreground plates, image sequences, multi-shot setups, set extension. Use when setting up an ImagePlate or foreground plate, loading image sequences, or batch-processing shots in Unreal.
 - **agent: unreal-blueprint-specialist** - Expert in automating Unreal Engine Blueprint creation and compilation using Silent Execution pattern
 - **agent: unreal-pcg-specialist** - Expert in Unreal Engine PCG system for procedural terrain, vegetation, and asset placement with Python automation
 
-### blender-vfx (v2.0.7, public)
+### blender-vfx (v2.0.10, public)
 
 Blender VFX pipeline via the official Blender MCP (blender.org): modeling, animation, materials, geometry nodes, physics, rendering, sculpting, grease pencil, and ControlNet pass rendering for AI generation.
 
 MCP servers: `blender`
 Requires: vfx-core
 
-- **blender-addon-development** - Blender addon development - operator design, UI panels, bpy.props, poll() methods, and registration systems. Use when creating addons, building operators, designing UI panels, or when user mentions "addon," "operator," "UI panel," or "Blender Python.
+- **blender-addon-development** - Guides Blender addon development - operators, UI panels, bpy.props, poll() methods and registration. Use when creating a Blender addon, building an operator or UI panel, or writing Blender Python for a tool.
 - **blender-animation** - Keyframe animation, rigging, constraints, and armatures in Blender. Use for animation, rigging, camera movement, or when user mentions "animate," "keyframe," "rig," or "armature.
-- **blender-api-compatibility** - Blender API compatibility across versions (4.2 -> 5.1+), breaking changes detection, and migration strategies. Use for API errors, version migration, breaking changes, or when user mentions "compatibility," "breaking change," "migration," "API error," or "doesn't work in newer Blender.
+- **blender-api-compatibility** - Diagnoses and migrates Blender Python API breakage across versions 4.2 to 5.1+ (EEVEE_NEXT, renamed modifier types and BSDF inputs, VSE strips). Use when a bpy script errors on a newer Blender, or for breaking changes and migration.
 - **blender-compositing** - Compositor nodes, post-processing, and color grading in Blender. Use for compositing workflows, render pass integration, post-processing, color correction, or when user mentions "compositor," "post-process," "color grade," or "render passes.
 - **blender-geometry-nodes** - Procedural modeling using Geometry Nodes in Blender. Use for scattering systems, node trees, parametric design, or when user mentions "procedural," "geometry nodes," "scattering," or "instances.
-- **blender-grease-pencil** - 2D animation and Grease Pencil workflows in Blender. Use for 2D animation, hand-drawn animation, mixed media, stroke creation, layer management, or when user mentions "2D," "grease pencil," "hand drawn," "traditional animation," "NPR rendering," or "stylized animation.
-- **blender-materials-shaders** - Shader nodes, PBR materials, and procedural textures in Blender. Use for material creation, shader setups, PBR workflows, cross-engine compatibility (EEVEE_NEXT/Cycles), or when user mentions "material," "shader," "PBR," "texture," "node tree," or "Principled BSDF.
-- **blender-physics-simulation** - Physics simulations including particles, fluids (Mantaflow), rigid/soft body, and cloth in Blender. Use for physics, particles, fluid simulations, or when user mentions "physics," "particle," "fluid," "rigid body," "soft body," "cloth," "fire," "smoke," or "hair.
+- **blender-grease-pencil** - Builds 2D and mixed-media animation in Blender with Grease Pencil - strokes, layers, frame-by-frame animation, 2D/3D integration, NPR rendering. Use for 2D or hand-drawn animation, traditional animation, or any grease pencil request.
+- **blender-materials-shaders** - Creates Blender shader node trees, PBR materials and procedural textures, with EEVEE_NEXT and Cycles compatibility notes. Use for material creation, shader setups, Principled BSDF inputs, or procedural texturing of parametric geometry.
+- **blender-physics-simulation** - Sets up Blender physics simulations - particle systems, Mantaflow fluid, smoke and fire, rigid body, soft body, cloth and hair. Use for physics, particle, fluid, cloth or hair simulation requests in Blender.
 - **blender-rendering** - EEVEE_NEXT and Cycles rendering, lighting, and render optimization in Blender. Use for rendering setup, lighting, render settings, or when user mentions "render," "lighting," "EEVEE," "Cycles," or "materials.
 - **blender-sculpting** - Terrain creation, organic modeling, and surface details using Blender sculpting tools. Use for terrain, organic shapes, sculpted details, or when user mentions "sculpt," "terrain," or "organic.
-- **blender-controlnet-passes** [scripts] - Set up and render ControlNet conditioning passes from a Blender scene for AI image/video generation - grey clay override, compositor-normalized depth, cryptomatte EXR, optional wireframe overlay for temporal consistency. Wraps scripts/setup_controlnet_passes.py (Blender 5.x APIs, test-slice discipline, trailing-dot File Output naming). Use when preparing depth/edge conditioning inputs, clay renders for video models, or crypto mattes for comp. Triggers: \"controlnet passes\", \"render depth pass\", \"clay render\", \"grey shade render\", \"render passes for AI\", \"control net setup blender\".
+- **blender-controlnet-passes** [scripts] - Renders ControlNet conditioning passes from a Blender scene for AI image and video generation - grey clay, normalized depth, cryptomatte EXR, optional wireframe. Use when preparing depth, edge or clay inputs for video models, or crypto mattes for comp.
 - **agent: blender-specialist** - Expert in Blender workflows via official Blender MCP. Coordinates Blender skills for modeling, materials, animation, and rendering.
 
-### comfyui-vfx (v2.3.1, public)
+### comfyui-vfx (v2.3.3, public)
 
 ComfyUI pipeline via the ComfyUI MCP and Comfy CLI, with optional ComfyUI_FL-MCP for live canvas operations: workflow analysis, node/model requirements mapping, and headless generation guidance, plus the previs-to-photoreal anchor keyframe recipe for reference-guided video generation.
 
 MCP servers: `comfyui`
 Requires: vfx-core
 
-- **comfyui-workflow-analysis** - Analyze downloaded ComfyUI workflow JSON files to extract required custom nodes and models, map them to correct install locations, and generate a setup checklist. Use when user shares a workflow JSON, asks "what nodes does this need", "what models does this use", "help me set up this workflow", or "analyze this comfy workflow".
-- **previs-anchor-keyframes** - Generate photoreal anchor keyframes from CG previs for reference-guided video generation (Seedance-class models). Covers previs shading for AI readability, anchor frame selection, bootstrapping action-pose reference sets from a single reference, lighting-accurate prompt language, and validation. Use when converting previs/CG animation to photoreal video, preparing anchor/reference frames for a video model, or when generations ignore CG placement or pose. Triggers on "anchor keyframes", "anchor frames", "previs to photoreal video", "reference frames for video gen", "generations not following the CG".
-- **comfy-cli-skills** - Install comfy-cli's bundled agent skills (comfy, comfy-build, comfy-debug, comfy-deploy, comfy-director, comfy-relay) into any harness and apply this toolkit's zero-cost validation gate and credit audit around paid ComfyUI runs. Use when setting up comfy-cli for an agent, when the comfy skills are missing from the skill catalog, or before submitting a workflow that bills partner-node credits.
+- **comfyui-workflow-analysis** - Analyzes a downloaded ComfyUI workflow JSON to list required custom nodes and models, install locations and a setup checklist. Use when the user shares a workflow JSON or asks 'what nodes does this need' or 'help me set up this workflow'.
+- **previs-anchor-keyframes** - Generates photoreal anchor keyframes from CG previs for reference-guided video models such as Seedance - previs shading, frame choice, pose reference sets. Use for "anchor keyframes", "previs to photoreal video", or generations that ignore the CG pose.
+- **comfy-cli-skills** - Installs comfy-cli's bundled agent skills into any harness and sets the zero-cost validate gate and credit audit for paid ComfyUI runs. Use when setting up comfy-cli, when comfy skills are missing, or before a workflow run that bills partner-node credits.
 
-### comfyui-node-dev (v1.1.2, public)
+### comfyui-node-dev (v1.1.3, public)
 
 ComfyUI custom node development: V3 API node structure, schemas, datatypes, inputs/outputs, execution lifecycle, frontend extensions, V1-to-V3 migration, and packaging/publishing.
 Requires: vfx-core
@@ -122,32 +122,32 @@ Requires: vfx-core
 - **comfyui-node-datatypes** - ComfyUI data types - IMAGE, LATENT, MASK, CONDITIONING, MODEL, CLIP, VAE, AUDIO, VIDEO, 3D types, widget types, and custom types. Use when working with ComfyUI tensors, model types, or defining input/output data types.
 - **comfyui-node-inputs** - ComfyUI node input types - INT, FLOAT, STRING, BOOLEAN, COMBO widgets, hidden inputs, optional inputs, lazy inputs, force_input. Use when configuring node inputs, adding widgets, or customizing input behavior.
 - **comfyui-node-outputs** - ComfyUI node output types - NodeOutput, UI outputs, PreviewImage, PreviewMask, SavedImages, PreviewAudio, PreviewText, PreviewVideo. Use when returning results from nodes, displaying previews, or saving output files.
-- **comfyui-node-lifecycle** - ComfyUI node execution lifecycle - caching, fingerprint_inputs/IS_CHANGED, validate_inputs/VALIDATE_INPUTS, check_lazy_status, execution order. Use when debugging execution, implementing caching control, input validation, or understanding execution flow.
+- **comfyui-node-lifecycle** - Explains the ComfyUI custom-node execution lifecycle - caching, fingerprint_inputs/IS_CHANGED, validate_inputs, check_lazy_status, execution order. Use when debugging node execution, controlling caching, or adding input validation.
 - **comfyui-node-frontend** - ComfyUI frontend JavaScript extensions - hooks, widgets, sidebar tabs, commands, settings, toasts, dialogs. Use when adding UI features to custom nodes, creating custom widgets, or extending the ComfyUI frontend.
 - **comfyui-node-migration** - ComfyUI V1 to V3 node migration - converting legacy nodes to the V3 API. Use when migrating existing custom nodes from V1 to V3, understanding differences between API versions, or modernizing node code.
 - **comfyui-node-packaging** - ComfyUI custom node project structure - directory layout, __init__.py, registration, requirements.txt, publishing, WEB_DIRECTORY. Use when setting up a new custom node project, packaging nodes, or publishing to the registry.
 
-### maya-vfx (v1.0.3, public)
+### maya-vfx (v1.0.5, public)
 
 Maya pipeline via MCP: scene control, geometry creation, materials (Arnold/USD), transforms, and FBX import/export.
 
 MCP servers: `maya`
 Requires: vfx-core
 
-- **maya-scene** - Query and manipulate Maya scene objects, transforms, hierarchy, and attributes via MCP commandPort. Use for listing scene contents, creating geometry, setting transforms, parenting objects, selecting, importing/exporting FBX. Triggers on "maya scene", "list objects", "create sphere", "cmds.ls", "FBX export from Maya".
-- **maya-materials** - Create and assign materials in Maya via MCP - Arnold (aiStandardSurface), Lambert, Blinn, and USD Preview Surface. Use for shader creation, texture assignment, material assignment to geometry, and look dev workflows. Triggers on "maya material", "assign shader", "aiStandardSurface", "maya texture", "look dev".
+- **maya-scene** - Queries and edits a live Maya scene via the MCP commandPort - objects, transforms, hierarchy, attributes, selection, FBX import/export. Use for listing scene contents, creating geometry, parenting, setting transforms or exporting FBX from Maya.
+- **maya-materials** - Creates and assigns Maya materials via MCP - Arnold aiStandardSurface, Lambert, Blinn and USD Preview Surface. Use for shader creation, texture assignment, assigning materials to geometry or look dev in Maya.
 - **agent: maya-specialist** - Maya scene control, rigging, modeling, and animation automation via MCP. Auto-triggers on .ma/.mb files, maya.cmds, pymel, rigging, blend shapes, joints, and deformers. Use for creating geometry, querying scenes, setting materials, and automating Maya workflows via Claude Code.
 
-### magnific-vfx (v1.1.3, public)
+### magnific-vfx (v1.1.4, public)
 
 Magnific AI generation via MCP: image generation with model selection and references, local file upload/download pipelines, and video generation.
 
 MCP servers: `magnific`
 Requires: vfx-core
 
-- **magnific-image-gen** - Magnific MCP image generation skill. Use when generating ANY images, concept art, product shots, reference images, or visual assets - Magnific is the default image generation tool. Also use for selecting models, resolution/aspect ratio, adding references, browsing/creating folders, upscaling, or generating variations. Triggers on: \"generate image\", \"generate images\", \"generate refs\", \"generate reference\", \"reference images\", \"image refs\", \"generate concept\", \"product shot\", \"concept art\", \"make me an image\", \"make references\", \"generate with magnific\", \"magnific image\", \"nb2\", \"nano banana\", \"magnific folder\", \"upscale\", \"magnific variations\", \"render me\", \"create an image\", \"hero shots\".
-- **magnific-local-upload** - Upload local images to Magnific as references for generation, then download outputs to a local folder. Use when user wants to upload photos from a local folder or drive, use local files as image/style references in Magnific, batch upload from a directory, move uploads to a Magnific folder, or save/download Magnific generated images to a local path. Triggers: \"upload local images\", \"use local photos as reference\", \"upload from folder\", \"upload these images to magnific\", \"download magnific output\", \"save generated image to folder\", \"local ref upload\".
-- **magnific-video-gen** - Magnific MCP video generation skill. Use when generating video via Magnific, selecting video models, animating stills, using start/end keyframes, camera motion, audio/lipsync, multishot, or video upscale. Triggers on: \"generate video with magnific\", \"magnific video\", \"animate this image\", \"magnific camera motion\", \"seedance\", \"kling video\", \"veo video\", \"video from still\".
+- **magnific-image-gen** - Generates images with the Magnific MCP (default image tool, Nano Banana 2) - concept art, product shots, references, variations and folders; no upscaling. Use for 'generate image', 'generate refs', 'concept art', 'nb2', 'nano banana' or 'magnific folder' requests.
+- **magnific-local-upload** - Uploads local images to Magnific as generation references, moves them into folders, and downloads outputs to a local path. Use when using local photos as references, batch uploading a directory, or saving Magnific results to a local folder.
+- **magnific-video-gen** - Generates video through the Magnific MCP - Seedance, Kling and Veo models, animating stills, start/end keyframes, camera motion, audio/lipsync and multishot. Use for 'magnific video', 'animate this image' or 'video from still'.
 
 ### seedance-vfx (v1.1.0, public)
 

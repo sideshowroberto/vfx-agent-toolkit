@@ -1,13 +1,13 @@
 ---
 name: unreal-sequencer-automation
-description: Automate Level Sequence creation, camera cuts, transform animation, and VFX plate workflows via Python. Use when creating sequences, adding tracks, setting keyframes, camera cuts, ImagePlate, or when user mentions "sequencer", "level sequence", "animation", "keyframe", "cinematic", "camera cut", "foreground plate".
+description: Automates Level Sequences in Unreal Engine 5.8 via Python - tracks, keyframes, camera cuts, transform animation, ImagePlate plates. Use when creating a sequence, adding tracks, setting keyframes or camera cuts, or setting up foreground plates in Sequencer.
 allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool
 ---
 
 # Unreal Sequencer Automation
 
-**Version:** 3.0.1
-**Last Updated:** 2026-09-08
+**Version:** 3.1.1
+**Last Updated:** 2026-10-09
 **Dependencies:** Unreal Engine 5.8+, UE 5.8 native MCP (HTTP, port 8000)
 **Major Updates:** UE 5.8 migration, camera cuts, channel initialization, ImagePlate 100%
 
@@ -276,6 +276,33 @@ def add_media_to_sequence(sequence, media_source_path, start_frame=0, end_frame=
 
 ---
 
+## READ-BACK RECIPE (over MCP)
+
+Reading a sequence back through the editor bridge fails silently: a read before
+the first evaluation, a list that skips transient actors and a screenshot that
+waits for a redraw all return "nothing", not an error. Verify the product (the
+bound object, the file) after every step, never the call's return. Full recipe
+with code: `reference/mcp_readback_recipe.md`.
+
+- **Binding IDs:** `LevelSequenceEditorBlueprintLibrary.get_bound_objects`
+  rejects the binding proxy ("Cannot nativize MovieSceneBindingProxy") - pass
+  `seq.get_binding_id(binding)`.
+- **Scrub first:** open the sequence and `set_current_time(frame)` BEFORE
+  listing cameras; a spawnable camera only exists after the first scrub, so an
+  earlier "cameras: []" is not a broken shot.
+- **Spawnables** are not in `get_all_level_actors()`; at the scrubbed time use
+  `unreal.GameplayStatics.get_all_actors_of_class(world, unreal.Actor)` and
+  filter by class.
+- **MCP calls time out at about 30 s** while the script keeps running: batch
+  work into short calls, treat a timeout as "read the state back", not as a
+  failure.
+- **A viewport screenshot may never draw** (it writes on the next redraw): call
+  `unreal.EditorLevelLibrary.editor_invalidate_viewports()`, then verify the
+  image file exists AND has content. Many stills: run the job loop inside the
+  editor on a slate post-tick callback (reference file).
+
+---
+
 ## TROUBLESHOOTING
 
 **Empty Channels:** Add first key to any channel (lazy initialization)
@@ -294,6 +321,7 @@ def add_media_to_sequence(sequence, media_source_path, start_frame=0, end_frame=
 
 - Complete API: `reference/`
 - Media Tracks: `reference/media_track_api.md`
+- Read-back over MCP: `reference/mcp_readback_recipe.md`
 - Code Examples: `examples/examples.md`
 
 ---
@@ -308,6 +336,11 @@ def add_media_to_sequence(sequence, media_source_path, start_frame=0, end_frame=
 ---
 
 ## VERSION HISTORY
+
+**v3.1.0** (2026-10-09) - Observation 140: read-back recipe over MCP (binding
+ids, scrub before listing cameras, spawnables via GameplayStatics, ~30 s call
+timeout, screenshots that need a viewport redraw, in-editor batch loop);
+summary section in SKILL.md, full recipe in `reference/mcp_readback_recipe.md`.
 
 **v3.0.0** (2026-07-06) - UE 5.8 Migration
 - Migrated from community MCP to UE 5.8 native MCP (HTTP, port 8000)
