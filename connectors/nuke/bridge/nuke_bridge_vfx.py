@@ -20,56 +20,89 @@ except ImportError as e:
 
 # Advanced VFX functions
 
+# CameraTracker knob names, from Foundry's CameraTracker reference. Each entry
+# lists candidates because Foundry's own page spells some knobs oddly
+# ("featureSpearation"); the first name the node actually has wins.
+CT_TRACK = ["trackFeatures"]
+CT_SOLVE = ["solveCamera"]
+CT_REFINE = ["refineSolve"]
+CT_RMSE = ["solveRMSE"]
+CT_FRAME_ERROR = ["solveError"]
+CT_NUMBER_FEATURES = ["numberFeatures"]
+CT_FEATURE_SEPARATION = ["featureSeparation", "featureSpearation"]
+
+
+def _first_knob(node, names):
+    """Return (name, knob) for the first of names the node has, else (None, None)."""
+    for name in names:
+        knob = node.knob(name)
+        if knob is not None:
+            return name, knob
+    return None, None
+
+
+def _missing_knob_error(node, names):
+    """Fail loudly: say which knob was wanted and list the ones that look related."""
+    related = sorted(k for k in node.knobs()
+                     if re.search(r"track|solve|feature|error|rmse", k, re.I))
+    return {
+        "error": f"{node.name()} ({node.Class()}) has none of the knobs {names}; "
+                 f"this Nuke version may name them differently",
+        "relatedKnobs": related,
+    }
+
+
 def create_camera_tracker(args):
-    """Creates and sets up a CameraTracker node"""
+    """Creates a CameraTracker node (NukeX only) wired to the source node"""
     try:
         source_name = args.get('sourceName')
-        tracking_features = args.get('trackingFeatures', {})
-        
+        tracking_features = args.get('trackingFeatures') or {}
+
         if not source_name:
             return {"error": "sourceName is required"}
-        
+
         # Get the source node
         source_node = nuke.toNode(source_name)
         if not source_node:
             return {"error": f"Source node '{source_name}' not found"}
-        
-        # Create CameraTracker node
-        camera_tracker = nuke.createNode("CameraTracker")
-        
-        # Connect the source node
+
+        # nuke.nodes rather than nuke.createNode, so the new node does not
+        # splice itself into whatever happens to be selected
+        camera_tracker = nuke.nodes.CameraTracker()
         camera_tracker.setInput(0, source_node)
-        
-        # Set tracking features parameters if provided
-        if tracking_features:
-            number_features = tracking_features.get('numberFeatures')
-            feature_size = tracking_features.get('featureSize')
-            feature_separation = tracking_features.get('featureSeparation')
-            
-            if number_features is not None:
-                k = camera_tracker.knob('keyframe_tracks') or camera_tracker.knob('number_of_features')
-                if k: k.setValue(number_features)
+        camera_tracker.setXYpos(source_node.xpos(), source_node.ypos() + 100)
 
-            if feature_size is not None:
-                k = camera_tracker.knob('detection_size') or camera_tracker.knob('feature_size')
-                if k: k.setValue(feature_size)
+        # Set tracking features parameters if provided, reading each one back
+        settings = {}
+        for arg_name, candidates in (('numberFeatures', CT_NUMBER_FEATURES),
+                                     ('featureSeparation', CT_FEATURE_SEPARATION)):
+            value = tracking_features.get(arg_name)
+            if value is None:
+                continue
+            knob_name, knob = _first_knob(camera_tracker, candidates)
+            if knob is None:
+                error = _missing_knob_error(camera_tracker, candidates)
+                nuke.delete(camera_tracker)
+                return error
+            knob.setValue(value)
+            settings[knob_name] = knob.value()
 
-            if feature_separation is not None:
-                k = camera_tracker.knob('detection_spacing') or camera_tracker.knob('feature_separation')
-                if k: k.setValue(feature_separation)
-        
-        return {
+        result = {
             "success": True,
             "cameraTracker": {
                 "name": camera_tracker.name(),
                 "source": source_name
-            }
+            },
+            "settings": settings
         }
+        if tracking_features.get('featureSize') is not None:
+            result["warning"] = "featureSize has no CameraTracker knob and was ignored"
+        return result
     except Exception as e:
         return {"error": str(e), "traceback": traceback.format_exc()}
 
 def solve_camera_track(args):
-    """Solves a camera track using the specified CameraTracker node"""
+    """Tracks and solves with a CameraTracker node, then reads the solve error back"""
     try:
         camera_tracker_node = args.get('cameraTrackerNode')
         solve_method = args.get('solveMethod', "Match-Moving")
@@ -90,36 +123,54 @@ def solve_camera_track(args):
         nuke.selectAll()
         nuke.invertSelection()
         camera_tracker.setSelected(True)
-        
-        # Set the solve method
-        solve_methods = {
-            "Match-Moving": "matchmoving",
-            "Full": "fullsolution",
-            "Refine": "refine"
-        }
-        
-        # Execute the solve
-        method = solve_methods.get(solve_method, "matchmoving")
-        
-        # Track features then solve via node knobs (Nuke 15 API)
-        track_knob = camera_tracker.knob('track_features') or camera_tracker.knob('track')
-        if track_knob:
-            track_knob.execute()
 
-        solve_knob = camera_tracker.knob('solve') or camera_tracker.knob('autoSolve')
-        if solve_knob:
-            solve_knob.execute()
-        
-        # Get status
-        error_knob = camera_tracker.knob("solve_error")
-        error_value = error_knob.value() if error_knob else "Unknown"
-        
-        return {
-            "success": True,
+        # Match-Moving and Full both track then solve; Refine re-solves an
+        # existing solve without retracking
+        if solve_method == "Refine":
+            steps = [CT_REFINE]
+        else:
+            steps = [CT_TRACK, CT_SOLVE]
+
+        executed = []
+        for candidates in steps:
+            knob_name, knob = _first_knob(camera_tracker, candidates)
+            if knob is None:
+                return _missing_knob_error(camera_tracker, candidates)
+            knob.execute()
+            executed.append(knob_name)
+
+        # A pressed button proves nothing: read the error the solve left behind
+        rmse_name, rmse_knob = _first_knob(camera_tracker, CT_RMSE)
+        if rmse_knob is None:
+            return _missing_knob_error(camera_tracker, CT_RMSE)
+        rmse = rmse_knob.value()
+
+        result = {
             "cameraTracker": camera_tracker_node,
             "solveMethod": solve_method,
-            "solveError": error_value
+            "knobsExecuted": executed,
+            "solveRMSE": rmse
         }
+
+        # Per-frame error: the worst frames show where a solve breaks
+        frame_name, frame_knob = _first_knob(camera_tracker, CT_FRAME_ERROR)
+        if frame_knob is not None and frame_knob.isAnimated():
+            first, last = camera_tracker.firstFrame(), camera_tracker.lastFrame()
+            per_frame = [(f, frame_knob.valueAt(f)) for f in range(first, last + 1)]
+            per_frame.sort(key=lambda pair: pair[1], reverse=True)
+            result["worstFrames"] = [{"frame": f, "error": e} for f, e in per_frame[:5]]
+
+        if not rmse or rmse <= 0:
+            result["success"] = False
+            result["error"] = ("Solve left no RMS error (0): either nothing was solved - check the "
+                               "source has trackable detail and camera parallax - or the track or "
+                               "solve is still running. Read solveRMSE on the node before retrying.")
+            return result
+
+        result["success"] = True
+        if rmse > 1.0:
+            result["warning"] = "RMS error above 1.0 px - Foundry suggests refining the solve"
+        return result
     except Exception as e:
         return {"error": str(e), "traceback": traceback.format_exc()}
 

@@ -328,11 +328,11 @@ server.tool(
 // Create Camera Tracker tool
 server.tool(
   "createCameraTracker",
-  "Creates and sets up a CameraTracker node",
+  "Creates a CameraTracker node (NukeX only) wired to the source node; returns the settings read back from the node",
   {
     sourceName: z.string().describe("Name of the source node to track"),
     numberFeatures: z.coerce.number().optional().describe("Number of features to track (default is 200)"),
-    featureSize: z.coerce.number().optional().describe("Size of features to track (default is 15)"),
+    featureSize: z.coerce.number().optional().describe("Not used: CameraTracker has no feature-size knob, so this is ignored with a warning"),
     featureSeparation: z.coerce.number().optional().describe("Minimum separation between features (default is 20)")
   },
   async ({ sourceName, numberFeatures, featureSize, featureSeparation }) => {
@@ -348,10 +348,10 @@ server.tool(
 // Execute Camera Solve tool
 server.tool(
   "solveCameraTrack",
-  "Solves a camera track using the specified CameraTracker node",
+  "Tracks and solves with a CameraTracker node, then returns the solve RMS error in pixels and the worst frames. success is false when the solve left no error value; above 1.0 px the result carries a warning",
   {
     cameraTrackerNode: z.string().describe("Name of the CameraTracker node"),
-    solveMethod: z.enum(["Match-Moving", "Full", "Refine"]).optional().describe("Solve method (default is 'Match-Moving')")
+    solveMethod: z.enum(["Match-Moving", "Full", "Refine"]).optional().describe("'Match-Moving' and 'Full' track then solve; 'Refine' re-solves an existing solve without retracking (default is 'Match-Moving')")
   },
   async ({ cameraTrackerNode, solveMethod = "Match-Moving" }) => {
     return await sendToNuke({

@@ -104,6 +104,13 @@ COMMAND_MAP = {
     "setupMotionBlur": setup_motion_blur,
 }
 
+# How long a GUI-mode command may hold Nuke's main thread before the bridge
+# gives up waiting. A CameraTracker track + solve on a real plate takes minutes.
+DEFAULT_MAIN_THREAD_TIMEOUT = 30
+MAIN_THREAD_TIMEOUTS = {
+    "solveCameraTrack": 1800,
+}
+
 class NukeBridgeServer(threading.Thread):
     def __init__(self, host='127.0.0.1', port=8765):
         threading.Thread.__init__(self)
@@ -186,11 +193,22 @@ class NukeBridgeServer(threading.Thread):
                     done = threading.Event()
 
                     def run_in_main(f=func, a=args):
-                        result_holder[0] = f(a)
-                        done.set()
+                        try:
+                            result_holder[0] = f(a)
+                        except Exception as e:
+                            result_holder[0] = {"error": f"Error executing {cmd_type}: {e}",
+                                                "traceback": traceback.format_exc()}
+                        finally:
+                            done.set()
 
                     nuke.executeInMainThread(run_in_main)
-                    done.wait(timeout=30)
+                    wait_s = MAIN_THREAD_TIMEOUTS.get(cmd_type, DEFAULT_MAIN_THREAD_TIMEOUT)
+                    if not done.wait(timeout=wait_s):
+                        # Without this the client receives null and cannot tell
+                        # a slow command from a broken bridge
+                        return {"error": f"{cmd_type} was still running in Nuke after {wait_s} s, "
+                                         f"so its result was not captured. Check the node in "
+                                         f"Nuke before running it again."}
                     result = result_holder[0]
                 else:
                     # Non-GUI mode: single-threaded, call directly
