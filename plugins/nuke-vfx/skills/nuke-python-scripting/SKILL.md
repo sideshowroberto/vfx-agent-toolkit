@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Bash
 
 # nuke-python-scripting
 
-**Version:** 1.0.1
-**Last Updated:** 2025-12-03
+**Version:** 1.1.0
+**Last Updated:** 2026-10-30
 **Dependencies:** Nuke (Foundry), NukeMCPLogger
 
 ---
@@ -407,6 +407,8 @@ print(nuke_mcp_logger.__file__)
 
 **Standards:** `ClaudeCode/agent-os/profiles/vfx/standards/nuke-standards.md`
 
+**Traps (read before scripting):** `reference/api_traps.md` (headless and bridge), `reference/roto_from_python.md`, `reference/version_up_method.md`. **Version-up and verify harness:** `scripts/nk_version_up.py` (append, compose, diff, lint, outputs, reads, verify); run its `lint` on any build script and its `outputs --differ` after rendering more than one branch. Preflight: before the first bridge read/write return `nuke.root().name()` and compare it with the script the user named (two GUI Nukes can share the port); keep bridge read-backs to about 10 samples.
+
 **Related Skills:**
 - `nuke-compositing` - Node graph workflows
 - `nuke-specialist` - Unified Nuke agent (coordinates skills)
@@ -444,6 +446,9 @@ print(nuke_mcp_logger.__file__)
 ---
 
 ## Version History
+
+**1.1.0 (2026-10-30):**
+- Added reference/ traps: API traps, Roto from Python, version-up method; bridge preflight line
 
 **1.0.0 (2025-12-03):**
 - Initial release

@@ -6,8 +6,8 @@ allowed-tools: Read,Write
 
 # Blender API Compatibility Skill
 
-**Version:** 3.1.1
-**Last Updated:** 2026-09-02
+**Version:** 3.1.2
+**Last Updated:** 2026-10-30
 **Dependencies:** Blender 5.1+
 
 ---
@@ -31,6 +31,7 @@ All changes below are tested and confirmed. The Blender MCP has full context, so
 # RuntimeError: "Cannot find node type"     -> Node type removed/renamed
 # TypeError: enum "FFMPEG" not found        -> Set media_type = 'VIDEO' first (5.0+)
 # AttributeError on 'sequences'             -> VSE renamed to strips/strips_all (5.0+)
+# all faces on material slot 0       -> mesh.materials.clear() resets material_index (see blender-materials-shaders)
 ```
 
 **Step 2: Apply the correct migration pattern** (see workflows below)
@@ -395,6 +396,8 @@ def set_render_engine_safe(preference):
 ---
 
 ## VERSION HISTORY
+
+**v3.1.2** (2026-10-30) - Obs 244: one-line error signature for `materials.clear()` resetting material_index.
 
 **v3.1.0** (2026-09-02) - Blender 5.x render output + VSE gotchas (ported from a stranded July worktree edit)
 - Added Workflow 6: `image_settings.media_type` gates the `file_format` enum (5.0+) - set media_type before file_format, hasattr-guarded portable pattern

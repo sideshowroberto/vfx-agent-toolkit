@@ -78,3 +78,18 @@ assert container.displayNode() == orig
 The same walk applies in Solaris: the stage the viewport or Karma shows may be a cached
 or sublayered file, so walk the display LOP's inputs for sublayers / references of an
 older written layer.
+
+---
+
+## Reading viewport captures (obs 160)
+
+- A viewport capture is RGBA. Where nothing is drawn, alpha is 0 and RGB is 0, which
+  viewers show as white. A semi-transparent object over the empty viewport therefore read
+  alpha 128 / RGB near white and looked like a wrong blend. Judge transparency only over
+  geometry, or put an opaque backdrop behind the subject.
+- Hash successive captures. If a change that must alter the image leaves the hash
+  identical, stop: something (an object covering the camera view, a frozen view) is
+  hiding the change. Seven captures over four different materials were byte-identical
+  because a camera icon filled the frame.
+- Compare sampled pixels with known source values (a test plate with markers and straight
+  alpha), not by eye.

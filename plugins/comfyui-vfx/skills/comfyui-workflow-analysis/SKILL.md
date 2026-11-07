@@ -89,3 +89,4 @@ Format the result as:
 - If a node repo is unknown, search for the class_type name on GitHub or Civitai
 - Model download sources vary - Hugging Face, Civitai, or project GitHub releases
 - After installing custom nodes, ComfyUI needs a restart to load them
+- Install a pack by its Comfy registry id (`cm-cli.py install <id>`, found by matching the repo URL in the Manager cache) before relaxing the Manager git-URL gate, and `pip install --dry-run` its requirements in the target interpreter first; an `nvidia-*` sdist on PyPI means install from NVIDIA's index (see comfy-debug, obs 258)

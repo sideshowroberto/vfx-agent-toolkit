@@ -6,7 +6,7 @@ allowed-tools: Read,Write,Edit,Bash,Glob,Grep,mcp__nuke__runPythonScript,mcp__nu
 
 # Nuke Shot Setup
 
-**Version:** 1.1.2
+**Version:** 1.1.3
 
 Batch setup of Nuke comp/visdev files, folder structures, and shot tracking CSV.
 
@@ -179,6 +179,7 @@ for shot in shots:
 2. Load 1-2 .nk files via `mcp__nuke__loadScript`, check `mcp__nuke__listNodes` and `mcp__nuke__getNode` on Read nodes
 3. Confirm the Write node TCL expression resolves correctly
 4. Check Read node colorspace is set to "ACES - ACEScg"
+5. Read the show fps back from the generated script: `nuke.root()['fps'].value()` must equal the config fps. The `#write_info` line is metadata only; the Root block must carry `fps` (obs 219), or Nuke opens the script at its default 24
 
 ## What the Script Does
 
@@ -234,3 +235,7 @@ Head In | Cut In | Cut Out | Tail Out | Working Duration | Plates | Plate First 
 - Node graph layout / positioning
 - Stamps v1.2 knob structure
 - Write node TCL expression pattern
+
+## Version History
+
+- 1.1.3 (2026-10-30): gen_header writes `fps` into the Root block (was only in the `#write_info` comment); verify step reads it back (obs 219).

@@ -39,3 +39,47 @@ first-pass results (or to the input) are the signature of this trap.
 
 **Tell:** a second loop that "does nothing", or a multi-pass result identical to the
 single-pass result, with a clean cook and no warnings.
+
+---
+
+## Trap 2: point() / prim() / detail() inside a ?: ternary lose their string type
+
+**Rule:** these lookups pick their return type from context, and inside a ternary the
+context is ambiguous. `s@tag = src >= 0 ? point(1, "tag", src) : "";` compiles without a
+warning and returns "" for every element.
+
+**Fix:** put the result in a typed local first, then assign.
+
+```vex
+string t = "";
+if (src >= 0) t = point(1, "tag", src);
+s@tag = t;
+```
+
+**Read-back that proves it:** count elements per value (a histogram), not one sample.
+An empty or zero value everywhere, with no error, is the signature. If a lookup returns
+one value everywhere, also check that the id attribute it indexes with actually reached
+the geometry (for example, carried through Copy to Points).
+
+---
+
+## Trap 3: an EMPTY group pattern means ALL elements
+
+**Rule:** `expandpointgroup(0, "")` (and `expandprimgroup`, and SOP group fields) returns
+every element when the pattern is empty. A parameter-driven list left blank therefore
+selects everything and silently overrides lists applied before it.
+
+**Fix:** guard parameter-driven patterns with `if (pat != "")`. `find()` on an int array
+returned -2 (not -1) for "not found" when measured, so test `find(...) >= 0`, never `== -1`.
+
+**First diagnostic when a wrangle's logic "does nothing":** write a debug attribute for
+every intermediate value and read them back.
+
+---
+
+## Trap 4: a wrangle made from Python does not bind bare globals
+
+**Rule:** an `attribwrangle` created with `hou` in hython fails at cook with "Reference
+to undefined variable: P" for `P.y = 1;`. Write `@P.y`. The error shows only in
+`node.errors()` and in a `hou.OperationFailed` from `cook(force=True)`, so a script that
+never force-cooks each node saves a broken hip.

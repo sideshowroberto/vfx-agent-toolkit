@@ -240,6 +240,12 @@ Build this check into any custom Read-side importer you write.
 
 ---
 
+### Generate with references is reference-GUIDED; use retouch to fix one region (obs 161)
+
+`images_generate` with references does NOT preserve the references' framing, even for a model that holds it through other routes (a correct ceiling came back with the wall top 300-400 px lower and openings up to 2x taller: unregistrable). To fix one wrong region of a take that is otherwise right, use `images_retouch` with `retouch-inpaint-lab-seedream-5-pro` and a mask: the rest of the image stays intact. Build the masks from the render (normals, depth, ID), one pass per surface, then read back the change outside the masks.
+
+A custom width/height comes back as the requested file size while the metadata reports the model's preset size: measure the file, not the metadata.
+
 ## VFX Concept Round Workflow
 
 1. **Pick model** - NB2 Flash for speed, NB2 Pro for finals. Never use `auto`.

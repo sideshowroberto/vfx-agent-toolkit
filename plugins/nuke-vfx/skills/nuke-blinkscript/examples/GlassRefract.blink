@@ -1,0 +1,140 @@
+// GlassRefract.blink
+// Single-pass replacement for the NukeSurvivalToolkit Glass gizmo
+// (46 stock nodes: 4 Transforms -> Expression gradient -> ZBlur -> 4 IDistorts).
+//
+// src     : plate (rgba)
+// control : glass matte in alpha (fed as rgba so .w is always valid)
+//
+// Same knob semantics as the original Glass gizmo:
+//   displace      - gradient * displace * format-width = pull in pixels
+//   aberration    - R scale = d/(1-a/10), G = d, B = d/(1+a/10)
+//   defocusSize   - ZBlur size   (radius = size * depth, depth = L1 gradient * width/2)
+//   defocusMax    - ZBlur max size
+//   defocusShape  - 0 gaussian .. 1 disc
+// Additions that make it crash-proof:
+//   maxDisplace   - hard clamp on the pull in pixels (the original gizmo asked IDistort for
+//                   ~3000 px pulls at any hard matte edge, which blew up its request region)
+//   the gather radius is clamped to defocusMax before any loop runs.
+
+kernel GlassRefract : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom,   eEdgeClamped> src;
+  Image<eRead, eAccessRanged2D, eEdgeClamped> control;
+  Image<eWrite> dst;
+
+param:
+  float displace;
+  float aberration;
+  float maxDisplace;
+  bool  useDefocus;
+  float defocusSize;
+  float defocusMax;
+  float defocusShape;
+  int   widthOverride;
+
+local:
+  float fw;
+  float rScale;
+  float gScale;
+  float bScale;
+  float maxRad;
+
+  void define()
+  {
+    defineParam(displace,      "displace",      1.6f);
+    defineParam(aberration,    "aberration",    0.0f);
+    defineParam(maxDisplace,   "maxDisplace",   64.0f);
+    defineParam(useDefocus,    "useDefocus",    true);
+    defineParam(defocusSize,   "defocusSize",   2.3f);
+    defineParam(defocusMax,    "defocusMax",    11.2f);
+    defineParam(defocusShape,  "defocusShape",  0.6f);
+    defineParam(widthOverride, "widthOverride", 0);
+  }
+
+  void init()
+  {
+    control.setRange(-1, -1, 1, 1);
+    fw = widthOverride > 0 ? float(widthOverride) : float(src.bounds.width());
+    float ab = clamp(aberration, -9.0f, 9.0f);
+    rScale = displace / (1.0f - ab / 10.0f);
+    gScale = displace;
+    bScale = displace / (1.0f + ab / 10.0f);
+    maxRad = clamp(defocusMax, 0.0f, 64.0f);
+  }
+
+  float4 sampleBilinear(float2 p)
+  {
+    float fx = floor(p.x);
+    float fy = floor(p.y);
+    float tx = p.x - fx;
+    float ty = p.y - fy;
+    int x = int(fx);
+    int y = int(fy);
+    float4 a = src(x,     y);
+    float4 b = src(x + 1, y);
+    float4 c = src(x,     y + 1);
+    float4 d = src(x + 1, y + 1);
+    return (a * (1.0f - tx) + b * tx) * (1.0f - ty) + (c * (1.0f - tx) + d * tx) * ty;
+  }
+
+  // Variable-radius gather around c: gaussian/disc blend like ZBlur's "filter shape".
+  float4 gather(float2 c, float r)
+  {
+    if (r < 0.5f)
+      return sampleBilinear(c);
+    int R  = int(ceil(r));
+    int cx = int(floor(c.x + 0.5f));
+    int cy = int(floor(c.y + 0.5f));
+    float sigma = max(r * 0.5f, 0.5f);
+    float inv2s = 1.0f / (2.0f * sigma * sigma);
+    float4 acc = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float wsum = 0.0f;
+    for (int j = -R; j <= R; j++) {
+      for (int i = -R; i <= R; i++) {
+        float d2 = float(i * i + j * j);
+        float d  = sqrt(d2);
+        float wg = exp(-d2 * inv2s);
+        float wd = clamp(r + 0.5f - d, 0.0f, 1.0f);
+        float w  = wg * (1.0f - defocusShape) + wd * defocusShape;
+        acc  += src(cx + i, cy + j) * w;
+        wsum += w;
+      }
+    }
+    return acc / wsum;
+  }
+
+  float2 clampPull(float2 o)
+  {
+    float m = sqrt(o.x * o.x + o.y * o.y);
+    if (m > maxDisplace && m > 0.0f)
+      o = o * (maxDisplace / m);
+    return o;
+  }
+
+  void process(int2 pos)
+  {
+    // Original gizmo: l = a(x+1), r = a(x-1), u = a(y-1), d = a(y+1)
+    float l = control( 1,  0).w;
+    float r = control(-1,  0).w;
+    float u = control( 0, -1).w;
+    float d = control( 0,  1).w;
+
+    float gx = (l - r) * fw;              // forward.u
+    float gy = (d - u) * fw;              // forward.v
+    float depth = (fabs(gx) + fabs(gy)) * 0.5f;
+    float rad = useDefocus ? min(defocusSize * depth, maxRad) : 0.0f;
+
+    float2 p = float2(float(pos.x), float(pos.y));
+    float2 g = float2(gx, gy);
+
+    float4 sg = gather(p + clampPull(g * gScale), rad);
+    if (aberration == 0.0f) {
+      dst() = sg;
+      return;
+    }
+    float4 sr = gather(p + clampPull(g * rScale), rad);
+    float4 sb = gather(p + clampPull(g * bScale), rad);
+    dst() = float4(sr.x, sg.y, sb.z,
+                   0.2126f * sr.w + 0.7152f * sg.w + 0.0722f * sb.w);
+  }
+};

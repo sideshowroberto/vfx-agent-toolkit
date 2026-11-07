@@ -6,8 +6,8 @@ allowed-tools: Read,Write
 
 # Blender Materials & Shaders Skill
 
-**Version:** 2.1.2
-**Last Updated:** 2026-10-09
+**Version:** 2.1.3
+**Last Updated:** 2026-10-30
 **Dependencies:** Blender 5.1+
 
 ---
@@ -291,6 +291,17 @@ for area in bpy.context.screen.areas:
 links.new(bsdf.outputs['BSDF'], output.inputs['Surface'])
 ```
 
+### Faces all on slot 0 after assigning materials from Python (obs 244)
+
+`mesh.materials.clear()` resets every face's `material_index` to 0. A mesh built
+from bmesh parts (faces given index 0 and 1) and then cleared and re-appended
+rendered with one material; the build's print listed both slot names, so it
+looked right. Append the slots ONCE (before or after `bm.to_mesh`), never call
+`clear()` on a mesh whose faces carry indices, and verify by COUNTING FACES PER
+SLOT in the saved file - a list of slot names proves the slots exist, not that
+faces use them. When a cause goes into a code comment, probe it first: the
+plausible one here ("to_mesh clamps indices on a mesh with no slots") was wrong.
+
 ### Material Renders Black
 
 ```python
@@ -321,11 +332,14 @@ if not output.inputs['Surface'].is_linked:
 - [ ] Material Output node connected
 - [ ] Viewport shading = `MATERIAL` (not `MATERIAL_PREVIEW`)
 - [ ] Test render validates appearance
+- [ ] Procedural meshes: faces-per-slot count read back from the saved file (no `materials.clear()` after indices are set)
 - [ ] Before applying/joining/baking transforms: materials reading Object / Generated / Position coordinates listed, and a before/after render (or sampled pixel) matches
 
 ---
 
 ## VERSION HISTORY
+
+**v2.1.3** (2026-10-30) - Obs 244: `materials.clear()` resets material_index; troubleshooting entry and checklist line.
 
 **v2.1.1** (2026-10-09) - Observation 98: applying, joining, realising or
 baking transforms silently changes materials that read Object-space

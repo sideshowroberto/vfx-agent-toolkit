@@ -2,7 +2,7 @@
 
 **Part of:** houdini-solaris-usd skill
 **Loaded:** On-demand (progressive disclosure)
-**Last Updated:** 2026-10-10
+**Last Updated:** 2026-10-30
 
 How Houdini light and ROP parameters land on the USD stage Karma renders, as measured on
 Houdini 21.0.596. Only what was measured is listed; each item was read back from the
@@ -108,3 +108,42 @@ The ROP ships with `causticsenable` off, `diffuselimit` 3, `volumelimit` 0, and 
 noise fell from 4.69 to 0.14, and box means stayed within 2.8 luma of the undenoised
 prediction, so a denoised scratch frame is a fair luminance read. The numbers are from one
 scene; read the defaults back from your own ROP.
+
+---
+
+## 7. A Light Mixer downstream overrides the light LOP (obs 291)
+
+**Rule:** before changing any light value, read it on the COMPOSED stage at the display / render node
+(`prim.GetAttribute('inputs:exposure').Get(frame)`) and compare with the light LOP's parm. If they differ, walk the
+chain for a `lightmixer` (its overrides are the `xn__<primpath>inputs...` parms) or a later Light / Edit LOP, edit
+where the value wins, and read it back after the edit.
+
+**Why:** a sun LOP showed exposure 3.45 and a sky dome LOP 10.0, but Karma rendered the sun at 7.0 and the sky at 1.0
+because a Light Mixer further down carried its own overrides; editing the light LOP changed nothing and raised no
+error. Only the overridden parms are affected (the sun's angle and colour still came from the light LOP).
+
+---
+
+## 8. Geometry (mesh) lights ignore Spread and shaping focus (obs 205)
+
+**Rule:** a Geometry Light LOP (MeshLightAPI) emits Lambertian from its faces; Spread, USD shaping focus, cone and
+barn doors do not apply. Aim it by orienting the emitting faces (and occluders), or use a rect / disk light where a
+beam must be shaped. Before concluding a parameter "does nothing", run the positive-control test in
+verification_instruments.md section 6.
+
+**Why:** measured with husk XPU: Spread 0.1 and focus 30 each changed the frame by about 0.6 (the noise floor), while
+an exposure change through the same override changed it by 19.2. Spread is documented only for rect / disk lights and
+the Geometry Light LOP exposes no shaping parameters. A 2D first-hit section showed turning a strip 45 degrees toward a
+wall moved the share landing on the jamb from 50% to 72%, while a baffle only removed light (x1.01).
+
+---
+
+## 9. Spot lights, sphere radius and cone angle (obs 174)
+
+- **Spot Light toggle:** the Light LOP writes cone / softness only when `spotlightenable` is on; with it off there is
+  no ShapingAPI and `inputs:shaping:cone:angle` reads None. Read it back before any render is judged.
+- **A sphere light's RADIUS is geometry.** A 3 cm fill 0.01 mm behind a 1.67 cm lip lit a bright speck at the edge
+  (120 px over 150 in the viewport); 1.2 cm was still a dot (9 over 100), 0.8 cm none. Keep the radius under about half
+  the occluder's thickness and re-check after any size change.
+- **`inputs:shaping:cone:angle` is degrees OFF THE AXIS** (half the spread): a "70 degree" fill reached nearly
+  horizontal and grazed the arch head (7.7% of cone rays clipped within 12 cm; 55 = 1.5%, 45 = 0).

@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Bash
 
 # nuke-compositing
 
-**Version:** 1.0.0
-**Last Updated:** 2025-12-03
+**Version:** 1.1.0
+**Last Updated:** 2026-10-30
 **Dependencies:** Nuke (Foundry), NukeMCPLogger
 
 ---
@@ -307,6 +307,17 @@ def setup_keying_comp(plate_path: str, bg_path: str, output_path: str,
 
 ---
 
+## Lens Distortion of CG (obs 302)
+
+A lens node has an implied format contract. A 3DE-style LD node maps the input FORMAT onto its filmback; an open-gate solve (for example 27.99 x 19.22) stretches a 16:9 format onto it with no error.
+
+- Reformat to a canvas of the filmback's shape (for example 3840 x 2638), resize none, centred, bbox kept so overscan stays readable; LD node with direction distort; then Reformat to 16:9 with no resize and no bbox preserve.
+- Give 5 percent overscan per side (the vendor STMap's own margin); read back as 1.0 on a white source to prove every corner is covered.
+- Verify with something other than the node that applied the lens: node vs the delivered STMap on a grid (mean abs 0.00028 here), then patch displacement on the real frame by template match in python (median 1.03 px over 23 patches). Patches on long straight edges slide along them, so use the median and look at the outliers.
+- Headless: `pluginAddPath` + `nuke.load` work under `--safe`.
+
+---
+
 ## Troubleshooting
 
 ### Issue 1: Nodes Not Connected
@@ -372,6 +383,9 @@ merge['operation'].setValue("over")
 ---
 
 ## Version History
+
+**1.1.0 (2026-10-30):**
+- Added Lens Distortion of CG section (obs 302)
 
 **1.0.0 (2025-12-03):**
 - Initial release

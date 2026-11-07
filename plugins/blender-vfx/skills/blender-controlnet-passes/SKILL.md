@@ -5,7 +5,7 @@ description: "Renders ControlNet conditioning passes from a Blender scene for AI
 
 # Blender ControlNet Passes
 
-**Version:** 1.1.1 | **Last Updated:** 2026-08-21 | **Blender:** 5.x
+**Version:** 1.1.2 | **Last Updated:** 2026-10-30 | **Blender:** 5.x (1.1.2: gotchas 12, 15, 16 - obs 240, 241)
 
 One parameterized script replaces the per-project pass-render scripts:
 `scripts/setup_controlnet_passes.py` (relative to this skill directory)
@@ -138,11 +138,20 @@ does the full range.
     beauty/pass renders with no subframe/speed tricks are safer via
     Blender's native animation render (`INVOKE_DEFAULT`), which held
     steady for 118-frame 4K renders in the same sessions.
-12. **Dark scenes render near-black clay.** The override preserves scene
-    lighting; a dark stage/arena scene gives an unreadable conditioning
-    frame. Temporarily set the world Background to flat grey
-    (color 0.5 / strength 1.0), render, restore. Flat even light is ideal
-    for geometry conditioning anyway (no baked-in light direction).
+12. **Dark scenes render near-black clay; an UNLIT scene renders flat clay.**
+    The override preserves scene lighting; a dark stage/arena scene that HAS
+    lights gives an unreadable conditioning frame. Temporarily set the world
+    Background to flat grey (color 0.5 / strength 1.0), render, restore. But a
+    scene with NO lights (the asset's lights sit in excluded collections) under
+    that flat world came out 137-170 of 255 over the whole frame: seat backs,
+    pans and background within about 30 levels, forms barely readable, while
+    the not-blank and not-uniform checks passed. For such a scene add an
+    in-memory soft SUN (angle 12 deg, strength 3, from high behind the camera,
+    direction (0, 0.6, -0.8)) and drop the world to 0.25: 99-179 with readable
+    forms and contact shadows, render time unchanged. Apply it in the render
+    session only (a sun from behind/above camera minimises cast-shadow
+    confusion). Add a READABILITY gate next to gotcha 9: p5-p95 spread of the
+    grey pass above 50 levels, judged on a CG-only preview too.
 13. **ffmpeg on Windows.** `encode_mp4` calls plain "ffmpeg"; if Blender's
     environment lacks it the script warns and leaves PNGs. A working copy
     often hides at `C:\Program Files\ImageMagick-*\ffmpeg.exe`. Also
@@ -160,6 +169,22 @@ does the full range.
     0001 when the calling python has OpenEXR (Blender's bundled python does
     not - it prints a skip notice, never a false PASS). Rule 8 in action:
     a too-clean "only Combined" result is the instrument, not the file.
+15. **Passes that go back into comp over a plate need the plate's frame
+    numbers.** `render_sequence()` names outputs by a sequential counter
+    (`_0001`...), so a plate shot running 981-1396 comes out 0001-0416 and
+    renaming 416 x 2 files afterwards is a MOVE.
+16. **Never point a script that renames its own outputs at a no-move
+    (write-only) share.** The depth path writes `<name>.Depth.png` and then
+    renames it to the canonical name; that rename happens inside Blender, where
+    a path hook does not see it, so it silently breaks a no-move/no-delete rule
+    when the output root is on such a share. Render to a LOCAL drive (naming each
+    frame with its plate frame number up front, not renaming later), then copy
+    to the share.
+
+17. **Prove a flat colour-ID pass before a paid reskin.** Key the palette on the
+    asset id, colour every non-target subject one flat colour, and run
+    `scripts/check_id_pass.py`: every key has pixels, no other-subject or unknown
+    flat colour, predicted feature positions, depth, and edges on the grey render.
 
 ## References
 

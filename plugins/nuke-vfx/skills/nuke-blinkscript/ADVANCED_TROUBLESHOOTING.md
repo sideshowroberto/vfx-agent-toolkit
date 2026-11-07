@@ -79,6 +79,15 @@ void init() {
 
 ---
 
+### Issue 8: Scripted kernel loading does nothing (Python / nuke -t)
+**Symptom:** `node['kernelSource'].setValue(text)` followed by `node['recompile'].execute()` leaves the node on the default Swirlomatic kernel; no `<Kernel>_<param>` knobs appear. Verified on Nuke 17.0v2.
+**Cause:** setValue on the BlinkEditorKnob is a silent no-op, and in `nuke -t` the parameter knobs are never created by recompile or reload at all.
+**Fix:**
+1. Write the kernel to a `.blink` file, set `kernelSourceFile`, then `node['reloadKernelSourceFile'].execute()` in a GUI session. Param knobs appear as `<KernelName>_<param>`; per-input channel masks as `<KernelName>_<input>`.
+2. For headless use, save the GUI-built node with `nuke.nodeCopy(path)`; the .nk embeds kernelSource + KernelDescription + param values and compiles correctly on load or paste in `-t`. Compile errors only print on the `-t` console; `node.error()` is just a bool.
+3. Link params from a Group with `{{parent.knob}}` expressions; they survive the save because the knobs exist once kernelSource has parsed.
+Also: Blink ships a built-in `bilinear(img, x, y)`, so name your own helper something else. See `examples/glass_blink_build.py` for the full pattern.
+
 ## Best Practices
 
 ### 1. Visible Default Values

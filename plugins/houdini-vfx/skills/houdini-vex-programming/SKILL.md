@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Bash
 
 # houdini-vex-programming
 
-**Version:** 1.1.0
-**Last Updated:** 2026-10-09
+**Version:** 1.1.1
+**Last Updated:** 2026-10-30
 **Dependencies:** Houdini 20+
 
 ---
@@ -658,7 +658,7 @@ if (!hasattrib(0, "point", "velocity")) {
 - Create attributes explicitly before using
 - Use Geometry Spreadsheet to see available attributes
 
-**See also:** `reference/wrangle_traps.md` - `set*attrib()` writes are deferred; `prim()`/`point()`/`detail()` in the same wrangle read the INPUT (keep multi-pass state in arrays, write once at the end).
+**See also:** `reference/wrangle_traps.md` - `set*attrib()` writes are deferred; `prim()`/`point()`/`detail()` in the same wrangle read the INPUT (keep multi-pass state in arrays, write once at the end). Also there: point() inside a ternary loses its string type (obs 175); an empty group pattern selects ALL elements (obs 233); bare globals do not bind in a wrangle built from Python (obs 190).
 
 ---
 
@@ -666,7 +666,7 @@ if (!hasattrib(0, "point", "velocity")) {
 
 ### **Progressive Disclosure Pattern**
 
-Longer traps live in `reference/` (currently `wrangle_traps.md`); the technique
+Longer traps live in `reference/` (currently `wrangle_traps.md`: deferred writes, ternary lookups, empty group patterns, bare globals); the technique
 sections above are the rest of the reference. Use the Houdini MCP `search_help` /
 `get_help_page` tools for SideFX's own documentation.
 
@@ -757,6 +757,8 @@ VEX compilation failed
 ---
 
 ## VERSION HISTORY
+
+**v1.1.1** (2026-10-30) - wrangle_traps.md: ternary string lookups, empty group pattern = all, bare globals from Python (obs 175, 233, 190)
 
 **v1.1.0** (2026-10-09) - Deferred set*attrib() writes (obs 148): new reference/wrangle_traps.md
 

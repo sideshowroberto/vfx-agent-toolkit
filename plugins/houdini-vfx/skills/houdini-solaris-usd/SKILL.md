@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Bash
 
 # houdini-solaris-usd
 
-**Version:** 1.1.1
-**Last Updated:** 2026-10-10
+**Version:** 1.2.0
+**Last Updated:** 2026-10-30
 **Dependencies:** Houdini 20+, USD libraries
 
 ---
@@ -714,6 +714,9 @@ sections above are the rest of the reference. Use the Houdini MCP `search_help` 
 Karma lights: `reference/karma_lights.md` - how Houdini light and ROP parameters land as UsdLux
 attributes (cone angle and softness, distance-squared falloff, double-sided area lights, x 2 pi intensity).
 
+More in `reference/`: from_obj_to_solaris, stage_readback, verification_instruments, viewport_slap_comp, stills_per_shot (USD Render ROP renderer must be BRAY_HdKarmaXPU; verify from the EXR Software header; `scripts/karma_rop.py` checks this and runs headless ROPs). `scripts/stage_digest.py` compares composed stages
+(stage_readback section 6). A render record that must prove its source: `houdini-python-automation/scripts/hip_provenance.py`.
+
 ---
 
 ## VALIDATION CHECKLIST
@@ -802,6 +805,10 @@ USD export failed
 ---
 
 ## VERSION HISTORY
+
+**v1.2.0** (2026-10-30) - five new reference files (obs 174, 177, 186/294, 188, 203, 205, 208, 211, 249, 250, 281, 290, 291, 292, 293, 298); Light Mixer and geometry-light items in karma_lights.md; export-to-another-DCC check in usd_export_checks.md
+
+**v1.1.2** (2026-10-20) - pointer to the new materialx-library-lookdev skill for third-party MaterialX libraries (obs 193, 195)
 
 **v1.1.1** (2026-10-10) - Karma light mapping facts (obs 113): new reference/karma_lights.md, pointer added
 

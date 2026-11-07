@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Edit
 
 # skill-creation-update
 
-**Skill Version:** 1.3.1
-**Last Updated:** 2026-10-09
+**Skill Version:** 1.3.2
+**Last Updated:** 2026-10-30
 **Dependencies:** Python 3.12+, VFX_SKILL_CONSTITUTION.md (v2.0.0+)
 **Status:** Production-ready
 
@@ -92,11 +92,13 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py unreal-vfx-a
    ```
    **Pass the skill NAME, never a path.** Given a path it cannot find the
    skill and still prints `[OK] PASS (0/0 automated checks)` - a vacuous
-   pass (2026-08-22). Also known: Article VIII enforces the retired
-   emoji-template section list (Quick Start, Dependencies, Last Updated...),
-   so current-style skills such as `wrap-session` FAIL it; treat an
-   Article VIII-only failure as instrument drift, not a defect, until the
-   validator is updated.
+   pass (2026-08-22). Article VIII is a LITERAL check, not drift: it needs a
+   Version line, "Last Updated", "Dependencies" and `##` headings for Quick
+   Start, Workflows, Troubleshooting, Reference Documentation, Constitutional
+   Compliance and Version History. A current-style skill that fails only
+   Article VIII is usually missing three headings - add them (obs 198; list
+   and the checklist for scripts that fetch remote content in
+   `reference/validation_checks.md`).
 2. **Review report:**
    - Article I: No hard-coded paths detected [OK]
    - Article III: 470 lines <500 [OK]
@@ -119,6 +121,9 @@ python .claude\skills\skill-creation-update\scripts\update_skill.py unreal-vfx-a
      shipped script is always somebody's personal path on somebody else's
      machine: nuke-shot-setup shipped a dead personal OCIO path and Nuke 15 as
      built-in defaults (observation #9, 2026-09-08).
+   - **Scripts that fetch remote content (manual, obs 199):** plan by default, `--go`
+     plus a recorded approver, no overwrite, source record, hostile-archive test
+     against a local fake API - see `reference/validation_checks.md`.
    - **Scripts that walk a share or folder tree at run time (manual, principle 10):**
      a shipped script that enumerates a share or folder tree bypasses the agent's
      drive-policy hook, because the hook sees only the command line (which names
@@ -385,6 +390,10 @@ Not applicable (this is a skill, uses directory structure)
 ---
 
 ## Version History
+
+**v1.3.2** (2026-10-30) - Validator and fetch-script checks
+- Article VIII is a literal heading check, not drift (obs 198); checklist for
+  scripts that fetch remote content (obs 199); both in `reference/validation_checks.md`
 
 **v1.3.0** (2026-10-09) - Run-time access policy for shipped scripts
 - Workflow 2 checklist: a shipped script that walks a share or folder tree at

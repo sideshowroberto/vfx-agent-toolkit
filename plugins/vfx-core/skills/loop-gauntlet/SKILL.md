@@ -6,7 +6,7 @@ user-invocable: true
 
 # Loop Gauntlet
 
-**Version:** 1.6.1 | **Created:** 2026-09-09 | **Last updated:** 2026-10-10 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
+**Version:** 1.6.2 | **Created:** 2026-09-09 | **Last updated:** 2026-10-30 | **Status:** public-safe (no studio paths; the run evidence lives in the workspace session log)
 Version history: `reference/version_history.md`.
 
 A gauntlet loop is a builder that keeps going until an authored quality bar
@@ -29,7 +29,10 @@ The lessons from that run are folded in below and in
    `magnific-local-upload`), copy to one folder, and SETTLE DISAGREEMENTS
    between references before the loop. Two refs that disagree on an object
    count or a hero prop shape cannot both be matched by one scene; the first
-   run lost a view to exactly that. Curate a lead-supplied set by allowlist.
+   run lost a view to exactly that. Curate a lead-supplied set by allowlist. For client work each view also names
+   where its design came from (client photo, client note, self-sourced); a
+   self-sourced or mock-derived reference is a stated assumption
+   (`reference/contract_authoring.md` 11).
    A plan drawing or a generated "orthographic" elevation is a MEASURING
    reference, never a view: a dimension table with one human-stated anchor,
    bands classified as geometry or projection (`reference/contract_authoring.md` 1-3).
@@ -265,10 +268,13 @@ caught immediately.
 A leg that continues or refines an existing scene (rather than building
 from scratch) shares a live DCC session with the run that came before it,
 and that changes the opening step: **before opening the working file,
-read back the currently open file's path, `bpy.data.is_dirty`, and its
-last-save time (mtime), and confirm the other run's LOOP_LOG ends with a
-STOP decision.** If the scene is dirty, or the mtime does not match the
-file's own last save, or the log has no stop decision, report and wait -
+read back the currently open file's path, `bpy.data.is_dirty`, its
+last-save time (mtime) and a content fingerprint, and confirm the other run's
+LOOP_LOG ends with a STOP decision.** `is_dirty` alone cannot prove the live
+session equals the file (`reference/contract_authoring.md` 12). If the scene
+is dirty, or the mtime does not match the file's own last save, or the
+fingerprint differs from the one the last leg logged, or the log has no stop
+decision, report and wait -
 do not open the file. A live DCC is shared state; opening a file is a
 destructive act on whatever is loaded.
 

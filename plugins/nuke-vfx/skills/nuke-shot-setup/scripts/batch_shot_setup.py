@@ -86,6 +86,16 @@ def make_stack_var(shot: str, plate_name: str) -> str:
     return f"N{h}"
 
 
+SHOT_CODE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_\-]*$")
+
+
+def valid_shot_code(code: str) -> bool:
+    """Shot and context codes become path segments. Reject anything that is not a
+    plain identifier (path separators, '..', drive letters, absolute paths) so a
+    hand-edited or malformed CSV can never write outside the project root."""
+    return bool(code) and bool(SHOT_CODE_RE.match(code))
+
+
 def sequence_from_shot(shot_code: str) -> str:
     """Derive sequence code from shot code: ac030_0110 -> ac030."""
     return shot_code.rsplit("_", 1)[0]
@@ -122,6 +132,9 @@ def parse_csv(csv_path: str, sequence_filter: str = None) -> list[dict]:
             row.setdefault(key, value)
         code = row.get("Shot Code", "").strip()
         if not code or code in seen_codes:
+            continue
+        if not valid_shot_code(code):
+            print(f"WARNING: skipping shot code {code!r} - not a plain identifier")
             continue
         seen_codes.add(code)
 
@@ -167,6 +180,9 @@ def scan_plates_from_csv(plates_csv_path: str, plates_dir: Path) -> dict[str, li
         for row in reader:
             filename = row["Filename"].strip()
             shot = row["Context"].strip()
+            if not valid_shot_code(shot):
+                print(f"WARNING: skipping plates row with context {shot!r} - not a plain identifier")
+                continue
             first = int(row["First Frame"].strip())
             last = int(row["Last Frame"].strip())
 
@@ -332,6 +348,7 @@ def gen_header(cfg, shot, nk_path, first_frame, last_frame):
         f" frame {first_frame}\n"
         f" first_frame {first_frame}\n"
         f" last_frame {last_frame}\n"
+        f' fps {cfg["fps"]}\n'
         f" lock_range true\n"
         f' format "{fw} {fh} 0 0 {fw} {fh} 1 "\n'
         f" proxy_type scale\n"
@@ -650,7 +667,13 @@ def create_shot(cfg, shared_dir, plates, shot, context, force=False):
     result = {"shot": shot, "status": "ok", "plates": [], "issues": []}
 
     seq_code = sequence_from_shot(shot)
+    for seg in (seq_code, shot, context):
+        if not valid_shot_code(seg):
+            raise ValueError(f"refusing path segment {seg!r}: not a plain identifier")
     nuke_dir = shared_dir / "06_seq" / seq_code / shot / "work" / context / "nuke"
+    root = Path(shared_dir).resolve()
+    if root not in Path(nuke_dir).resolve().parents:
+        raise ValueError(f"refusing to write outside the project root: {nuke_dir}")
     (nuke_dir / "render" / "default").mkdir(parents=True, exist_ok=True)
 
     if not plates:

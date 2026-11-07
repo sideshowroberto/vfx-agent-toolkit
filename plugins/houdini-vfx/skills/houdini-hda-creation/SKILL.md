@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Bash
 
 # houdini-hda-creation
 
-**Version:** 1.1.1
-**Last Updated:** 2026-10-09
+**Version:** 1.2.0
+**Last Updated:** 2026-10-30
 **Dependencies:** Houdini 20+, Python 3.9+
 
 ---
@@ -472,7 +472,10 @@ Locked instances follow definition updates; unlocked instances keep their local
 edits. Check which definition is active (`hou.HDADefinition.isPreferred()`) and
 whether the affected instance is unlocked (`instance.isEditable()`). Do NOT
 bulk-match or destroy instances as a refresh remedy: `matchCurrentDefinition()`
-discards unsaved contents, and recreation can lose connections and state.
+discards unsaved contents, and recreation can lose connections and state. The one
+exception is a single instance that is no longer `matchesCurrentDefinition()`: diff its
+contents against a fresh unlocked instance first and match only when the differences are
+just the missing definition changes (`reference/in_place_update.md`, section 1).
 Parameter-interface changes must be saved with `definition.setParmTemplateGroup`;
 an instance-only spare parameter never reaches future instances. A parameter
 version migration is a deliberate migration of the actual asset, not a refresh.
@@ -543,6 +546,8 @@ two calls are commonly misread: `setIsPreferred(True)` selects which definition
 is active - it does not unlock a node or grant write access; and
 `matchCurrentDefinition()` REVERTS the instance to the saved definition - it is
 not an "exit and save" command. Calling match before save throws the edits away.
+Match is correct only after a successful save (below) or as a deliberate, diffed revert
+of one stale instance (see "HDA Parameters Not Updating").
 
 **Solution (save-then-match; native save/match/reopen and intentional revert
 verified on Houdini 21.0.596, 2026-09-08):**
@@ -573,7 +578,14 @@ HDA creation, versioning and reload are driven through the Houdini MCP tools
 `set_hda_section_content`) or the `hou.HDADefinition` API shown above. This skill
 ships no helper scripts: callbacks, parameter design and VEX integration are covered
 inline in the technique sections; versioning, int-menu and delivery-verification traps
-are in `reference/versioning_and_verification.md`.
+are in `reference/versioning_and_verification.md`. Further references: `in_place_update.md` (dry-run, unlocked instances, copied interfaces, master-control scan), `override_layers.md`, `asset_interface_design.md`, `viewport_image_assets.md`.
+
+Spare-parm tabs and interface edits (hou.ParmTemplateGroup): when adding several templates to an EXISTING folder, append
+BY THE FOLDER LABEL (`g.appendToFolder("Tab", t)`) or re-run `findFolder` before every append - a FolderParmTemplate handle
+taken earlier goes stale after the first append and the next one raises `hou.OperationFailed: Invalid indices/name/parm
+template` (reproduced on 21.0.596). Idempotent pattern: create the tab if missing, else append only the missing knobs and
+never reset an existing value; call `setParmTemplateGroup` once. Working code (function `ensure_knobs`):
+`materialx-library-lookdev/scripts/mtlx_build_helpers.py`.
 
 ---
 
@@ -663,6 +675,10 @@ HDA Creation failed
 ---
 
 ## VERSION HISTORY
+
+**v1.2.0** (2026-10-30) - new references in_place_update, override_layers, asset_interface_design, viewport_image_assets; versioning reference gains minor-version fix and swap leftovers; matchCurrentDefinition wording reconciled (obs 155, 159, 176, 180, 187, 191, 202, 210, 217, 234)
+
+**v1.1.2** (2026-10-20) - interface edits: append to an existing folder by label, never reuse a folder handle (obs 196)
 
 **v1.1.0** (2026-10-09) - Version pinning, int-menu position, force-cook every output, display-node cross-ref (obs 150, 139, 121, 149): new reference/versioning_and_verification.md
 

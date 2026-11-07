@@ -46,7 +46,12 @@ moment a graph is accepted. Two zero-cost steps come first, every time:
    with header `X-API-KEY: <key>`; `effective_balance_micros` is US CENTS despite the name:
    value / 100 = USD, USD x 211 = credits (docs.comfy.org billing reference; comfy-cli PR #926).
    Reconcile the delta against the price badges. A larger drop than predicted
-   means stop and find what else billed.
+   means stop and find what else billed. The ledger settles a few seconds after
+   the run: an AFTER read taken in the same command as `comfy run --wait` can
+   return the BEFORE value exactly. If the delta is zero for a run with a
+   non-zero price badge, re-read after about 30 s before concluding anything
+   (obs 269). On a shared account the delta can include other people's jobs:
+   read the billing activity feed before blaming your run.
 
 Submit with `comfy run --workflow api.json --wait --json --timeout 600`. Feed the
 workflow's API-format export; UI-format graphs with Get/Set virtual nodes or
@@ -73,3 +78,48 @@ Save3DAdvanced as "" (four shape_mismatch errors). Fix: take the API prompt
 from the run's `prompt_preview` event, patch the values, and submit that API
 file instead of the UI file. Validate it with `comfy validate --where local`
 before the run.
+
+## Checks the validator cannot make (obs 157, 223, 68)
+
+`comfy validate` only knows the constraints it is fed. `scripts/comfy_gate.py` enforces the checks below: run `pre` on the workflow before a paid run and `post` on the saved `comfy run --wait --json` output after it. Its limits table is stamped with the ComfyUI version it was read from.
+
+- **Partner-node limits live in the node's execute code, not object_info.**
+  Output pixel caps (Seedream 5.0 Pro: 4.19 MP on ComfyUI 0.37, 4.62 MP on 0.43,
+  while its width/height ranges allow more; the limits move between versions) and reference-image aspect ranges (for
+  example 1:3 to 3:1 on one version, 1:16 to 16:1 on the next) pass validate and fail at execution. Check every partner
+  node's size and every reference image's aspect against the cap before submit.
+- **One paid partner node per prompt.** ComfyUI aborts the whole prompt at the
+  first node error, so one bad size cancels the other paid node. A failed run
+  can still exit 0; judge by the envelope's `ok` and the files on disk.
+- **Read the `data` object of the validate envelope** (`data.valid`,
+  `data.error_count`), not the top level.
+- **Upload inputs to the TOP of the input folder.** LoadImage and LoadVideo
+  option lists hold only top-level files; a subfolder path fails validate as
+  `unknown_enum_value`. Use unique names and read back by hash.
+- **"completed" is not a result.** The server drops every output node that
+  depends on an invalid node and still runs the rest. After a run, read the
+  run's `queued` event: `validation_warnings` must be empty or explained, the
+  output node the run exists to produce (SaveImage, SaveVideo, SaveGLB) must be
+  in `executed_node_ids`, and the file must exist. A template saved before a
+  ComfyUI upgrade can be missing newly required inputs; diff its node inputs
+  against `/object_info` before the first run.
+- **Autogrow input shape is node-specific.** Some nodes want one flattened key
+  per slot, others a nested dict (`"ref_images": {"ref_image0": ["15", 0]}`),
+  and the validator's hint can be wrong. When a validated graph dies at
+  runtime with an unexpected-keyword error, read the node's `execute()`
+  signature in `comfy_extras/`; it is the ground truth for argument shape.
+
+## Long local batches (obs 56)
+
+Design so any single process (the agent, the server, the GPU) can die at any
+second and the only loss is the clip in flight.
+
+- Submit in small chunks; copy and probe each output as it lands. Never batch
+  the read-backs at the end.
+- Derive resumption from what is on disk (the missing list), tolerant of
+  partial chunks, not from a plan.
+- Record GPU telemetry beside the job
+  (`nvidia-smi --query-gpu=... -l 5` to a CSV) so a fault leaves evidence.
+- If the card runs at its power limit, gate on temperature between gens with a
+  cooldown, and ask the operator for a lower power limit. Breaks change the
+  duty cycle; the cap changes the peaks. Failure signatures: see comfy-debug.

@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Bash
 
 # nuke-blinkscript
 
-**Version:** 1.3.1
-**Last Updated:** 2026-03-26
+**Version:** 1.4.0
+**Last Updated:** 2026-11-06
 **Dependencies:** Nuke 15.0+, BlinkScript node
 
 ---
@@ -520,6 +520,46 @@ kernel FrequencyBlur : ImageComputationKernel<ePixelWise>
 
 ---
 
+## Complete Example: GlassBlink (replacing a crash-prone gizmo)
+
+**Reference:** `examples/GlassRefract.blink` + `examples/glass_blink_build.py`
+
+The NukeSurvivalToolkit Glass gizmo is 46 stock nodes: four 1-px Transforms feed an
+Expression that builds a matte gradient scaled by format width, ZBlur uses the
+gradient magnitude as a fake depth, and four IDistorts do the refraction and
+chromatic aberration. At any hard matte edge it asked IDistort for a ~3000 px
+pull, blowing up the request region and crashing Nuke. The whole graph is one
+pixel-wise kernel:
+
+```cpp
+kernel GlassRefract : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom,   eEdgeClamped> src;      // plate, sampled anywhere
+  Image<eRead, eAccessRanged2D, eEdgeClamped> control;  // matte, +-1 px neighbourhood
+  Image<eWrite> dst;
+  ...
+  void init() { control.setRange(-1, -1, 1, 1); ... }
+  void process(int2 pos) {
+    float gx = (control(1, 0).w - control(-1, 0).w) * fw;   // gradient = pull vector
+    float gy = (control(0, 1).w - control(0, -1).w) * fw;
+    float rad = min(defocusSize * (fabs(gx) + fabs(gy)) * 0.5f, maxRad);
+    float4 sg = gather(p + clampPull(g * gScale), rad);     // variable-radius blur at the pulled position
+    ...                                                      // R/B sampled with their own scale = aberration
+  }
+};
+```
+
+**Patterns demonstrated:**
+- Two image inputs with different access modes (random for the plate, ranged for the matte)
+- Variable-radius gather blur with a gaussian/disc "filter shape" blend (ZBlur stand-in)
+- Clamping every offset and radius in pixels before any loop runs (the crash fix)
+- Group wrapper with the ORIGINAL gizmo's knob names so it drops in unchanged
+- Scripted build via `kernelSourceFile` + `reloadKernelSourceFile` (see Issue 8 in ADVANCED_TROUBLESHOOTING.md)
+
+**Verified:** soft-matte diff vs the original gizmo about 0.5/255 mean; hard-edged matte renders in 0.15 s instead of crashing (Nuke 17.0v2, 2026-11-06).
+
+---
+
 ## Complete Example: Composition Grids
 
 **Reference:** `~/.nuke\blinkscript\CompositionGrids.blink`
@@ -616,6 +656,7 @@ kernel CompositionGrids : ImageComputationKernel<ePixelWise>
 - Testing methodology
 
 **Working Examples:**
+- `examples/GlassRefract.blink` + `examples/glass_blink_build.py` - one-kernel replacement for the NukeSurvivalToolkit Glass gizmo (two inputs, variable blur, scripted build)
 - `~/.nuke\blinkscript\CompositionGrids.blink` (475 lines)
 - Production-tested at 4K
 - 7 grid types implemented

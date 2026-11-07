@@ -6,8 +6,8 @@ allowed-tools: Read,Write
 
 # Blender Geometry Nodes Skill
 
-**Version:** 2.0.1
-**Last Updated:** 2026-10-10
+**Version:** 2.0.2
+**Last Updated:** 2026-10-30
 **Dependencies:** Blender 5.1+
 
 ---
@@ -415,6 +415,8 @@ print("Notes: expose Seed input per-lane if needed; merge three Factor sockets i
 - Expose `Seed` as a group input so iterations can be varied non-destructively
 - Merging all three per-lane Factor sockets to a single shared Factor makes the system easier to art-direct
 
+Replacing an asset a scatter instances: read the instancer's contract (Object Info space, switch wiring, instance matrices, ray-cast placement), then swap-test through the shot camera - `reference/REPLACE_INSTANCED_ASSET.md` (obs 245).
+
 ---
 
 ## TROUBLESHOOTING
@@ -478,6 +480,8 @@ cutter (empty Difference). Checks and snippet: `reference/BOOLEAN_CARVE_TRAPS.md
 ---
 
 ## VERSION HISTORY
+
+**v2.0.2** (2026-10-30) - Obs 245: replacing an instanced asset (new reference file, one pointer).
 
 **v2.0.1** (2026-10-10) - Troubleshooting Issue 3: scripted Boolean carve fails silently (excluded collection, inside-out cutter) (obs 64)
 

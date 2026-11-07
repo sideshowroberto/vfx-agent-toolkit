@@ -190,7 +190,7 @@ EOT
     if [ "$hi" -eq 0 ] && [ -n "$(ls "$LOG"/*.md 2>/dev/null)" ]; then
       echo "ID COMMAND BROKEN - log is non-empty but no ids extracted"; exit 1
     fi
-    next=$((hi + 1))
+    next=$((10#$hi + 1))  # 10#: a padded filename id such as 0303 would otherwise be read as octal
     echo "$next" > "$ARCH/.id-floor"
     printf '%04d\n' "$next"
     exit 0 ;;

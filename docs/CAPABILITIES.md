@@ -1,12 +1,12 @@
 # Capabilities index (public toolkit)
 
-GENERATED 2026-10-10 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/registry.json, the skill and agent files, .mcp.json and the script folders. Do not edit; it is rewritten on every /sync-plugins. Registry 2.0.4, updated 2026-10-06.
+GENERATED 2026-11-06 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/registry.json, the skill and agent files, .mcp.json and the script folders. Do not edit; it is rewritten on every /sync-plugins. Registry 2.0.4, updated 2026-10-30.
 
 **How to use it:** ask your agent "what can we do for <task>?" - it should read this file and name the skill, agent, tool or script to reach for. Each line is: name, then what it does and the phrases that trigger it.
 
 ## Skills, by plugin
 
-### vfx-core (v2.10.2, public)
+### vfx-core (v2.10.4, public)
 
 Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).
 
@@ -34,7 +34,7 @@ MCP servers: `brave-search`, `context7`, `desktop-commander`
 - **agent: python-specialist** - Applying templates, systematic refactoring, type safety (mypy, type hints, protocols), async programming (AsyncIO, concurrent.futures), data science workflows (pandas, numpy vectorization), and testing methodology (pytest, fixtures, parameterized tests). Use when applying agent-skill templates, migrating code patterns, refactoring with type hints, optimizing with async/vectorization, or performing systematic code transformation across multiple files.
 - **agent: python-refactoring-specialist** - Python refactoring specialist for applying templates, batch search/replace, and systematic code refactoring. Use when applying agent-skill templates, migrating code patterns, or performing systematic refactoring across multiple files.
 
-### nuke-vfx (v1.1.8, public)
+### nuke-vfx (v1.1.11, public)
 
 Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, and batch shot setup.
 
@@ -51,7 +51,7 @@ Requires: vfx-core
 - **nuke-shot-setup** [scripts] - Batch-creates Nuke visdev or comp v001 files, per-shot folders and a tracker CSV from a ShotGrid CSV and plates data, with ACES Reads and per-show config. Use for "set up shots" or "create comps from csv"; the team job ritual is shot-setup.
 - **agent: nuke-specialist** - Nuke compositing expert coordinating node graph operations, Python scripting, and ComfyUI integration. Use when user mentions nuke, compositing, nodes, grade, merge, multi-shot, or nuke python.
 
-### houdini-vfx (v1.1.2, public)
+### houdini-vfx (v1.1.5, public)
 
 Houdini VFX pipeline: procedural generation, USD/Solaris, VEX, Python automation, HDA creation.
 
@@ -60,8 +60,8 @@ Requires: vfx-core
 
 - **houdini-hda-creation** - Creates and manages Houdini Digital Assets (HDAs) - parameter interfaces, compilation, versioning and asset organization. Use when authoring reusable Houdini tools or asked about HDA creation, HDA parameters or compiling an HDA.
 - **houdini-procedural-generation** - Create procedural geometry workflows using SOPs including scattering, copying, instancing, and parametric modeling. Use for procedural modeling workflows. Triggers: procedural generation, scatter, copy to points, procedural modeling, sops
-- **houdini-python-automation** - Automates Houdini with Python (HOM) - node creation, parameter manipulation, scene management and batch processing. Use when scripting Houdini workflows, e.g. 'houdini python', 'hom script', 'automate houdini' or batch processing hip files.
-- **houdini-solaris-usd** - Work with USD (Universal Scene Description) in Houdini Solaris including stage creation, layer composition, variants, and USD export workflows. Use for USD workflows and Solaris. Triggers: solaris, usd, stage, layer, variant, usd export
+- **houdini-python-automation** [scripts] - Automates Houdini with Python (HOM) - node creation, parameter manipulation, scene management and batch processing. Use when scripting Houdini workflows, e.g. 'houdini python', 'hom script', 'automate houdini' or batch processing hip files.
+- **houdini-solaris-usd** [scripts] - Work with USD (Universal Scene Description) in Houdini Solaris including stage creation, layer composition, variants, and USD export workflows. Use for USD workflows and Solaris. Triggers: solaris, usd, stage, layer, variant, usd export
 - **houdini-vex-programming** - Write VEX code for Houdini including wrangles, custom operations, attribute manipulation, and performance optimization. Use when writing VEX scripts or custom operations. Triggers: vex, wrangle, vex code, attribute wrangle, point wrangle
 
 ### unreal-vfx (v2.2.1, public)
@@ -81,7 +81,7 @@ Requires: vfx-core
 - **agent: unreal-blueprint-specialist** - Expert in automating Unreal Engine Blueprint creation and compilation using Silent Execution pattern
 - **agent: unreal-pcg-specialist** - Expert in Unreal Engine PCG system for procedural terrain, vegetation, and asset placement with Python automation
 
-### blender-vfx (v2.0.10, public)
+### blender-vfx (v2.0.12, public)
 
 Blender VFX pipeline via the official Blender MCP (blender.org): modeling, animation, materials, geometry nodes, physics, rendering, sculpting, grease pencil, and ControlNet pass rendering for AI generation.
 
@@ -101,7 +101,7 @@ Requires: vfx-core
 - **blender-controlnet-passes** [scripts] - Renders ControlNet conditioning passes from a Blender scene for AI image and video generation - grey clay, normalized depth, cryptomatte EXR, optional wireframe. Use when preparing depth, edge or clay inputs for video models, or crypto mattes for comp.
 - **agent: blender-specialist** - Expert in Blender workflows via official Blender MCP. Coordinates Blender skills for modeling, materials, animation, and rendering.
 
-### comfyui-vfx (v2.3.3, public)
+### comfyui-vfx (v2.3.5, public)
 
 ComfyUI pipeline via the ComfyUI MCP and Comfy CLI, with optional ComfyUI_FL-MCP for live canvas operations: workflow analysis, node/model requirements mapping, and headless generation guidance, plus the previs-to-photoreal anchor keyframe recipe for reference-guided video generation.
 
@@ -110,7 +110,7 @@ Requires: vfx-core
 
 - **comfyui-workflow-analysis** - Analyzes a downloaded ComfyUI workflow JSON to list required custom nodes and models, install locations and a setup checklist. Use when the user shares a workflow JSON or asks 'what nodes does this need' or 'help me set up this workflow'.
 - **previs-anchor-keyframes** - Generates photoreal anchor keyframes from CG previs for reference-guided video models such as Seedance - previs shading, frame choice, pose reference sets. Use for "anchor keyframes", "previs to photoreal video", or generations that ignore the CG pose.
-- **comfy-cli-skills** - Installs comfy-cli's bundled agent skills into any harness and sets the zero-cost validate gate and credit audit for paid ComfyUI runs. Use when setting up comfy-cli, when comfy skills are missing, or before a workflow run that bills partner-node credits.
+- **comfy-cli-skills** [scripts] - Installs comfy-cli's bundled agent skills into any harness and sets the zero-cost validate gate and credit audit for paid ComfyUI runs. Use when setting up comfy-cli, when comfy skills are missing, or before a workflow run that bills partner-node credits.
 
 ### comfyui-node-dev (v1.1.3, public)
 
@@ -138,7 +138,7 @@ Requires: vfx-core
 - **maya-materials** - Creates and assigns Maya materials via MCP - Arnold aiStandardSurface, Lambert, Blinn and USD Preview Surface. Use for shader creation, texture assignment, assigning materials to geometry or look dev in Maya.
 - **agent: maya-specialist** - Maya scene control, rigging, modeling, and animation automation via MCP. Auto-triggers on .ma/.mb files, maya.cmds, pymel, rigging, blend shapes, joints, and deformers. Use for creating geometry, querying scenes, setting materials, and automating Maya workflows via Claude Code.
 
-### magnific-vfx (v1.1.4, public)
+### magnific-vfx (v1.1.5, public)
 
 Magnific AI generation via MCP: image generation with model selection and references, local file upload/download pipelines, and video generation.
 

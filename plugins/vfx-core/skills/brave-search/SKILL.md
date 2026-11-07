@@ -6,7 +6,7 @@ allowed-tools: Read,Bash
 
 # Brave Search Skill - VFX Research Intelligence
 
-**Version:** 2.2.2 | **Updated:** 2026-10-10
+**Version:** 2.2.3 | **Updated:** 2026-10-30
 
 ---
 
@@ -139,6 +139,10 @@ One line per hit, largest pixel area first, then a `RESULTS <n>` line:
 - **Hits are leads, not verdicts.** Sidebar images of other people or items get attached to the right page, and many CDNs serve AVIF/WEBP under a `.jpg` URL. Download, confirm the file opens, then open every candidate and look before keeping or naming it (see vfx-research, "Verify sourced URLs and images").
 
 ---
+
+### Opening what a search returns
+- An unversioned vendor docs URL can serve a NEWER release than the installed one; cite versioned URLs and, for "does the app ship X", query the installed app's own help first (see `vfx-research`).
+- A vendor doc that is a PDF may come back from a fetch as raw compressed bytes. That is a gap in the instrument, not a silent document: extract the auto-saved copy with PyMuPDF in a `python -I` script (set stdout to utf-8 inside it) before reporting a fact as "not stated".
 
 ## Search Protocols
 

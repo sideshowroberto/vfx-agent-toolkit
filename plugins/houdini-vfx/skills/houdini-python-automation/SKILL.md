@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Bash
 
 # houdini-python-automation
 
-**Version:** 1.1.1
-**Last Updated:** 2026-10-09
+**Version:** 1.3.0
+**Last Updated:** 2026-10-30
 **Dependencies:** Houdini 20+, Python 3.9+
 
 ---
@@ -638,9 +638,22 @@ for frame, value in [(1, 0.0), (50, 5.0), (100, 2.0)]:
 
 Two guides live in `reference/`: `geometry_export.md` (hython export traps: fake
 `saveToFile` formats, ROP menu defaults, missing bulk calls) and
-`verify_through_display_node.md` (read back through the display/render-flag node). The
-technique sections above are the rest of the reference. Use the Houdini MCP
+`verify_through_display_node.md` (read back through the display/render-flag node; also how to read viewport captures). More traps, one file each: `headless_build_checks.md` (cook every node, point-count rows/cols, face direction, a new ROP's `$FSTART`/`$FEND` frame range needs `deleteAllKeyframes()` before set), `python_sop_traps.md` (code-parm expansion, `inputGeometry(i)`, exec'd helpers clobbering globals), `editable_proxies.md` (procedural layout to movable objects), `takes.md` (per-shot variants), `measure_without_nodes.md` (point-to-surface clearance). The technique sections above are the rest of the reference. Use the Houdini MCP
 `search_help` / `get_help_page` tools for SideFX's own documentation.
+
+Two verification scripts live in `scripts/`. `geo_digest.py` proves two SOP outputs match and names the component
+that differs (attributes by name, so creation order cannot fake a change); when a proof fails with nothing changed,
+digest the saved hip headless before blaming the change. `hip_provenance.py` stamps a hip's bytes, time, sha256 and
+camera samples into a render record or beside a diff result, and `check` re-lists the files before an old result is
+reused. An empty diff says two files match, not that the work is missing: when two versions match, diff against the
+last version from before the work.
+
+Spare-parm tabs and interface edits (hou.ParmTemplateGroup): when adding several templates to an EXISTING folder, append
+BY THE FOLDER LABEL (`g.appendToFolder("Tab", t)`) or re-run `findFolder` before every append - a FolderParmTemplate handle
+taken earlier goes stale after the first append and the next one raises `hou.OperationFailed: Invalid indices/name/parm
+template` (reproduced on 21.0.596). Idempotent pattern: create the tab if missing, else append only the missing knobs and
+never reset an existing value; call `setParmTemplateGroup` once. Working code (function `ensure_knobs`):
+`materialx-library-lookdev/scripts/mtlx_build_helpers.py`.
 
 ---
 
@@ -730,6 +743,12 @@ Python automation failed
 ---
 
 ## VERSION HISTORY
+
+**v1.3.0** (2026-10-30) - scripts/geo_digest.py and scripts/hip_provenance.py (obs 285, 230, 299)
+
+**v1.2.0** (2026-10-30) - new references headless_build_checks, python_sop_traps, editable_proxies, takes, measure_without_nodes; capture-reading rules added to verify_through_display_node (obs 190, 253, 283, 286, 287, 221, 296, 179, 160)
+
+**v1.1.2** (2026-10-20) - spare-parm folder append by label, idempotent knob tab pattern (obs 196)
 
 **v1.1.0** (2026-10-09) - hython geometry-export traps (obs 101) and verify-through-display-node (obs 149): new reference/geometry_export.md, reference/verify_through_display_node.md
 

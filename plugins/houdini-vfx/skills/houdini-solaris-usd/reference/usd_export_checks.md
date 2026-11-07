@@ -2,7 +2,7 @@
 
 **Part of:** houdini-solaris-usd skill
 **Loaded:** On-demand (progressive disclosure)
-**Last Updated:** 2026-10-09
+**Last Updated:** 2026-10-30
 
 Three checks for USD that look fine in every measurement that only counts faces,
 bounding boxes or binding targets. Each one was found by a render or an importer, not by
@@ -115,3 +115,29 @@ the cloth with zero material slots. Run the per-face check after ANY structural 
 only references the SOP layer. Set the token, read `parm.evalAsString()` back, then open
 the written file and count its prims (`len(list(stage.Traverse()))`); a tiny file with a
 handful of prims and a sublayer reference is the stub.
+
+---
+
+## 4. Exporting a stage for another DCC: prove the same point lands on the same pixel (obs 208)
+
+**Rules:** (a) an importer may merge an Xform that has exactly one child into that child (`/podium/mesh_0` arrived as
+a top-level `mesh_0`): name a lone mesh after its parent, or let the receiving script find it by bounds. (b) A LOP
+camera that never authored `clippingRange` exports USD's fallback (1, 1000000), which Blender applies as a 1 m near
+clip: author it on the camera or set it on import. Lens values are in tenths of a scene unit (0.29 = 29 mm) and
+converted correctly. (c) Write a sidecar JSON with lens / sensor / resolution / transform in both axis conventions and
+a handful of projected check points, and make the receiving side re-open its saved file and compare, exiting non-zero
+on a mismatch.
+
+**Check:** six known world points projected through the USD camera in Houdini (Gf frustum, pixels) and through the
+imported Blender camera (`world_to_camera_view`) agreed within 0.004 px; also compare the camera position / forward
+vector after the axis map (x, y, z) -> (x, -z, y), bounds of named parts, and the total face count against the source.
+A cross-DCC handoff is proven by the same point landing on the same pixel in both apps, not by the import succeeding.
+Also read the stage at the frame (stage_readback.md section 1) before export.
+
+## 5. Houdini polygon winding is left-handed against USD's right-handed default
+
+Authoring Mesh prims from Houdini geometry without `orientation = leftHanded` renders
+the meshes inside-out. Detect it by comparing `prim.normal()` with the right-hand rule
+on a known face, and set the USD orientation from that measured winding test rather
+than by assumption. (A Revolve SOP also faces INWARD for a bottom-to-top profile: check
+normals against the radial direction before exporting.)

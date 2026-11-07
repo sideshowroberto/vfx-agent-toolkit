@@ -107,7 +107,7 @@ Review `tmp/` and any scratch files created this session:
 
 ## 5. Handoff Plan
 
-Write a concise next-session plan file to the canonical home: `Documentation/sessions/YYYY-MM-DD_<topic>_handoff.md` (job work: the job sandbox, with an INDEX.md pointer). Never tmp/ - handoffs are part of the session corpus. Cover:
+Write a concise next-session plan file to the canonical home: `Documentation/sessions/YYYY-MM-DD_<topic>_handoff.md` (job work: build a handoff PACKAGE per the `project-lifecycle` skill's "Handoff package" - `AGENT\handoffs\<YYYY-MM-DD>_<topic>_<username>\` from the share templates: README_CLAUDE.md, STARTER_PROMPT.txt, check_setup.py, and scripts\ copies when the recipe needs them - run check_setup.py once before handing over, and add the INDEX.md pointer and the PROJECT.md ledger line; use `<app>\development\` only for the session log, and read the folder holding the last few hand-offs before writing the next). Never tmp/ - handoffs are part of the session corpus. Cover:
 
 - **Completed** - what got done this session
 - **In flight** - what's partially done and its current state

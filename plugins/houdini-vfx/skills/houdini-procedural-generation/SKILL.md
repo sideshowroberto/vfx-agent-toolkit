@@ -6,8 +6,8 @@ allowed-tools: Read,Write,Bash
 
 # houdini-procedural-generation
 
-**Version:** 1.1.0
-**Last Updated:** 2026-10-09
+**Version:** 1.2.0
+**Last Updated:** 2026-10-30
 **Dependencies:** Houdini 20+
 
 ---
@@ -618,8 +618,8 @@ Instances only created at render time, not in viewport
 
 ### **Progressive Disclosure Pattern**
 
-This skill ships no separate reference guides: the technique sections above
-are the reference. Use the Houdini MCP `search_help` / `get_help_page` tools
+`reference/text_and_engraving.md`: measured font cleanliness, placing engraving/decals by ray-cast onto the real surface, Boolean Detriangulate before Divide/bend (obs 280, 282, 204). The technique sections above
+are the rest of the reference. Use the Houdini MCP `search_help` / `get_help_page` tools
 for SideFX's own documentation.
 
 ---
@@ -710,6 +710,8 @@ Procedural generation failed
 ---
 
 ## VERSION HISTORY
+
+**v1.2.0** (2026-10-30) - new reference/text_and_engraving.md (obs 280, 282, 204)
 
 **v1.1.0** (2026-10-09) - Checklist pointer to the display-node verification rule in houdini-python-automation (obs 149)
 

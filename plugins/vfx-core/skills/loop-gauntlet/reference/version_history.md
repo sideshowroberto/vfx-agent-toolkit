@@ -2,6 +2,11 @@
 
 Newest first. SKILL.md carries the current version line and points here.
 
+**v1.6.2** (2026-10-30) - Skill review wave 2 (owner-approved observations).
+- Reference provenance check for client work (obs 222) and a content
+  fingerprint beside `is_dirty` in the continuation opening (226), both in
+  `reference/contract_authoring.md` 11-12.
+
 **v1.6.0** (2026-10-10) - Skill review wave 2 (owner-approved observations).
 - Contract authoring moved to `reference/contract_authoring.md`: plan and
   layout drawings as measuring references (obs 59); classify the bands of a

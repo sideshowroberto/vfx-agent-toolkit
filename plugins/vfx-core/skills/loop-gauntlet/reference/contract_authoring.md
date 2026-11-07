@@ -263,3 +263,35 @@ stops the run.
 - **Resume document.** `RESUME.md` in the working folder names the last
   saved scene, the last logged iteration, any half-finished iteration and the
   open items, so a stopped run can be continued by another session.
+
+## 11. Reference provenance: a loop can only converge on its references (obs 222)
+
+Every leg can stop "clean" at its cap while building the wrong design, because
+the rubric scores the match to the references it was GIVEN. Check the reference
+set itself before the loop, not after a clean stop:
+
+- For client work, each matched view names where the design choice came from:
+  client photo, client note, or self-sourced. A self-sourced reference, or one
+  taken from a client mock or placeholder image, is written into the spec as an
+  assumption. A mock or placeholder in a client deck is never a design
+  reference unless the note says it is.
+- When the client's own item-to-photo mapping arrives later, it supersedes
+  self-sourced references. Re-run a side-by-side check of every built item
+  against it and re-open the contract for any mismatch.
+
+## 12. Continuation: `is_dirty` is not a state check (obs 226)
+
+Edits made by script through RNA did not set `bpy.data.is_dirty` in background
+mode: moving one object 5 mm through the data API changed a geometry checksum
+and the flag stayed False. (Measured headless only; whether a GUI session tags
+dirty on its own undo pushes was not measured.) So the flag cannot prove the
+live session equals the file on disk.
+
+- End of leg: save, REOPEN the saved file, then read back `is_dirty` and the
+  fingerprint - not in the session that did the editing.
+- The leg writes the geometry/scene checksum of its final saved file into
+  LOOP_LOG.md (or final_delivery.json).
+- The next leg compares a fresh read-back of the live session against that
+  checksum before opening anything. A mismatch is the same report-and-wait as a
+  dirty flag.
+- Test a flag with a known edit before relying on it.
