@@ -34,9 +34,9 @@ MCP servers: `brave-search`, `context7`, `desktop-commander`
 - **agent: python-specialist** - Applying templates, systematic refactoring, type safety (mypy, type hints, protocols), async programming (AsyncIO, concurrent.futures), data science workflows (pandas, numpy vectorization), and testing methodology (pytest, fixtures, parameterized tests). Use when applying agent-skill templates, migrating code patterns, refactoring with type hints, optimizing with async/vectorization, or performing systematic code transformation across multiple files.
 - **agent: python-refactoring-specialist** - Python refactoring specialist for applying templates, batch search/replace, and systematic code refactoring. Use when applying agent-skill templates, migrating code patterns, or performing systematic refactoring across multiple files.
 
-### nuke-vfx (v1.1.11, public)
+### nuke-vfx (v1.1.12, public)
 
-Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, and batch shot setup.
+Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, and tiling tool.
 
 MCP servers: `nuke`
 Requires: vfx-core
@@ -48,7 +48,6 @@ Requires: vfx-core
 - **nuke-node-tree-patterns** - Production-tested patterns for creating robust Nuke node trees programmatically. Use for avoiding auto-connection issues, dynamic positioning, expression masks, and gradient blending.
 - **nuke-python-scripting** [scripts] - Writes Nuke Python automation scripts using the NukeMCPLogger pattern so results and logs return through the MCP bridge. Use when scripting Nuke, automating comps, or when "nuke python", "nuke script" or the nuke logger come up.
 - **nuke-tiling-tool** [scripts] - Automated image tiling for ML processing in Nuke with seamless gradient blending. Use for large plates (4K+) through ML nodes (ViTMatte) optimized for 1K-2K tiles.
-- **nuke-shot-setup** [scripts] - Batch-creates Nuke visdev or comp v001 files, per-shot folders and a tracker CSV from a ShotGrid CSV and plates data, with ACES Reads and per-show config. Use for "set up shots" or "create comps from csv"; the team job ritual is shot-setup.
 - **agent: nuke-specialist** - Nuke compositing expert coordinating node graph operations, Python scripting, and ComfyUI integration. Use when user mentions nuke, compositing, nodes, grade, merge, multi-shot, or nuke python.
 
 ### houdini-vfx (v1.1.5, public)

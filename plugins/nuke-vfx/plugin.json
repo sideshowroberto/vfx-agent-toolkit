@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "nuke-vfx",
-  "version": "1.1.11",
-  "description": "Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, tiling tool, and batch shot setup.",
+  "version": "1.1.12",
+  "description": "Nuke compositing pipeline: node graphs, BlinkScript, Cattery AI inference, Python scripting, and tiling tool.",
   "author": {
     "name": "Rob Williams"
   },
