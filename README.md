@@ -24,18 +24,32 @@ Two things in one repo:
 
 ## What it looks like in use
 
-You say, in Claude Code with Nuke running:
+You say, in Claude Code with Blender (or Houdini) and Nuke running:
 
-> "Set up comps for the 12 shots in this CSV - plates connected, our standard
-> grade/denoise front end, and give me a contact sheet of first frames."
+> "Here's a photo of the building. Block it out in 3D matched to the photo,
+> reskin it photoreal, and give me a Nuke comp with the reskin over the
+> render passes."
 
-The agent parses the CSV, scans the plates on disk, builds a v001 comp per
-shot over the Nuke MCP (Read nodes, Stamp/Anchor wiring, the front-end
-template), renders first-frame thumbnails, and writes a tracker CSV back to
-disk. That workflow is `nuke-shot-setup`, one of 70+ skills in the toolkit -
-the same pattern (knowledge in the skill, hands via the connector) drives
-Houdini scatter setups, UE PCG graphs, ComfyUI generation batches, and
-Blender ControlNet pass renders.
+One request, three applications, each driven over its own MCP connector:
+
+1. **Model from the photo.** The agent studies the reference, blocks out the
+   environment or object in Blender or Houdini (proportions, camera, lens
+   matched to the photo), then renders clean control passes - grey clay,
+   depth, normals, mattes.
+2. **Reskin via MCP.** Those passes go to an image model (ComfyUI, Magnific,
+   Nano Banana) through its connector, conditioned so the result holds the
+   3D layout instead of drifting. The agent compares each take against the
+   reference and re-runs regional fixes rather than accepting the first
+   output.
+3. **Comp in Nuke.** The agent builds the comp over the Nuke MCP - Reads for
+   the reskin and the passes, colourspace set correctly for AI-generated
+   images, mattes from the 3D for regional grades, and a colour match back to
+   the source photo - and renders a review frame.
+
+Each stage is a skill (`blender-controlnet-passes`, `magnific-image-gen`,
+`nuke-compositing`, and 70+ more): the knowledge lives in the skill, the hands
+come from the connector. The same pattern drives Houdini scatter setups, UE
+PCG graphs, ComfyUI generation batches, and Seedance video passes.
 
 ## Quickstart
 
