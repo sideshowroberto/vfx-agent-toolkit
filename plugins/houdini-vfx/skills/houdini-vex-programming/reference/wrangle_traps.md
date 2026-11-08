@@ -1,8 +1,14 @@
 # VEX Wrangle Traps
 
-**Part of:** houdini-vex-programming skill
-**Loaded:** On-demand (progressive disclosure)
-**Last Updated:** 2026-10-09
+Part of the houdini-vex-programming skill; each trap was measured in a live session.
+
+## Contents
+1. set*attrib() writes are deferred
+2. point() / prim() / detail() inside a ternary
+3. An empty group pattern means ALL elements (and find() not-found value)
+4. A wrangle made from Python does not bind bare globals
+5. nearpoints() includes the point itself
+6. chs() is stale when spare parms are added after the wrangle cooked
 
 ---
 
@@ -44,6 +50,10 @@ single-pass result, with a clean cook and no warnings.
 
 ## Trap 2: point() / prim() / detail() inside a ?: ternary lose their string type
 
+> **NOT REPRODUCED 2026-11-08:** the snippet below returned the correct tags in hython
+> H20.5.613 and H21.0.596. Kept for history only; not a rule in SKILL.md. Delete if a
+> future build does not show it either.
+
 **Rule:** these lookups pick their return type from context, and inside a ternary the
 context is ambiguous. `s@tag = src >= 0 ? point(1, "tag", src) : "";` compiles without a
 warning and returns "" for every element.
@@ -69,8 +79,11 @@ the geometry (for example, carried through Copy to Points).
 every element when the pattern is empty. A parameter-driven list left blank therefore
 selects everything and silently overrides lists applied before it.
 
-**Fix:** guard parameter-driven patterns with `if (pat != "")`. `find()` on an int array
-returned -2 (not -1) for "not found" when measured, so test `find(...) >= 0`, never `== -1`.
+**Fix:** guard parameter-driven patterns with `if (pat != "")`.
+
+**Related - find() not-found value:** in H21 `find()` on an array returns `-(len+1)` for a
+missing value (-2 for a one-element array; re-checked in hython 2026-11-08), not -1. Test
+`find(...) >= 0` (or `< 0`), never `== -1`.
 
 **First diagnostic when a wrangle's logic "does nothing":** write a debug attribute for
 every intermediate value and read them back.
@@ -83,3 +96,48 @@ every intermediate value and read them back.
 to undefined variable: P" for `P.y = 1;`. Write `@P.y`. The error shows only in
 `node.errors()` and in a `hou.OperationFailed` from `cook(force=True)`, so a script that
 never force-cooks each node saves a broken hip.
+
+---
+
+## Trap 5: nearpoints() includes the point itself
+
+**Rule:** `nearpoints(0, @P, r)` searches the same geometry the point lives on, so the
+current point is always in the result (distance 0). A neighbour count is one too high and a
+neighbour average is pulled towards the point. The skill's old Workflow 2.3 snippet had
+exactly this bug.
+
+**Fix:**
+
+```vex
+int near[] = nearpoints(0, @P, chf("radius"));
+int count = 0;
+vector sum = {0, 0, 0};
+foreach (int pt; near) {
+    if (pt == @ptnum) continue;          // skip self
+    sum += point(0, "P", pt);
+    count++;
+}
+i@neighbor_count = count;
+if (count > 0) v@neighbor_avg = sum / count;
+```
+
+**Read-back that proves it:** an isolated point must report 0 neighbours, not 1.
+
+---
+
+## Trap 6: chs() is stale when spare parms are added after the wrangle cooked
+
+**Rule:** building a wrangle (e.g. Houdini MCP `build_network`) cooks it immediately. Spare
+parms added afterwards (`create_spare_parameters`) do not trigger a recook of the code that
+reads them, so `chs()`/`chf()` return empty or default values and the first result is wrong.
+In the 2026-11-08 eval this hit 9 of 9 runs (121 points kept instead of 81); each lost 8-15
+turns, and 5 of 9 then reported an invented cause ("removepoint needs and_prims",
+"`protected` is a reserved name").
+
+**Fix:** create the spare parms before setting the snippet, or re-set the snippet / force a
+cook after adding them. Then re-read the counts before diagnosing anything.
+
+**Tell:** a result that matches "parameter empty or zero" exactly, which changes when the
+snippet is re-set with no edit.
+
+(Observation 442.)
