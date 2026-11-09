@@ -11,15 +11,13 @@ The bundled bridge returns the Python variable `result`; it does not capture
 stdout. Its GUI timeout means completion is unknown and a mutation may still
 execute. Inspect state before repeating it. An external logger is optional.
 
-The nuke-tiling-tool skill's auto_tile_processor.py
-has corrected grid/mask math with overlap limited to half a tile. Native
-identity reconstruction passed 80 rendered Nuke 17.0v2 cases after repairing
-tile-origin translation, Reformat centering and explicit mask alpha channels.
-An additional 4096x2160 case passed. Processed RGBA is copied onto the original
-input so auxiliary source channels remain unchanged. Two model-edited tiles
-showed a material mismatch that blending did not repair; see
-continuation evidence.
-Do not use the duplicated legacy mask examples as repaired implementations.
+Tiled processing (the tiling-tool skill was retired 2026-11-09; these are its
+measured traps): limit overlap to half a tile; translate each tile's origin,
+center its Reformat and set the mask alpha channel explicitly - identity
+reconstruction passed 80 rendered Nuke 17.0v2 cases only after those three
+repairs. Copy processed RGBA onto the original input so auxiliary channels
+survive. Model-edited tiles can disagree in material, and blending does not
+repair that.
 Blink kernels and CatFileCreator/Inference examples need the installed build's
 API and actual compilation/load/inference checks. DA3 channel/export lessons
 retain their original model/version scope.

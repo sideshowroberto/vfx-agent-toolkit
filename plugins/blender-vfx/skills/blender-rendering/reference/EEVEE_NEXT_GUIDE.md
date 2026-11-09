@@ -55,7 +55,6 @@ def configure_gtao():
     eevee = bpy.context.scene.eevee
 
     # Enable GTAO
-    eevee.use_gtao = True
 
     # Distance (how far AO reaches)
     eevee.gtao_distance = 0.2         # Units: Blender units
@@ -329,7 +328,6 @@ def optimize_for_speed():
     eevee.taa_render_samples = 16     # Minimum acceptable
 
     # Disable expensive effects
-    eevee.use_gtao = False            # Disable AO
     eevee.use_raytracing = False      # Disable ray tracing
 
     # Simplify scene
@@ -359,7 +357,6 @@ def optimize_for_quality():
     eevee.taa_render_samples = 128
 
     # Enable all effects
-    eevee.use_gtao = True
     eevee.gtao_quality = 1.0          # Maximum quality
     eevee.use_raytracing = True
 

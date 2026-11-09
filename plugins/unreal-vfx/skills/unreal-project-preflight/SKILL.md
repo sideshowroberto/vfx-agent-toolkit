@@ -202,7 +202,7 @@ ini:DefaultEditorPerProjectUser|EditorPerProjectUserSettings:/Script/UnrealEd.Ed
 | `nanite` / `lumen` / `vsm` / `substrate` / `raytracing` | the RendererSettings keys each needs (+ SM6/DX12 where relevant) |
 | `water` / `landscape-patch` / `landmass` | the plugin |
 | `mrq` / `mrq-cryptomatte` / `ocio` | MovieRenderPipeline, MoviePipelineMaskRenderPass, OpenColorIO |
-| `imageplate` | ImagePlate (experimental, off by default - needed by the sequencer and vfx skills) |
+| `imageplate` | ImagePlate (experimental, off by default - needed for ImagePlate actors, see unreal-sequencer-automation) |
 | `sequencer-python` / `python` / `geometry-scripting` / `modeling` | the scripting-side plugins |
 | `mcp` / `vibeue` | ModelContextProtocol (+ its ini keys), VibeUE from Fab |
 | `niagara-fluids`, `hair-strands`, `usd`, `alembic`, `datasmith`, `livelink`, `takes`, `virtual-camera`, `composure`, `camera-calibration`, `cine-camera-rigs`, `template-sequence`, `virtual-heightfield` | the plugin (+ skin cache for hair) |
@@ -210,6 +210,10 @@ ini:DefaultEditorPerProjectUser|EditorPerProjectUserSettings:/Script/UnrealEd.Ed
 Each feature can carry `notes` - production lessons the plan should inherit
 (MegaPlants presets bake UI-only, MRQ ObjectId skips skinned instances,
 Substrate toggles recompile every shader, ...). `--plan-block` prints them.
+Notes are NOT requirements: a requirements answer lists only what `requires`
+holds. A note that starts "OPTIONAL workaround" (the custom-depth stencil matte
+for skinned instances MRQ ObjectId misses) goes into the answer only when the
+plan asks for that matte.
 
 **Extending the catalog:** add a feature with `summary`, `requires`, and
 `notes`. Plugin names must be `.uplugin` basenames that exist in the engine

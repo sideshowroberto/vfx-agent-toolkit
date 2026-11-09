@@ -85,4 +85,4 @@ literal default.
 
 When an asset gains geometry in an existing Boolean (a second cutter, a hole), test the
 parameter combinations that turn on downstream slicers or bends, not only the defaults.
-See `houdini-procedural-generation/reference/text_and_engraving.md`, section 3.
+See [text_and_engraving.md](text_and_engraving.md), section 3.

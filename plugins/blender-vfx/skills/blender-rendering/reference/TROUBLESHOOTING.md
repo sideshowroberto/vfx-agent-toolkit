@@ -18,7 +18,7 @@ Comprehensive troubleshooting guide for common rendering errors, performance iss
 
 **Full Error Message:**
 ```
-ValueError: bpy_struct: item.attr = val: enum "BLENDER_EEVEE" not found in ('BLENDER_EEVEE_NEXT', 'CYCLES', 'BLENDER_WORKBENCH')
+ValueError: bpy_struct: item.attr = val: enum "BLENDER_EEVEE" not found in ('BLENDER_EEVEE', 'CYCLES', 'BLENDER_WORKBENCH')
 ```
 
 **Cause:**
@@ -30,7 +30,7 @@ EEVEE (legacy) was completely removed in Blender 4.5.0. Only EEVEE_NEXT remains.
 scene.render.engine = 'BLENDER_EEVEE'
 
 # [OK] NEW - Works in 4.5.0+
-scene.render.engine = 'BLENDER_EEVEE_NEXT'
+scene.render.engine = 'BLENDER_EEVEE'
 ```
 
 **Version Detection Code:**
@@ -48,7 +48,7 @@ def get_available_engines():
 
 # Check if EEVEE_NEXT is available
 engines = get_available_engines()
-if 'BLENDER_EEVEE_NEXT' in engines:
+if 'BLENDER_EEVEE' in engines:
     print("[OK] EEVEE_NEXT available")
 else:
     print("[FAIL] EEVEE_NEXT not found (update Blender)")
@@ -271,7 +271,6 @@ def diagnose_viewport_performance():
         issues.append(f"High viewport samples: {eevee.taa_samples}")
 
     # Check GTAO
-    if eevee.use_gtao and eevee.gtao_quality > 0.5:
         issues.append(f"High GTAO quality: {eevee.gtao_quality}")
 
     # Check ray tracing
@@ -291,7 +290,6 @@ def optimize_viewport():
     eevee.taa_samples = 8             # Down from 16+
 
     # Reduce GTAO quality
-    if eevee.use_gtao:
         eevee.gtao_quality = 0.1      # Low quality for viewport
 
     # Disable ray tracing in viewport
@@ -593,7 +591,7 @@ def print_render_stats():
     if scene.render.engine == 'CYCLES':
         stats["Samples"] = scene.cycles.samples
         stats["Device"] = scene.cycles.device
-    elif scene.render.engine == 'BLENDER_EEVEE_NEXT':
+    elif scene.render.engine == 'BLENDER_EEVEE':
         stats["Samples"] = scene.eevee.taa_render_samples
 
     for key, value in stats.items():

@@ -47,7 +47,7 @@
 1. **Configure EEVEE_NEXT Engine**
    ```python
    scene = bpy.context.scene
-   scene.render.engine = 'BLENDER_EEVEE_NEXT'
+   scene.render.engine = 'BLENDER_EEVEE'
    eevee = scene.eevee
 
    # Quality settings
@@ -58,7 +58,6 @@
 2. **Enable Lighting Features**
    ```python
    # Ambient occlusion
-   eevee.use_gtao = True
    eevee.gtao_distance = 0.2
    eevee.gtao_factor = 1.0
    ```

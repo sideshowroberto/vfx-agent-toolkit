@@ -1,6 +1,6 @@
 ---
 name: task-observer
-description: Logs skill lessons (user corrections, broken rules, better workflows) to the observation log as they happen; applied only after owner review. Invoke before the first tool call of any session and run its Session Start Protocol. Also "observation log", "skill review".
+description: Logs skill lessons (user corrections, broken rules, better workflows) to the observation log as they happen; applied only after owner review. Use when a skill is corrected, a documented rule fails, a better workflow emerges, or for "observation log" and "skill review". Session-start status comes from the SessionStart hook.
 ---
 
 # Task Observer

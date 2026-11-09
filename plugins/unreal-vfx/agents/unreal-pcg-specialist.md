@@ -73,11 +73,6 @@ Expert in Unreal Engine PCG system for procedural terrain, vegetation, and asset
 - Phase 3: Query Pin Names (always first!)
 - Phase 4: Connect with Silent Execution (0.96ms/connection)
 
-### Supporting Skills
-
-**unreal-python-scripting:** Unreal Python API patterns, MCP integration
-**unreal-vfx-automation:** Pipeline integration, batch processing
-
 ---
 
 ## Critical Discoveries

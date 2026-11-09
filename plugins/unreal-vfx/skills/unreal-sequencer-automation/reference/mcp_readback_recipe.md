@@ -5,6 +5,15 @@ grab shot-camera stills through the UE 5.8 native MCP server, without being
 fooled by "nothing" results.
 **Added:** 2026-10-09 (observation 140)
 
+## Contents
+
+1. Open, scrub, read bindings
+2. Spawnables
+3. The 30-second MCP limit
+4. Screenshots that never draw
+5. Many stills: run the loop inside the editor
+6. Related
+
 Reading a sequence back through the editor bridge fails silently: a read that
 runs before the first evaluation, a list that skips transient actors and a
 latent request that waits for a redraw all return "nothing" instead of an
@@ -29,8 +38,7 @@ for b in seq.get_bindings():
 ```
 
 `seq.get_binding_id(b)` is the same call as
-`unreal.MovieSceneSequenceExtensions.get_binding_id(seq, b)` used in the camera
-cut examples in SKILL.md.
+`unreal.MovieSceneSequenceExtensions.get_binding_id(seq, b)` (SKILL.md trap 3).
 
 - **Scrub before listing cameras.** A spawnable camera is only spawned by the
   first `set_current_time`. Until then the camera-cut camera list is EMPTY, and
@@ -109,4 +117,4 @@ job list on its own ticks:
   project): run `ModelContextProtocol.StartServer 8000` in the editor console.
   Preflight should check the server is LISTENING, not only that the plugin is
   enabled (`unreal-project-preflight`).
-- Spawn/possess and camera-cut creation patterns: SKILL.md.
+- Possess, keying and camera-cut traps: SKILL.md traps 1-5.

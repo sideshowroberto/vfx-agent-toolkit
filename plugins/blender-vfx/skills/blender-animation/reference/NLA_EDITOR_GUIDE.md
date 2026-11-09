@@ -736,7 +736,7 @@ import bpy
 print("All actions in file:")
 for action in bpy.data.actions:
     frame_range = action.frame_range
-    fcurve_count = len(action.fcurves)
+    fcurve_count = len(fcurves_of(action))  # 5.x: action.fcurves removed, iterate layers[].strips[].channelbag(slot).fcurves
 
     print(f"  {action.name}:")
     print(f"    Frames: {frame_range[0]:.0f} - {frame_range[1]:.0f} ({frame_range[1]-frame_range[0]:.0f} frames)")

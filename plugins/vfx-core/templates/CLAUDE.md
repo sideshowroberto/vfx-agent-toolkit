@@ -78,8 +78,6 @@ Run `/skills` to see all available skills. Core skills pre-loaded in this projec
 | `gap-check` | Audit Claude's knowledge gaps against a plan before implementing |
 | `vfx-plan` | Structured planning framework for VFX tasks |
 | `brave-search` | AI-enhanced web research via Brave Search API |
-| `vfx-documentation` | Generate and maintain VFX documentation |
-| `agent-creation-update` | Create and update VFX agents |
 | `skill-creation-update` | Create and update VFX skills |
 | `development-management` | Spec-driven development workflows |
 | `wrap-session` | End-of-session wrap-up: save memories, session log, handoff plan |
@@ -97,8 +95,7 @@ Agents are auto-delegated when relevant - no manual invocation needed.
 | `search-specialist` | Deep web research, technical documentation |
 | `documentation-specialist` | Generating and updating project docs |
 | `testing-specialist` | Validating scripts and checking outputs |
-| `python-specialist` | Type safety, async, testing methodology |
-| `python-refactoring-specialist` | Systematic code refactoring across files |
+| `python-specialist` | Type safety, async, testing, systematic multi-file refactoring |
 
 ---
 

@@ -18,7 +18,7 @@ allowed-tools: Read,Write
 import bpy
 
 # Render engine (5.1+)
-bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT'  # Not 'BLENDER_EEVEE'
+bpy.context.scene.render.engine = 'BLENDER_EEVEE'  # Not 'BLENDER_EEVEE'
 
 # Principled BSDF input names changed in 4.5.0 - use names not indices
 bsdf.inputs['Transmission Weight'].default_value = 1.0  # was 'Transmission'
@@ -255,7 +255,7 @@ import bpy
 
 engine = bpy.context.scene.render.engine
 
-if engine == 'BLENDER_EEVEE_NEXT':
+if engine == 'BLENDER_EEVEE':
     # EEVEE: performance-conscious, keep it simple
     mat.refraction_depth = 0.1
     # Real-time: avoid expensive SSS and volumetrics unless needed
@@ -327,7 +327,7 @@ if not output.inputs['Surface'].is_linked:
 
 ## VALIDATION CHECKLIST
 
-- [ ] Engine set (`BLENDER_EEVEE_NEXT` or `CYCLES`)
+- [ ] Engine set (`BLENDER_EEVEE` or `CYCLES`)
 - [ ] BSDF inputs use 4.5+ naming convention
 - [ ] Material Output node connected
 - [ ] Viewport shading = `MATERIAL` (not `MATERIAL_PREVIEW`)

@@ -1,864 +1,262 @@
-#!/usr/bin/env python3
-"""
-Validate VFX Agent Skill constitutional compliance across all 9 articles.
-Now supports Agent OS standards validation.
+#!/usr/bin/env python
+"""Validate one skill against ClaudeCode/development/SKILL_AND_AGENT_STANDARD.md.
 
-Purpose: Automated constitutional validation for skill quality assurance
-Article I: Detects hard-coded paths/project names in scripts
-Article III: Enforces <500 line limit for SKILL.md (Skills) or standards files (Agent OS)
-Article IV: Verifies independent testing evidence
-Article VI: Validates context efficiency through progressive disclosure
-Article VIII: Checks documentation standards compliance
+Checks (FAIL = exit 1, WARN = reported, exit stays 0):
+  FAIL  skill folder or SKILL.md not found (never a vacuous pass - obs 434)
+  FAIL  frontmatter missing, or not valid YAML (a parse error drops the skill silently - obs 440)
+  FAIL  description missing, empty, or written over more than one source line
+        (folded '>' / literal '|' / continued plain scalar - OpenCode drops the skill,
+        Claude Code may load it with an empty description; eval case sk2)
+  FAIL  retired top-level keys (version, last_updated, status, triggers ...): Claude Code
+        does not act on them - use metadata: or git history
+  FAIL  any other undocumented top-level key
+  FAIL  '<' or '>' in description / when_to_use; description + when_to_use over 1,536 chars
+  FAIL  non-ASCII bytes or control bytes in shipped scripts (windows-gotchas.md)
+  WARN  SKILL.md body over 500 lines; description over 400 chars; "This skill..." opening
+  WARN  name differs from folder; reference file over 100 lines without a table of contents
+  WARN  absolute drive / user paths inside scripts (constitution Article I)
 
 Usage:
-    # Validate Claude Code skill
-    python validate_skill.py SKILL_NAME [--report]
-
-    # Validate Agent OS standard
-    python validate_skill.py STANDARD_NAME --agent-os [--report]
-
-    --agent-os: Validate Agent OS standard instead of Claude Code skill
-    --report: Generate detailed markdown compliance report
-
-Author: VFX Skill System
-Version: 1.1.0
+    python validate_skill.py <skill-name | path-to-skill-dir | path-to-SKILL.md> [--skills-path DIR]
+Exit: 0 = no FAIL, 1 = at least one FAIL, 2 = PyYAML missing (cannot check, so no pass).
+ASCII only.
 """
-
 import argparse
-import json
-import os
 import re
 import sys
-from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
-from typing import Optional
+
+# Documented SKILL.md frontmatter keys (Claude Code skills docs + Agent Skills spec).
+# Re-check against the docs when Claude Code changes; the standard, section 3, is the source.
+ALLOWED_KEYS = {
+    "name", "description", "when_to_use", "argument-hint", "paths",
+    "disable-model-invocation", "user-invocable", "allowed-tools", "disallowed-tools",
+    "model", "effort", "context", "agent", "hooks", "shell", "background",
+    "metadata", "license", "compatibility",
+}
+RETIRED_KEYS = {
+    "version": "move to metadata.version or rely on git",
+    "last_updated": "move to metadata.updated or rely on git",
+    "updated": "move to metadata.updated or rely on git",
+    "status": "move to metadata.status or rely on git",
+    "triggers": "put trigger phrases in when_to_use",
+    "dependencies": "state dependencies in the body or metadata",
+    "author": "move to metadata.author",
+}
+SINGLE_LINE_KEYS = ("description", "when_to_use")
+BODY_LINE_LIMIT = 500
+DESC_SOFT_LIMIT = 400
+LISTING_CAP = 1536
+ABS_PATH = re.compile(r"(?<![A-Za-z])[A-Za-z]:[\\/][A-Za-z]|/Users/[a-z]|/home/[a-z]")
+TOC_HINT = re.compile(r"(?im)^#+\s*(table of )?contents\b|^\s*[-*0-9.]+\s*\[[^\]]+\]\(#")
 
 
-@dataclass
-class ValidationResult:
-    """Result of a single validation check."""
-    article: str
-    status: str  # "PASS", "FAIL", "WARN", "SKIP"
-    message: str
-    details: list[str]
+class Result:
+    def __init__(self):
+        self.fails = []
+        self.warns = []
+        self.oks = []
+
+    def fail(self, msg):
+        self.fails.append(msg)
+
+    def warn(self, msg):
+        self.warns.append(msg)
+
+    def ok(self, msg):
+        self.oks.append(msg)
 
 
-class SkillValidator:
-    """Validates VFX Agent Skills and Agent OS standards against constitutional requirements."""
+def resolve_skill(arg, skills_path):
+    """Return the SKILL.md path for a name or a path, or None."""
+    # absolute(), not resolve(): resolve() turns a mapped drive into a UNC path (windows-gotchas.md)
+    p = Path(arg).absolute()
+    if p.is_file() and p.name == "SKILL.md":
+        return p
+    if p.is_dir() and (p / "SKILL.md").is_file():
+        return p / "SKILL.md"
+    cand = Path(skills_path) / p.name / "SKILL.md"
+    if cand.is_file():
+        return cand
+    return None
 
-    def __init__(self, skill_name: str, skill_path: Optional[Path] = None, is_agent_os: bool = False):
-        """
-        Initialize validator.
 
-        Args:
-            skill_name: Name of skill or standard to validate
-            skill_path: Path to .claude/skills/ or agent-os/profiles/vfx/standards/ (auto-detect if None)
-            is_agent_os: True if validating Agent OS standard, False for Claude Code skill
-        """
-        self.skill_name = skill_name
-        self.is_agent_os = is_agent_os
+def split_frontmatter(text):
+    """Return (frontmatter_lines, body_lines) or (None, lines) when there is no block."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return None, lines
+    for i in range(1, len(lines)):
+        if lines[i].strip() == "---":
+            return lines[1:i], lines[i + 1:]
+    return None, lines
 
-        if skill_path is None:
-            script_dir = Path(__file__).parent.absolute()
-            if is_agent_os:
-                # Navigate to agent-os/profiles/vfx/standards/
-                skill_path = script_dir.parent.parent.parent.parent / "ClaudeCode" / "agent-os" / "profiles" / "vfx" / "standards"
-            else:
-                # Auto-detect .claude/skills/
-                skill_path = script_dir.parent.parent
 
-        if is_agent_os:
-            # Agent OS standards are single .md files
-            self.skill_dir = skill_path
-            self.skill_md = skill_path / f"{skill_name}.md"
-        else:
-            # Claude Code skills are directories with SKILL.md
-            self.skill_dir = skill_path / skill_name
-            self.skill_md = self.skill_dir / "SKILL.md"
-        
-        self.results: list[ValidationResult] = []
-
-    def validate_all(self) -> bool:
-        """
-        Run all validation checks.
-
-        Returns:
-            True if all applicable checks pass, False otherwise
-        """
-        # Check file exists
-        if not self.skill_md.exists():
-            entity_type = "Agent OS standard" if self.is_agent_os else "Skill"
-            print(f"[FAIL] {entity_type} not found: {self.skill_name}")
-            print(f"   Expected path: {self.skill_md}")
-            return False
-
-        # Check constitutional headers for Agent OS standards
-        if self.is_agent_os:
-            self.validate_agent_os_headers()
-
-        # Run validations
-        self.validate_article_i()
-        self.validate_article_iii()
-        self.validate_article_iv()
-        self.validate_article_v()
-        self.validate_article_vi()
-        self.validate_article_vii()
-        self.validate_article_viii()
-        self.validate_article_ix()
-
-        # Calculate overall pass/fail
-        failures = [r for r in self.results if r.status == "FAIL"]
-        return len(failures) == 0
-
-    def validate_agent_os_headers(self) -> None:
-        """
-        Validate Agent OS standard constitutional headers (YAML frontmatter).
-
-        Required fields:
-        - validated_by: VFX_SKILL_CONSTITUTION.md vX.X.X
-        - last_validation: YYYY-MM-DD
-        - articles_compliant: [I, II, III, ...]
-        - tool_version: Tool name + version
-        """
-        with open(self.skill_md, 'r', encoding='utf-8') as f:
-            content = f.read()
-
-        details = []
-        issues = []
-
-        if not content.strip().startswith("---"):
-            issues.append("[FAIL] Missing YAML frontmatter with constitutional headers")
-            self.results.append(ValidationResult(
-                article="Agent OS Headers",
-                status="FAIL",
-                message="Constitutional headers missing",
-                details=issues
-            ))
+def check_single_line(fm_lines, key, res):
+    """The value of `key` must sit entirely on its own source line."""
+    pat = re.compile(r"^" + re.escape(key) + r"\s*:(.*)$")
+    for i, line in enumerate(fm_lines):
+        m = pat.match(line)
+        if not m:
+            continue
+        rest = m.group(1).strip()
+        if rest[:1] in (">", "|"):
+            res.fail("%s uses a block scalar '%s' - write it on ONE line (OpenCode drops the "
+                     "skill; Claude Code may load an empty description)" % (key, rest[:2].strip()))
             return
-
-        # Extract frontmatter
-        parts = content.split("---", 2)
-        if len(parts) < 2:
-            issues.append("[FAIL] Malformed YAML frontmatter")
-            self.results.append(ValidationResult(
-                article="Agent OS Headers",
-                status="FAIL",
-                message="Constitutional headers malformed",
-                details=issues
-            ))
+        if rest == "":
+            res.fail("%s is empty on its line - the value must be on the same line, one line" % key)
             return
-
-        frontmatter = parts[1]
-
-        # Check required fields
-        required_fields = {
-            "validated_by": r"validated_by:\s*VFX_SKILL_CONSTITUTION\.md\s+v\d+\.\d+\.\d+",
-            "last_validation": r"last_validation:\s*\d{4}-\d{2}-\d{2}",
-            "articles_compliant": r"articles_compliant:\s*\[.*\]",
-            "tool_version": r"tool_version:"
-        }
-
-        for field_name, pattern in required_fields.items():
-            if re.search(pattern, frontmatter):
-                details.append(f"[OK] {field_name}")
-            else:
-                issues.append(f"[FAIL] Missing or malformed: {field_name}")
-
-        # Extract articles_compliant list
-        articles_match = re.search(r"articles_compliant:\s*\[(.*?)\]", frontmatter)
-        if articles_match:
-            articles_str = articles_match.group(1)
-            articles = [a.strip() for a in articles_str.split(",")]
-            details.append(f"   Compliant articles: {', '.join(articles)}")
-
-        if issues:
-            self.results.append(ValidationResult(
-                article="Agent OS Headers",
-                status="FAIL",
-                message="Constitutional headers incomplete",
-                details=issues + details
-            ))
-        else:
-            self.results.append(ValidationResult(
-                article="Agent OS Headers",
-                status="PASS",
-                message="Constitutional headers valid",
-                details=details
-            ))
-
-    def validate_article_i(self) -> None:
-        """
-        Article I: General Purpose Scripts
-
-        Checks:
-        - No hard-coded paths (C:\\, D:\\, /Users/, /home/)
-        - No hard-coded project names (common patterns)
-        - Parameterization (argparse, sys.argv)
-        - Relative paths preferred
-        """
-        scripts_dir = self.skill_dir / "scripts"
-        details = []
-
-        if not scripts_dir.exists():
-            self.results.append(ValidationResult(
-                article="Article I",
-                status="SKIP",
-                message="No scripts directory (documentation-only skill)",
-                details=["Scripts directory not found - skill may be doc-only or MCP-based"]
-            ))
+        nxt = fm_lines[i + 1] if i + 1 < len(fm_lines) else ""
+        if nxt.strip() and nxt[:1] in (" ", "\t"):
+            res.fail("%s continues onto the next line - join it into one line" % key)
             return
+        res.ok("%s is a single line" % key)
+        return
 
-        # Find Python scripts
-        scripts = list(scripts_dir.glob("*.py"))
-        if not scripts:
-            self.results.append(ValidationResult(
-                article="Article I",
-                status="SKIP",
-                message="No Python scripts found",
-                details=["No .py files in scripts/ - may use MCP tools instead"]
-            ))
-            return
 
-        # Check for hard-coded paths
-        hard_coded_patterns = [
-            (r'[CDE]:\\\\', "Windows absolute path"),
-            (r'/Users/', "macOS user path"),
-            (r'/home/', "Linux home path"),
-            (r'[CDE]:\\', "Windows path (single backslash)"),
-        ]
+def check_frontmatter(skill_md, res):
+    try:
+        import yaml
+    except ImportError:
+        print("[FAIL] PyYAML is not importable - the frontmatter cannot be checked (pip install pyyaml)")
+        sys.exit(2)
 
-        # Check for hard-coded project names (common patterns)
-        project_patterns = [
-            (r'MyProject', "Generic 'MyProject' name"),
-            (r'TestProject', "Generic 'TestProject' name"),
-            (r'project_name\s*=\s*["\'][A-Z]', "Hard-coded project_name variable"),
-        ]
+    raw = skill_md.read_bytes()
+    if raw.startswith(b"\xef\xbb\xbf"):
+        res.warn("SKILL.md starts with a UTF-8 BOM - write it without one")
+        raw = raw[3:]
+    text = raw.decode("utf-8", errors="replace")
+    fm_lines, body = split_frontmatter(text)
+    if fm_lines is None:
+        res.fail("no frontmatter block: SKILL.md must start with '---' and close it with '---'")
+        return None, body
 
-        has_hard_coded = False
-        has_argparse = False
+    for key in SINGLE_LINE_KEYS:
+        check_single_line(fm_lines, key, res)
 
-        for script in scripts:
-            with open(script, 'r', encoding='utf-8') as f:
-                content = f.read()
+    try:
+        data = yaml.safe_load("\n".join(fm_lines))
+    except yaml.YAMLError as exc:
+        first = str(exc).splitlines()[0] if str(exc) else "parse error"
+        res.fail("frontmatter is not valid YAML (%s) - quote a value that contains ': '" % first)
+        return None, body
+    if not isinstance(data, dict):
+        res.fail("frontmatter is not a YAML mapping")
+        return None, body
+    res.ok("frontmatter parses as YAML")
 
-            # Check hard-coded paths
-            for pattern, desc in hard_coded_patterns:
-                if re.search(pattern, content):
-                    details.append(f"[FAIL] {script.name}: {desc} detected")
-                    has_hard_coded = True
+    for key in data:
+        if key in RETIRED_KEYS:
+            res.fail("retired top-level key '%s' - %s" % (key, RETIRED_KEYS[key]))
+        elif key not in ALLOWED_KEYS:
+            res.fail("undocumented top-level key '%s' - custom data goes under metadata:" % key)
 
-            # Check hard-coded project names
-            for pattern, desc in project_patterns:
-                if re.search(pattern, content):
-                    details.append(f"[FAIL] {script.name}: {desc}")
-                    has_hard_coded = True
-
-            # Check for parameterization
-            if 'argparse' in content or 'sys.argv' in content:
-                has_argparse = True
-
-        if has_hard_coded:
-            details.append("Fix: Replace hard-coded values with CLI parameters or environment variables")
-            self.results.append(ValidationResult(
-                article="Article I",
-                status="FAIL",
-                message="Hard-coded paths or project names detected",
-                details=details
-            ))
-        elif not has_argparse and len(scripts) > 0:
-            self.results.append(ValidationResult(
-                article="Article I",
-                status="WARN",
-                message="No argparse/sys.argv found - verify parameterization",
-                details=[f"Scripts: {', '.join(s.name for s in scripts)}"]
-            ))
+    desc = data.get("description")
+    if not isinstance(desc, str) or not desc.strip():
+        res.fail("description is missing or not a string")
+    else:
+        desc = desc.strip()
+        wtu = data.get("when_to_use") or ""
+        if not isinstance(wtu, str):
+            res.fail("when_to_use must be a string")
+            wtu = ""
+        for k, v in (("description", desc), ("when_to_use", wtu)):
+            if "<" in v or ">" in v:
+                res.fail("%s contains '<' or '>' (renders as &lt;) - use [name]" % k)
+        total = len(desc) + len(wtu)
+        if total > LISTING_CAP:
+            res.fail("description + when_to_use = %d chars, over the %d listing cap" % (total, LISTING_CAP))
+        elif len(desc) > DESC_SOFT_LIMIT:
+            res.warn("description is %d chars (aim 150-400; long ones push other skills to name-only)" % len(desc))
         else:
-            details.append(f"[OK] No hard-coded paths detected in {len(scripts)} script(s)")
-            details.append(f"[OK] Parameterization verified (argparse/sys.argv)")
-            self.results.append(ValidationResult(
-                article="Article I",
-                status="PASS",
-                message="Scripts are general-purpose",
-                details=details
-            ))
-
-    def validate_article_iii(self) -> None:
-        """
-        Article III: Progressive Disclosure (<500 Lines)
-
-        Checks:
-        - SKILL.md line count <500 (Skills)
-        - Agent OS standards can exceed 500 but track context efficiency
-        - Warn if >450 (approaching limit)
-        - Reference directory exists
-        - Reference docs mentioned in SKILL.md
-        """
-        # Count lines
-        with open(self.skill_md, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-        line_count = len(lines)
-
-        details = []
-        
-        if self.is_agent_os:
-            # Agent OS standards: Track but don't enforce <500 line limit
-            details.append(f"{line_count} lines (Agent OS standard)")
-            
-            # Calculate context efficiency
-            # Typical before: Complete tool docs (1000-2000 lines)
-            # After: Focused standard (300-600 lines)
-            if line_count < 400:
-                details.append(f"[OK] Excellent context efficiency (<400 lines)")
-            elif line_count < 550:
-                details.append(f"[OK] Good context efficiency (400-550 lines)")
-            else:
-                details.append(f"[WARN] Consider refactoring (>550 lines)")
-                details.append("   Complex topics acceptable, but aim for <550")
-            
-            self.results.append(ValidationResult(
-                article="Article III",
-                status="PASS",
-                message="Progressive disclosure (Agent OS mode)",
-                details=details
-            ))
-            return
-
-        # Claude Code Skills: Enforce strict <500 line limit
-        reference_dir = self.skill_dir / "reference"
-
-        if line_count > 500:
-            margin = line_count - 500
-            self.results.append(ValidationResult(
-                article="Article III",
-                status="FAIL",
-                message=f"SKILL.md exceeds 500 line limit ({line_count} lines)",
-                details=[
-                    f"[FAIL] {line_count} lines (>{500} limit)",
-                    f"Overage: {margin} lines ({margin / 500 * 100:.1f}%)",
-                    "Fix: Move detailed content to reference/*.md",
-                    "Example: Troubleshooting (>100 lines) -> reference/troubleshooting_guide.md"
-                ]
-            ))
-        elif line_count > 450:
-            margin = 500 - line_count
-            buffer_pct = margin / 500 * 100
-            details.append(f"[WARN] {line_count} lines (approaching 500 limit)")
-            details.append(f"Margin: {margin} lines ({buffer_pct:.1f}% buffer)")
-            details.append("Consider moving content to reference docs before adding more")
-            self.results.append(ValidationResult(
-                article="Article III",
-                status="WARN",
-                message="SKILL.md approaching 500 line limit",
-                details=details
-            ))
-        else:
-            margin = 500 - line_count
-            buffer_pct = margin / 500 * 100
-            details.append(f"[OK] {line_count} lines (<500 limit)")
-            details.append(f"Margin: {margin} lines ({buffer_pct:.1f}% buffer)")
-
-            # Check reference directory
-            if reference_dir.exists():
-                ref_files = list(reference_dir.glob("*.md"))
-                details.append(f"[OK] Reference directory: {len(ref_files)} file(s)")
-            else:
-                details.append("[WARN] No reference/ directory (may not be needed)")
-
-            self.results.append(ValidationResult(
-                article="Article III",
-                status="PASS",
-                message="Progressive disclosure compliant",
-                details=details
-            ))
-
-    def validate_article_iv(self) -> None:
-        """
-        Article IV: Test Independently Before Agent Integration
-
-        Checks:
-        - Scripts have if __name__ == "__main__" blocks
-        - Test files exist (test_*.py, *_test.py)
-        - Session documentation mentions testing
-        """
-        scripts_dir = self.skill_dir / "scripts"
-        details = []
-
-        if not scripts_dir.exists() or not list(scripts_dir.glob("*.py")):
-            self.results.append(ValidationResult(
-                article="Article IV",
-                status="SKIP",
-                message="No scripts to test",
-                details=["Skill may be documentation-only or MCP-based"]
-            ))
-            return
-
-        # Check for __main__ blocks
-        scripts = list(scripts_dir.glob("*.py"))
-        has_main_block = False
-
-        for script in scripts:
-            with open(script, 'r', encoding='utf-8') as f:
-                content = f.read()
-            if 'if __name__ == "__main__"' in content:
-                has_main_block = True
-                details.append(f"[OK] {script.name}: Has __main__ block")
-
-        # Check for test files
-        test_files = (
-            list(scripts_dir.glob("test_*.py")) +
-            list(scripts_dir.glob("*_test.py"))
-        )
-
-        # Check session documentation
-        session_docs = []
-        parent_dir = self.skill_dir.parent.parent  # Go up to project root
-        if (parent_dir / "development").exists():
-            session_docs = list((parent_dir / "development").glob("Session_*.md"))
-
-        if has_main_block:
-            details.append(f"[OK] Independent testing possible (__main__ blocks present)")
-        else:
-            details.append("[WARN] No __main__ blocks found - add for independent testing")
-
-        if test_files:
-            details.append(f"[OK] Test files: {', '.join(f.name for f in test_files)}")
-
-        if session_docs:
-            details.append(f"[OK] Session docs available: {len(session_docs)} file(s)")
-
-        # Determine status
-        if has_main_block or test_files:
-            self.results.append(ValidationResult(
-                article="Article IV",
-                status="PASS",
-                message="Independent testing verified",
-                details=details
-            ))
-        else:
-            details.append("Recommendation: Add if __name__ == '__main__' blocks to scripts")
-            self.results.append(ValidationResult(
-                article="Article IV",
-                status="WARN",
-                message="No clear testing evidence",
-                details=details
-            ))
-
-    def validate_article_v(self) -> None:
-        """
-        Article V: Follow Official Tool/Engine Patterns
-
-        Manual verification - output reminder to user
-        """
-        self.results.append(ValidationResult(
-            article="Article V",
-            status="SKIP",
-            message="Manual verification required",
-            details=[
-                "[WARN] Verify tool/engine documentation is referenced",
-                "Check: Quick Start and Workflows cite official docs",
-                "Example: 'See Unreal Engine 5.5 documentation for...'",
-                "Example: 'Follows Houdini 20.0 Python API patterns'"
-            ]
-        ))
-
-    def validate_article_vi(self) -> None:
-        """
-        Article VI: Context Efficiency Through Architecture
-
-        Checks:
-        - Context savings metrics in Constitutional Compliance
-        - Progressive disclosure structure
-        - Metadata -> SKILL.md -> reference pattern
-        """
-        details = []
-
-        # Read SKILL.md
-        with open(self.skill_md, 'r', encoding='utf-8') as f:
-            content = f.read()
-
-        # Check for context efficiency documentation
-        has_context_metrics = False
-        if "context reduction" in content.lower() or "context efficiency" in content.lower():
-            has_context_metrics = True
-            details.append("[OK] Context efficiency documented in SKILL.md")
-
-            # Extract metrics if present
-            metrics_match = re.search(r'(\d+)%\s+(?:context\s+)?(?:reduction|savings)', content, re.IGNORECASE)
-            if metrics_match:
-                pct = int(metrics_match.group(1))
-                details.append(f"   Context reduction: {pct}%")
-                if pct < 50:
-                    details.append(f"   [WARN] <50% reduction - consider more aggressive refactoring")
-
-        # Check progressive disclosure structure
-        reference_dir = self.skill_dir / "reference"
-        if reference_dir.exists():
-            ref_files = list(reference_dir.glob("*.md"))
-            details.append(f"[OK] Progressive disclosure: {len(ref_files)} reference file(s)")
-        else:
-            details.append("[WARN] No reference/ directory - consider for future content")
-
-        # Check metadata (YAML frontmatter)
-        has_frontmatter = content.strip().startswith("---")
-        if has_frontmatter:
-            details.append("[OK] YAML frontmatter present (metadata layer)")
-
-        if has_context_metrics or (reference_dir.exists() and len(list(reference_dir.glob("*.md"))) > 0):
-            self.results.append(ValidationResult(
-                article="Article VI",
-                status="PASS",
-                message="Context efficiency verified",
-                details=details
-            ))
-        else:
-            details.append("Recommendation: Document context savings in Constitutional Compliance")
-            self.results.append(ValidationResult(
-                article="Article VI",
-                status="WARN",
-                message="Context efficiency not documented",
-                details=details
-            ))
-
-    def validate_article_vii(self) -> None:
-        """
-        Article VII: Cross-Application Integration Protocol
-
-        Optional check - only applicable if skill involves cross-app workflows
-        """
-        # Read SKILL.md
-        with open(self.skill_md, 'r', encoding='utf-8') as f:
-            content = f.read()
-
-        # Keywords suggesting cross-app integration
-        cross_app_keywords = [
-            "export", "import", "unreal", "houdini", "blender", "nuke",
-            ".fbx", ".hda", ".exr", ".abc", "alembic"
-        ]
-
-        has_cross_app = any(keyword in content.lower() for keyword in cross_app_keywords)
-
-        if not has_cross_app:
-            self.results.append(ValidationResult(
-                article="Article VII",
-                status="SKIP",
-                message="Not applicable (no cross-app integration)",
-                details=["Skill does not involve cross-application workflows"]
-            ))
-        else:
-            details = []
-            # Check for file format documentation
-            file_format_keywords = [".fbx", ".hda", ".exr", ".abc", ".uasset"]
-            has_file_format = any(fmt in content for fmt in file_format_keywords)
-
-            # Check for asset naming conventions
-            naming_keywords = ["SM_", "SK_", "M_", "T_", "naming convention", "asset naming"]
-            has_naming = any(kw in content for kw in naming_keywords)
-
-            if has_file_format:
-                details.append("[OK] File format standards documented")
-
-            if has_naming:
-                details.append("[OK] Asset naming conventions documented")
-
-            if has_file_format and has_naming:
-                self.results.append(ValidationResult(
-                    article="Article VII",
-                    status="PASS",
-                    message="Cross-app integration documented",
-                    details=details
-                ))
-            else:
-                details.append("[WARN] Consider documenting:")
-                if not has_file_format:
-                    details.append("   - File format standards (.fbx, .hda, etc.)")
-                if not has_naming:
-                    details.append("   - Asset naming conventions (SM_, M_, etc.)")
-                self.results.append(ValidationResult(
-                    article="Article VII",
-                    status="WARN",
-                    message="Cross-app integration incomplete",
-                    details=details
-                ))
-
-    def validate_article_viii(self) -> None:
-        """
-        Article VIII: Documentation Standards
-
-        Checks:
-        - YAML frontmatter with required fields
-        - Required sections present (Skills)
-        - Agent OS standards have different requirements
-        - Description follows "What + When + Triggers" formula (Skills)
-        - Semantic versioning (X.Y.Z) (Skills)
-        """
-        with open(self.skill_md, 'r', encoding='utf-8') as f:
-            content = f.read()
-
-        details = []
-        issues = []
-
-        # Check YAML frontmatter
-        if not content.strip().startswith("---"):
-            issues.append("[FAIL] Missing YAML frontmatter")
-        else:
-            parts = content.split("---", 2)
-            if len(parts) >= 2:
-                frontmatter = parts[1]
-                
-                if self.is_agent_os:
-                    # Agent OS standards: Different required fields
-                    required_fields = [
-                        "validated_by:",
-                        "last_validation:",
-                        "articles_compliant:",
-                        "tool_version:"
-                    ]
-                else:
-                    # Claude Code skills: Official Anthropic format
-                    # Reference: https://code.claude.com/docs/en/skills
-                    required_fields = ["name:", "description:"]
-                    # Optional: allowed-tools:
-                
-                for field in required_fields:
-                    if field not in frontmatter:
-                        issues.append(f"[FAIL] Missing frontmatter field: {field}")
-                    else:
-                        details.append(f"[OK] {field.rstrip(':')}")
-
-        if self.is_agent_os:
-            # Agent OS standards: Check for standard sections
-            required_sections = [
-                ("Overview", r"##.*Overview"),
-                ("Core Patterns", r"##.*(?:Core )?Patterns?"),
-                ("Article I Examples", r"##.*Article I"),
-                ("MCP Integration", r"##.*MCP"),
-            ]
-        else:
-            # Claude Code skills: Original required sections
-            required_sections = [
-                ("Version", r"(?:Version|version).*\d+\.\d+\.\d+"),
-                ("Last Updated", r"Last Updated"),
-                ("Dependencies", r"Dependencies"),
-                ("Quick Start", r"##.*Quick Start"),
-                ("Standard Workflows", r"##.*(?:Standard )?Workflows?"),
-                ("Troubleshooting", r"##.*Troubleshooting"),
-                ("Reference Documentation", r"##.*Reference Documentation"),
-                ("Constitutional Compliance", r"##.*Constitutional Compliance"),
-                ("Version History", r"##.*Version History"),
-            ]
-
-        for section_name, pattern in required_sections:
-            if re.search(pattern, content, re.IGNORECASE):
-                details.append(f"[OK] {section_name} section present")
-            else:
-                # Only warn for Agent OS (some sections optional)
-                if self.is_agent_os:
-                    details.append(f"[WARN] {section_name} section recommended")
-                else:
-                    issues.append(f"[FAIL] Missing section: {section_name}")
-
-        # Check semantic versioning (Skills only)
-        if not self.is_agent_os:
-            version_match = re.search(r'[Vv]ersion.*?(\d+\.\d+\.\d+)', content)
-            if version_match:
-                details.append(f"[OK] Semantic versioning: {version_match.group(1)}")
-            else:
-                issues.append("[FAIL] Version not in semantic format (X.Y.Z)")
-
-        # Determine status
-        if issues:
-            self.results.append(ValidationResult(
-                article="Article VIII",
-                status="FAIL",
-                message="Documentation standards incomplete",
-                details=issues + details
-            ))
-        else:
-            self.results.append(ValidationResult(
-                article="Article VIII",
-                status="PASS",
-                message="Documentation standards compliant",
-                details=details
-            ))
-
-    def validate_article_ix(self) -> None:
-        """
-        Article IX: Agent Versioning and Naming Conventions
-
-        Not applicable to skills (agents only)
-        """
-        self.results.append(ValidationResult(
-            article="Article IX",
-            status="SKIP",
-            message="Not applicable (skills use directory structure)",
-            details=["Article IX applies to agents, not skills"]
-        ))
-
-    def generate_report(self, output_path: Optional[Path] = None) -> str:
-        """
-        Generate detailed compliance report in markdown format.
-
-        Args:
-            output_path: Path to save report (optional)
-
-        Returns:
-            Report content as string
-        """
-        report = []
-        report.append(f"# Constitutional Compliance Report: {self.skill_name}\n")
-        report.append(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        report.append(f"**Skill Path:** {self.skill_dir.absolute()}\n")
-        report.append("\n---\n\n")
-
-        # Summary
-        passed = [r for r in self.results if r.status == "PASS"]
-        failed = [r for r in self.results if r.status == "FAIL"]
-        warned = [r for r in self.results if r.status == "WARN"]
-        skipped = [r for r in self.results if r.status == "SKIP"]
-
-        report.append("## Summary\n\n")
-        report.append(f"- **PASS:** {len(passed)}\n")
-        report.append(f"- **FAIL:** {len(failed)}\n")
-        report.append(f"- **WARN:** {len(warned)}\n")
-        report.append(f"- **SKIP:** {len(skipped)}\n")
-        report.append(f"\n**Overall Status:** {'[OK] PASS' if len(failed) == 0 else '[FAIL] FAIL'}\n\n")
-        report.append("---\n\n")
-
-        # Detailed results
-        report.append("## Detailed Results\n\n")
-        for result in self.results:
-            status_icon = {
-                "PASS": "[OK]",
-                "FAIL": "[FAIL]",
-                "WARN": "[WARN]",
-                "SKIP": "[SKIP]"
-            }.get(result.status, "?")
-
-            report.append(f"### {result.article}: {status_icon} {result.status}\n\n")
-            report.append(f"**Result:** {result.message}\n\n")
-            if result.details:
-                report.append("**Details:**\n")
-                for detail in result.details:
-                    report.append(f"- {detail}\n")
-            report.append("\n---\n\n")
-
-        report_content = "".join(report)
-
-        # Save to file if requested
-        if output_path:
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(output_path, 'w', encoding='utf-8') as f:
-                f.write(report_content)
-
-        return report_content
-
-    def print_summary(self) -> None:
-        """Print human-readable summary to console."""
-        import sys
-        # Fix Windows console encoding for emojis
-        if sys.platform == 'win32':
-            try:
-                sys.stdout.reconfigure(encoding='utf-8')
-            except:
-                pass
-        
-        entity_type = "Agent OS Standard" if self.is_agent_os else "Skill"
-        print(f"\n[Constitutional Compliance Report: {self.skill_name} ({entity_type})]\n")
-
-        for result in self.results:
-            status_icon = {
-                "PASS": "[OK]",
-                "FAIL": "[FAIL]",
-                "WARN": "[WARN]",
-                "SKIP": "[SKIP]"
-            }.get(result.status, "?")
-
-            print(f"{result.article}: {status_icon} {result.status}")
-            print(f"  {result.message}")
-
-            # Print first 3 details
-            for detail in result.details[:3]:
-                print(f"  {detail}")
-            if len(result.details) > 3:
-                print(f"  ... and {len(result.details) - 3} more")
-            print()
-
-        # Overall summary
-        passed = [r for r in self.results if r.status == "PASS"]
-        failed = [r for r in self.results if r.status == "FAIL"]
-        warned = [r for r in self.results if r.status == "WARN"]
-        automated = len([r for r in self.results if r.status != "SKIP"])
-        manual = len([r for r in self.results if r.status == "SKIP" and "Manual" in r.message])
-
-        overall = "[OK] PASS" if len(failed) == 0 else "[FAIL] FAIL"
-        print(f"Overall: {overall} ({len(passed)}/{automated} automated checks")
-        if manual > 0:
-            print(f"         {manual} manual verification(s) needed)")
-        else:
-            print(")")
-
-
-def main() -> int:
-    """
-    Main entry point for skill and Agent OS standard validation.
-
-    Returns:
-        Exit code (0 = success, 1 = failure)
-    """
-    parser = argparse.ArgumentParser(
-        description="Validate VFX Agent Skill or Agent OS standard constitutional compliance",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-    # Validate Claude Code skill
-    python validate_skill.py unreal-vfx-automation
-
-    # Validate Agent OS standard
-    python validate_skill.py unreal-engine-standards --agent-os
-
-    # Generate detailed report
-    python validate_skill.py unreal-vfx-automation --report
-
-    # Validate all Agent OS standards
-    python validate_skill.py blender-standards --agent-os --report
-        """
-    )
-
-    parser.add_argument("name", help="Skill or standard name to validate")
-    parser.add_argument("--report", action="store_true",
-                        help="Generate detailed markdown report")
-    parser.add_argument("--agent-os", action="store_true",
-                        help="Validate Agent OS standard instead of Claude Code skill")
-    parser.add_argument("--skills-path", type=Path,
-                        help="Path to .claude/skills or agent-os standards directory (auto-detect if not provided)")
-
-    args = parser.parse_args()
-
-    # Create validator
-    validator = SkillValidator(args.name, args.skills_path, is_agent_os=args.agent_os)
-
-    # Run validation
-    success = validator.validate_all()
-
-    # Print summary
-    validator.print_summary()
-
-    # Generate report if requested
-    if args.report:
-        # Determine report path
-        script_dir = Path(__file__).parent.absolute()
-        reports_dir = script_dir.parent.parent.parent.parent / "ClaudeCode" / "development" / "reports"
-        
-        if args.agent_os:
-            report_path = reports_dir / f"AGENT_OS_{args.name}_COMPLIANCE_REPORT.md"
-        else:
-            report_path = reports_dir / f"{args.name}_COMPLIANCE_REPORT.md"
-
-        validator.generate_report(report_path)
-        print(f"\nDetailed report saved to: {report_path.absolute()}")
-
-    return 0 if success else 1
+            res.ok("description length %d chars" % len(desc))
+        if re.match(r"(?i)(this skill|i can|i will|use this skill)\b", desc):
+            res.warn("description should open with what it does, third person - not 'This skill...'")
+        if not re.search(r"(?i)\buse (when|for|before|after|to)\b", desc + " " + wtu):
+            res.warn("description has no 'Use when ...' clause")
+
+    name = data.get("name")
+    if name is not None:
+        if not isinstance(name, str) or not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", name) or len(name) > 64:
+            res.fail("name '%s' must be kebab-case, max 64 chars" % name)
+        elif name != skill_md.parent.name:
+            res.warn("name '%s' differs from folder '%s'" % (name, skill_md.parent.name))
+    meta = data.get("metadata")
+    if meta is not None and not isinstance(meta, dict):
+        res.fail("metadata must be a mapping")
+    return data, body
+
+
+def check_body(body, res):
+    n = len(body)
+    if n > BODY_LINE_LIMIT:
+        res.warn("SKILL.md body is %d lines, over %d - move detail to reference/*.md" % (n, BODY_LINE_LIMIT))
+    else:
+        res.ok("body %d lines (limit %d)" % (n, BODY_LINE_LIMIT))
+    fills = sum(1 for line in body if re.match(r"\s*(?:[-*]|\d+\.)\s+FILL:", line))
+    if fills:
+        res.warn("%d unfilled 'FILL:' placeholder line(s) from create_skill.py" % fills)
+
+
+def check_files(skill_dir, res):
+    for ref in sorted(skill_dir.glob("reference*/*.md")):
+        text = ref.read_text(encoding="utf-8", errors="replace")
+        if text.count("\n") > 100 and not TOC_HINT.search(text):
+            res.warn("%s is over 100 lines with no table of contents" % ref.relative_to(skill_dir))
+    for f in sorted(skill_dir.rglob("*")):
+        if not f.is_file() or "__pycache__" in f.parts:
+            continue
+        if f.suffix.lower() not in (".py", ".ps1", ".sh", ".bat", ".cmd", ".nk", ".json", ".yaml", ".yml"):
+            continue
+        b = f.read_bytes()
+        rel = f.relative_to(skill_dir)
+        if b and max(b) > 127:
+            res.fail("%s has non-ASCII bytes" % rel)
+        if any(c < 32 and c not in (9, 10, 13) for c in b):
+            res.fail("%s has control bytes (an escape-eaten path?)" % rel)
+        if f.suffix.lower() in (".py", ".ps1", ".sh"):
+            for no, line in enumerate(b.decode("ascii", errors="replace").splitlines(), 1):
+                s = line.strip()
+                if s.startswith("#") or not ABS_PATH.search(s):
+                    continue
+                res.warn("%s:%d absolute path - parameterise it (Article I)" % (rel, no))
+                break
+
+
+def validate(skill_md):
+    res = Result()
+    _data, body = check_frontmatter(skill_md, res)
+    check_body(body, res)
+    check_files(skill_md.parent, res)
+    return res
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Validate a skill against SKILL_AND_AGENT_STANDARD.md")
+    ap.add_argument("skill", help="skill name, skill folder, or SKILL.md path")
+    ap.add_argument("--skills-path", default=str(Path(__file__).resolve().parents[2]),
+                    help="folder holding skills, used when a bare name is given")
+    args = ap.parse_args()
+
+    skill_md = resolve_skill(args.skill, args.skills_path)
+    if skill_md is None:
+        print("[FAIL] skill not found: %s (looked for a folder with SKILL.md, then %s/<name>)"
+              % (args.skill, args.skills_path))
+        print("Overall: FAIL (nothing was checked)")
+        return 1
+
+    print("Validating %s" % skill_md)
+    res = validate(skill_md)
+    for m in res.oks:
+        print("  [OK]   " + m)
+    for m in res.warns:
+        print("  [WARN] " + m)
+    for m in res.fails:
+        print("  [FAIL] " + m)
+    verdict = "FAIL" if res.fails else "PASS"
+    print("Overall: %s (%d fail, %d warn, %d ok)" % (verdict, len(res.fails), len(res.warns), len(res.oks)))
+    return 1 if res.fails else 0
 
 
 if __name__ == "__main__":

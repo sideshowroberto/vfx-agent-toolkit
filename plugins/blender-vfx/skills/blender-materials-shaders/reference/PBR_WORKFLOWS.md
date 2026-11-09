@@ -1082,7 +1082,6 @@ links.new(mix_ao.outputs['Result'], bsdf.inputs['Base Color'])
 ## Cross-References
 
 **Related Skills:**
-- `blender-specialist` - Main Blender coordination agent
 - `blender-rendering` - EEVEE_NEXT/Cycles render settings
 - `blender-api-compatibility` - Breaking changes database
 

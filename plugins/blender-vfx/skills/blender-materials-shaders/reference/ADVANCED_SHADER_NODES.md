@@ -667,7 +667,7 @@ import bpy
 
 engine = bpy.context.scene.render.engine
 
-if engine == 'BLENDER_EEVEE_NEXT':
+if engine == 'BLENDER_EEVEE':
     print("EEVEE_NEXT: Real-time, screen-space effects")
 elif engine == 'CYCLES':
     print("Cycles: Ray-traced, physically accurate")
@@ -710,10 +710,10 @@ mat.shadow_method = 'OPAQUE'  # Faster shadow rendering
 
 # Scene settings
 scene = bpy.context.scene
-scene.render.engine = 'BLENDER_EEVEE_NEXT'
+scene.render.engine = 'BLENDER_EEVEE'
 scene.eevee.use_ssr = True  # Screen-space reflections
 scene.eevee.use_ssr_refraction = True  # Screen-space refraction
-scene.eevee.use_gtao = True  # Ground-truth AO (better quality)
+# (use_gtao does not exist in 5.1; AO comes from ray tracing / Fast GI)  # Ground-truth AO (better quality)
 """
 ```
 
@@ -773,7 +773,7 @@ links.new(bsdf.outputs['BSDF'], output.inputs['Surface'])
 
 # Engine-specific scene setup (run separately)
 engine = bpy.context.scene.render.engine
-if engine == 'BLENDER_EEVEE_NEXT':
+if engine == 'BLENDER_EEVEE':
     # Enable SSR for reflections
     bpy.context.scene.eevee.use_ssr = True
 elif engine == 'CYCLES':

@@ -1,430 +1,103 @@
 ---
 name: skill-creation-update
-description: Creates, validates and versions VFX Agent Skills against the skill constitution using template scripts (create_skill, validate_skill, test_skill). Use when creating or updating a skill, checking compliance, or bumping a skill version.
-allowed-tools: Read,Write,Edit
+description: "Writes, updates and validates Claude Code skills (SKILL.md) to the house standard - one-line YAML description, no retired top-level keys, traps-first body under 500 lines, retirement outside .claude/. Use when creating a skill, fixing or migrating an old-format one, or checking skills before a sync."
+when_to_use: Triggers on "write a skill", "new skill", "update this skill", "fix the frontmatter", "validate the skill", "migrate SKILL.md", "retire a skill".
+metadata:
+  version: 2.0.0
+  updated: 2026-11-09
 ---
 
 # skill-creation-update
 
-**Skill Version:** 1.3.2
-**Last Updated:** 2026-10-30
-**Dependencies:** Python 3.12+, VFX_SKILL_CONSTITUTION.md (v2.0.0+)
-**Status:** Production-ready
+The rules live in `ClaudeCode/development/SKILL_AND_AGENT_STANDARD.md` (it supersedes the
+frontmatter and archiving articles of the constitution). This skill is the traps that keep
+getting missed plus the scripts that enforce them. Script paths below are relative to this
+skill's folder (`<skill-dir>`).
 
----
+## Traps (read first)
 
-## Quick Start
+1. **A folded or multi-line description breaks harnesses.** `description: >`, `>-`, `|`, or a
+   description that wraps onto an indented next line. YAML parses all of these, so a parse
+   check passes them; OpenCode drops the skill and Claude Code can list it with an empty
+   description. In the 2026-11-09 eval BOTH arms (with and without this skill) kept a folded
+   description while updating an old skill (case sk2). When you update a skill, rewrite the
+   description line itself - moving the other keys is not enough. One line; double-quote it.
+2. **No top-level `version`, `last_updated`, `status`, `triggers`, `tags`, `author`.** Claude Code
+   ignores them. The retired agent-creation-update kept them and scored worse than no skill.
+   Bookkeeping goes under `metadata:` (or git history); trigger phrases go in `when_to_use`.
+   Do not add "Skill Version / Last Updated" header lines or a Version History section to the
+   body either - git is the history.
+3. **An unquoted `: ` inside a value is a YAML error, and a skill that fails to parse is dropped
+   silently** (observation 440: two agents vanished from the list). Quote the value.
+4. **No `<` or `>` in description or when_to_use** - they render as `&lt;`. Write `[name]`.
+5. **Retiring = moving the folder out of `.claude/`** to `archive/skills/<name>/`. A folder named
+   `archive` inside `.claude/skills` is still scanned. To hide a skill without retiring it, use
+   `skillOverrides` (standard, section 5). Confirm in a fresh session's listing, not the folder.
+6. **A validator that examined nothing has not passed.** `validate_skill.py` takes a name or a
+   path and exits 1 when it finds no skill; read the exit code, not just the last line.
+7. `model` / `effort` are valid skill fields (the old "model causes a 404" rule is retired); use
+   them only for a deliberate reason.
 
-### Create New Skill
+## Create a skill
+
 ```bash
-python .claude\skills\skill-creation-update\scripts\create_skill.py houdini-hda-export \
-  --description "Export Houdini Digital Assets for Unreal Engine" \
-  --triggers "hda export,houdini to unreal" \
-  --dependencies "Houdini 20+,UE 5.5+" \
-  --model sonnet
+python <skill-dir>/scripts/create_skill.py my-skill \
+  --description "Does X for Y. Use when Z." --when-to-use "Triggers on 'phrase'." \
+  [--paths "**/*.nk"] [--manual] [--reference] [--scripts] [--skills-path DIR] [--dry-run]
 ```
 
-### Validate Skill Compliance
+It writes a quoted one-line description, `metadata:` bookkeeping and a traps-first skeleton,
+then runs the validator. Replace every `FILL:` line (the validator warns while any remain).
+Content rules (standard, section 3): first clause says what it does, second says when; third
+person; 150-400 chars. Body: hard rules and the mandatory first step in the first ~40 lines;
+only what Claude does not already know; detail in `reference/*.md`, linked one level deep,
+with a table of contents on any reference file over 100 lines.
+
+## Update or migrate an existing skill
+
+1. `python <skill-dir>/scripts/update_skill.py NAME --migrate --dry-run`, then without
+   `--dry-run`. It moves retired and undocumented top-level keys under `metadata:` (triggers
+   into `when_to_use`), joins a folded description onto one line, leaves the body byte-exact,
+   and re-validates. It drops frontmatter comments (it says so).
+2. Read the frontmatter back, then rewrite the description wording yourself - the script only
+   joins lines; it does not front-load "what" before "when".
+3. Move critical rules into the first screen; cut tutorial content the model already knows.
+4. Version: `update_skill.py NAME --version X.Y.Z` sets `metadata.version` and `updated`.
+   A skill that ships in a plugin also needs that plugin's version bumped in the registry -
+   the operator's step in the sync workflow, not this script's.
+
+## Validate
+
 ```bash
-# Validate Claude Code skill
-python .claude\skills\skill-creation-update\scripts\validate_skill.py unreal-vfx-automation
-# Output: Article I: [OK] PASS, Article III: [OK] PASS (470 lines), Overall: [OK] PASS
-
-# Validate Agent OS standard
-python .claude\skills\skill-creation-update\scripts\validate_skill.py unreal-engine-standards --agent-os
-# Output: Agent OS Headers: [OK] PASS, Article III: [OK] PASS (414 lines), Overall: [OK] PASS
+python <skill-dir>/scripts/validate_skill.py NAME_OR_PATH     # one skill, exit 1 on FAIL
+python <skill-dir>/scripts/batch_validate.py [--quiet]        # every skill + archive folders
+python <skill-dir>/scripts/selftest_validate.py               # after changing any script here
 ```
 
-### Test with Multiple Targets (Article I)
-```bash
-python .claude\skills\skill-creation-update\scripts\test_skill.py unreal-vfx-automation \
-  --targets Shot001,Shot002,Shot003
-# Output: 3/3 passed [OK], Article I: [OK] VALIDATED
-```
-
-### Update Skill Version
-```bash
-python .claude\skills\skill-creation-update\scripts\update_skill.py unreal-vfx-automation \
-  --version 1.1.0 \
-  --changes "Added Sequencer integration"
-# Output: [OK] Updated to 1.1.0, [OK] Compliance maintained
-```
-
----
-
-## Standard Workflows
-
-### Workflow 1: Create New Skill from Template
-
-**Steps:**
-1. **Plan scope:** Identify repeatable workflow, verify 3+ projects can use it
-2. **Run create_skill.py:**
-   ```bash
-   python .claude\skills\skill-creation-update\scripts\create_skill.py SKILL_NAME \
-     --description "What + When + Triggers (Article VIII)" \
-     --triggers "trigger1,trigger2,trigger3" \
-     --dependencies "Required software" \
-     --model sonnet
-   ```
-3. **Verify structure:**
-   ```bash
-   ls .claude/skills/SKILL_NAME/
-   # Expected: SKILL.md, reference/, scripts/
-   ```
-4. **Fill SKILL.md sections:** Quick Start, Workflows (3-5), Troubleshooting (4-5 issues)
-5. **Create reference docs:** Move detailed content to `reference/*.md`
-6. **Validate line count:**
-   ```bash
-   wc -l .claude/skills/SKILL_NAME/SKILL.md
-   # Must be <500 lines
-   ```
-
-**Output:** Complete skill directory with template populated
-
----
-
-### Workflow 2: Validate Constitutional Compliance
-
-**Steps:**
-1. **Run validate_skill.py:**
-   ```bash
-   python .claude\skills\skill-creation-update\scripts\validate_skill.py SKILL_NAME
-   ```
-   **Pass the skill NAME, never a path.** Given a path it cannot find the
-   skill and still prints `[OK] PASS (0/0 automated checks)` - a vacuous
-   pass (2026-08-22). Article VIII is a LITERAL check, not drift: it needs a
-   Version line, "Last Updated", "Dependencies" and `##` headings for Quick
-   Start, Workflows, Troubleshooting, Reference Documentation, Constitutional
-   Compliance and Version History. A current-style skill that fails only
-   Article VIII is usually missing three headings - add them (obs 198; list
-   and the checklist for scripts that fetch remote content in
-   `reference/validation_checks.md`).
-2. **Review report:**
-   - Article I: No hard-coded paths detected [OK]
-   - Article III: 470 lines <500 [OK]
-   - Article IV: Independent testing documented [OK]
-   - Article VI: 70% context reduction [OK]
-   - Article VIII: All sections present [OK]
-   - **Bundled scripts (manual, not in the validator yet):** every flag shown in a
-     SKILL.md example (`python <skill-dir>/scripts/X.py --flag`) must appear in
-     that script's `--help`. Run the help and diff against the doc. A documented
-     flag argparse rejects is doc drift: qwen-delegate shipped a phantom `--file`
-     and a dead default port for weeks because nobody ran the script from the doc
-     (observation #4, 2026-09-01).
-   - **Shipped defaults (manual, principle 9):** grep the skill's `scripts/` for
-     drive letters, usernames and version-pinned install paths inside DEFAULTS
-     blocks and module constants:
-     `grep -nE "[A-Za-z]:[/\]|Users|[0-9]+[.][0-9]+ ?v[0-9]" scripts/*.py`.
-     Every hit moves to a config file the workflow passes explicitly (layered,
-     repeatable) or to an argument, and the run must PRINT the effective value
-     so a wrong one is read back instead of trusted. A default baked into a
-     shipped script is always somebody's personal path on somebody else's
-     machine: nuke-shot-setup shipped a dead personal OCIO path and Nuke 15 as
-     built-in defaults (observation #9, 2026-09-08).
-   - **Scripts that fetch remote content (manual, obs 199):** plan by default, `--go`
-     plus a recorded approver, no overwrite, source record, hostile-archive test
-     against a local fake API - see `reference/validation_checks.md`.
-   - **Scripts that walk a share or folder tree at run time (manual, principle 10):**
-     a shipped script that enumerates a share or folder tree bypasses the agent's
-     drive-policy hook, because the hook sees only the command line (which names
-     no drive), not what the launched program opens. The script must apply the
-     policy itself: allowlisted roots or the policy's folder pattern checked
-     before it opens anything, and named folders opened directly instead of
-     listing the root. Review every contributed script package against a hostile
-     fixture - a folder it must not read (holding a marker line that must never
-     appear in the output), a misnamed file, a character outside cp1252 - not
-     against the author's examples. One such fixture caught all three faults in
-     a roll-up script that the author's own examples had passed (observation
-     #131, 2026-10-05).
-3. **Address failures:**
-   - Article I: Remove hard-coded paths, add params
-   - Article III: Move details to reference docs
-   - Article VIII: Add missing sections
-4. **Re-validate:** Run validate_skill.py again until [OK] PASS
-5. **Generate report:**
-   ```bash
-   python .claude\skills\skill-creation-update\scripts\validate_skill.py SKILL_NAME --report
-   # Saves to: ClaudeCode/development/reports/SKILL_NAME_COMPLIANCE_REPORT.md
-   ```
-
-**Output:** Compliance report with pass/fail per article
-
----
-
-### Workflow 3: Test with Multiple Projects (Article I)
-
-**Steps:**
-1. **Identify 3+ test targets:** Different projects/assets (e.g., Shot001, Shot002, Shot003)
-2. **Run test_skill.py:**
-   ```bash
-   python .claude\skills\skill-creation-update\scripts\test_skill.py SKILL_NAME \
-     --targets target1,target2,target3
-   ```
-3. **Review results:**
-   - Test 1/3: target1 [OK] PASS (487ms)
-   - Test 2/3: target2 [OK] PASS (502ms)
-   - Test 3/3: target3 [OK] PASS (495ms)
-   - Article I: [OK] VALIDATED
-4. **Address failures:** Fix script bugs if any target fails
-5. **Document testing:** Add to Constitutional Compliance section
-
-**Output:** Test report with 100% pass rate, Article I validation
-
----
-
-### Workflow 4: Update Existing Skill
-
-**Steps:**
-1. **Determine version increment:**
-   - MAJOR (X.0.0): Breaking changes
-   - MINOR (x.Y.0): New features (backward compatible)
-   - PATCH (x.y.Z): Bug fixes
-2. **Run update_skill.py:**
-   ```bash
-   # Minor update
-   python .claude\skills\skill-creation-update\scripts\update_skill.py SKILL_NAME \
-     --version 1.1.0 \
-     --changes "Added feature X"
-
-   # Major update (breaking)
-   python .claude\skills\skill-creation-update\scripts\update_skill.py SKILL_NAME \
-     --version 2.0.0 \
-     --changes "BREAKING: Removed UE 4.27 support" \
-     --breaking
-   ```
-3. **Review changelog entry:**
-   ```markdown
-   **v1.1.0** (2025-10-26) - Feature Update
-   - Added: Feature X
-   - Fixed: Bug Y
-   ```
-4. **Re-validate:** Automatic compliance check during update
-5. **Test updated skill:** Re-run test_skill.py to verify
-
-**Output:** Version incremented, changelog added, compliance maintained
-
----
-
-## Troubleshooting
-
-### Issue 1: "Skill Already Exists"
-
-**Symptom:** `[FAIL] Error: Skill 'skill-name' already exists`
-
-**Fix:**
-```bash
-# Option 1: Delete and recreate
-rm -rf .claude/skills/skill-name
-python .claude\skills\skill-creation-update\scripts\create_skill.py skill-name ...
-
-# Option 2: Use update instead
-python .claude\skills\skill-creation-update\scripts\update_skill.py skill-name --version 1.1.0
-```
-
----
-
-### Issue 2: "SKILL.md >500 Lines"
-
-**Symptom:** `Article III: [FAIL] FAIL - SKILL.md: 547 lines (>500 limit)`
-
-**Fix:**
-1. **Identify verbose sections:**
-   ```bash
-   grep -n "^## " .claude/skills/SKILL_NAME/SKILL.md
-   ```
-2. **Move detailed content to reference:**
-   - Troubleshooting too long (200 lines)? -> Move to `reference/troubleshooting_guide.md`, keep 4-5 issues (50 lines)
-   - Workflows too detailed (300 lines)? -> Move to `reference/detailed_workflow.md`, keep summaries (150 lines)
-3. **Add references:**
-   ```markdown
-   **For complete troubleshooting:** See reference/troubleshooting_guide.md
-   ```
-4. **Re-validate:**
-   ```bash
-   python .claude\skills\skill-creation-update\scripts\validate_skill.py SKILL_NAME
-   # Should show: Article III: [OK] PASS
-   ```
-
----
-
-### Issue 3: "Hard-Coded Paths Detected"
-
-**Symptom:** `Article I: [FAIL] FAIL - Hard-coded paths in scripts/export.py`
-
-**Fix:**
-```python
-# [FAIL] WRONG
-project_path = "C:\\Users\\Me\\UnrealProjects\\MyProject"
-
-# [OK] CORRECT: Parameterized
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument("--project-path", required=True)
-args = parser.parse_args()
-project_path = args.project_path
-
-# [OK] CORRECT: Relative
-import os
-script_dir = os.path.dirname(__file__)
-project_path = os.path.join(script_dir, "..", "..", "Projects", "MyProject")
-
-# [OK] CORRECT: Environment variable
-project_path = os.getenv("UNREAL_PROJECT_PATH", "DefaultPath")
-```
-
----
-
-### Issue 4: "No Script Found" (Test Fails)
-
-**Symptom:** `[FAIL] Error: No executable script found in scripts/`
-
-**Fix:**
-- **Documentation-only skills:** Skip test_skill.py (not applicable)
-- **MCP-based skills:** Create test wrapper:
-  ```python
-  # scripts/test_wrapper.py
-  import sys
-  from mcp import client
-
-  def test(target):
-      result = client.call_tool("tool_name", {"target": target})
-      return result["success"]
-
-  if __name__ == "__main__":
-      sys.exit(0 if test(sys.argv[1]) else 1)
-  ```
-- **Validation scripts:**
-  ```python
-  # scripts/validate.py
-  import sys, os
-
-  skill_md = os.path.join(os.path.dirname(__file__), "..", "SKILL.md")
-  if not os.path.exists(skill_md):
-      print("[FAIL] SKILL.md not found")
-      sys.exit(1)
-
-  with open(skill_md) as f:
-      if len(f.readlines()) > 500:
-          print("[FAIL] SKILL.md >500 lines")
-          sys.exit(1)
-
-  print("[OK] Valid")
-  sys.exit(0)
-  ```
-
----
-
-## Reference Documentation
-
-### Detailed Guides
-
-**skill_template_guide.md** - Template structure, placeholders, best practices
-**constitutional_validation.md** - Validation logic, regex patterns, edge cases
-
-### Python Scripts
-
-**create_skill.py** - Create new skill from template (CLI, template copying)
-**validate_skill.py** - Validate constitutional compliance (9 articles)
-**test_skill.py** - Test with multiple targets (Article I validation)
-**update_skill.py** - Update version and changelog (SemVer)
-
-**Detailed workflow documentation:** See `reference/skill_template_guide.md`
-
----
-
-## Constitutional Compliance
-
-### Article I: General Purpose Scripts [OK]
-- create_skill.py works for ALL skill types (tested: vfx-documentation, unreal-vfx-automation, agent-creation-update)
-- validate_skill.py validates ANY skill (no hard-coded skill names)
-- test_skill.py tests ANY skill with scripts
-- No per-skill script generation
-
-### Article II: MCP vs Direct [OK]
-- Complex workflows -> Direct Python scripts (not MCP tools)
-- Multi-step processes (creation, validation, testing)
-- Skill-specific logic (constitutional rules, line counting)
-
-### Article III: Progressive Disclosure [OK]
-- SKILL.md: 465 lines (<500 limit [OK])
-- Margin: 35 lines (7% buffer)
-- Reference docs: 2 files (on-demand loading)
-
-### Article IV: Test Independently [OK]
-- create_skill.py tested with test-skill (deleted after)
-- validate_skill.py tested against all existing skills
-- test_skill.py tested with unreal-vfx-automation
-- update_skill.py tested with version increments
-
-### Article V: Follow Official Patterns [OK]
-- Python argparse (Python standard)
-- JSON output (industry standard)
-- Semantic versioning (SemVer 2.0)
-- Markdown docs (GitHub standard)
-
-### Article VI: Context Efficiency [OK]
-**Context Reduction:**
-```
-Before: VFX_SKILL_CONSTITUTION (862) + VFX_SKILL_TEMPLATE (350) + VFX_AGENT_SKILLS_GUIDE (500) = 1,712 lines (~8,560 tokens)
-After: Metadata (12) + SKILL.md (465) + Reference avg (300) = ~777 lines (3,885 tokens)
-Savings: 73% reduction [OK]
-```
-
-### Article VII: Cross-App Integration [SKIP]
-Not applicable (skill management tool, not cross-app workflow)
-
-### Article VIII: Documentation Standards [OK]
-- [OK] YAML frontmatter (name, description, triggers, model)
-- [OK] Version/Last Updated/Dependencies
-- [OK] Quick Start (4 workflows)
-- [OK] Standard Workflows (4 detailed)
-- [OK] Troubleshooting (4 issues)
-- [OK] Reference Documentation (2 guides)
-- [OK] Constitutional Compliance (applicable articles)
-- [OK] Version History (SemVer)
-- [OK] Description formula: What + When + Triggers
-
-### Article IX: Agent Versioning [SKIP]
-Not applicable (this is a skill, uses directory structure)
-
----
-
-## Version History
-
-**v1.3.2** (2026-10-30) - Validator and fetch-script checks
-- Article VIII is a literal heading check, not drift (obs 198); checklist for
-  scripts that fetch remote content (obs 199); both in `reference/validation_checks.md`
-
-**v1.3.0** (2026-10-09) - Run-time access policy for shipped scripts
-- Workflow 2 checklist: a shipped script that walks a share or folder tree at
-  run time must apply the drive policy itself (the command-text hook cannot see
-  what the program opens); contributed script packages are reviewed against a
-  hostile fixture, not the author's examples (observation #131, principle 10)
-
-**v1.2.0** (2026-09-10) - Catalog-budget and self-containment observations
-- Description rule: put trigger phrases in the FIRST sentence, or keep the
-  description well under the 1024-char cap, because some harnesses (Codex)
-  budget the whole installed catalog and truncate from the end (observation #20)
-- Validation checklist: a skill documents its own scripts as `<skill-dir>/...`,
-  never by an absolute path
-- Validation checklist: run check_skill_self_contained.py plus the team-gate
-  pattern set against every new skill directory regardless of its distribution
-  tier, including internal/workspace-only (observation #19)
-
-**v1.1.0** (2025-12-03) - Agent OS Integration
-- Added Agent OS standards validation support
-- New `--agent-os` flag for validate_skill.py
-- Constitutional header validation (YAML frontmatter)
-- Context efficiency tracking for standards files
-- Line count flexibility for complex standards (400-550 lines)
-- Fixed Windows console encoding for Unicode emojis
-- All 5 VFX standards validated successfully
-
-**v1.0.0** (2025-10-25) - Initial Release
-- create_skill.py: Automated skill creation from template
-- validate_skill.py: Constitutional compliance validation (9 articles)
-- test_skill.py: Multi-target testing for Article I
-- update_skill.py: Semantic versioning and changelog
-- Reference docs: Template guide, validation guide
-- 73% context reduction vs manual process
-- Full constitutional compliance (8/8 applicable articles)
+FAIL: missing skill, no or unparseable frontmatter, multi-line description or when_to_use,
+retired or undocumented top-level keys, `<`/`>` in description, over the 1,536-char listing
+cap, non-ASCII or control bytes in shipped scripts. WARN: body over 500 lines, description
+over 400 chars or not front-loaded, name differs from folder, long reference without a TOC,
+absolute paths in scripts, unfilled `FILL:` lines.
+
+The validator is necessary, not sufficient. The manual checks (documented flags vs `--help`,
+shipped defaults, scripts that download or walk a share, the self-containment check) are in
+`reference/validation_checks.md`. The full release checklist is the standard's section 8.
+
+## Prove the skill helps
+
+A general-know-how skill must beat a no-skill baseline before it is kept (standard, section
+7: `claude plugin eval`, with and without, read the WITH vs W/OUT table). Read section 7
+before building cases - it records the traps (MCP ablation, `--runs`, pinned `--model`). Both
+arms passing means the skill is not what made it pass: cut it down to the house knowledge.
+
+## Scripts
+
+| Script | Does |
+|---|---|
+| `scripts/create_skill.py` | scaffold a skill in the standard format, then validate |
+| `scripts/update_skill.py` | `--migrate` old frontmatter, `--version` bump under metadata |
+| `scripts/validate_skill.py` | one skill against the standard (exit 0 / 1, 2 = no PyYAML) |
+| `scripts/batch_validate.py` | all skills in a folder, plus archive folders that still load |
+| `scripts/selftest_validate.py` | two-way test: clean skills pass, folded descriptions and retired keys fail |
+| `scripts/test_skill.py` | optional smoke test: run a skill's main script against 3+ targets |

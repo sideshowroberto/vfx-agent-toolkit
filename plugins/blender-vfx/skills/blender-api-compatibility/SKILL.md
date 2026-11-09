@@ -41,28 +41,28 @@ All changes below are tested and confirmed. The Blender MCP has full context, so
 import bpy
 
 # Quick test: check current render engine
-print(bpy.context.scene.render.engine)  # Should print BLENDER_EEVEE_NEXT or CYCLES
+print(bpy.context.scene.render.engine)  # Should print BLENDER_EEVEE or CYCLES
 ```
 
 ---
 
 ## STANDARD WORKFLOWS
 
-### Workflow 1: EEVEE -> EEVEE_NEXT Migration
+### Workflow 1: EEVEE engine id (measured on 5.1.2)
 
 **Use When:** Code references BLENDER_EEVEE or old EEVEE properties
 
 ```python
 import bpy
 
-# [FAIL] REMOVED in 4.5.0+
-# bpy.context.scene.render.engine = 'BLENDER_EEVEE'
+# Measured on Blender 5.1.2: render.engine enum = ['BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES'].
+# 'BLENDER_EEVEE_NEXT' is NOT a member (TypeError). 4.2-4.4 used BLENDER_EEVEE_NEXT; 5.0+ renamed it back.
 # scene.eevee.use_bloom = True
 # scene.eevee.use_ssr = True
 # scene.eevee.use_motion_blur = True
 
-# [OK] Render engine
-bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT'
+# [OK] Render engine (5.x)
+bpy.context.scene.render.engine = 'BLENDER_EEVEE'
 
 # [OK] Bloom -> Compositor Glare node
 scene = bpy.context.scene
@@ -244,7 +244,7 @@ def detect_blender_capabilities():
     # Test EEVEE_NEXT
     try:
         current = bpy.context.scene.render.engine
-        bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT'
+        bpy.context.scene.render.engine = 'BLENDER_EEVEE'
         caps['has_eevee_next'] = True
         bpy.context.scene.render.engine = current
     except Exception:
@@ -277,8 +277,8 @@ import bpy
 
 def set_render_engine_safe(preference):
     engine_map = {
-        'EEVEE': 'BLENDER_EEVEE_NEXT',
-        'BLENDER_EEVEE': 'BLENDER_EEVEE_NEXT',
+        'EEVEE': 'BLENDER_EEVEE',
+        'BLENDER_EEVEE': 'BLENDER_EEVEE',
         'CYCLES': 'CYCLES',
         'WORKBENCH': 'BLENDER_WORKBENCH',
     }
@@ -296,8 +296,8 @@ def set_render_engine_safe(preference):
 
 ### "BLENDER_EEVEE" ValueError
 
-**Cause:** BLENDER_EEVEE completely removed in 4.5.0
-**Fix:** `bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT'`
+**Cause:** n/a on 5.1 - BLENDER_EEVEE is the ONLY EEVEE id; the error appears for BLENDER_EEVEE_NEXT
+**Fix:** `bpy.context.scene.render.engine = 'BLENDER_EEVEE'`
 
 ---
 
@@ -332,7 +332,7 @@ def set_render_engine_safe(preference):
 ## COMPLETE BREAKING CHANGES REFERENCE (4.2 -> 5.1)
 
 ### Render Engine
-1. `BLENDER_EEVEE` -> `BLENDER_EEVEE_NEXT` (complete removal in 4.5.0)
+1. `BLENDER_EEVEE` -> `BLENDER_EEVEE` (complete removal in 4.5.0)
 2. `scene.eevee.use_bloom` -> Compositor Glare node (`FOG_GLOW`)
 3. `scene.eevee.use_ssr` -> `scene.eevee.use_raytracing`
 4. `scene.eevee.use_motion_blur` -> `scene.render.use_motion_blur`
@@ -379,7 +379,7 @@ def set_render_engine_safe(preference):
 
 ## VALIDATION CHECKLIST
 
-- [ ] No `BLENDER_EEVEE` references (use `BLENDER_EEVEE_NEXT`)
+- [ ] No `BLENDER_EEVEE` references (use `BLENDER_EEVEE`)
 - [ ] No `GEOMETRY_NODES` modifier type (use `NODES`)
 - [ ] No `CompositorNodeColorRamp` (use `ShaderNodeValToRGB`)
 - [ ] No `CompositorNodeComposite` (removed in 5.1)

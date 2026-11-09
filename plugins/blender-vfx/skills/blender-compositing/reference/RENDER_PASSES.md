@@ -414,7 +414,7 @@ if old_render_layers:
     new_render_layers.location = location
 
 # Check if pass is supported by render engine
-if scene.render.engine == 'BLENDER_EEVEE_NEXT':
+if scene.render.engine == 'BLENDER_EEVEE':
     # EEVEE_NEXT doesn't support all Cycles passes
     print("Note: Some Cycles passes unavailable in EEVEE")
 ```

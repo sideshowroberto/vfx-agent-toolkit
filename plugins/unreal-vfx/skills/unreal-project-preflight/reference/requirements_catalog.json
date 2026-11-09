@@ -60,7 +60,8 @@
         "The Nanite Foliage (Experimental) project setting is r.Nanite.Foliage under RendererSettings - restart after enabling.",
         "GrowerPresets are recipes, not meshes: bake via the PVE Output node (Skeletal Mesh + Nanite) in the UI. The ProceduralVegetation asset graph is not scriptable.",
         "Place at scale with the PCG Skinned Mesh Spawner; the classic Foliage painter cannot take skeletal meshes.",
-        "Known 5.7/5.8 bugs: PCG-spawned skinned instances have no collision; PVE meshes reported to crash PACKAGED builds (editor + MRQ fine); MRQ ObjectId does not capture InstancedSkinnedMesh instances (use the custom-stencil matte workaround)."
+        "Known 5.7/5.8 bugs: PCG-spawned skinned instances have no collision; PVE meshes reported to crash PACKAGED builds (editor + MRQ fine); MRQ ObjectId does not capture InstancedSkinnedMesh instances.",
+        "OPTIONAL workaround, NOT a requirement - never list it in a requirements answer or Step 0 unless the plan asks for mattes of PCG skinned instances: a custom-depth stencil matte (r.CustomDepth stencil setting + per-component stencil flags)."
       ]
     },
     "nanite": {
@@ -124,7 +125,10 @@
     "mrq-cryptomatte": {
       "summary": "MRQ ObjectId / cryptomatte pass",
       "requires": ["plugin:MoviePipelineMaskRenderPass", "plugin:MovieRenderPipeline"],
-      "notes": ["ObjectId does NOT capture InstancedSkinnedMeshComponent instances (PCG skinned spawners) - use the custom-depth stencil matte workaround."]
+      "notes": [
+        "ObjectId does NOT capture InstancedSkinnedMeshComponent instances (PCG skinned spawners).",
+        "OPTIONAL workaround, NOT a requirement - never list it in a requirements answer or Step 0 unless the plan asks for mattes of PCG skinned instances: a custom-depth stencil matte (r.CustomDepth stencil setting + per-component stencil flags)."
+      ]
     },
     "ocio": {
       "summary": "OpenColorIO colour management in MRQ / viewport",
@@ -133,7 +137,7 @@
     "imageplate": {
       "summary": "ImagePlate actors for foreground / background plates",
       "requires": ["plugin:ImagePlate"],
-      "notes": ["Experimental and OFF by default - the unreal-sequencer-automation and unreal-vfx-automation skills both need it."]
+      "notes": ["Experimental and OFF by default - ImagePlate actors and the unreal-sequencer-automation plate trap need it; without it, build a MediaTexture card instead."]
     },
     "sequencer-python": {
       "summary": "Level Sequence scripting from Python",

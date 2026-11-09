@@ -18,7 +18,7 @@ allowed-tools: Read,Write
 import bpy
 
 # 1. EEVEE engine renamed (complete removal)
-bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT'  # Not 'BLENDER_EEVEE'
+bpy.context.scene.render.engine = 'BLENDER_EEVEE'  # Not 'BLENDER_EEVEE'
 
 # 2. Bloom removed from EEVEE - use Compositor Glare node
 # scene.eevee.use_bloom = True  <- AttributeError in 4.5.3+
@@ -82,13 +82,12 @@ cycles.samples = 128
 import bpy
 
 scene = bpy.context.scene
-scene.render.engine = 'BLENDER_EEVEE_NEXT'
+scene.render.engine = 'BLENDER_EEVEE'
 
 # Quality settings
 eevee = scene.eevee
 eevee.taa_render_samples = 64     # Render quality
 eevee.taa_samples = 16            # Viewport preview quality
-eevee.use_gtao = True             # Ambient occlusion
 eevee.use_raytracing = True       # Ray-traced reflections (replaces SSR)
 
 # Output settings
@@ -261,7 +260,7 @@ print("Bloom via Compositor Glare configured")
 
 ```python
 import bpy
-bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT'   # Fixed
+bpy.context.scene.render.engine = 'BLENDER_EEVEE'   # Fixed
 ```
 
 ### KeyError on Principled BSDF Inputs
@@ -299,7 +298,7 @@ print(f"Output path: {scene.render.filepath}")
 
 ## VALIDATION CHECKLIST
 
-- [ ] Correct engine set (`BLENDER_EEVEE_NEXT` or `CYCLES`)
+- [ ] Correct engine set (`BLENDER_EEVEE` or `CYCLES`)
 - [ ] No legacy `BLENDER_EEVEE` or `use_bloom`/`use_ssr` references
 - [ ] Principled BSDF inputs use 4.5+ naming
 - [ ] Output path configured

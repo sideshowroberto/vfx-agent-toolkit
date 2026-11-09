@@ -1,354 +1,60 @@
 ---
 name: unreal-sequencer-automation
-description: Automates Level Sequences in Unreal Engine 5.8 via Python - tracks, keyframes, camera cuts, transform animation, ImagePlate plates. Use when creating a sequence, adding tracks, setting keyframes or camera cuts, or setting up foreground plates in Sequencer.
+description: Verified UE 5.8 Sequencer Python traps - add_key(FrameNumber(n)) keys DISPLAY-rate frame n (not ticks), get_channel_by_name does not exist, section.cast raises TypeError, cut cameras compare by guid, reads over MCP need a scrub first, ImagePlate is off by default. Use when keying channels, adding camera cuts, animating a camera property, or reading a Level Sequence back.
 allowed-tools: mcp__ue58-mcp__execute_python_code,mcp__ue58-mcp__call_tool
+metadata:
+  version: 4.0.0
+  updated: 2026-11-09
 ---
 
-# Unreal Sequencer Automation
-
-**Version:** 3.1.1
-**Last Updated:** 2026-10-09
-**Dependencies:** Unreal Engine 5.8+, UE 5.8 native MCP (HTTP, port 8000)
-**Major Updates:** UE 5.8 migration, camera cuts, channel initialization, ImagePlate 100%
-
-> **Preflight first (2026-09-08):** before the first build step of any approved plan, run the `unreal-project-preflight` skill (`ue_preflight.py --live --features <list> --plan-block`) so plugins and project settings this skill depends on are enabled in ONE restart. Mid-task "class not found / plugin not enabled" errors go back to that Step 0, never to a runtime toggle.
-
----
-
-## CRITICAL DISCOVERIES
-
-### 1. Camera Cut Tracks - SOLVED
-**The API that doesn't exist:** `add_camera_cut_track()` - Use generic `add_track()` instead!
-
-### 2. Transform Channels - SOLVED
-**Empty channels are NORMAL!** Channels don't exist until you add the first keyframe.
-
-### 3. ImagePlate Python API - DISCOVERED
-**BREAKING:** ImagePlate DOES have Python API (`get_plate()`, `set_image_plate()`)
-
----
-
-## QUICK START: Complete Animated Sequence
-
-```python
-# Via mcp__ue58-mcp__execute_python_code
-import unreal
-
-# 1. Create Level Sequence
-factory = unreal.LevelSequenceFactoryNew()
-asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
-
-sequence = asset_tools.create_asset(
-    asset_name="LS_MyAnimation",
-    package_path="/Game/Cinematics",
-    asset_class=unreal.LevelSequence,
-    factory=factory
-)
-
-# 2. Get actor using modern API (not deprecated EditorLevelLibrary)
-world = unreal.EditorLevelLibrary.get_editor_world()
-actors = unreal.GameplayStatics.get_all_actors_of_class(world, unreal.StaticMeshActor)
-actor = actors[0]
-
-# 3. Add actor as possessable
-binding = unreal.MovieSceneSequenceExtensions.add_possessable(sequence, actor)
-
-# 4. Add transform track
-track = binding.add_track(unreal.MovieScene3DTransformTrack)
-
-# 5. Add section
-section = track.add_section()
-section.set_range(0, 300)
-
-# 6. CRITICAL: Initialize channels by adding first key!
-# Channels don't exist until you do this
-location_z_channel = unreal.MovieSceneSectionExtensions.get_channel_by_name(
-    section,
-    "Location.Z"
-)
-location_z_channel.add_key(unreal.FrameNumber(0), 0.0)
-
-# 7. Add remaining keyframes
-location_z_channel.add_key(unreal.FrameNumber(150), 500.0)
-location_z_channel.add_key(unreal.FrameNumber(300), 0.0)
-
-print(f"Created sequence with {location_z_channel.get_num_keys()} keyframes!")
-```
-
----
-
-## CAMERA CUT TRACKS
-
-### The Correct API Pattern
-
-```python
-import unreal
-
-def create_camera_cut(sequence, camera_binding, start_frame, end_frame):
-    """
-    Creates camera cut track and section.
-    IMPORTANT: Use generic add_track(), NOT add_camera_cut_track() (doesn't exist!)
-    """
-    # Add camera cut track using GENERIC add_track method
-    camera_cut_track = unreal.MovieSceneSequenceExtensions.add_track(
-        sequence,
-        unreal.MovieSceneCameraCutTrack
-    )
-
-    # Add section to track
-    section = unreal.MovieSceneTrackExtensions.add_section(camera_cut_track)
-
-    # Cast to correct section type
-    camera_cut_section = section.cast(unreal.MovieSceneCameraCutSection)
-
-    # Get camera binding ID
-    camera_binding_id = unreal.MovieSceneSequenceExtensions.get_binding_id(
-        sequence,
-        camera_binding
-    )
-
-    # Configure the cut
-    camera_cut_section.set_camera_binding_id(camera_binding_id)
-    camera_cut_section.set_range(start_frame, end_frame)
-
-    return camera_cut_section
-```
-
-### Multi-Camera Cuts Example
-
-```python
-def setup_multi_camera_sequence(sequence, cameras_with_ranges):
-    """
-    Creates camera cuts for multiple cameras.
-    cameras_with_ranges: List of (camera_binding, start, end) tuples
-    """
-    camera_cut_track = unreal.MovieSceneSequenceExtensions.add_track(
-        sequence,
-        unreal.MovieSceneCameraCutTrack
-    )
-
-    for camera_binding, start, end in cameras_with_ranges:
-        section = unreal.MovieSceneTrackExtensions.add_section(camera_cut_track)
-        camera_cut_section = section.cast(unreal.MovieSceneCameraCutSection)
-
-        camera_id = unreal.MovieSceneSequenceExtensions.get_binding_id(
-            sequence, camera_binding
-        )
-
-        camera_cut_section.set_camera_binding_id(camera_id)
-        camera_cut_section.set_range(start, end)
-
-    return camera_cut_track
-```
-
----
-
-## TRANSFORM CHANNEL INITIALIZATION
-
-### The Problem: Empty Channels
-
-```python
-section = track.add_section()
-channels = unreal.MovieSceneSectionExtensions.get_channels_by_type(
-    section,
-    unreal.MovieSceneScriptingFloatChannel
-)
-print(len(channels))  # Prints: 0 - channels don't exist yet!
-```
-
-### The Solution: Lazy Initialization
-
-**Channels don't exist until you add the first keyframe!**
-
-```python
-def initialize_transform_channels(transform_section):
-    location_x = unreal.MovieSceneSectionExtensions.get_channel_by_name(
-        transform_section, "Location.X"
-    )
-    # Add first key - THIS CREATES ALL 9 CHANNELS!
-    location_x.add_key(unreal.FrameNumber(0), 0.0)
-
-    all_channels = unreal.MovieSceneSectionExtensions.get_all_channels(
-        transform_section
-    )
-    print(len(all_channels))  # Prints: 9
-    return transform_section
-```
-
-### Channel Naming Convention
-
-Transform sections have 9 float channels:
-
-**Location:** `Location.X`, `Location.Y`, `Location.Z`
-**Rotation:** `Rotation.X`, `Rotation.Y`, `Rotation.Z`
-**Scale:** `Scale.X`, `Scale.Y`, `Scale.Z`
-
-### Complete Transform Animation
-
-```python
-def animate_transform(section, component, axis, keyframes):
-    channel_name = f"{component}.{axis}"
-    channel = unreal.MovieSceneSectionExtensions.get_channel_by_name(
-        section, channel_name
-    )
-
-    for frame, value in keyframes:
-        channel.add_key(
-            time=unreal.FrameNumber(frame),
-            new_value=value,
-            interpolation=unreal.MovieSceneKeyInterpolation.AUTO
-        )
-
-    return channel.get_num_keys()
-
-# Example: Bouncing animation
-keyframes = [
-    (0, 0.0), (75, 500.0), (150, 0.0), (225, 300.0), (300, 0.0)
-]
-animate_transform(section, "Location", "Z", keyframes)
-```
-
----
-
-## IMAGEPLATE AUTOMATION (VFX WORKFLOWS)
-
-**For complete foreground plate setup, use `unreal-vfx-automation` skill.**
-
-### Integrated Workflow
-
-**Step 1: Create Assets (VFX Automation Skill)**
-```python
-# Via mcp__ue58-mcp__execute_python_code - run ForegroundPlateSetup script
-# See unreal-vfx-automation skill for full details
-```
-
-**Step 2: Add to Sequence (This Skill)**
-```python
-import unreal
-
-sequence = unreal.load_asset('/Game/Sequences/Shot001_Sequence')
-
-# Get camera actor created by VFX automation
-world = unreal.EditorLevelLibrary.get_editor_world()
-cameras = unreal.GameplayStatics.get_all_actors_of_class(world, unreal.CineCameraActor)
-camera = [c for c in cameras if "Shot001" in c.get_actor_label()][0]
-
-# Add to sequence
-binding = unreal.MovieSceneSequenceExtensions.add_possessable(sequence, camera)
-
-# Add transform track for animation
-track = binding.add_track(unreal.MovieScene3DTransformTrack)
-section = track.add_section()
-section.set_range(0, 300)
-
-animate_transform(section, "Location", "Z", [(0, 0.0), (150, 500.0), (300, 0.0)])
-```
-
----
-
-## MEDIA TRACKS
-
-### Pattern: Generic add_track() + Property Access
-
-```python
-import unreal
-
-def add_media_to_sequence(sequence, media_source_path, start_frame=0, end_frame=240):
-    media_track = unreal.MovieSceneSequenceExtensions.add_track(
-        sequence,
-        unreal.MovieSceneMediaTrack
-    )
-
-    section = unreal.MovieSceneTrackExtensions.add_section(media_track)
-    media_section = section.cast(unreal.MovieSceneMediaSection)
-
-    media_section.media_source = unreal.load_asset(media_source_path)
-    media_section.start_frame_offset = unreal.FrameNumber(0)
-    media_section.set_range(
-        unreal.FrameNumber(start_frame),
-        unreal.FrameNumber(end_frame)
-    )
-
-    return media_section
-```
-
-**Complete API:** See `reference/media_track_api.md`
-
----
-
-## READ-BACK RECIPE (over MCP)
-
-Reading a sequence back through the editor bridge fails silently: a read before
-the first evaluation, a list that skips transient actors and a screenshot that
-waits for a redraw all return "nothing", not an error. Verify the product (the
-bound object, the file) after every step, never the call's return. Full recipe
-with code: `reference/mcp_readback_recipe.md`.
-
-- **Binding IDs:** `LevelSequenceEditorBlueprintLibrary.get_bound_objects`
-  rejects the binding proxy ("Cannot nativize MovieSceneBindingProxy") - pass
-  `seq.get_binding_id(binding)`.
-- **Scrub first:** open the sequence and `set_current_time(frame)` BEFORE
-  listing cameras; a spawnable camera only exists after the first scrub, so an
-  earlier "cameras: []" is not a broken shot.
-- **Spawnables** are not in `get_all_level_actors()`; at the scrubbed time use
-  `unreal.GameplayStatics.get_all_actors_of_class(world, unreal.Actor)` and
-  filter by class.
-- **MCP calls time out at about 30 s** while the script keeps running: batch
-  work into short calls, treat a timeout as "read the state back", not as a
-  failure.
-- **A viewport screenshot may never draw** (it writes on the next redraw): call
-  `unreal.EditorLevelLibrary.editor_invalidate_viewports()`, then verify the
-  image file exists AND has content. Many stills: run the job loop inside the
-  editor on a slate post-tick callback (reference file).
-
----
-
-## TROUBLESHOOTING
-
-**Empty Channels:** Add first key to any channel (lazy initialization)
-**Camera Cut Track:** Use add_track(sequence, MovieSceneCameraCutTrack)
-**Deprecated API:** Use GameplayStatics.get_all_actors_of_class
-
----
-
-## VALIDATION CHECKLIST
-
-**After creating sequence:** Check sequence exists, bindings added, tracks/sections created, first keyframe added (initializes channels), camera cuts/ImagePlate configured (if needed), playback works
-
----
-
-## Reference Documentation
-
-- Complete API: `reference/`
-- Media Tracks: `reference/media_track_api.md`
-- Read-back over MCP: `reference/mcp_readback_recipe.md`
-- Code Examples: `examples/examples.md`
-
----
-
-## Constitutional Compliance
-
-**Article I:** General-purpose scripts (no hardcoded paths)
-**Article III:** SKILL.md under 500 lines
-**Article IV:** Independent testing (verify_sequence.py)
-**Article VI:** Progressive disclosure (3 reference files)
-
----
-
-## VERSION HISTORY
-
-**v3.1.0** (2026-10-09) - Observation 140: read-back recipe over MCP (binding
-ids, scrub before listing cameras, spawnables via GameplayStatics, ~30 s call
-timeout, screenshots that need a viewport redraw, in-editor batch loop);
-summary section in SKILL.md, full recipe in `reference/mcp_readback_recipe.md`.
-
-**v3.0.0** (2026-07-06) - UE 5.8 Migration
-- Migrated from community MCP to UE 5.8 native MCP (HTTP, port 8000)
-- Updated allowed-tools to mcp__ue58-mcp__execute_python_code + call_tool
-- Removed all references to old unreal-mcp server
-- Updated VFX workflow to use direct Python via execute_python_code
-
-**v2.2.0** (2025-11-20) - ImagePlate Integration & 100% Coverage
-**v2.1.0** (2025-11-20) - Media Track API Added
-**v2.0.0** (2025-11-20) - Major API Corrections (camera cuts, channel init)
-**v1.0.0** (2025-11-17) - Initial Discovery
+# Unreal Sequencer Automation - traps
+
+Traps 1-5 measured in UE 5.8.0 (editor probes + unreal-round2 eval 2026-11-08, unreal-round3 seq3 2026-11-09;
+ClaudeCode/evals/unreal-round3/ANALYSIS.md). Trap 6 is the obs 140 production read-back lesson; trap 7 is
+from the round-3 vfx2 runs. Step 0 for any approved plan: `unreal-project-preflight`.
+
+1. **Channel keys are in DISPLAY-rate frames, not ticks.** Wrong: `ch.add_key(unreal.FrameNumber(48*1000), 85.0)`
+   assuming tick resolution - the key reads back at display frame 48000 (the one round-3 seq3 miss). The
+   same run then "verified" it by dividing the read-back by the tick resolution, so the check agreed with the
+   bug. Right: `ch.add_key(unreal.FrameNumber(48), 85.0)` after `seq.set_display_rate(unreal.FrameRate(24, 1))`.
+   Verified route for a camera property (CurrentFocalLength 35 -> 85, both with-skills runs passed):
+   `b = seq.add_possessable(cam)`; `cb = seq.add_possessable(cam.get_cine_camera_component())`;
+   `t = cb.add_track(unreal.MovieSceneFloatTrack)`; `t.set_property_name_and_path("CurrentFocalLength",
+   "CurrentFocalLength")`; `s = t.add_section(); s.set_range(0, 48)`; `ch = s.get_all_channels()[0]`.
+   Verify: `[(k.get_time().frame_number.value, k.get_value()) for k in ch.get_keys()]` reads `(48, 85.0)` - take
+   that number as the display frame, never rescale it.
+
+2. **`MovieSceneSectionExtensions.get_channel_by_name` does not exist.** Right:
+   `[c for c in unreal.MovieSceneSectionExtensions.get_all_channels(section) if str(c.channel_name) == "Location.Z"][0]`.
+   Channels are NOT created lazily: a fresh transform section already reports all 9 (Location/Rotation/Scale
+   .X/.Y/.Z) before any key - no "first key initialises the channels" step is needed. Verify:
+   `len(get_all_channels(section)) == 9` on a transform section.
+
+3. **`section.cast(unreal.MovieSceneCameraCutSection)` raises TypeError.** Right: `ct =
+   seq.add_track(unreal.MovieSceneCameraCutTrack)`; the section from `ct.add_section()` already has
+   `set_camera_binding_id(seq.get_binding_id(binding))` and `set_range(start, end)`. Bind the cut to the
+   camera ACTOR binding, not the component binding. Verify with trap 4.
+
+4. **`str()` of a Guid prints an empty struct.** Compare a cut's camera by
+   `section.get_camera_binding_id().get_editor_property("guid").export_text()` against
+   `binding.get_id().export_text()`. Verify: the matching binding's display name is the camera's label.
+
+5. **`LevelSequenceEditorBlueprintLibrary.get_bound_objects(binding)` rejects the binding proxy** ("Cannot
+   nativize MovieSceneBindingProxy"). Right: pass `seq.get_binding_id(binding)`.
+
+6. **Read-backs over MCP fail as "nothing", not as an error** (obs 140, production). Open the sequence and
+   `set_current_time(frame)` BEFORE listing cameras - a spawnable exists only after the first scrub, so an
+   earlier "cameras: []" is not a broken shot. Spawnables are not in `get_all_level_actors()`; after the scrub
+   use `unreal.GameplayStatics.get_all_actors_of_class(world, unreal.Actor)` and filter by class. MCP calls
+   time out at ~30 s while the script keeps running - read the state back, do not re-run. A viewport
+   screenshot writes on the next redraw: call `unreal.EditorLevelLibrary.editor_invalidate_viewports()` and
+   check the file has content. Code and the in-editor batch loop: `reference/mcp_readback_recipe.md`.
+
+7. **ImagePlate is an Experimental plugin, off by default** (preflight feature `imageplate`). In the round-3
+   test project it was disabled: `hasattr(unreal, "ImagePlate")` False and
+   `unreal.PluginBlueprintLibrary.is_plugin_mounted("ImagePlate")` False. Do not enable it at runtime - go back
+   to preflight, or build the verified fallback card: `ImgMediaSource` (`sequence_path` +
+   `frame_rate_override`) -> `MediaPlayer` -> `MediaTexture` (`media_player`) -> Material with
+   `shading_model = MSM_UNLIT`, TextureSample (`sampler_type = SAMPLERTYPE_EXTERNAL`) RGB -> Emissive, on a
+   plane scaled to the plate aspect. Verify: `get_material_property_input_node(m, MP_EMISSIVE_COLOR)` is the
+   TextureSample holding the MediaTexture, and report ImagePlate as unavailable rather than faking it.

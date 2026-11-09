@@ -14,7 +14,10 @@ allowed-tools: Read,Write
 
 ## Animation System Status (5.1+)
 
-**All core animation APIs are stable - no breaking changes from 4.x to 5.1.**
+**Breaking change in 5.0+: `action.fcurves` no longer exists (slotted/layered actions).** Read F-curves with
+`cb = act.layers[0].strips[0].channelbag(act.slots[0]); cb.fcurves` (measured on 5.1.2: AttributeError on `act.fcurves`,
+`hasattr(act, 'fcurves')` is False). `keyframe_insert` and `fcurve.evaluate(frame)` are unchanged.
+Helper: `def fcurves(ob): a = ob.animation_data.action; return [fc for l in a.layers for st in l.strips for s in a.slots for fc in (st.channelbag(s).fcurves if st.channelbag(s) else [])]`
 
 Validated: `obj.keyframe_insert()`, F-curve access, armature creation, constraints, shape keys, drivers, NLA system.
 
@@ -56,7 +59,7 @@ scene.frame_set(100)
 obj.location = (5, 5, 0)
 obj.keyframe_insert(data_path="location", frame=100)
 
-print(f"Created animation with {len(obj.animation_data.action.fcurves)} F-curves")
+print(f"Created animation with {len(fcurves(obj))} F-curves")
 ```
 
 ---
@@ -201,12 +204,12 @@ import bpy
 
 # Safe access pattern
 if obj.animation_data and obj.animation_data.action:
-    fcurves = obj.animation_data.action.fcurves
-    for fc in fcurves:
+    fcurves_list = fcurves(obj)
+    for fc in fcurves_list:
         print(f"{fc.data_path}[{fc.array_index}]: {len(fc.keyframe_points)} keyframes")
 
 # Insert keyframe point directly
-fcurve = obj.animation_data.action.fcurves[0]
+fcurve = fcurves(obj)[0]
 point = fcurve.keyframe_points.insert(frame=25, value=2.5)
 point.interpolation = 'BEZIER'  # or 'LINEAR', 'CONSTANT'
 ```
@@ -244,7 +247,7 @@ if hasattr(obj, "location"):
 
 # Check animation data was created
 if obj.animation_data and obj.animation_data.action:
-    print(f"F-curves: {len(obj.animation_data.action.fcurves)}")
+    print(f"F-curves: {len(fcurves(obj))}")
 else:
     print("No animation data - keyframe_insert may have failed")
 ```
@@ -275,7 +278,7 @@ for c in pose_bone.constraints:
 ## VALIDATION CHECKLIST
 
 - [ ] Animation data exists (`obj.animation_data is not None`)
-- [ ] F-curves created (`len(action.fcurves) > 0`)
+- [ ] F-curves created (`len(fcurves(obj)) > 0`)
 - [ ] Frame range set (`scene.frame_start`, `frame_end`)
 - [ ] Keyframes at expected frames
 - [ ] Constraints have valid targets

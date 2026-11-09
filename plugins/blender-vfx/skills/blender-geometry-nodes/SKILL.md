@@ -23,6 +23,15 @@ modifier = obj.modifiers.new("GeometryNodes", type='NODES')
 
 `bpy.ops` works normally via the Blender MCP - use direct data API for explicit control, operators when convenient.
 
+
+**Interface first (measured on 5.1.2):** `bpy.data.node_groups.new(..., 'GeometryNodeTree')` has an EMPTY interface. Linking
+from `NodeGroupInput.outputs[0]` then does nothing and the modifier silently evaluates to NOTHING (0 instances, no error). Create the sockets first:
+```python
+ng.interface.new_socket('Geometry', in_out='INPUT', socket_type='NodeSocketGeometry')
+ng.interface.new_socket('Geometry', in_out='OUTPUT', socket_type='NodeSocketGeometry')
+```
+Also: an object in a collection EXCLUDED from the view layer evaluates WITHOUT its modifiers (count 0) - un-exclude it to measure.
+
 ---
 
 ## QUICK START

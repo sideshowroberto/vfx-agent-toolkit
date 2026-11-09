@@ -113,9 +113,10 @@ import bpy
 
 # [OK] Use Compositor Glare node
 glare = comp_tree.nodes.new('CompositorNodeGlare')
-glare.glare_type = 'FOG_GLOW'
-glare.threshold = 0.8
-glare.size = 8
+# 5.1: Glare settings are INPUT SOCKETS, not node properties (glare.glare_type / .threshold do not exist)
+glare.inputs['Type'].default_value = 'Fog Glow'   # string value; also 'Streaks', 'Bloom', 'Ghosts' (all verified settable on 5.1.2, plus 'Simple Star', 'Sun Beams')
+glare.inputs['Threshold'].default_value = 0.8
+glare.inputs['Size'].default_value = 0.5   # 5.1 default 0.5, a 0-1 factor
 ```
 
 ---

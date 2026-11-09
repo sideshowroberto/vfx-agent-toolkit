@@ -385,7 +385,7 @@ def benchmark_engines(scene_name, samples_cycles=128, samples_eevee=64):
     results['cycles_samples'] = samples_cycles
 
     # Test EEVEE_NEXT
-    scene.render.engine = 'BLENDER_EEVEE_NEXT'
+    scene.render.engine = 'BLENDER_EEVEE'
     scene.eevee.taa_render_samples = samples_eevee
     results['eevee_samples'] = samples_eevee
 
