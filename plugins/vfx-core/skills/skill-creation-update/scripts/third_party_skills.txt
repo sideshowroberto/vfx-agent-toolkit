@@ -1,0 +1,6 @@
+# Vendored third-party skills: frontmatter is upstream's, so retired / undocumented
+# top-level keys WARN instead of FAIL (Claude Code ignores unknown keys). Loading
+# breakers (YAML errors, multi-line description, '<' '>', listing length) still FAIL.
+# One folder name or fnmatch pattern per line. ASCII only.
+krea-*
+seedance-*

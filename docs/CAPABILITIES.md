@@ -6,7 +6,7 @@ GENERATED 2026-11-09 by `ClaudeCode/scripts/gen_capabilities.py` from plugins/re
 
 ## Skills, by plugin
 
-### vfx-core (v2.11.0, public)
+### vfx-core (v2.11.1, public)
 
 Foundation package - install first. Cross-application skills and agents: search, documentation, testing, Python, planning, skill/agent creation, git safety guardrails, and session wrap-up. Registers core MCP servers (brave-search, context7, desktop-commander).
 
@@ -56,7 +56,7 @@ Requires: vfx-core
 - **houdini-solaris-usd** [scripts] - Verified traps for Solaris, Karma and USD export in Houdini: how light and camera values land on the stage, time samples, instance proxies, loose points, GeomSubsets, savestyle. Use when authoring or checking a LOP stage, Karma lights, or a USD export.
 - **houdini-vex-programming** - Verified Houdini VEX traps for wrangles - find() return value, deferred set*attrib writes, empty group patterns, nearpoints self-hits, stale chs() after spare parms, bare globals from Python. Use when writing or debugging a wrangle whose result looks wrong with a clean cook.
 
-### unreal-vfx (v2.3.0, public)
+### unreal-vfx (v2.4.0, public)
 
 Unreal Engine 5.8 VFX pipeline via the native UE MCP (ModelContextProtocol plugin + VibeUE toolsets): Blueprint automation, PCG, actor operations, Sequencer, Python scripting.
 
@@ -67,8 +67,6 @@ Requires: vfx-core
 - **unreal-pcg-automation** - Verified UE 5.8 PCG Python traps - add_edge with a wrong pin label adds no edge and raises nothing, pin.label is protected (read it via properties), mesh entries ARE settable but descriptor needs get_editor_property, count instances on the volume ISM. Use when wiring PCG graph nodes, setting Static Mesh Spawner meshes, or checking what a PCG graph generated.
 - **unreal-project-preflight** [scripts] - Checks and batch-fixes the Unreal project prerequisites a plan needs (plugins, project settings, editor config) as Step 0 before building. Use once an Unreal plan is approved, before MegaPlants, PCG, MRQ or ImagePlate work, or when a class, node or plugin is missing.
 - **unreal-sequencer-automation** - Verified UE 5.8 Sequencer Python traps - add_key(FrameNumber(n)) keys DISPLAY-rate frame n (not ticks), get_channel_by_name does not exist, section.cast raises TypeError, cut cameras compare by guid, reads over MCP need a scrub first, ImagePlate is off by default. Use when keying channels, adding camera cuts, animating a camera property, or reading a Level Sequence back.
-- **agent: unreal-blueprint-specialist** - Expert in automating Unreal Engine Blueprint creation and compilation using Silent Execution pattern
-- **agent: unreal-pcg-specialist** - Expert in Unreal Engine PCG system for procedural terrain, vegetation, and asset placement with Python automation
 
 ### blender-vfx (v2.1.0, public)
 

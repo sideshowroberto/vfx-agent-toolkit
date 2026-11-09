@@ -43,6 +43,31 @@ RETIRED_KEYS = {
     "dependencies": "state dependencies in the body or metadata",
     "author": "move to metadata.author",
 }
+# Vendored third-party skills (names or fnmatch patterns, one per line, '#' comments) in
+# third_party_skills.txt next to this script. Their frontmatter belongs upstream, and Claude
+# Code ignores unknown keys, so retired / undocumented keys WARN instead of FAIL for them.
+# Everything that actually breaks loading (YAML, multi-line description, '<' '>', length)
+# still FAILs.
+THIRD_PARTY_FILE = Path(__file__).resolve().parent / "third_party_skills.txt"
+
+
+def load_third_party(path=THIRD_PARTY_FILE):
+    if not path.is_file():
+        return []
+    pats = []
+    for line in path.read_text(encoding="ascii", errors="replace").splitlines():
+        line = line.split("#", 1)[0].strip()
+        if line:
+            pats.append(line)
+    return pats
+
+
+def is_third_party(folder_name, patterns=None):
+    from fnmatch import fnmatchcase
+    pats = load_third_party() if patterns is None else patterns
+    return any(fnmatchcase(folder_name, p) for p in pats)
+
+
 SINGLE_LINE_KEYS = ("description", "when_to_use")
 BODY_LINE_LIMIT = 500
 DESC_SOFT_LIMIT = 400
@@ -146,11 +171,17 @@ def check_frontmatter(skill_md, res):
         return None, body
     res.ok("frontmatter parses as YAML")
 
+    vendored = is_third_party(skill_md.parent.name)
+    if vendored:
+        res.ok("third-party skill (third_party_skills.txt): key issues are WARN, fix upstream")
     for key in data:
         if key in RETIRED_KEYS:
-            res.fail("retired top-level key '%s' - %s" % (key, RETIRED_KEYS[key]))
+            msg = "retired top-level key '%s' - %s" % (key, RETIRED_KEYS[key])
         elif key not in ALLOWED_KEYS:
-            res.fail("undocumented top-level key '%s' - custom data goes under metadata:" % key)
+            msg = "undocumented top-level key '%s' - custom data goes under metadata:" % key
+        else:
+            continue
+        (res.warn if vendored else res.fail)(msg + (" (third-party: ignored by Claude Code)" if vendored else ""))
 
     desc = data.get("description")
     if not isinstance(desc, str) or not desc.strip():

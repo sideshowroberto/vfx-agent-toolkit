@@ -119,6 +119,18 @@ def main():
         cases.append(("non-ASCII script", 1, "non-ASCII bytes") + run("validate_skill.py", d))
         d = skill(r, "angle", "name: angle\ndescription: Exports [x] for <shot>. Use when x.\n")
         cases.append(("'<' in description", 1, "contains '<' or '>'") + run("validate_skill.py", d))
+
+        # ---- third-party list (third_party_skills.txt has krea-* and seedance-*) ----
+        tagged = "license: MIT\ntags:\n  - camera\nversion: 0.7.6\n"
+        d = skill(r, "seedance-zz-test", good % "seedance-zz-test" + tagged)
+        cases.append(("third-party: tags/version WARN, not FAIL", 0, "(third-party: ignored")
+                     + run("validate_skill.py", d))
+        d = skill(r, "house-zz-test", good % "house-zz-test" + tagged)
+        cases.append(("same keys on a house skill still FAIL", 1, "undocumented top-level key 'tags'")
+                     + run("validate_skill.py", d))
+        d = skill(r, "krea-zz-folded", "name: krea-zz-folded\ndescription: >\n  Makes x. Use when y.\n")
+        cases.append(("third-party folded description still FAILs", 1, "block scalar")
+                     + run("validate_skill.py", d))
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
